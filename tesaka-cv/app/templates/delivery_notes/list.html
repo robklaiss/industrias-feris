@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block title %}Notas de Entrega - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>Notas Internas de Entrega</h2>
+
+<div style="margin-bottom: 1rem;">
+    <a href="/delivery-notes/new" class="btn">➕ Nueva Nota de Entrega</a>
+    <a href="/reports/delivery_notes.xlsx" class="btn btn-success">📊 Excel</a>
+    <a href="/reports/delivery_notes.pdf" class="btn btn-success">📄 PDF</a>
+</div>
+
+<!-- Filtros -->
+<form method="get" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+    <div class="form-row">
+        <div class="form-group">
+            <label>Cliente:</label>
+            <input type="text" name="cliente" value="{{ filters.cliente or '' }}" placeholder="Buscar por cliente">
+        </div>
+        <div class="form-group">
+            <label>ID Contrato:</label>
+            <input type="number" name="contract_id" value="{{ filters.contract_id or '' }}" placeholder="ID de contrato">
+        </div>
+    </div>
+    <button type="submit" class="btn">Filtrar</button>
+    <a href="/delivery-notes" class="btn">Limpiar</a>
+</form>
+
+{% if delivery_notes %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Número Nota</th>
+            <th>Contrato</th>
+            <th>Cliente</th>
+            <th>RUC</th>
+            <th>Dirección Entrega</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for dn in delivery_notes %}
+        <tr>
+            <td>{{ dn.id }}</td>
+            <td>{{ dn.fecha }}</td>
+            <td>{{ dn.numero_nota }}</td>
+            <td>{{ dn.numero_contrato or '-' }}</td>
+            <td>{{ dn.cliente_nombre or '-' }}</td>
+            <td>{{ dn.cliente_ruc or '-' }}</td>
+            <td>{{ dn.direccion_entrega or '-' }}</td>
+            <td>
+                <a href="/delivery-notes/{{ dn.id }}" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Ver</a>
+                <a href="/delivery-notes/{{ dn.id }}/print" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">🖨️</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No se encontraron notas de entrega. <a href="/delivery-notes/new">Crear la primera</a></p>
+{% endif %}
+{% endblock %}
+

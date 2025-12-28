@@ -1,0 +1,141 @@
+{% extends "layout.html" %}
+
+{% block title %}Nueva Orden de Compra - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>Nueva Orden de Compra</h2>
+
+<form method="post" action="/purchase-orders">
+    <div class="form-row">
+        <div class="form-group">
+            <label for="fecha">Fecha *</label>
+            <input type="date" id="fecha" name="fecha" required>
+        </div>
+        <div class="form-group">
+            <label for="numero">Número *</label>
+            <input type="text" id="numero" name="numero" required placeholder="OC-001">
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label for="sync_mode">Modo *</label>
+            <select id="sync_mode" name="sync_mode" required onchange="toggleMode()">
+                <option value="linked">Vinculado (Desde Contrato)</option>
+                <option value="manual">Manual</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="contract_id">Contrato</label>
+            <select id="contract_id" name="contract_id" onchange="loadContractData()">
+                <option value="">Seleccionar contrato...</option>
+                {% for contract in contracts %}
+                <option value="{{ contract.id }}" data-numero="{{ contract.numero_contrato }}">
+                    {{ contract.numero_contrato }} ({{ contract.numero_id or 'Sin ID' }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="client_id">Cliente</label>
+            <select id="client_id" name="client_id">
+                <option value="">Seleccionar cliente...</option>
+                {% for client in clients %}
+                <option value="{{ client.id }}">
+                    {{ client.nombre }} ({{ client.ruc or 'Sin RUC' }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    
+    <h3>Items</h3>
+    <div id="items-container">
+        <div class="item-row" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 0.5rem; margin-bottom: 0.5rem; align-items: end;">
+            <select name="producto" class="product-select" onchange="fillProductData(this)" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                <option value="">Seleccionar producto...</option>
+                {% for product in products %}
+                <option value="{{ product.nombre }}" 
+                        data-unidad="{{ product.unidad_medida }}" 
+                        data-precio="{{ product.precio_base or '' }}">
+                    {{ product.nombre }}{% if product.codigo %} ({{ product.codigo }}){% endif %}
+                </option>
+                {% endfor %}
+            </select>
+            <input type="text" name="unidad_medida" placeholder="Unidad" required readonly style="background: #f5f5f5;">
+            <input type="number" step="0.01" name="cantidad" placeholder="Cantidad" required>
+            <input type="number" step="0.01" name="precio_unitario" placeholder="Precio Unit." required>
+            <button type="button" class="btn btn-danger" onclick="removeItem(this)" style="padding: 0.5rem;">❌</button>
+        </div>
+    </div>
+    
+    <button type="button" class="btn" onclick="addItem()" style="margin-bottom: 1rem;">➕ Agregar Item</button>
+    
+    <div style="margin-top: 2rem;">
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a href="/purchase-orders" class="btn">Cancelar</a>
+    </div>
+</form>
+
+<script>
+function addItem() {
+    const container = document.getElementById('items-container');
+    const newRow = document.createElement('div');
+    newRow.className = 'item-row';
+    newRow.style.cssText = 'display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 0.5rem; margin-bottom: 0.5rem; align-items: end;';
+    
+    const productSelect = container.querySelector('.product-select');
+    const productOptions = productSelect ? productSelect.innerHTML : '<option value="">Seleccionar producto...</option>';
+    
+    newRow.innerHTML = `
+        <select name="producto" class="product-select" onchange="fillProductData(this)" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+            ${productOptions}
+        </select>
+        <input type="text" name="unidad_medida" placeholder="Unidad" required readonly style="background: #f5f5f5;">
+        <input type="number" step="0.01" name="cantidad" placeholder="Cantidad" required>
+        <input type="number" step="0.01" name="precio_unitario" placeholder="Precio Unit." required>
+        <button type="button" class="btn btn-danger" onclick="removeItem(this)" style="padding: 0.5rem;">❌</button>
+    `;
+    container.appendChild(newRow);
+}
+
+function fillProductData(select) {
+    const row = select.closest('.item-row');
+    const unidadInput = row.querySelector('input[name="unidad_medida"]');
+    const precioInput = row.querySelector('input[name="precio_unitario"]');
+    const selectedOption = select.options[select.selectedIndex];
+    
+    if (selectedOption.value) {
+        unidadInput.value = selectedOption.getAttribute('data-unidad') || '';
+        const precioBase = selectedOption.getAttribute('data-precio');
+        if (precioBase && !precioInput.value) {
+            precioInput.value = precioBase;
+        }
+    } else {
+        unidadInput.value = '';
+    }
+}
+
+function removeItem(btn) {
+    const container = document.getElementById('items-container');
+    if (container.children.length > 1) {
+        btn.closest('.item-row').remove();
+    } else {
+        alert('Debe haber al menos un item');
+    }
+}
+
+function toggleMode() {
+    const mode = document.getElementById('sync_mode').value;
+    const contractSelect = document.getElementById('contract_id');
+    // Si es manual, el contrato es opcional
+    // Si es linked, sería mejor requerirlo pero por ahora lo dejamos opcional
+}
+
+function loadContractData() {
+    // Aquí se podría cargar automáticamente los items del contrato
+    // Por ahora lo dejamos manual
+}
+</script>
+{% endblock %}
+

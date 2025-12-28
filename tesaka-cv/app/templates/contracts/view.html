@@ -1,0 +1,100 @@
+{% extends "layout.html" %}
+
+{% block title %}Contrato #{{ contract.id }} - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>Contrato #{{ contract.id }}</h2>
+
+<div style="margin-bottom: 1rem;">
+    <a href="/contracts" class="btn">← Volver a Lista</a>
+    <a href="/contracts/{{ contract.id }}/edit" class="btn">✏️ Editar</a>
+    <a href="/contracts/{{ contract.id }}/print" class="btn">🖨️ Imprimir</a>
+</div>
+
+<h3>Información General</h3>
+<table>
+    <tr>
+        <th>Fecha</th>
+        <td>{{ contract.fecha }}</td>
+    </tr>
+    <tr>
+        <th>Número Contrato</th>
+        <td>{{ contract.numero_contrato }}</td>
+    </tr>
+    {% if contract.numero_id %}
+    <tr>
+        <th>Número ID</th>
+        <td>{{ contract.numero_id }}</td>
+    </tr>
+    {% endif %}
+    {% if contract.tipo_contrato %}
+    <tr>
+        <th>Tipo Contrato</th>
+        <td>{{ contract.tipo_contrato }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <th>Cliente</th>
+        <td>{{ contract.cliente_nombre or '-' }}</td>
+    </tr>
+    {% if contract.cliente_ruc %}
+    <tr>
+        <th>RUC</th>
+        <td>{{ contract.cliente_ruc }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <th>Estado</th>
+        <td>
+            <span style="padding: 0.25rem 0.5rem; border-radius: 3px; 
+                         background: {% if contract.estado == 'vigente' %}#27ae60{% else %}#e74c3c{% endif %}; 
+                         color: white;">
+                {{ contract.estado|title }}
+            </span>
+        </td>
+    </tr>
+</table>
+
+<h3>Productos</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Unidad de Medida</th>
+            <th>Cantidad Total</th>
+            <th>Precio Unitario</th>
+            <th>Precio Total</th>
+            <th>Saldo Disponible</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.producto }}</td>
+            <td>{{ item.unidad_medida }}</td>
+            <td>{{ "%.2f"|format(item.cantidad_total) }}</td>
+            <td>{{ "%.2f"|format(item.precio_unitario) }}</td>
+            <td>{{ "%.2f"|format(item.precio_total) }}</td>
+            <td>
+                <strong>{{ "%.2f"|format(item.saldo_disponible) }}</strong>
+                {% if item.saldo_disponible < item.cantidad_total %}
+                <span style="color: #e74c3c;">⚠️</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="4">Monto Total del Contrato</th>
+            <th colspan="2">{{ "%.2f"|format(monto_total) }}</th>
+        </tr>
+    </tfoot>
+</table>
+
+<div style="margin-top: 2rem;">
+    <h3>Órdenes de Compra Relacionadas</h3>
+    <a href="/purchase-orders?contract_id={{ contract.id }}" class="btn">Ver Órdenes de Compra</a>
+</div>
+{% endblock %}
+

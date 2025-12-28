@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rDE xmlns="http://ekuatia.set.gov.py/sifen/xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+    <dVerFor>150</dVerFor>
+    <DE Id="jF1latpWb4PRF+2Y3GisAsASS6gyC1VQ3fN9NzbdSyo">
+        <dDVId>4</dDVId>
+        <dFecFirma>2025-12-26T19:29:01</dFecFirma>
+        <dSisFact>1</dSisFact>
+        <gOpeDE>
+            <iTipEmi>1</iTipEmi>
+            <dDesTipEmi>Normal</dDesTipEmi>
+            <dCodSeg>TESTCSC123456789012345678901234567890123456</dCodSeg>
+        </gOpeDE>
+        <gTimb>
+            <iTiDE>1</iTiDE>
+            <dDesTiDE>Factura</dDesTiDE>
+            <dNumTim>12345678</dNumTim>
+            <dEst>001</dEst>
+            <dPunExp>001</dPunExp>
+            <dNumDoc>0000001</dNumDoc>
+            <dFeIniT>2025-12-26</dFeIniT>
+        </gTimb>
+        <gDatGralOpe>
+            <dFeEmiDE>2025-12-26T19:29:01</dFeEmiDE>
+            <gEmis>
+                <dRucEm>12345678901</dRucEm>
+                <dDVEmi>0</dDVEmi>
+                <iTipCont>12345678901</iTipCont>
+                <dNomEmi>Contribuyente de Prueba S.A.</dNomEmi>
+                <dDirEmi>Asunción</dDirEmi>
+            </gEmis>
+            <gDatRec>
+                <iNatRec>1</iNatRec>
+                <dNomRec>Cliente de Prueba</dNomRec>
+                <dRucRec>80012345</dRucRec>
+                <dDVRec>7</dDVRec>
+                <dDirRec>Asunción</dDirRec>
+            </gDatRec>
+        </gDatGralOpe>
+        <gDtipDE>
+            <gCamItem>
+                <dCodInt>001</dCodInt>
+                <dParProd>1</dParProd>
+                <dDesProSer>Producto de Prueba</dDesProSer>
+                <dCantProSer>1.00</dCantProSer>
+                <dUniMedProSer>99</dUniMedProSer>
+                <dPreUniProSer>100000</dPreUniProSer>
+                <dTotBruOpeItem>100000</dTotBruOpeItem>
+            </gCamItem>
+        </gDtipDE>
+        <gTotSub>
+            <dSubNoGra>100000</dSubNoGra>
+            <dTotOpe>100000</dTotOpe>
+            <dTotGralOpe>100000</dTotGralOpe>
+            <dLiqTotOpe>100000</dLiqTotOpe>
+        </gTotSub>
+    </DE>
+    <!-- Firma digital omitida para pruebas -->
+    <!-- <ds:Signature>...</ds:Signature> -->
+    <gCamFuFD>
+        <dCarQR>TESTQRCODE12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890</dCarQR>
+    </gCamFuFD>
+</rDE>

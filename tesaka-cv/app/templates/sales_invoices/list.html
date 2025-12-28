@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block title %}Facturas de Venta - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>Facturas de Venta</h2>
+
+<div style="margin-bottom: 1rem;">
+    <a href="/sales-invoices/new" class="btn">➕ Nueva Factura</a>
+    <a href="/reports/sales_invoices.xlsx" class="btn btn-success">📊 Excel</a>
+    <a href="/reports/sales_invoices.pdf" class="btn btn-success">📄 PDF</a>
+</div>
+
+<!-- Filtros -->
+<form method="get" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+    <div class="form-row">
+        <div class="form-group">
+            <label>Cliente:</label>
+            <input type="text" name="cliente" value="{{ filters.cliente or '' }}" placeholder="Buscar por cliente">
+        </div>
+        <div class="form-group">
+            <label>ID Contrato:</label>
+            <input type="number" name="contract_id" value="{{ filters.contract_id or '' }}" placeholder="ID de contrato">
+        </div>
+    </div>
+    <button type="submit" class="btn">Filtrar</button>
+    <a href="/sales-invoices" class="btn">Limpiar</a>
+</form>
+
+{% if sales_invoices %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Número</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>RUC</th>
+            <th>Condición</th>
+            <th>Monto Total</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for invoice in sales_invoices %}
+        <tr>
+            <td>{{ invoice.id }}</td>
+            <td>{{ invoice.numero }}</td>
+            <td>{{ invoice.fecha }}</td>
+            <td>{{ invoice.cliente_nombre or '-' }}</td>
+            <td>{{ invoice.cliente_ruc or '-' }}</td>
+            <td>{{ invoice.condicion_venta }}</td>
+            <td>{{ "%.2f"|format(invoice.monto_total) }}</td>
+            <td>
+                <a href="/sales-invoices/{{ invoice.id }}" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Ver</a>
+                <a href="/sales-invoices/{{ invoice.id }}/export-tesaka" class="btn btn-success" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">📤 Tesaka</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No se encontraron facturas de venta. <a href="/sales-invoices/new">Crear la primera</a></p>
+{% endif %}
+{% endblock %}
+

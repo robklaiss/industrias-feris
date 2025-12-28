@@ -1,0 +1,149 @@
+{% extends "layout.html" %}
+
+{% block title %}{% if contract %}Editar{% else %}Nuevo{% endif %} Contrato - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>{% if contract %}Editar{% else %}Nuevo{% endif %} Contrato</h2>
+
+<form method="post" action="{% if contract %}/contracts/{{ contract.id }}{% else %}/contracts{% endif %}">
+    <div class="form-row">
+        <div class="form-group">
+            <label for="fecha">Fecha *</label>
+            <input type="date" id="fecha" name="fecha" value="{{ contract.fecha if contract else '' }}" required>
+        </div>
+        <div class="form-group">
+            <label for="numero_contrato">Número Contrato *</label>
+            <input type="text" id="numero_contrato" name="numero_contrato" value="{{ contract.numero_contrato if contract else '' }}" required>
+        </div>
+        <div class="form-group">
+            <label for="numero_id">Número ID</label>
+            <input type="text" id="numero_id" name="numero_id" value="{{ contract.numero_id if contract else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="tipo_contrato">Tipo Contrato</label>
+            <input type="text" id="tipo_contrato" name="tipo_contrato" value="{{ contract.tipo_contrato if contract else '' }}">
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label for="client_id">Cliente</label>
+            <select id="client_id" name="client_id">
+                <option value="">Seleccionar cliente...</option>
+                {% for client in clients %}
+                <option value="{{ client.id }}" {% if contract and contract.client_id == client.id %}selected{% endif %}>
+                    {{ client.nombre }} ({{ client.ruc or 'Sin RUC' }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="estado">Estado *</label>
+            <select id="estado" name="estado" required>
+                <option value="vigente" {% if contract and contract.estado == 'vigente' %}selected{% endif %}>Vigente</option>
+                <option value="cancelado" {% if contract and contract.estado == 'cancelado' %}selected{% endif %}>Cancelado</option>
+            </select>
+        </div>
+    </div>
+    
+    <h3>Productos</h3>
+    <div id="items-container">
+        {% if items %}
+            {% for item in items %}
+            <div class="item-row" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 0.5rem; margin-bottom: 0.5rem; align-items: end;">
+                <select name="producto" class="product-select" onchange="fillProductData(this)" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Seleccionar producto...</option>
+                    {% for product in products %}
+                    <option value="{{ product.nombre }}" 
+                            data-unidad="{{ product.unidad_medida }}" 
+                            data-precio="{{ product.precio_base or '' }}"
+                            {% if item.producto == product.nombre %}selected{% endif %}>
+                        {{ product.nombre }}{% if product.codigo %} ({{ product.codigo }}){% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+                <input type="text" name="unidad_medida" placeholder="Unidad" value="{{ item.unidad_medida }}" required readonly style="background: #f5f5f5;">
+                <input type="number" step="0.01" name="cantidad_total" placeholder="Cantidad" value="{{ item.cantidad_total }}" required>
+                <input type="number" step="0.01" name="precio_unitario" placeholder="Precio Unit." value="{{ item.precio_unitario }}" required>
+                <button type="button" class="btn btn-danger" onclick="removeItem(this)" style="padding: 0.5rem;">❌</button>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="item-row" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 0.5rem; margin-bottom: 0.5rem; align-items: end;">
+                <select name="producto" class="product-select" onchange="fillProductData(this)" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Seleccionar producto...</option>
+                    {% for product in products %}
+                    <option value="{{ product.nombre }}" 
+                            data-unidad="{{ product.unidad_medida }}" 
+                            data-precio="{{ product.precio_base or '' }}">
+                        {{ product.nombre }}{% if product.codigo %} ({{ product.codigo }}){% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+                <input type="text" name="unidad_medida" placeholder="Unidad" required readonly style="background: #f5f5f5;">
+                <input type="number" step="0.01" name="cantidad_total" placeholder="Cantidad" required>
+                <input type="number" step="0.01" name="precio_unitario" placeholder="Precio Unit." required>
+                <button type="button" class="btn btn-danger" onclick="removeItem(this)" style="padding: 0.5rem;">❌</button>
+            </div>
+        {% endif %}
+    </div>
+    
+    <button type="button" class="btn" onclick="addItem()" style="margin-bottom: 1rem;">➕ Agregar Producto</button>
+    
+    <div style="margin-top: 2rem;">
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a href="/contracts" class="btn">Cancelar</a>
+    </div>
+</form>
+
+<script>
+function addItem() {
+    const container = document.getElementById('items-container');
+    const newRow = document.createElement('div');
+    newRow.className = 'item-row';
+    newRow.style.cssText = 'display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 0.5rem; margin-bottom: 0.5rem; align-items: end;';
+    
+    // Obtener opciones de productos
+    const productSelect = container.querySelector('.product-select');
+    const productOptions = productSelect ? productSelect.innerHTML : '<option value="">Seleccionar producto...</option>';
+    
+    newRow.innerHTML = `
+        <select name="producto" class="product-select" onchange="fillProductData(this)" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+            ${productOptions}
+        </select>
+        <input type="text" name="unidad_medida" placeholder="Unidad" required readonly style="background: #f5f5f5;">
+        <input type="number" step="0.01" name="cantidad_total" placeholder="Cantidad" required>
+        <input type="number" step="0.01" name="precio_unitario" placeholder="Precio Unit." required>
+        <button type="button" class="btn btn-danger" onclick="removeItem(this)" style="padding: 0.5rem;">❌</button>
+    `;
+    container.appendChild(newRow);
+}
+
+function fillProductData(select) {
+    const row = select.closest('.item-row');
+    const unidadInput = row.querySelector('input[name="unidad_medida"]');
+    const precioInput = row.querySelector('input[name="precio_unitario"]');
+    const selectedOption = select.options[select.selectedIndex];
+    
+    if (selectedOption.value) {
+        unidadInput.value = selectedOption.getAttribute('data-unidad') || '';
+        const precioBase = selectedOption.getAttribute('data-precio');
+        if (precioBase && !precioInput.value) {
+            precioInput.value = precioBase;
+        }
+    } else {
+        unidadInput.value = '';
+    }
+}
+
+function removeItem(btn) {
+    const container = document.getElementById('items-container');
+    if (container.children.length > 1) {
+        btn.closest('.item-row').remove();
+    } else {
+        alert('Debe haber al menos un producto');
+    }
+}
+</script>
+{% endblock %}
+

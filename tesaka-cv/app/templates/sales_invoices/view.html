@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+{% block title %}Factura {{ sales_invoice.numero }} - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>Factura {{ sales_invoice.numero }}</h2>
+
+<div style="margin-bottom: 1rem;">
+    <a href="/sales-invoices" class="btn">← Volver a Lista</a>
+    <a href="/sales-invoices/{{ sales_invoice.id }}/export-tesaka" class="btn btn-success">📤 Exportar Tesaka</a>
+</div>
+
+<h3>Información General</h3>
+<table>
+    <tr>
+        <th>Número</th>
+        <td>{{ sales_invoice.numero }}</td>
+    </tr>
+    <tr>
+        <th>Fecha</th>
+        <td>{{ sales_invoice.fecha }}</td>
+    </tr>
+    {% if sales_invoice.cliente_nombre %}
+    <tr>
+        <th>Cliente</th>
+        <td>{{ sales_invoice.cliente_nombre }}</td>
+    </tr>
+    {% endif %}
+    {% if sales_invoice.cliente_ruc %}
+    <tr>
+        <th>RUC</th>
+        <td>{{ sales_invoice.cliente_ruc }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <th>Condición de Venta</th>
+        <td>{{ sales_invoice.condicion_venta }}</td>
+    </tr>
+</table>
+
+<h3>Items</h3>
+{% if items %}
+<table>
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Unidad</th>
+            <th>Cantidad</th>
+            <th>Precio Unitario</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.producto }}</td>
+            <td>{{ item.unidad_medida }}</td>
+            <td>{{ "%.2f"|format(item.cantidad) }}</td>
+            <td>{{ "%.2f"|format(item.precio_unitario) }}</td>
+            <td>{{ "%.2f"|format(item.cantidad * item.precio_unitario) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="4">Total</th>
+            <th>{{ "%.2f"|format(monto_total) }}</th>
+        </tr>
+    </tfoot>
+</table>
+{% else %}
+<p>No hay items en esta factura.</p>
+{% endif %}
+{% endblock %}
+

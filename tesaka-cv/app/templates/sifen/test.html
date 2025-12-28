@@ -1,0 +1,327 @@
+{% extends "layout.html" %}
+
+{% block title %}SIFEN Smoke Test - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-vial"></i> SIFEN Smoke Test</h2>
+
+<p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+    Ejecuta un test end-to-end contra el ambiente de pruebas de SIFEN para validar la integración.
+</p>
+
+<div class="card">
+    <div class="card-header">
+        <h4 style="margin: 0;"><i class="fas fa-info-circle"></i> Información</h4>
+    </div>
+    <p>
+        Este smoke test ejecuta los siguientes pasos:
+    </p>
+    <ol>
+        <li>Validación de estructura XML (well-formed)</li>
+        <li>Validación contra esquema XSD (si disponible)</li>
+        <li>Prevalidación usando Prevalidador SIFEN</li>
+        <li>Envío al ambiente de pruebas (si datos configurados)</li>
+        <li>Consulta de estado (si aplica)</li>
+    </ol>
+    
+    <div class="alert alert-info" style="margin-top: 1rem;">
+        <i class="fas fa-exclamation-circle"></i>
+        <strong>Nota:</strong> Para probar el envío real, configure las variables de entorno:
+        <code>SIFEN_TEST_RUC</code>, <code>SIFEN_TEST_TIMBRADO</code>, <code>SIFEN_TEST_CSC</code>
+    </div>
+    
+    <div class="alert alert-warning" style="margin-top: 1rem;">
+        <i class="fas fa-info-circle"></i>
+        <strong>Prevalidador SIFEN:</strong> El Prevalidador es una aplicación web Angular.
+        Para validar XML, use <a href="https://ekuatia.set.gov.py/prevalidador/validacion" target="_blank">el formulario web oficial</a>.
+        <br><strong>Nota sobre XML:</strong> El XML generado es una estructura tentativa. Para que sea válido según SIFEN,
+        se requiere el esquema XSD oficial. Si el XML es rechazado, verifique:
+        <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+            <li>Que el namespace y estructura coincidan con el esquema oficial</li>
+            <li>Que todos los elementos requeridos estén presentes</li>
+            <li>Que los valores cumplan con las restricciones del esquema</li>
+        </ul>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h4 style="margin: 0;"><i class="fas fa-play"></i> Ejecutar Test</h4>
+    </div>
+    <button class="btn btn-primary" onclick="runSmokeTest()" id="testBtn">
+        <i class="fas fa-play"></i> Ejecutar Smoke Test
+    </button>
+    
+    <div id="testResult" style="display: none; margin-top: 1.5rem;"></div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h4 style="margin: 0;"><i class="fas fa-code"></i> Prevalidar XML Personalizado</h4>
+    </div>
+    <div class="form-group">
+        <label for="customXml">XML del Documento Electrónico:</label>
+        <textarea id="customXml" rows="10" style="font-family: monospace; font-size: 0.875rem;"></textarea>
+    </div>
+    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+        <button class="btn btn-primary" onclick="prevalidateCustomXml()">
+            <i class="fas fa-check-circle"></i> Prevalidar XML (Método Estándar)
+        </button>
+        <button class="btn btn-primary" onclick="prevalidateCustomXmlAngular()">
+            <i class="fas fa-angular"></i> Prevalidar con App Angular
+        </button>
+        <button class="btn btn-info" onclick="testAngularConnection()">
+            <i class="fas fa-plug"></i> Probar Conexión Angular
+        </button>
+    </div>
+    
+    <div id="prevalidationResult" style="display: none; margin-top: 1.5rem;"></div>
+</div>
+
+<script>
+async function runSmokeTest() {
+    const btn = document.getElementById('testBtn');
+    const resultDiv = document.getElementById('testResult');
+    
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ejecutando...';
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Ejecutando smoke test...</div>';
+    
+    try {
+        const response = await fetch('/dev/sifen-smoke-test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        // Mostrar resultados si hay steps_completed (incluso si hay advertencias)
+        if (data.results && data.results.steps_completed.length > 0) {
+            const hasFailures = data.results.steps_failed && data.results.steps_failed.length > 0;
+            const alertClass = (data.ok && !hasFailures) ? 'alert-success' : 'alert-warning';
+            const alertIcon = (data.ok && !hasFailures) ? 'fa-check-circle' : 'fa-exclamation-triangle';
+            const alertText = (data.ok && !hasFailures) ? 'Smoke test exitoso' : 'Smoke test completado con advertencias';
+            
+            let html = `<div class="alert ${alertClass}"><i class="fas ${alertIcon}"></i> <strong>${alertText}</strong></div>`;
+            
+            if (data.message) {
+                html += `<p>${escapeHtml(data.message)}</p>`;
+            }
+            
+            html += '<h5>Pasos completados:</h5><ul>';
+            data.results.steps_completed.forEach(step => {
+                html += `<li><span class="badge badge-success">✓</span> ${step}</li>`;
+            });
+            html += '</ul>';
+            
+            if (hasFailures) {
+                html += '<h5 style="margin-top: 1rem;">Advertencias:</h5><ul>';
+                data.results.steps_failed.forEach(step => {
+                    html += `<li><span class="badge badge-warning">⚠</span> ${step}</li>`;
+                });
+                html += '</ul>';
+            }
+            
+            // Mostrar nota sobre Prevalidador si aplica
+            if (data.results.details && data.results.details.prevalidation_note) {
+                const isDiscovered = data.results.details.prevalidation_note.includes('✅') || 
+                                     data.results.details.prevalidation_note.includes('API descubierta');
+                const alertClass = isDiscovered ? 'alert-success' : 'alert-info';
+                const icon = isDiscovered ? 'fa-check-circle' : 'fa-info-circle';
+                
+                html += `<div class="alert ${alertClass}" style="margin-top: 1rem;">
+                    <i class="fas ${icon}"></i> 
+                    <strong>Prevalidador SIFEN:</strong> ${escapeHtml(data.results.details.prevalidation_note)}`;
+                
+                if (!isDiscovered) {
+                    html += `<br><a href="https://ekuatia.set.gov.py/prevalidador/validacion" target="_blank" class="btn btn-primary btn-sm" style="margin-top: 0.5rem;">
+                        <i class="fas fa-external-link-alt"></i> Abrir Prevalidador Web
+                    </a>`;
+                }
+                
+                html += `</div>`;
+            }
+            
+            if (data.results.details && data.results.details.send_skipped) {
+                html += `<div class="alert alert-info" style="margin-top: 1rem;">
+                    <i class="fas fa-info-circle"></i> 
+                    <strong>Envío omitido:</strong> ${escapeHtml(data.results.details.send_skipped.reason)}
+                    <br><small>${escapeHtml(data.results.details.send_skipped.note || '')}</small>
+                </div>`;
+            }
+            
+            html += '<h5 style="margin-top: 1.5rem;">Detalles técnicos:</h5>';
+            html += '<pre style="background-color: var(--light-bg); padding: 1rem; border-radius: 0; overflow-x: auto; font-size: 0.875rem; max-height: 400px; overflow-y: auto;">';
+            html += escapeHtml(JSON.stringify(data.results.details, null, 2));
+            html += '</pre>';
+            
+            resultDiv.innerHTML = html;
+        } else {
+            // Error real o sin resultados
+            let html = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <strong>Smoke test falló</strong></div>';
+            html += '<p>' + escapeHtml(data.error || 'Error desconocido') + '</p>';
+            
+            if (data.results) {
+                html += '<pre style="background-color: var(--light-bg); padding: 1rem; border-radius: 0; overflow-x: auto; font-size: 0.875rem;">';
+                html += escapeHtml(JSON.stringify(data.results, null, 2));
+                html += '</pre>';
+            }
+            
+            resultDiv.innerHTML = html;
+        }
+    } catch (error) {
+        resultDiv.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> ' + escapeHtml(error.message) + '</div>';
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-play"></i> Ejecutar Smoke Test';
+    }
+}
+
+async function prevalidateCustomXml() {
+    const xmlContent = document.getElementById('customXml').value;
+    const resultDiv = document.getElementById('prevalidationResult');
+    
+    if (!xmlContent.trim()) {
+        alert('Por favor ingrese un XML');
+        return;
+    }
+    
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Prevalidando...</div>';
+    
+    try {
+        const response = await fetch('/dev/sifen-prevalidate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ xml: xmlContent })
+        });
+        
+        const data = await response.json();
+        const result = data.result || {};
+        
+        // Determinar estado basado en valid
+        if (result.valid === true) {
+            resultDiv.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> <strong>XML válido</strong></div>';
+        } else if (result.valid === false) {
+            resultDiv.innerHTML = '<div class="alert alert-error"><i class="fas fa-times-circle"></i> <strong>XML con errores</strong></div>';
+        } else if (result.valid === null || result.response_type === 'html') {
+            resultDiv.innerHTML = '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> <strong>No se puede validar automáticamente</strong></div>';
+            resultDiv.innerHTML += '<p>El Prevalidador SIFEN es una aplicación web. Use el <a href="https://ekuatia.set.gov.py/prevalidador/validacion" target="_blank">formulario web oficial</a> para validar su XML.</p>';
+        } else {
+            resultDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-info-circle"></i> <strong>Resultado</strong></div>';
+        }
+        
+        resultDiv.innerHTML += '<pre style="background-color: var(--light-bg); padding: 1rem; border-radius: 0; overflow-x: auto; font-size: 0.875rem; margin-top: 1rem; max-height: 400px; overflow-y: auto;">';
+        resultDiv.innerHTML += escapeHtml(JSON.stringify(result, null, 2));
+        resultDiv.innerHTML += '</pre>';
+        
+        if (result.error) {
+            resultDiv.innerHTML += `<div class="alert alert-error" style="margin-top: 1rem;"><i class="fas fa-exclamation-circle"></i> ${escapeHtml(result.error)}</div>`;
+        }
+    } catch (error) {
+        resultDiv.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> ' + escapeHtml(error.message) + '</div>';
+    }
+}
+
+async function prevalidateCustomXmlAngular() {
+    const xml = document.getElementById('customXml').value;
+    if (!xml.trim()) {
+        alert('Por favor ingrese XML para prevalidar');
+        return;
+    }
+    
+    const resultDiv = document.getElementById('prevalidationResult');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Prevalidando con aplicación Angular...</div>';
+    
+    try {
+        const response = await fetch('/dev/sifen-prevalidate-angular', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({xml: xml})
+        });
+        
+        const data = await response.json();
+        
+        let html = '<div class="card">';
+        html += '<div class="card-header"><h5>Resultado de Prevalidación (App Angular)</h5></div>';
+        html += '<div class="card-body">';
+        
+        if (data.result && data.result.method) {
+            html += `<div class="alert alert-info"><i class="fas fa-angular"></i> Método usado: <strong>${escapeHtml(data.result.method)}</strong></div>`;
+            if (data.result.endpoint) {
+                html += `<div class="alert alert-info">Endpoint: <code>${escapeHtml(data.result.endpoint)}</code></div>`;
+            }
+        }
+        
+        if (data.ok) {
+            html += '<div class="alert alert-success"><i class="fas fa-check-circle"></i> XML válido</div>';
+        } else if (data.result && data.result.valid === false) {
+            html += '<div class="alert alert-danger"><i class="fas fa-times-circle"></i> XML inválido</div>';
+        } else {
+            html += '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> No se pudo determinar validez</div>';
+        }
+        
+        html += '<pre style="background: #f5f5f5; padding: 1rem; overflow-x: auto;">' + escapeHtml(JSON.stringify(data.result, null, 2)) + '</pre>';
+        html += '</div></div>';
+        
+        resultDiv.innerHTML = html;
+    } catch (error) {
+        resultDiv.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> ' + escapeHtml(error.message) + '</div>';
+    }
+}
+
+async function testAngularConnection() {
+    const resultDiv = document.getElementById('prevalidationResult');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Probando conexión con aplicación Angular...</div>';
+    
+    try {
+        const response = await fetch('/dev/sifen-test-angular');
+        const data = await response.json();
+        
+        let html = '<div class="card">';
+        html += '<div class="card-header"><h5>Test de Conexión - Aplicación Angular</h5></div>';
+        html += '<div class="card-body">';
+        
+        if (data.connection && data.connection.connected) {
+            html += '<div class="alert alert-success"><i class="fas fa-check-circle"></i> Conexión exitosa con aplicación Angular</div>';
+            html += '<p><strong>Endpoints descubiertos:</strong></p>';
+            if (data.connection.endpoints_discovered && Object.keys(data.connection.endpoints_discovered).length > 0) {
+                html += '<ul>';
+                for (const [name, url] of Object.entries(data.connection.endpoints_discovered)) {
+                    html += `<li><code>${escapeHtml(name)}</code>: <a href="${escapeHtml(url)}" target="_blank">${escapeHtml(url)}</a></li>`;
+                }
+                html += '</ul>';
+            } else {
+                html += '<p class="text-muted">No se encontraron endpoints específicos</p>';
+            }
+        } else {
+            html += '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> No se pudo conectar con la aplicación Angular</div>';
+            if (data.connection && data.connection.error) {
+                html += `<p>Error: ${escapeHtml(data.connection.error)}</p>`;
+            }
+        }
+        
+        html += '<pre style="background: #f5f5f5; padding: 1rem; overflow-x: auto;">' + escapeHtml(JSON.stringify(data.connection, null, 2)) + '</pre>';
+        html += '</div></div>';
+        
+        resultDiv.innerHTML = html;
+    } catch (error) {
+        resultDiv.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> ' + escapeHtml(error.message) + '</div>';
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
+{% endblock %}
+

@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+
+{% block title %}Contratos - Industrias Feris{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+    <h2 style="margin: 0;">
+        <i class="fas fa-file-contract"></i> Contratos
+    </h2>
+    <div class="btn-group" style="margin: 0;">
+        <a href="/contracts/new" class="btn btn-success">
+            <i class="fas fa-plus"></i> Nuevo Contrato
+        </a>
+        <a href="/reports/contracts.xlsx" class="btn btn-primary">
+            <i class="fas fa-file-excel"></i> Excel
+        </a>
+        <a href="/reports/contracts.pdf" class="btn btn-primary">
+            <i class="fas fa-file-pdf"></i> PDF
+        </a>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card" style="margin-bottom: 1.5rem;">
+    <div class="card-header">
+        <h4 style="margin: 0;"><i class="fas fa-filter"></i> Filtros</h4>
+    </div>
+    <form method="get">
+    <div class="form-row">
+        <div class="form-group">
+            <label>Cliente:</label>
+            <input type="text" name="cliente" value="{{ filters.cliente or '' }}" placeholder="Buscar por cliente">
+        </div>
+        <div class="form-group">
+            <label>Número Contrato:</label>
+            <input type="text" name="numero_contrato" value="{{ filters.numero_contrato or '' }}" placeholder="Buscar por número">
+        </div>
+        <div class="form-group">
+            <label>Número ID:</label>
+            <input type="text" name="numero_id" value="{{ filters.numero_id or '' }}" placeholder="Buscar por ID">
+        </div>
+        <div class="form-group">
+            <label>Estado:</label>
+            <select name="estado">
+                <option value="">Todos</option>
+                <option value="vigente" {% if filters.estado == 'vigente' %}selected{% endif %}>Vigente</option>
+                <option value="cancelado" {% if filters.estado == 'cancelado' %}selected{% endif %}>Cancelado</option>
+            </select>
+        </div>
+    </div>
+    <div class="btn-group" style="margin-top: 1rem;">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search"></i> Filtrar
+        </button>
+        <a href="/contracts" class="btn">
+            <i class="fas fa-times"></i> Limpiar
+        </a>
+    </div>
+    </form>
+</div>
+
+{% if contracts %}
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Número Contrato</th>
+                <th>Número ID</th>
+                <th>Cliente</th>
+                <th>RUC</th>
+                <th class="text-right">Monto Total</th>
+                <th>Estado</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contract in contracts %}
+            <tr>
+                <td><strong>#{{ contract.id }}</strong></td>
+                <td>{{ contract.fecha }}</td>
+                <td><strong>{{ contract.numero_contrato }}</strong></td>
+                <td>{{ contract.numero_id or '-' }}</td>
+                <td>{{ contract.cliente_nombre or '-' }}</td>
+                <td>{{ contract.cliente_ruc or '-' }}</td>
+                <td class="text-right"><strong>{{ "%.2f"|format(contract.monto_total) }}</strong></td>
+                <td>
+                    <span class="badge {% if contract.estado == 'vigente' %}badge-success{% else %}badge-danger{% endif %}">
+                        {{ contract.estado|title }}
+                    </span>
+                </td>
+                <td class="text-center">
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                        <a href="/contracts/{{ contract.id }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> Ver
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-file-contract"></i>
+    <h3>No se encontraron contratos</h3>
+    <p style="margin-top: 1rem;">
+        <a href="/contracts/new" class="btn btn-success">
+            <i class="fas fa-plus"></i> Crear primer contrato
+        </a>
+    </p>
+</div>
+{% endif %}
+{% endblock %}
+

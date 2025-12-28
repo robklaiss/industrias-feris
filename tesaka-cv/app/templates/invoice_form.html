@@ -1,0 +1,390 @@
+{% extends "layout.html" %}
+
+{% block title %}Nueva Factura - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>Nueva Factura</h2>
+
+<form method="POST" action="/invoices" id="invoiceForm">
+    <h3>Información General</h3>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="issue_date">Fecha de Emisión *</label>
+            <input type="date" id="issue_date" name="issue_date" required>
+        </div>
+        <div class="form-group">
+            <label for="issue_datetime">Fecha y Hora de Emisión (opcional)</label>
+            <input type="datetime-local" id="issue_datetime" name="issue_datetime">
+        </div>
+    </div>
+
+    <h3>Comprador (Buyer)</h3>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="buyer_situacion">Situación *</label>
+            <select id="buyer_situacion" name="buyer_situacion" required onchange="toggleBuyerFields()">
+                <option value="CONTRIBUYENTE">CONTRIBUYENTE</option>
+                <option value="NO_CONTRIBUYENTE">NO_CONTRIBUYENTE</option>
+                <option value="NO_RESIDENTE">NO_RESIDENTE</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="buyer_nombre">Nombre *</label>
+            <input type="text" id="buyer_nombre" name="buyer_nombre" required>
+        </div>
+    </div>
+
+    <div id="contribuyente_fields">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="buyer_ruc">RUC</label>
+                <input type="text" id="buyer_ruc" name="buyer_ruc">
+            </div>
+            <div class="form-group">
+                <label for="buyer_dv">Dígito Verificador</label>
+                <input type="text" id="buyer_dv" name="buyer_dv">
+            </div>
+        </div>
+    </div>
+
+    <div id="no_contribuyente_fields" style="display: none;">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="buyer_tipoIdentificacion">Tipo de Identificación</label>
+                <input type="text" id="buyer_tipoIdentificacion" name="buyer_tipoIdentificacion">
+            </div>
+            <div class="form-group">
+                <label for="buyer_identificacion">Número de Identificación</label>
+                <input type="text" id="buyer_identificacion" name="buyer_identificacion">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="buyer_correoElectronico">Correo Electrónico</label>
+                <input type="email" id="buyer_correoElectronico" name="buyer_correoElectronico">
+            </div>
+        </div>
+    </div>
+
+    <div id="no_residente_fields" style="display: none;">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="buyer_pais">País</label>
+                <input type="text" id="buyer_pais" name="buyer_pais">
+            </div>
+            <div class="form-group">
+                <label for="buyer_tieneRepresentante">Tiene Representante</label>
+                <select id="buyer_tieneRepresentante" name="buyer_tieneRepresentante" onchange="toggleRepresentante()">
+                    <option value="">No</option>
+                    <option value="true">Sí</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="buyer_tieneBeneficiario">Tiene Beneficiario</label>
+                <select id="buyer_tieneBeneficiario" name="buyer_tieneBeneficiario" onchange="toggleBeneficiario()">
+                    <option value="">No</option>
+                    <option value="true">Sí</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="representante_fields" style="display: none;">
+            <h4>Representante</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="buyer_representante_tipoIdentificacion">Tipo Identificación</label>
+                    <input type="text" id="buyer_representante_tipoIdentificacion" name="buyer_representante_tipoIdentificacion">
+                </div>
+                <div class="form-group">
+                    <label for="buyer_representante_identificacion">Identificación</label>
+                    <input type="text" id="buyer_representante_identificacion" name="buyer_representante_identificacion">
+                </div>
+                <div class="form-group">
+                    <label for="buyer_representante_nombre">Nombre</label>
+                    <input type="text" id="buyer_representante_nombre" name="buyer_representante_nombre">
+                </div>
+            </div>
+        </div>
+
+        <div id="beneficiario_fields" style="display: none;">
+            <h4>Beneficiario</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="buyer_beneficiario_tipoIdentificacion">Tipo Identificación</label>
+                    <input type="text" id="buyer_beneficiario_tipoIdentificacion" name="buyer_beneficiario_tipoIdentificacion">
+                </div>
+                <div class="form-group">
+                    <label for="buyer_beneficiario_identificacion">Identificación</label>
+                    <input type="text" id="buyer_beneficiario_identificacion" name="buyer_beneficiario_identificacion">
+                </div>
+                <div class="form-group">
+                    <label for="buyer_beneficiario_nombre">Nombre</label>
+                    <input type="text" id="buyer_beneficiario_nombre" name="buyer_beneficiario_nombre">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="buyer_domicilio">Domicilio</label>
+            <input type="text" id="buyer_domicilio" name="buyer_domicilio">
+        </div>
+        <div class="form-group">
+            <label for="buyer_direccion">Dirección</label>
+            <input type="text" id="buyer_direccion" name="buyer_direccion">
+        </div>
+        <div class="form-group">
+            <label for="buyer_telefono">Teléfono</label>
+            <input type="text" id="buyer_telefono" name="buyer_telefono">
+        </div>
+    </div>
+
+    <h3>Transacción</h3>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="transaction_condicionCompra">Condición de Compra *</label>
+            <select id="transaction_condicionCompra" name="transaction_condicionCompra" required onchange="toggleCuotas()">
+                <option value="CONTADO">CONTADO</option>
+                <option value="CREDITO">CREDITO</option>
+            </select>
+        </div>
+        <div class="form-group" id="cuotas_group" style="display: none;">
+            <label for="transaction_cuotas">Cuotas</label>
+            <input type="number" id="transaction_cuotas" name="transaction_cuotas" min="1">
+        </div>
+        <div class="form-group">
+            <label for="transaction_tipoComprobante">Tipo de Comprobante *</label>
+            <select id="transaction_tipoComprobante" name="transaction_tipoComprobante" required>
+                <option value="1">1</option>
+                <option value="5">5</option>
+                <option value="11">11</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="transaction_numeroComprobanteVenta">Número Comprobante Venta *</label>
+            <input type="text" id="transaction_numeroComprobanteVenta" name="transaction_numeroComprobanteVenta" required placeholder="001-001-00000001">
+        </div>
+        <div class="form-group">
+            <label for="transaction_numeroTimbrado">Número Timbrado *</label>
+            <input type="text" id="transaction_numeroTimbrado" name="transaction_numeroTimbrado" required placeholder="12345678">
+        </div>
+        <div class="form-group">
+            <label for="transaction_fecha">Fecha Transacción (opcional)</label>
+            <input type="date" id="transaction_fecha" name="transaction_fecha">
+        </div>
+    </div>
+
+    <h3>Items</h3>
+    <div id="items_container">
+        <div class="item-row">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Cantidad *</label>
+                    <input type="number" name="item_cantidad" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Tasa Aplica *</label>
+                    <select name="item_tasaAplica" required>
+                        <option value="0">0</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Precio Unitario *</label>
+                    <input type="number" name="item_precioUnitario" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Descripción *</label>
+                    <input type="text" name="item_descripcion" required>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="btn" onclick="addItem()">Agregar Item</button>
+
+    <h3>Retención</h3>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="retention_fecha">Fecha *</label>
+            <input type="date" id="retention_fecha" name="retention_fecha" required>
+        </div>
+        <div class="form-group">
+            <label for="retention_moneda">Moneda *</label>
+            <select id="retention_moneda" name="retention_moneda" required onchange="toggleTipoCambio()">
+                <option value="PYG">PYG</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="BRL">BRL</option>
+            </select>
+        </div>
+        <div class="form-group" id="tipo_cambio_group" style="display: none;">
+            <label for="retention_tipoCambio">Tipo de Cambio</label>
+            <input type="number" id="retention_tipoCambio" name="retention_tipoCambio" min="1">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="retention_retencionRenta">Retención Renta *</label>
+            <select id="retention_retencionRenta" name="retention_retencionRenta" required onchange="toggleConceptoRenta()">
+                <option value="false">No</option>
+                <option value="true">Sí</option>
+            </select>
+        </div>
+        <div class="form-group" id="concepto_renta_group" style="display: none;">
+            <label for="retention_conceptoRenta">Concepto Renta</label>
+            <input type="text" id="retention_conceptoRenta" name="retention_conceptoRenta">
+        </div>
+        <div class="form-group">
+            <label for="retention_retencionIva">Retención IVA *</label>
+            <select id="retention_retencionIva" name="retention_retencionIva" required onchange="toggleConceptoIva()">
+                <option value="false">No</option>
+                <option value="true">Sí</option>
+            </select>
+        </div>
+        <div class="form-group" id="concepto_iva_group" style="display: none;">
+            <label for="retention_conceptoIva">Concepto IVA</label>
+            <input type="text" id="retention_conceptoIva" name="retention_conceptoIva">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="retention_rentaPorcentaje">Renta Porcentaje *</label>
+            <input type="number" id="retention_rentaPorcentaje" name="retention_rentaPorcentaje" step="0.01" value="0" required>
+        </div>
+        <div class="form-group">
+            <label for="retention_ivaPorcentaje5">IVA Porcentaje 5% *</label>
+            <input type="number" id="retention_ivaPorcentaje5" name="retention_ivaPorcentaje5" step="0.01" value="0" required>
+        </div>
+        <div class="form-group">
+            <label for="retention_ivaPorcentaje10">IVA Porcentaje 10% *</label>
+            <input type="number" id="retention_ivaPorcentaje10" name="retention_ivaPorcentaje10" step="0.01" value="0" required>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="retention_rentaCabezasBase">Renta Cabezas Base *</label>
+            <input type="number" id="retention_rentaCabezasBase" name="retention_rentaCabezasBase" step="0.01" value="0" required>
+        </div>
+        <div class="form-group">
+            <label for="retention_rentaCabezasCantidad">Renta Cabezas Cantidad *</label>
+            <input type="number" id="retention_rentaCabezasCantidad" name="retention_rentaCabezasCantidad" step="0.01" value="0" required>
+        </div>
+        <div class="form-group">
+            <label for="retention_rentaToneladasBase">Renta Toneladas Base *</label>
+            <input type="number" id="retention_rentaToneladasBase" name="retention_rentaToneladasBase" step="0.01" value="0" required>
+        </div>
+        <div class="form-group">
+            <label for="retention_rentaToneladasCantidad">Renta Toneladas Cantidad *</label>
+            <input type="number" id="retention_rentaToneladasCantidad" name="retention_rentaToneladasCantidad" step="0.01" value="0" required>
+        </div>
+    </div>
+
+    <div style="margin-top: 2rem;">
+        <button type="submit" class="btn btn-success">Guardar Factura</button>
+        <a href="/invoices" class="btn">Cancelar</a>
+    </div>
+</form>
+
+<script>
+let itemCount = 1;
+
+function addItem() {
+    itemCount++;
+    const container = document.getElementById('items_container');
+    const newItem = document.createElement('div');
+    newItem.className = 'item-row';
+    newItem.innerHTML = `
+        <div class="form-row">
+            <div class="form-group">
+                <label>Cantidad *</label>
+                <input type="number" name="item_cantidad" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label>Tasa Aplica *</label>
+                <select name="item_tasaAplica" required>
+                    <option value="0">0</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Precio Unitario *</label>
+                <input type="number" name="item_precioUnitario" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label>Descripción *</label>
+                <input type="text" name="item_descripcion" required>
+            </div>
+            <div class="form-group">
+                <label>&nbsp;</label>
+                <button type="button" class="btn btn-danger" onclick="removeItem(this)">Eliminar</button>
+            </div>
+        </div>
+    `;
+    container.appendChild(newItem);
+}
+
+function removeItem(btn) {
+    btn.closest('.item-row').remove();
+}
+
+function toggleBuyerFields() {
+    const situacion = document.getElementById('buyer_situacion').value;
+    const contribuyenteFields = document.getElementById('contribuyente_fields');
+    const noContribuyenteFields = document.getElementById('no_contribuyente_fields');
+    const noResidenteFields = document.getElementById('no_residente_fields');
+    
+    contribuyenteFields.style.display = situacion === 'CONTRIBUYENTE' ? 'block' : 'none';
+    noContribuyenteFields.style.display = (situacion === 'NO_CONTRIBUYENTE' || situacion === 'NO_RESIDENTE') ? 'block' : 'none';
+    noResidenteFields.style.display = situacion === 'NO_RESIDENTE' ? 'block' : 'none';
+}
+
+function toggleCuotas() {
+    const condicion = document.getElementById('transaction_condicionCompra').value;
+    document.getElementById('cuotas_group').style.display = condicion === 'CREDITO' ? 'block' : 'none';
+}
+
+function toggleTipoCambio() {
+    const moneda = document.getElementById('retention_moneda').value;
+    document.getElementById('tipo_cambio_group').style.display = moneda !== 'PYG' ? 'block' : 'none';
+}
+
+function toggleConceptoRenta() {
+    const tiene = document.getElementById('retention_retencionRenta').value === 'true';
+    document.getElementById('concepto_renta_group').style.display = tiene ? 'block' : 'none';
+}
+
+function toggleConceptoIva() {
+    const tiene = document.getElementById('retention_retencionIva').value === 'true';
+    document.getElementById('concepto_iva_group').style.display = tiene ? 'block' : 'none';
+}
+
+function toggleRepresentante() {
+    const tiene = document.getElementById('buyer_tieneRepresentante').value === 'true';
+    document.getElementById('representante_fields').style.display = tiene ? 'block' : 'none';
+}
+
+function toggleBeneficiario() {
+    const tiene = document.getElementById('buyer_tieneBeneficiario').value === 'true';
+    document.getElementById('beneficiario_fields').style.display = tiene ? 'block' : 'none';
+}
+</script>
+
+<style>
+.item-row {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+</style>
+{% endblock %}
+

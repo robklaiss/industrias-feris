@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}Clientes - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>Clientes</h2>
+
+<div style="margin-bottom: 1rem;">
+    <a href="/clients/new" class="btn">➕ Nuevo Cliente</a>
+</div>
+
+{% if clients %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>RUC</th>
+            <th>Dirección</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for client in clients %}
+        <tr>
+            <td>{{ client['id'] }}</td>
+            <td>{{ client['nombre'] }}</td>
+            <td>{{ client['ruc'] or '-' }}</td>
+            <td>{{ client['direccion'] or '-' }}</td>
+            <td>{{ client['telefono'] or '-' }}</td>
+            <td>{{ client['email'] or '-' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No hay clientes registrados. <a href="/clients/new">Crear el primero</a></p>
+{% endif %}
+{% endblock %}
+

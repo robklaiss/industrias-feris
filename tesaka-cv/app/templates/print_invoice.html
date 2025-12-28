@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura {{ sales_invoice.numero }}</title>
+    <style>
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 1.5cm;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+        @media screen {
+            body {
+                margin: 20px;
+                background: #f5f5f5;
+            }
+            .print-container {
+                background: white;
+                padding: 20px;
+                max-width: 21cm;
+                margin: 0 auto;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            }
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.4;
+            color: #000;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 18pt;
+            font-weight: bold;
+        }
+        .header p {
+            margin: 5px 0;
+            font-size: 9pt;
+        }
+        .document-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .info-block {
+            border: 1px solid #000;
+            padding: 10px;
+        }
+        .info-block h3 {
+            margin: 0 0 10px 0;
+            font-size: 11pt;
+            font-weight: bold;
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .info-label {
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        table th, table td {
+            border: 1px solid #000;
+            padding: 6px;
+            text-align: left;
+        }
+        table th {
+            background-color: #e0e0e0;
+            font-weight: bold;
+            text-align: center;
+        }
+        table td {
+            text-align: right;
+        }
+        table td:first-child {
+            text-align: left;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #f0f0f0;
+        }
+        .totals {
+            margin-top: 15px;
+            margin-left: auto;
+            width: 300px;
+        }
+        .totals table {
+            margin: 0;
+        }
+        .signatures {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        .signature-box {
+            border-top: 1px solid #000;
+            padding-top: 10px;
+            text-align: center;
+            min-height: 80px;
+        }
+        .signature-box p {
+            margin: 5px 0;
+            font-size: 9pt;
+        }
+        .signature-image {
+            max-height: 60px;
+            margin-bottom: 5px;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 8pt;
+            color: #666;
+        }
+        .no-print {
+            margin-bottom: 20px;
+        }
+        .no-print button {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .no-print button:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="print-container">
+        <div class="no-print">
+            <button onclick="window.print()">🖨️ Imprimir</button>
+            <button onclick="window.close()">Cerrar</button>
+        </div>
+
+        <div class="header">
+            <h1>FACTURA DE VENTA</h1>
+            <p>Número: {{ sales_invoice.numero }}</p>
+            <p>Fecha: {{ sales_invoice.fecha }}</p>
+            <p>Condición: {{ sales_invoice.condicion_venta|upper }}</p>
+        </div>
+
+        <div class="document-info">
+            <div class="info-block">
+                <h3>DATOS DEL CLIENTE</h3>
+                {% if cliente %}
+                <div class="info-row">
+                    <span class="info-label">Razón Social:</span>
+                    <span>{{ cliente.nombre or '-' }}</span>
+                </div>
+                {% if cliente.ruc %}
+                <div class="info-row">
+                    <span class="info-label">RUC:</span>
+                    <span>{{ cliente.ruc }}</span>
+                </div>
+                {% endif %}
+                {% if sales_invoice.direccion %}
+                <div class="info-row">
+                    <span class="info-label">Dirección:</span>
+                    <span>{{ sales_invoice.direccion }}</span>
+                </div>
+                {% endif %}
+                {% if sales_invoice.numero_contrato %}
+                <div class="info-row">
+                    <span class="info-label">Contrato:</span>
+                    <span>{{ sales_invoice.numero_contrato }}</span>
+                </div>
+                {% endif %}
+                {% else %}
+                <p>No especificado</p>
+                {% endif %}
+            </div>
+
+            <div class="info-block">
+                <h3>INFORMACIÓN DE FACTURACIÓN</h3>
+                {% if sales_invoice.condicion_venta == 'credito' %}
+                <div class="info-row">
+                    <span class="info-label">Condición:</span>
+                    <span>CRÉDITO</span>
+                </div>
+                {% else %}
+                <div class="info-row">
+                    <span class="info-label">Condición:</span>
+                    <span>CONTADO</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <h3>DETALLE DE PRODUCTOS</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 35%;">Producto</th>
+                    <th style="width: 15%;">Unidad</th>
+                    <th style="width: 15%;">Cantidad</th>
+                    <th style="width: 17.5%;">Precio Unit.</th>
+                    <th style="width: 17.5%;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.producto }}</td>
+                    <td style="text-align: center;">{{ item.unidad_medida }}</td>
+                    <td>{{ "%.2f"|format(item.cantidad) }}</td>
+                    <td>{{ "%.2f"|format(item.precio_unitario) }}</td>
+                    <td>{{ "%.2f"|format(item.cantidad * item.precio_unitario) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="totals">
+            <table>
+                <tfoot>
+                    <tr class="total-row">
+                        <td style="text-align: right;">TOTAL:</td>
+                        <td>{{ "%.2f"|format(monto_total) }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="signatures">
+            <div class="signature-box">
+                <p><strong>VENDEDOR</strong></p>
+                {% if firma_vendedor %}
+                <img src="{{ firma_vendedor }}" alt="Firma Vendedor" class="signature-image">
+                {% endif %}
+                <p>_________________________________</p>
+                <p>Firma y Aclaración</p>
+            </div>
+            <div class="signature-box">
+                <p><strong>CLIENTE</strong></p>
+                {% if firma_cliente %}
+                <img src="{{ firma_cliente }}" alt="Firma Cliente" class="signature-image">
+                {% endif %}
+                <p>_________________________________</p>
+                <p>Firma y Aclaración</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Documento generado el {{ fecha_emision }}</p>
+        </div>
+    </div>
+</body>
+</html>
+

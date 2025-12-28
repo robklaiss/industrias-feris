@@ -1,0 +1,44 @@
+[
+  {
+    "atributos": {
+      "fechaCreacion": "2024-01-15"
+    },
+    "informado": {
+      "situacion": "CONTRIBUYENTE",
+      "nombre": "Empresa Ejemplo S.A.",
+      "ruc": "80012345",
+      "dv": "7"
+    },
+    "transaccion": {
+      "condicionCompra": "CONTADO",
+      "tipoComprobante": 1,
+      "numeroComprobanteVenta": "001-001-00000001",
+      "numeroTimbrado": "12345678",
+      "fecha": "2024-01-15"
+    },
+    "detalle": [
+      {
+        "cantidad": 10.5,
+        "tasaAplica": 10,
+        "precioUnitario": 1000.0,
+        "descripcion": "Producto de ejemplo"
+      }
+    ],
+    "retencion": {
+      "fecha": "2024-01-15",
+      "moneda": "PYG",
+      "retencionRenta": false,
+      "conceptoRenta": "",
+      "retencionIva": false,
+      "conceptoIva": "",
+      "rentaPorcentaje": 0,
+      "ivaPorcentaje5": 0,
+      "ivaPorcentaje10": 0,
+      "rentaCabezasBase": 0,
+      "rentaCabezasCantidad": 0,
+      "rentaToneladasBase": 0,
+      "rentaToneladasCantidad": 0
+    }
+  }
+]
+

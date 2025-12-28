@@ -1,0 +1,14 @@
+{
+  "name": "sifen-xmlgen-oracle",
+  "version": "1.0.0",
+  "description": "Oracle wrapper for facturacionelectronicapy-xmlgen to compare DE generation",
+  "main": "generate_de.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "facturacionelectronicapy-xmlgen": "github:TIPS-SA/facturacionelectronicapy-xmlgen"
+  },
+  "private": true
+}
+

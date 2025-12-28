@@ -1,0 +1,598 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Schema de Exportación - Comprobantes Virtuales Tesaka",
+  "description": "Schema para validar comprobantes de exportación según Especificación Técnica Exportación",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["datos", "estado", "recepcion"],
+    "properties": {
+      "datos": {
+        "type": "object",
+        "required": ["atributos", "id", "informante", "informado", "transaccion", "detalle", "totales", "retencion"],
+        "properties": {
+          "atributos": {
+            "type": "object",
+            "required": ["fechaCreacion"],
+            "properties": {
+              "fechaCreacion": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                "description": "Fecha de creación en formato YYYY-MM-DD"
+              },
+              "fechaHoraCreacion": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$",
+                "description": "Fecha y hora de creación en formato YYYY-MM-DD HH:mm:SS"
+              },
+              "uuid": {
+                "type": "string",
+                "description": "UUID del comprobante"
+              },
+              "version": {
+                "type": "string",
+                "description": "Versión del comprobante"
+              }
+            }
+          },
+          "id": {
+            "type": "string",
+            "description": "Identificador del comprobante"
+          },
+          "informante": {
+            "type": "object",
+            "description": "Datos del informante",
+            "properties": {
+              "domicilioEmision": {
+                "type": "string",
+                "description": "Domicilio de emisión"
+              },
+              "telefono": {
+                "type": "string",
+                "description": "Teléfono del informante"
+              },
+              "nombreFantasia": {
+                "type": "string",
+                "description": "Nombre de fantasía"
+              },
+              "codigoEstablecimiento": {
+                "type": "string",
+                "description": "Código del establecimiento"
+              },
+              "timbradoFactura": {
+                "type": "string",
+                "description": "Timbrado de factura"
+              },
+              "puntoExpedicionFactura": {
+                "type": "string",
+                "description": "Punto de expedición de factura"
+              },
+              "inicioVigenciaFactura": {
+                "type": "string",
+                "description": "Inicio de vigencia de factura"
+              },
+              "timbradoComprobante": {
+                "type": "string",
+                "description": "Timbrado de comprobante"
+              },
+              "puntoExpedicionComprobante": {
+                "type": "string",
+                "description": "Punto de expedición de comprobante"
+              },
+              "inicioVigenciaComprobante": {
+                "type": "string",
+                "description": "Inicio de vigencia de comprobante"
+              }
+            }
+          },
+          "informado": {
+            "type": "object",
+            "required": ["situacion", "nombre"],
+            "properties": {
+              "situacion": {
+                "type": "string",
+                "enum": ["CONTRIBUYENTE", "NO_CONTRIBUYENTE", "NO_RESIDENTE"],
+                "description": "Situación del informado"
+              },
+              "nombre": {
+                "type": "string",
+                "description": "Nombre del informado"
+              },
+              "ruc": {
+                "type": "string",
+                "description": "RUC (requerido si situacion=CONTRIBUYENTE)"
+              },
+              "dv": {
+                "type": "string",
+                "description": "Dígito verificador (requerido si situacion=CONTRIBUYENTE)"
+              },
+              "tipoIdentificacion": {
+                "type": "string",
+                "description": "Tipo de identificación (requerido si situacion≠CONTRIBUYENTE)"
+              },
+              "identificacion": {
+                "type": "string",
+                "description": "Identificación (requerido si situacion≠CONTRIBUYENTE)"
+              },
+              "correoElectronico": {
+                "type": "string",
+                "format": "email",
+                "description": "Correo electrónico (requerido si situacion≠CONTRIBUYENTE)"
+              },
+              "pais": {
+                "type": "string",
+                "description": "País (requerido si situacion=NO_RESIDENTE)"
+              },
+              "tieneRepresentante": {
+                "type": "boolean",
+                "description": "Indica si tiene representante (requerido si situacion=NO_RESIDENTE)"
+              },
+              "tieneBeneficiario": {
+                "type": "boolean",
+                "description": "Indica si tiene beneficiario (requerido si situacion=NO_RESIDENTE)"
+              },
+              "representante": {
+                "type": "object",
+                "properties": {
+                  "tipoIdentificacion": {
+                    "type": "string"
+                  },
+                  "identificacion": {
+                    "type": "string"
+                  },
+                  "nombre": {
+                    "type": "string"
+                  }
+                },
+                "required": ["tipoIdentificacion", "identificacion", "nombre"]
+              },
+              "beneficiario": {
+                "type": "object",
+                "properties": {
+                  "tipoIdentificacion": {
+                    "type": "string"
+                  },
+                  "identificacion": {
+                    "type": "string"
+                  },
+                  "nombre": {
+                    "type": "string"
+                  }
+                },
+                "required": ["tipoIdentificacion", "identificacion", "nombre"]
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "situacion": {
+                      "const": "CONTRIBUYENTE"
+                    }
+                  }
+                },
+                "then": {
+                  "required": ["ruc", "dv"]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "situacion": {
+                      "enum": ["NO_CONTRIBUYENTE", "NO_RESIDENTE"]
+                    }
+                  }
+                },
+                "then": {
+                  "required": ["tipoIdentificacion", "identificacion", "correoElectronico"]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "situacion": {
+                      "const": "NO_RESIDENTE"
+                    }
+                  }
+                },
+                "then": {
+                  "required": ["pais", "tieneRepresentante", "tieneBeneficiario"],
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "tieneRepresentante": {
+                            "const": true
+                          }
+                        }
+                      },
+                      "then": {
+                        "required": ["representante"]
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "tieneBeneficiario": {
+                            "const": true
+                          }
+                        }
+                      },
+                      "then": {
+                        "required": ["beneficiario"]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "transaccion": {
+            "type": "object",
+            "required": ["condicionCompra", "tipoComprobante", "numeroComprobanteVenta", "numeroTimbrado", "fecha"],
+            "properties": {
+              "condicionCompra": {
+                "type": "string",
+                "enum": ["CONTADO", "CREDITO"],
+                "description": "Condición de compra"
+              },
+              "cuotas": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Número de cuotas (requerido si condicionCompra=CREDITO)"
+              },
+              "tipoComprobante": {
+                "type": "integer",
+                "enum": [1, 5, 11, 17, 18, 19, 20],
+                "description": "Tipo de comprobante"
+              },
+              "numeroComprobanteVenta": {
+                "type": "string",
+                "pattern": "^\\d{3}-\\d{3}-\\d{1,}$",
+                "description": "Número de comprobante de venta (formato: 999-999-9[9..])"
+              },
+              "numeroTimbrado": {
+                "type": "string",
+                "pattern": "^\\d{8}$",
+                "description": "Número de timbrado (8 dígitos)"
+              },
+              "fecha": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                "description": "Fecha en formato YYYY-MM-DD"
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "condicionCompra": {
+                      "const": "CREDITO"
+                    }
+                  }
+                },
+                "then": {
+                  "required": ["cuotas"]
+                }
+              }
+            ]
+          },
+          "detalle": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["cantidad", "tasaAplica", "precioUnitario", "descripcion"],
+              "properties": {
+                "cantidad": {
+                  "type": "number",
+                  "multipleOf": 0.01,
+                  "minimum": 0,
+                  "description": "Cantidad (máximo 2 decimales)"
+                },
+                "tasaAplica": {
+                  "type": "integer",
+                  "enum": [0, 5, 10],
+                  "description": "Tasa aplicable"
+                },
+                "precioUnitario": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Precio unitario (máximo 2 decimales si moneda extranjera)"
+                },
+                "descripcion": {
+                  "type": "string",
+                  "maxLength": 300,
+                  "description": "Descripción del ítem (máximo 300 caracteres)"
+                }
+              }
+            }
+          },
+          "totales": {
+            "type": "object",
+            "required": [
+              "valorTotalExento",
+              "valorTotalAl5",
+              "valorTotalAl10",
+              "valorTotal",
+              "impuestoTotalExento",
+              "impuestoTotalAl5",
+              "impuestoTotalAl10",
+              "impuestoTotal"
+            ],
+            "description": "Totales calculados del comprobante",
+            "properties": {
+              "valorTotalExento": {
+                "type": "number",
+                "description": "Valor total exento"
+              },
+              "valorTotalAl5": {
+                "type": "number",
+                "description": "Valor total al 5%"
+              },
+              "valorTotalAl10": {
+                "type": "number",
+                "description": "Valor total al 10%"
+              },
+              "valorTotal": {
+                "type": "number",
+                "description": "Valor total"
+              },
+              "impuestoTotalExento": {
+                "type": "number",
+                "description": "Impuesto total exento"
+              },
+              "impuestoTotalAl5": {
+                "type": "number",
+                "description": "Impuesto total al 5%"
+              },
+              "impuestoTotalAl10": {
+                "type": "number",
+                "description": "Impuesto total al 10%"
+              },
+              "impuestoTotal": {
+                "type": "number",
+                "description": "Impuesto total"
+              }
+            }
+          },
+          "retencion": {
+            "type": "object",
+            "required": [
+              "fecha",
+              "moneda",
+              "retencionRenta",
+              "retencionIva",
+              "rentaPorcentaje",
+              "ivaPorcentaje5",
+              "ivaPorcentaje10",
+              "rentaCabezasBase",
+              "rentaCabezasCantidad",
+              "rentaToneladasBase",
+              "rentaToneladasCantidad"
+            ],
+            "properties": {
+              "fecha": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                "description": "Fecha en formato YYYY-MM-DD"
+              },
+              "moneda": {
+                "type": "string",
+                "enum": ["EUR", "PYG", "USD", "BRL"],
+                "description": "Moneda"
+              },
+              "tipoCambio": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Tipo de cambio (requerido si moneda≠PYG, debe ser entero positivo)"
+              },
+              "retencionRenta": {
+                "type": "boolean",
+                "description": "Indica si hay retención de renta"
+              },
+              "conceptoRenta": {
+                "type": "string",
+                "description": "Concepto de renta"
+              },
+              "retencionIva": {
+                "type": "boolean",
+                "description": "Indica si hay retención de IVA"
+              },
+              "conceptoIva": {
+                "type": "string",
+                "description": "Concepto de IVA"
+              },
+              "rentaPorcentaje": {
+                "type": "number",
+                "enum": [0, 0.4, 0.5, 1, 1.5, 2, 2.4, 3, 4.5, 8, 10, 15, 20, 30],
+                "description": "Porcentaje de retención de renta"
+              },
+              "ivaPorcentaje5": {
+                "type": "number",
+                "enum": [0, 0.90909, 10, 30, 50, 70, 100],
+                "description": "Porcentaje de IVA 5%"
+              },
+              "ivaPorcentaje10": {
+                "type": "number",
+                "enum": [0, 0.90909, 30, 50, 70, 100],
+                "description": "Porcentaje de IVA 10%"
+              },
+              "rentaCabezasBase": {
+                "type": "number",
+                "description": "Base de renta por cabezas (puede ser 0)"
+              },
+              "rentaCabezasCantidad": {
+                "type": "number",
+                "description": "Cantidad de renta por cabezas (puede ser 0)"
+              },
+              "rentaToneladasBase": {
+                "type": "number",
+                "description": "Base de renta por toneladas (puede ser 0)"
+              },
+              "rentaToneladasCantidad": {
+                "type": "number",
+                "description": "Cantidad de renta por toneladas (puede ser 0)"
+              },
+              "ivaBase5": {
+                "type": "number",
+                "description": "Base de IVA 5% calculada"
+              },
+              "ivaBase10": {
+                "type": "number",
+                "description": "Base de IVA 10% calculada"
+              },
+              "ivaTotal5": {
+                "type": "number",
+                "description": "Total de IVA 5% calculado"
+              },
+              "ivaTotal10": {
+                "type": "number",
+                "description": "Total de IVA 10% calculado"
+              },
+              "rentaBase": {
+                "type": "number",
+                "description": "Base de renta calculada"
+              },
+              "rentaTotal": {
+                "type": "number",
+                "description": "Total de renta calculado"
+              },
+              "retencionTotal": {
+                "type": "number",
+                "description": "Total de retención calculado"
+              },
+              "retencionIvaTotal": {
+                "type": "number",
+                "description": "Total de retención de IVA calculado"
+              },
+              "retencionRentaTotal": {
+                "type": "number",
+                "description": "Total de retención de renta calculado"
+              },
+              "rentaCabezasTotal": {
+                "type": "number",
+                "description": "Total de renta por cabezas calculado"
+              },
+              "rentaToneladasTotal": {
+                "type": "number",
+                "description": "Total de renta por toneladas calculado"
+              },
+              "monedaNombre": {
+                "type": "string",
+                "description": "Nombre de la moneda"
+              },
+              "conceptoRentaNombre": {
+                "type": "string",
+                "description": "Nombre del concepto de renta"
+              },
+              "conceptoIvaNombre": {
+                "type": "string",
+                "description": "Nombre del concepto de IVA"
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "moneda": {
+                      "not": {
+                        "const": "PYG"
+                      }
+                    }
+                  }
+                },
+                "then": {
+                  "required": ["tipoCambio"]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "retencionRenta": {
+                      "const": true
+                    }
+                  }
+                },
+                "then": {
+                  "required": ["conceptoRenta"]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "retencionIva": {
+                      "const": true
+                    }
+                  }
+                },
+                "then": {
+                  "required": ["conceptoIva"]
+                }
+              }
+            ]
+          }
+        }
+      },
+      "estado": {
+        "type": "string",
+        "description": "Estado del comprobante (ej: 'enviado')"
+      },
+      "recepcion": {
+        "type": "object",
+        "description": "Información de recepción y procesamiento del comprobante",
+        "properties": {
+          "fechaProceso": {
+            "type": "string",
+            "description": "Fecha de proceso"
+          },
+          "numeroComprobante": {
+            "type": "string",
+            "description": "Número de comprobante asignado"
+          },
+          "numeroControl": {
+            "type": "string",
+            "description": "Número de control"
+          },
+          "cadenaControl": {
+            "type": "string",
+            "description": "Cadena de control"
+          },
+          "recepcionCorrecta": {
+            "type": "boolean",
+            "description": "Indica si la recepción fue correcta"
+          },
+          "mensajeRecepcion": {
+            "type": "string",
+            "description": "Mensaje de recepción"
+          },
+          "procesamientoCorrecto": {
+            "type": "boolean",
+            "description": "Indica si el procesamiento fue correcto"
+          },
+          "mensajeProcesamiento": {
+            "type": "string",
+            "description": "Mensaje de procesamiento"
+          },
+          "hash": {
+            "type": "string",
+            "description": "Hash del comprobante"
+          },
+          "codigoProcesamiento": {
+            "type": "string",
+            "description": "Código de procesamiento (puede aparecer en ejemplos)"
+          },
+          "numero": {
+            "type": "string",
+            "description": "Número (puede aparecer en ejemplos)"
+          },
+          "fechaRecepcion": {
+            "type": "string",
+            "description": "Fecha de recepción (puede aparecer en ejemplos)"
+          }
+        }
+      }
+    }
+  }
+}
+

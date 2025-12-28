@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+
+{% block title %}Producto #{{ product.id }} - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>Producto #{{ product.id }}</h2>
+
+<div style="margin-bottom: 1rem;">
+    <a href="/products" class="btn">← Volver a Lista</a>
+    <a href="/products/{{ product.id }}/edit" class="btn">✏️ Editar</a>
+</div>
+
+<h3>Información del Producto</h3>
+<table>
+    <tr>
+        <th>Código</th>
+        <td>{{ product.codigo or '-' }}</td>
+    </tr>
+    <tr>
+        <th>Nombre</th>
+        <td>{{ product.nombre }}</td>
+    </tr>
+    {% if product.descripcion %}
+    <tr>
+        <th>Descripción</th>
+        <td>{{ product.descripcion }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <th>Unidad de Medida</th>
+        <td>{{ product.unidad_medida }}</td>
+    </tr>
+    {% if product.precio_base %}
+    <tr>
+        <th>Precio Base</th>
+        <td>{{ "%.2f"|format(product.precio_base) }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <th>Estado</th>
+        <td>
+            <span style="padding: 0.25rem 0.5rem; border-radius: 3px; 
+                         background: {% if product.activo %}#27ae60{% else %}#e74c3c{% endif %}; 
+                         color: white;">
+                {{ 'Activo' if product.activo else 'Inactivo' }}
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <th>Creado</th>
+        <td>
+            {% if product.created_at %}
+                {% if product.created_at is string %}
+                    {{ product.created_at }}
+                {% else %}
+                    {{ product.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                {% endif %}
+            {% else %}
+                -
+            {% endif %}
+        </td>
+    </tr>
+</table>
+{% endblock %}
+

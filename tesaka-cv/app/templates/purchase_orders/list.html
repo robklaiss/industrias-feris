@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block title %}Órdenes de Compra - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>Órdenes de Compra</h2>
+
+<div style="margin-bottom: 1rem;">
+    <a href="/purchase-orders/new" class="btn">➕ Nueva Orden de Compra</a>
+    <a href="/reports/purchase_orders.xlsx" class="btn btn-success">📊 Excel</a>
+    <a href="/reports/purchase_orders.pdf" class="btn btn-success">📄 PDF</a>
+</div>
+
+<!-- Filtros -->
+<form method="get" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+    <div class="form-row">
+        <div class="form-group">
+            <label>Cliente:</label>
+            <input type="text" name="cliente" value="{{ filters.cliente or '' }}" placeholder="Buscar por cliente">
+        </div>
+        <div class="form-group">
+            <label>ID Contrato:</label>
+            <input type="number" name="contract_id" value="{{ filters.contract_id or '' }}" placeholder="ID de contrato">
+        </div>
+        <div class="form-group">
+            <label>ID Orden:</label>
+            <input type="number" name="id" value="{{ filters.id or '' }}" placeholder="ID de orden">
+        </div>
+    </div>
+    <button type="submit" class="btn">Filtrar</button>
+    <a href="/purchase-orders" class="btn">Limpiar</a>
+</form>
+
+{% if purchase_orders %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Número</th>
+            <th>Contrato</th>
+            <th>Cliente</th>
+            <th>RUC</th>
+            <th>Monto Total</th>
+            <th>Modo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for po in purchase_orders %}
+        <tr>
+            <td>{{ po.id }}</td>
+            <td>{{ po.fecha }}</td>
+            <td>{{ po.numero }}</td>
+            <td>{{ po.numero_contrato or '-' }}</td>
+            <td>{{ po.cliente_nombre or '-' }}</td>
+            <td>{{ po.cliente_ruc or '-' }}</td>
+            <td>{{ "%.2f"|format(po.monto_total) }}</td>
+            <td>{{ po.sync_mode }}</td>
+            <td>
+                <a href="/purchase-orders/{{ po.id }}" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Ver</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No se encontraron órdenes de compra. <a href="/purchase-orders/new">Crear la primera</a></p>
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,381 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-chart-line"></i> Dashboard</h2>
+
+<!-- Métricas Principales -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Productos -->
+    <div class="card" style="border-left: 4px solid var(--primary-color);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <p style="color: var(--text-secondary); margin: 0 0 0.5rem 0; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Productos</p>
+                <h3 style="margin: 0; font-size: 2rem; color: var(--primary-color);">{{ stats.products.total }}</h3>
+                <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">
+                    <span class="badge badge-success">{{ stats.products.activos }} activos</span>
+                </p>
+            </div>
+            <div style="font-size: 2.5rem; color: var(--primary-color); opacity: 0.2;">
+                <i class="fas fa-box"></i>
+            </div>
+        </div>
+        <a href="/products" class="btn btn-primary btn-sm" style="margin-top: 1rem; width: 100%;">
+            <i class="fas fa-arrow-right"></i> Ver Productos
+        </a>
+    </div>
+
+    <!-- Clientes -->
+    <div class="card" style="border-left: 4px solid var(--secondary-color);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <p style="color: var(--text-secondary); margin: 0 0 0.5rem 0; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Clientes</p>
+                <h3 style="margin: 0; font-size: 2rem; color: var(--secondary-color);">{{ stats.clients.total }}</h3>
+            </div>
+            <div style="font-size: 2.5rem; color: var(--secondary-color); opacity: 0.2;">
+                <i class="fas fa-users"></i>
+            </div>
+        </div>
+        <a href="/clients" class="btn btn-success btn-sm" style="margin-top: 1rem; width: 100%;">
+            <i class="fas fa-arrow-right"></i> Ver Clientes
+        </a>
+    </div>
+
+    <!-- Contratos -->
+    <div class="card" style="border-left: 4px solid var(--info-color);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <p style="color: var(--text-secondary); margin: 0 0 0.5rem 0; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Contratos</p>
+                <h3 style="margin: 0; font-size: 2rem; color: var(--info-color);">{{ stats.contracts.total }}</h3>
+                <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">
+                    <span class="badge badge-success">{{ stats.contracts.vigentes }} vigentes</span>
+                    {% if stats.contracts.cancelados > 0 %}
+                    <span class="badge badge-danger">{{ stats.contracts.cancelados }} cancelados</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div style="font-size: 2.5rem; color: var(--info-color); opacity: 0.2;">
+                <i class="fas fa-file-contract"></i>
+            </div>
+        </div>
+        <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color);">
+            <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">Monto Total:</p>
+            <p style="margin: 0.25rem 0 0 0; font-size: 1.25rem; font-weight: 600; color: var(--text-primary);">
+                {{ "%.2f"|format(stats.contracts.monto_total) }}
+            </p>
+        </div>
+        <a href="/contracts" class="btn btn-primary btn-sm" style="margin-top: 1rem; width: 100%;">
+            <i class="fas fa-arrow-right"></i> Ver Contratos
+        </a>
+    </div>
+
+    <!-- Órdenes de Compra -->
+    <div class="card" style="border-left: 4px solid #8b5cf6;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <p style="color: var(--text-secondary); margin: 0 0 0.5rem 0; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Órdenes de Compra</p>
+                <h3 style="margin: 0; font-size: 2rem; color: #8b5cf6;">{{ stats.purchase_orders.total }}</h3>
+            </div>
+            <div style="font-size: 2.5rem; color: #8b5cf6; opacity: 0.2;">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+        </div>
+        <a href="/purchase-orders" class="btn btn-primary btn-sm" style="margin-top: 1rem; width: 100%;">
+            <i class="fas fa-arrow-right"></i> Ver Órdenes
+        </a>
+    </div>
+
+    <!-- Notas de Entrega -->
+    <div class="card" style="border-left: 4px solid #f59e0b;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <p style="color: var(--text-secondary); margin: 0 0 0.5rem 0; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Notas de Entrega</p>
+                <h3 style="margin: 0; font-size: 2rem; color: #f59e0b;">{{ stats.delivery_notes.total }}</h3>
+            </div>
+            <div style="font-size: 2.5rem; color: #f59e0b; opacity: 0.2;">
+                <i class="fas fa-truck"></i>
+            </div>
+        </div>
+        <a href="/delivery-notes" class="btn btn-primary btn-sm" style="margin-top: 1rem; width: 100%;">
+            <i class="fas fa-arrow-right"></i> Ver Entregas
+        </a>
+    </div>
+
+    <!-- Remisiones -->
+    <div class="card" style="border-left: 4px solid #ec4899;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <p style="color: var(--text-secondary); margin: 0 0 0.5rem 0; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Remisiones</p>
+                <h3 style="margin: 0; font-size: 2rem; color: #ec4899;">{{ stats.remissions.total }}</h3>
+            </div>
+            <div style="font-size: 2.5rem; color: #ec4899; opacity: 0.2;">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+        </div>
+        <a href="/remissions" class="btn btn-primary btn-sm" style="margin-top: 1rem; width: 100%;">
+            <i class="fas fa-arrow-right"></i> Ver Remisiones
+        </a>
+    </div>
+
+    <!-- Facturas de Venta -->
+    <div class="card" style="border-left: 4px solid #10b981;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <p style="color: var(--text-secondary); margin: 0 0 0.5rem 0; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Facturas de Venta</p>
+                <h3 style="margin: 0; font-size: 2rem; color: #10b981;">{{ stats.sales_invoices.total }}</h3>
+            </div>
+            <div style="font-size: 2.5rem; color: #10b981; opacity: 0.2;">
+                <i class="fas fa-file-invoice"></i>
+            </div>
+        </div>
+        <a href="/sales-invoices" class="btn btn-success btn-sm" style="margin-top: 1rem; width: 100%;">
+            <i class="fas fa-arrow-right"></i> Ver Facturas
+        </a>
+    </div>
+
+    <!-- Facturas Tesaka -->
+    <div class="card" style="border-left: 4px solid #06b6d4;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <p style="color: var(--text-secondary); margin: 0 0 0.5rem 0; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Facturas Tesaka</p>
+                <h3 style="margin: 0; font-size: 2rem; color: #06b6d4;">{{ stats.invoices.total }}</h3>
+            </div>
+            <div style="font-size: 2.5rem; color: #06b6d4; opacity: 0.2;">
+                <i class="fas fa-file-alt"></i>
+            </div>
+        </div>
+        <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color);">
+            <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">Total Facturado:</p>
+            <p style="margin: 0.25rem 0 0 0; font-size: 1.25rem; font-weight: 600; color: var(--text-primary);">
+                {{ "%.2f"|format(stats.invoices.total_facturado) }}
+            </p>
+        </div>
+        <a href="/invoices" class="btn btn-primary btn-sm" style="margin-top: 1rem; width: 100%;">
+            <i class="fas fa-arrow-right"></i> Ver Facturas
+        </a>
+    </div>
+
+    <!-- Envíos a Tesaka -->
+    {% if stats.submissions.total > 0 %}
+    <div class="card" style="border-left: 4px solid var(--warning-color);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <p style="color: var(--text-secondary); margin: 0 0 0.5rem 0; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Envíos Tesaka</p>
+                <h3 style="margin: 0; font-size: 2rem; color: var(--warning-color);">{{ stats.submissions.total }}</h3>
+                <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">
+                    <span class="badge badge-success">{{ stats.submissions.exitosos }} exitosos</span>
+                    {% if stats.submissions.fallidos > 0 %}
+                    <span class="badge badge-danger">{{ stats.submissions.fallidos }} fallidos</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div style="font-size: 2.5rem; color: var(--warning-color); opacity: 0.2;">
+                <i class="fas fa-paper-plane"></i>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Últimos Registros -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+    <!-- Últimos Contratos -->
+    {% if recent.contracts %}
+    <div class="card">
+        <div class="card-header">
+            <h4 style="margin: 0;"><i class="fas fa-file-contract"></i> Últimos Contratos</h4>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Fecha</th>
+                        <th class="text-center">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contract in recent.contracts %}
+                    <tr>
+                        <td><strong>{{ contract.numero_contrato }}</strong></td>
+                        <td>{{ contract.fecha }}</td>
+                        <td class="text-center">
+                            <a href="/contracts/{{ contract.id }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Últimas Órdenes de Compra -->
+    {% if recent.purchase_orders %}
+    <div class="card">
+        <div class="card-header">
+            <h4 style="margin: 0;"><i class="fas fa-shopping-cart"></i> Últimas Órdenes</h4>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Fecha</th>
+                        <th class="text-center">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent.purchase_orders %}
+                    <tr>
+                        <td><strong>{{ order.numero }}</strong></td>
+                        <td>{{ order.fecha }}</td>
+                        <td class="text-center">
+                            <a href="/purchase-orders/{{ order.id }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Últimas Remisiones -->
+    {% if recent.remissions %}
+    <div class="card">
+        <div class="card-header">
+            <h4 style="margin: 0;"><i class="fas fa-clipboard-list"></i> Últimas Remisiones</h4>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Fecha</th>
+                        <th class="text-center">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for remission in recent.remissions %}
+                    <tr>
+                        <td><strong>{{ remission.numero_remision }}</strong></td>
+                        <td>{{ remission.fecha_inicio }}</td>
+                        <td class="text-center">
+                            <a href="/remissions/{{ remission.id }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Últimas Facturas de Venta -->
+    {% if recent.sales_invoices %}
+    <div class="card">
+        <div class="card-header">
+            <h4 style="margin: 0;"><i class="fas fa-file-invoice"></i> Últimas Facturas</h4>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Fecha</th>
+                        <th class="text-center">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in recent.sales_invoices %}
+                    <tr>
+                        <td><strong>{{ invoice.numero }}</strong></td>
+                        <td>{{ invoice.fecha }}</td>
+                        <td class="text-center">
+                            <a href="/sales-invoices/{{ invoice.id }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Últimas Facturas Tesaka -->
+    {% if recent.invoices %}
+    <div class="card">
+        <div class="card-header">
+            <h4 style="margin: 0;"><i class="fas fa-file-alt"></i> Últimas Facturas Tesaka</h4>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Comprador</th>
+                        <th class="text-center">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in recent.invoices %}
+                    <tr>
+                        <td><strong>#{{ invoice.id }}</strong></td>
+                        <td>{{ invoice.issue_date }}</td>
+                        <td>{{ invoice.buyer_name[:30] }}{% if invoice.buyer_name|length > 30 %}...{% endif %}</td>
+                        <td class="text-center">
+                            <a href="/invoices/{{ invoice.id }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if stats.products.total == 0 and stats.clients.total == 0 and stats.contracts.total == 0 %}
+<div class="empty-state" style="margin-top: 2rem;">
+    <i class="fas fa-database"></i>
+    <h3>¡Bienvenido a Industrias Feris!</h3>
+    <p style="margin-top: 1rem; color: var(--text-secondary);">
+        Comienza agregando tus primeros productos, clientes y contratos.
+    </p>
+    <div class="btn-group" style="margin-top: 1.5rem; justify-content: center;">
+        <a href="/products/new" class="btn btn-success">
+            <i class="fas fa-plus"></i> Agregar Producto
+        </a>
+        <a href="/clients/new" class="btn btn-success">
+            <i class="fas fa-plus"></i> Agregar Cliente
+        </a>
+        <a href="/contracts/new" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Crear Contrato
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<style>
+/* Responsive adjustments for dashboard */
+@media (max-width: 768px) {
+    div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+{% endblock %}
+

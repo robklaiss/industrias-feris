@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}{% if product %}Editar{% else %}Nuevo{% endif %} Producto - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>{% if product %}Editar{% else %}Nuevo{% endif %} Producto</h2>
+
+<form method="post" action="{% if product %}/products/{{ product.id }}{% else %}/products{% endif %}">
+    <div class="form-row">
+        <div class="form-group">
+            <label for="codigo">Código</label>
+            <input type="text" id="codigo" name="codigo" value="{{ product.codigo if product else '' }}" placeholder="Código único (opcional)">
+        </div>
+        <div class="form-group">
+            <label for="nombre">Nombre *</label>
+            <input type="text" id="nombre" name="nombre" value="{{ product.nombre if product else '' }}" required>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label for="descripcion">Descripción</label>
+        <textarea id="descripcion" name="descripcion" rows="3">{{ product.descripcion if product else '' }}</textarea>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label for="unidad_medida">Unidad de Medida *</label>
+            <select id="unidad_medida" name="unidad_medida" required>
+                <option value="">Seleccionar...</option>
+                <option value="kg" {% if product and product.unidad_medida == 'kg' %}selected{% endif %}>kg</option>
+                <option value="g" {% if product and product.unidad_medida == 'g' %}selected{% endif %}>g</option>
+                <option value="tn" {% if product and product.unidad_medida == 'tn' %}selected{% endif %}>tn</option>
+                <option value="l" {% if product and product.unidad_medida == 'l' %}selected{% endif %}>l</option>
+                <option value="ml" {% if product and product.unidad_medida == 'ml' %}selected{% endif %}>ml</option>
+                <option value="m" {% if product and product.unidad_medida == 'm' %}selected{% endif %}>m</option>
+                <option value="cm" {% if product and product.unidad_medida == 'cm' %}selected{% endif %}>cm</option>
+                <option value="un" {% if product and product.unidad_medida == 'un' %}selected{% endif %}>un</option>
+                <option value="caj" {% if product and product.unidad_medida == 'caj' %}selected{% endif %}>caj</option>
+                <option value="pza" {% if product and product.unidad_medida == 'pza' %}selected{% endif %}>pza</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="precio_base">Precio Base</label>
+            <input type="number" step="0.01" id="precio_base" name="precio_base" value="{{ product.precio_base if product and product.precio_base else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="activo">Estado</label>
+            <select id="activo" name="activo">
+                <option value="1" {% if not product or product.activo %}selected{% endif %}>Activo</option>
+                <option value="0" {% if product and not product.activo %}selected{% endif %}>Inactivo</option>
+            </select>
+        </div>
+    </div>
+    
+    <div style="margin-top: 2rem;">
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a href="/products" class="btn">Cancelar</a>
+    </div>
+</form>
+{% endblock %}
+

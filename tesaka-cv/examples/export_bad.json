@@ -1,0 +1,67 @@
+[
+  {
+    "datos": {
+      "atributos": {
+        "fechaCreacion": "2024-01-15",
+        "uuid": "550e8400-e29b-41d4-a716-446655440000",
+        "version": "1.0"
+      },
+      "id": "COMP-001",
+      "informante": {
+        "domicilioEmision": "Av. Principal 123",
+        "telefono": "021-123456",
+        "nombreFantasia": "Mi Empresa"
+      },
+      "informado": {
+        "situacion": "CONTRIBUYENTE",
+        "nombre": "Cliente Ejemplo S.A.",
+        "ruc": "80012345",
+        "dv": "7"
+      },
+      "transaccion": {
+        "condicionCompra": "CONTADO",
+        "tipoComprobante": 1,
+        "numeroComprobanteVenta": "001-001-00000001",
+        "numeroTimbrado": "12345678",
+        "fecha": "2024-01-15"
+      },
+      "detalle": [
+        {
+          "cantidad": 10.5,
+          "tasaAplica": 10,
+          "precioUnitario": 1000.0,
+          "descripcion": "Producto de ejemplo"
+        }
+      ],
+      "totales": {
+        "valorTotalExento": 0,
+        "valorTotalAl5": 0,
+        "valorTotalAl10": 10500,
+        "valorTotal": 10500,
+        "impuestoTotalExento": 0,
+        "impuestoTotalAl5": 0,
+        "impuestoTotalAl10": 1050
+      },
+      "retencion": {
+        "fecha": "2024-01-15",
+        "moneda": "USD",
+        "retencionRenta": true,
+        "retencionIva": false,
+        "rentaPorcentaje": 1,
+        "ivaPorcentaje5": 0,
+        "ivaPorcentaje10": 0,
+        "rentaCabezasBase": 0,
+        "rentaCabezasCantidad": 0,
+        "rentaToneladasBase": 0,
+        "rentaToneladasCantidad": 0
+      }
+    },
+    "estado": "enviado",
+    "recepcion": {
+      "fechaProceso": "2024-01-15",
+      "numeroComprobante": "001-001-00000001",
+      "recepcionCorrecta": true
+    }
+  }
+]
+

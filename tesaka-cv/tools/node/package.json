@@ -1,0 +1,15 @@
+{
+  "name": "sifen-xmlgen-runner",
+  "version": "1.0.0",
+  "description": "Runner para facturacionelectronicapy-xmlgen (oracle validation)",
+  "main": "xmlgen_runner.cjs",
+  "type": "commonjs",
+  "scripts": {
+    "xmlgen:de": "node xmlgen_runner.cjs"
+  },
+  "dependencies": {
+    "facturacionelectronicapy-xmlgen": "github:TIPS-SA/facturacionelectronicapy-xmlgen"
+  },
+  "private": true
+}
+

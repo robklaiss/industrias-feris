@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block title %}Remisiones - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>Remisiones</h2>
+
+<div style="margin-bottom: 1rem;">
+    <a href="/remissions/new" class="btn">➕ Nueva Remisión</a>
+    <a href="/reports/remissions.xlsx" class="btn btn-success">📊 Excel</a>
+    <a href="/reports/remissions.pdf" class="btn btn-success">📄 PDF</a>
+</div>
+
+<!-- Filtros -->
+<form method="get" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+    <div class="form-row">
+        <div class="form-group">
+            <label>Cliente:</label>
+            <input type="text" name="cliente" value="{{ filters.cliente or '' }}" placeholder="Buscar por cliente">
+        </div>
+        <div class="form-group">
+            <label>ID Contrato:</label>
+            <input type="number" name="contract_id" value="{{ filters.contract_id or '' }}" placeholder="ID de contrato">
+        </div>
+    </div>
+    <button type="submit" class="btn">Filtrar</button>
+    <a href="/remissions" class="btn">Limpiar</a>
+</form>
+
+{% if remissions %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Número Remisión</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Fin</th>
+            <th>Partida</th>
+            <th>Llegada</th>
+            <th>Transportista</th>
+            <th>Cliente</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in remissions %}
+        <tr>
+            <td>{{ r.id }}</td>
+            <td>{{ r.numero_remision }}</td>
+            <td>{{ r.fecha_inicio }}</td>
+            <td>{{ r.fecha_fin or '-' }}</td>
+            <td>{{ r.partida or '-' }}</td>
+            <td>{{ r.llegada or '-' }}</td>
+            <td>{{ r.transportista_nombre or '-' }}</td>
+            <td>{{ r.cliente_nombre or '-' }}</td>
+            <td>
+                <a href="/remissions/{{ r.id }}" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Ver</a>
+                <a href="/remissions/{{ r.id }}/print" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">🖨️</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No se encontraron remisiones. <a href="/remissions/new">Crear la primera</a></p>
+{% endif %}
+{% endblock %}
+

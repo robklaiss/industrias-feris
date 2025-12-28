@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block title %}Productos - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>Productos</h2>
+
+<div style="margin-bottom: 1rem;">
+    <a href="/products/new" class="btn">➕ Nuevo Producto</a>
+</div>
+
+<!-- Filtros -->
+<form method="get" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+    <div class="form-row">
+        <div class="form-group">
+            <label>Buscar:</label>
+            <input type="text" name="search" value="{{ filters.search or '' }}" placeholder="Código, nombre o descripción">
+        </div>
+        <div class="form-group">
+            <label>Estado:</label>
+            <select name="activo">
+                <option value="">Todos</option>
+                <option value="1" {% if filters.activo == '1' %}selected{% endif %}>Activos</option>
+                <option value="0" {% if filters.activo == '0' %}selected{% endif %}>Inactivos</option>
+            </select>
+        </div>
+    </div>
+    <button type="submit" class="btn">Filtrar</button>
+    <a href="/products" class="btn">Limpiar</a>
+</form>
+
+{% if products %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Unidad de Medida</th>
+            <th>Precio Base</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+        <tr>
+            <td>{{ product.id }}</td>
+            <td>{{ product.codigo or '-' }}</td>
+            <td>{{ product.nombre }}</td>
+            <td>{{ product.descripcion or '-' }}</td>
+            <td>{{ product.unidad_medida }}</td>
+            <td>{{ "%.2f"|format(product.precio_base) if product.precio_base else '-' }}</td>
+            <td>
+                <span style="padding: 0.25rem 0.5rem; border-radius: 3px; 
+                             background: {% if product.activo %}#27ae60{% else %}#e74c3c{% endif %}; 
+                             color: white;">
+                    {{ 'Activo' if product.activo else 'Inactivo' }}
+                </span>
+            </td>
+            <td>
+                <a href="/products/{{ product.id }}" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Ver</a>
+                <a href="/products/{{ product.id }}/edit" class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">Editar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No se encontraron productos. <a href="/products/new">Crear el primero</a></p>
+{% endif %}
+{% endblock %}
+

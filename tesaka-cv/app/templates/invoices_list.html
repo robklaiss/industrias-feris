@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block title %}Lista de Facturas - Industrias Feris{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+    <h2 style="margin: 0;">
+        <i class="fas fa-file-alt"></i> Facturas Tesaka
+    </h2>
+    <a href="/invoices/new" class="btn btn-success">
+        <i class="fas fa-plus"></i> Nueva Factura
+    </a>
+</div>
+
+{% if invoices %}
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Fecha Emisión</th>
+                <th>Comprador</th>
+                <th>Total</th>
+                <th>Creado</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for invoice in invoices %}
+            <tr>
+                <td><strong>#{{ invoice.id }}</strong></td>
+                <td>{{ invoice.issue_date }}</td>
+                <td>{{ invoice.buyer_name }}</td>
+                <td><strong>{{ "%.2f"|format(invoice.calculate_total()) }}</strong></td>
+                <td>{{ invoice.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td class="text-center">
+                    <a href="/invoices/{{ invoice.id }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye"></i> Ver
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-file-invoice"></i>
+    <h3>No hay facturas guardadas</h3>
+    <p style="margin-top: 1rem;">
+        <a href="/invoices/new" class="btn btn-success">
+            <i class="fas fa-plus"></i> Crear primera factura
+        </a>
+    </p>
+</div>
+{% endif %}
+{% endblock %}
+

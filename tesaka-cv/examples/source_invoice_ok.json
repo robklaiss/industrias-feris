@@ -1,0 +1,42 @@
+{
+  "issue_date": "2024-01-15",
+  "issue_datetime": "2024-01-15 10:30:00",
+  "buyer": {
+    "situacion": "CONTRIBUYENTE",
+    "nombre": "Empresa Ejemplo S.A.",
+    "ruc": "80012345",
+    "dv": "7",
+    "domicilio": "Av. Principal 123",
+    "direccion": "Asunción",
+    "telefono": "021-123456"
+  },
+  "transaction": {
+    "condicionCompra": "CONTADO",
+    "tipoComprobante": 1,
+    "numeroComprobanteVenta": "001-001-00000001",
+    "numeroTimbrado": "12345678",
+    "fecha": "2024-01-15"
+  },
+  "items": [
+    {
+      "cantidad": 10.5,
+      "tasaAplica": 10,
+      "precioUnitario": 1000.0,
+      "descripcion": "Producto de ejemplo"
+    }
+  ],
+  "retention": {
+    "fecha": "2024-01-15",
+    "moneda": "PYG",
+    "retencionRenta": false,
+    "retencionIva": false,
+    "rentaPorcentaje": 0,
+    "ivaPorcentaje5": 0,
+    "ivaPorcentaje10": 0,
+    "rentaCabezasBase": 0,
+    "rentaCabezasCantidad": 0,
+    "rentaToneladasBase": 0,
+    "rentaToneladasCantidad": 0
+  }
+}
+

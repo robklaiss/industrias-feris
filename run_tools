@@ -1,0 +1,77 @@
+#!/bin/bash
+# Script ejecutable para correr herramientas desde el repo raíz
+# Uso: ./run_tools <comando> [argumentos...]
+#
+# Ejemplo:
+#   ./run_tools smoketest --input examples/de_input.json
+#   ./run_tools oracle_compare --input tesaka-cv/examples/de_input.json
+#   ./run_tools validate_xml tesaka-cv/artifacts/test.xml
+
+set -e
+
+# Obtener directorio del script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Cambiar a tesaka-cv
+cd "$SCRIPT_DIR/tesaka-cv"
+
+# Verificar que existe
+if [ ! -d "tools" ]; then
+    echo "❌ Error: No se encontró tesaka-cv/tools/"
+    exit 1
+fi
+
+# Detectar Python (venv o sistema)
+if [ -f "$SCRIPT_DIR/.venv/bin/python" ]; then
+    PYTHON_CMD="$SCRIPT_DIR/.venv/bin/python"
+elif [ -f "$SCRIPT_DIR/.venv/bin/python3" ]; then
+    PYTHON_CMD="$SCRIPT_DIR/.venv/bin/python3"
+elif command -v python3 &> /dev/null; then
+    PYTHON_CMD="python3"
+elif command -v python &> /dev/null; then
+    PYTHON_CMD="python"
+else
+    echo "❌ Error: No se encontró Python"
+    exit 1
+fi
+
+# Ejecutar comando
+if [ $# -eq 0 ]; then
+    echo "Uso: ./run_tools <comando> [argumentos...]"
+    echo ""
+    echo "Comandos disponibles:"
+    echo "  smoketest         Smoke test end-to-end completo"
+    echo "  oracle_compare    Compara generación DE Python vs xmlgen"
+    echo "  validate_xml      Valida XML contra XSD"
+    echo "  validate_xsd      Valida XML contra XSD (modo manual)"
+    echo "  build_de          Genera DE crudo"
+    echo "  build_sirecepde   Genera siRecepDE"
+    echo "  download_xsd      Descarga XSD oficiales"
+    echo "  send_sirecepde    Envía siRecepDE a SIFEN (SOAP)"
+    echo ""
+    echo "Ejemplos:"
+    echo "  ./run_tools smoketest --input examples/de_input.json"
+    echo "  ./run_tools oracle_compare --input examples/de_input.json"
+    echo "  ./run_tools validate_xml artifacts/test.xml"
+    exit 1
+fi
+
+# Obtener comando y argumentos
+COMMAND=$1
+shift
+
+# Convertir paths que empiezan con tesaka-cv/ a paths relativos a tesaka-cv/
+# Ejemplo: tesaka-cv/examples/file.json -> examples/file.json
+CONVERTED_ARGS=()
+for arg in "$@"; do
+    if [[ "$arg" == tesaka-cv/* ]]; then
+        # Remover prefijo tesaka-cv/
+        CONVERTED_ARGS+=("${arg#tesaka-cv/}")
+    else
+        CONVERTED_ARGS+=("$arg")
+    fi
+done
+
+# Ejecutar comando con argumentos convertidos (usar comillas para manejar espacios)
+"$PYTHON_CMD" -m "tools.$COMMAND" "${CONVERTED_ARGS[@]}"
+

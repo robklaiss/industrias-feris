@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block title %}Remisión {{ remission.numero_remision }} - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>Remisión {{ remission.numero_remision }}</h2>
+
+<div style="margin-bottom: 1rem;">
+    <a href="/remissions" class="btn">← Volver a Lista</a>
+    <a href="/remissions/{{ remission.id }}/print" class="btn">🖨️ Imprimir</a>
+</div>
+
+<h3>Información General</h3>
+<table>
+    <tr>
+        <th>Número Remisión</th>
+        <td>{{ remission.numero_remision }}</td>
+    </tr>
+    <tr>
+        <th>Fecha Inicio</th>
+        <td>{{ remission.fecha_inicio }}</td>
+    </tr>
+    {% if remission.fecha_fin %}
+    <tr>
+        <th>Fecha Fin</th>
+        <td>{{ remission.fecha_fin }}</td>
+    </tr>
+    {% endif %}
+    {% if remission.partida %}
+    <tr>
+        <th>Partida</th>
+        <td>{{ remission.partida }}</td>
+    </tr>
+    {% endif %}
+    {% if remission.llegada %}
+    <tr>
+        <th>Llegada</th>
+        <td>{{ remission.llegada }}</td>
+    </tr>
+    {% endif %}
+    {% if remission.transportista_nombre %}
+    <tr>
+        <th>Transportista</th>
+        <td>{{ remission.transportista_nombre }} {% if remission.transportista_ruc %}({{ remission.transportista_ruc }}){% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if remission.vehiculo_marca %}
+    <tr>
+        <th>Vehículo</th>
+        <td>{{ remission.vehiculo_marca }} {% if remission.chapa %}- Chapa: {{ remission.chapa }}{% endif %}</td>
+    </tr>
+    {% endif %}
+    {% if remission.conductor_nombre %}
+    <tr>
+        <th>Conductor</th>
+        <td>{{ remission.conductor_nombre }} {% if remission.conductor_ci %}(CI: {{ remission.conductor_ci }}){% endif %}</td>
+    </tr>
+    {% endif %}
+</table>
+
+<h3>Items</h3>
+{% if items %}
+<table>
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Unidad</th>
+            <th>Cantidad</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.producto }}</td>
+            <td>{{ item.unidad_medida }}</td>
+            <td>{{ "%.2f"|format(item.cantidad) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No hay items en esta remisión.</p>
+{% endif %}
+{% endblock %}
+

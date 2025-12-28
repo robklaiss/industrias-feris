@@ -1,0 +1,366 @@
+{% extends "layout.html" %}
+
+{% block title %}Factura #{{ invoice.id }} - Industrias Feris{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+    <h2 style="margin: 0;">
+        <i class="fas fa-file-invoice"></i> Factura #{{ invoice.id }}
+    </h2>
+    <a href="/invoices" class="btn btn-primary">
+        <i class="fas fa-arrow-left"></i> Volver
+    </a>
+</div>
+
+<div class="btn-group">
+    <button class="btn btn-success" onclick="validateInvoice()">
+        <i class="fas fa-check-circle"></i> Validar Schema
+    </button>
+    <a href="/invoices/{{ invoice.id }}/export" class="btn btn-success">
+        <i class="fas fa-download"></i> Exportar JSON
+    </a>
+    <button class="btn btn-primary" onclick="sendToTesaka('factura')">
+        <i class="fas fa-paper-plane"></i> Enviar Factura
+    </button>
+    <button class="btn btn-primary" onclick="sendToTesaka('retencion')">
+        <i class="fas fa-paper-plane"></i> Enviar Retención
+    </button>
+    <button class="btn btn-primary" onclick="sendToTesaka('autofactura')">
+        <i class="fas fa-paper-plane"></i> Enviar Autofactura
+    </button>
+    <button class="btn btn-info" onclick="loadSubmissions()">
+        <i class="fas fa-history"></i> Historial
+    </button>
+</div>
+
+<div id="validation_result" style="display: none;"></div>
+<div id="send_result" style="display: none;"></div>
+<div id="submissions_section" style="display: none;"></div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 style="margin: 0;"><i class="fas fa-info-circle"></i> Información General</h3>
+    </div>
+    <div class="table-wrapper">
+        <table>
+            <tbody>
+                <tr>
+                    <th style="width: 200px;">Fecha de Emisión</th>
+                    <td>{{ invoice.issue_date }}</td>
+                </tr>
+                {% if invoice.data.get('issue_datetime') %}
+                <tr>
+                    <th>Fecha y Hora</th>
+                    <td>{{ invoice.data['issue_datetime'] }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th>Creado</th>
+                    <td>{{ invoice.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 style="margin: 0;"><i class="fas fa-user"></i> Comprador</h3>
+    </div>
+    <div class="table-wrapper">
+        <table>
+            <tbody>
+                {% for key, value in invoice.data['buyer'].items() %}
+                <tr>
+                    <th style="width: 200px;">{{ key }}</th>
+                    <td>
+                        {% if value is mapping %}
+                            <table style="margin: 0; width: 100%;">
+                                {% for k, v in value.items() %}
+                                <tr>
+                                    <td style="padding: 0.5rem 0.75rem; border: none; width: 40%;"><strong>{{ k }}:</strong></td>
+                                    <td style="padding: 0.5rem 0.75rem; border: none;">{{ v }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        {% else %}
+                            {{ value }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 style="margin: 0;"><i class="fas fa-exchange-alt"></i> Transacción</h3>
+    </div>
+    <div class="table-wrapper">
+        <table>
+            <tbody>
+                {% for key, value in invoice.data['transaction'].items() %}
+                <tr>
+                    <th style="width: 200px;">{{ key }}</th>
+                    <td>{{ value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 style="margin: 0;"><i class="fas fa-list"></i> Items</h3>
+    </div>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Cantidad</th>
+                    <th>Tasa</th>
+                    <th>Precio Unitario</th>
+                    <th>Descripción</th>
+                    <th class="text-right">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in invoice.data['items'] %}
+                <tr>
+                    <td>{{ item.cantidad }}</td>
+                    <td>{{ item.tasaAplica }}%</td>
+                    <td>{{ "%.2f"|format(item.precioUnitario) }}</td>
+                    <td>{{ item.descripcion }}</td>
+                    <td class="text-right"><strong>{{ "%.2f"|format(item.cantidad * item.precioUnitario) }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr style="background-color: var(--light-bg);">
+                    <th colspan="4" class="text-right">Total</th>
+                    <th class="text-right" style="font-size: 1.125rem;">{{ "%.2f"|format(invoice.calculate_total()) }}</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 style="margin: 0;"><i class="fas fa-percent"></i> Retención</h3>
+    </div>
+    <div class="table-wrapper">
+        <table>
+            <tbody>
+                {% for key, value in invoice.data['retention'].items() %}
+                <tr>
+                    <th style="width: 200px;">{{ key }}</th>
+                    <td>{{ value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 style="margin: 0;"><i class="fas fa-code"></i> Datos JSON</h3>
+    </div>
+    <pre style="background-color: var(--light-bg); padding: 1.5rem; border-radius: var(--radius); overflow-x: auto; margin: 0; font-size: 0.875rem; line-height: 1.6;">{{ invoice.data | tojson(indent=2) }}</pre>
+</div>
+
+<script>
+async function validateInvoice() {
+    const resultDiv = document.getElementById('validation_result');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Validando...</div>';
+    
+    try {
+        const response = await fetch('/invoices/{{ invoice.id }}/validate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.valid) {
+            resultDiv.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> <strong>Validación exitosa:</strong> El comprobante Tesaka es válido según el schema de importación.</div>';
+        } else {
+            let html = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <strong>Validación fallida:</strong> Se encontraron los siguientes errores:<ul style="margin-top: 0.75rem;">';
+            data.errors.forEach(error => {
+                html += '<li>' + escapeHtml(error) + '</li>';
+            });
+            html += '</ul></div>';
+            resultDiv.innerHTML = html;
+        }
+    } catch (error) {
+        resultDiv.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> ' + escapeHtml(error.message) + '</div>';
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+async function sendToTesaka(kind) {
+    const resultDiv = document.getElementById('send_result');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Enviando a Tesaka...</div>';
+    
+    try {
+        const response = await fetch(`/invoices/{{ invoice.id }}/send/${kind}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.ok) {
+            let html = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> <strong>Envío exitoso:</strong>';
+            html += '<pre style="background-color: rgba(0,0,0,0.05); padding: 1rem; border-radius: var(--radius); overflow-x: auto; margin-top: 0.75rem; font-size: 0.875rem;">';
+            html += escapeHtml(JSON.stringify(data.response, null, 2));
+            html += '</pre></div>';
+            resultDiv.innerHTML = html;
+            
+            loadSubmissions();
+        } else {
+            let html = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <strong>Error al enviar:</strong><p style="margin-top: 0.5rem;">' + escapeHtml(data.error || 'Error desconocido') + '</p>';
+            if (data.errors) {
+                html += '<ul style="margin-top: 0.75rem;">';
+                data.errors.forEach(error => {
+                    html += '<li>' + escapeHtml(error) + '</li>';
+                });
+                html += '</ul>';
+            }
+            html += '</div>';
+            resultDiv.innerHTML = html;
+        }
+    } catch (error) {
+        resultDiv.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> ' + escapeHtml(error.message) + '</div>';
+    }
+}
+
+async function loadSubmissions() {
+    const section = document.getElementById('submissions_section');
+    section.style.display = 'block';
+    section.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Cargando historial...</div>';
+    
+    try {
+        const response = await fetch('/invoices/{{ invoice.id }}/submissions');
+        const data = await response.json();
+        
+        if (data.submissions.length === 0) {
+            section.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No hay envíos registrados para esta factura.</p></div>';
+            return;
+        }
+        
+        let html = '<div class="card"><div class="card-header"><h3 style="margin: 0;"><i class="fas fa-history"></i> Historial de Envíos a Tesaka</h3></div>';
+        html += '<div class="table-wrapper"><table><thead><tr><th>Fecha</th><th>Tipo</th><th>Entorno</th><th>Estado</th><th class="text-center">Acciones</th></tr></thead><tbody>';
+        
+        data.submissions.forEach(sub => {
+            const statusIcon = sub.ok ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>';
+            const statusText = sub.ok ? 'Exitoso' : 'Error';
+            const statusClass = sub.ok ? 'badge-success' : 'badge-danger';
+            html += `<tr>
+                <td>${escapeHtml(sub.created_at)}</td>
+                <td><span class="badge badge-info">${escapeHtml(sub.kind)}</span></td>
+                <td><span class="badge">${escapeHtml(sub.env)}</span></td>
+                <td><span class="badge ${statusClass}">${statusIcon} ${statusText}</span></td>
+                <td class="text-center">
+                    <button onclick="showSubmissionDetails(${sub.id})" class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye"></i> Ver
+                    </button>
+                </td>
+            </tr>`;
+        });
+        
+        html += '</tbody></table></div></div>';
+        html += '<div id="submission_details"></div>';
+        section.innerHTML = html;
+        
+        window.submissions = data.submissions;
+    } catch (error) {
+        section.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Error al cargar historial: ' + escapeHtml(error.message) + '</div>';
+    }
+}
+
+function showSubmissionDetails(submissionId) {
+    const sub = window.submissions.find(s => s.id === submissionId);
+    if (!sub) return;
+    
+    let html = '<div class="card mt-2"><div class="card-header"><h4 style="margin: 0;"><i class="fas fa-info-circle"></i> Detalles del Envío #' + sub.id + '</h4></div>';
+    
+    html += '<div class="table-wrapper"><table><tbody>';
+    html += '<tr><th style="width: 200px;">Fecha</th><td>' + escapeHtml(sub.created_at) + '</td></tr>';
+    html += '<tr><th>Tipo</th><td><span class="badge badge-info">' + escapeHtml(sub.kind) + '</span></td></tr>';
+    html += '<tr><th>Entorno</th><td><span class="badge">' + escapeHtml(sub.env) + '</span></td></tr>';
+    html += '<tr><th>Estado</th><td><span class="badge ' + (sub.ok ? 'badge-success' : 'badge-danger') + '">' + (sub.ok ? '<i class="fas fa-check-circle"></i> Exitoso' : '<i class="fas fa-times-circle"></i> Error') + '</span></td></tr>';
+    
+    if (sub.error) {
+        html += '<tr><th>Error</th><td><div class="alert alert-error" style="margin: 0;">' + escapeHtml(sub.error) + '</div></td></tr>';
+    }
+    
+    html += '</tbody></table></div>';
+    
+    if (sub.response_json) {
+        html += '<h4 class="mt-2"><i class="fas fa-reply"></i> Respuesta de Tesaka</h4>';
+        html += '<pre style="background-color: var(--light-bg); padding: 1rem; border-radius: var(--radius); overflow-x: auto; font-size: 0.875rem;">';
+        html += escapeHtml(JSON.stringify(sub.response_json, null, 2));
+        html += '</pre>';
+    }
+    
+    if (sub.request_json) {
+        html += '<h4 class="mt-2"><i class="fas fa-paper-plane"></i> Datos Enviados</h4>';
+        html += '<pre style="background-color: var(--light-bg); padding: 1rem; border-radius: var(--radius); overflow-x: auto; font-size: 0.875rem;">';
+        html += escapeHtml(JSON.stringify(sub.request_json, null, 2));
+        html += '</pre>';
+    }
+    
+    html += '</div>';
+    
+    const detailsDiv = document.getElementById('submission_details');
+    detailsDiv.innerHTML = html;
+    detailsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>
+
+<style>
+/* Animación para spinner */
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Mejoras para pre */
+pre {
+    font-family: 'Courier New', Courier, monospace;
+    line-height: 1.6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}

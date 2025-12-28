@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+
+{% block title %}Nota de Entrega #{{ delivery_note.numero_nota }} - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>Nota de Entrega #{{ delivery_note.numero_nota }}</h2>
+
+<div style="margin-bottom: 1rem;">
+    <a href="/delivery-notes" class="btn">← Volver a Lista</a>
+    <a href="/delivery-notes/{{ delivery_note.id }}/print" class="btn">🖨️ Imprimir</a>
+</div>
+
+<h3>Información General</h3>
+<table>
+    <tr>
+        <th>Fecha</th>
+        <td>{{ delivery_note.fecha }}</td>
+    </tr>
+    <tr>
+        <th>Número Nota</th>
+        <td>{{ delivery_note.numero_nota }}</td>
+    </tr>
+    {% if delivery_note.numero_contrato %}
+    <tr>
+        <th>Contrato</th>
+        <td>{{ delivery_note.numero_contrato }}</td>
+    </tr>
+    {% endif %}
+    {% if delivery_note.cliente_nombre %}
+    <tr>
+        <th>Cliente</th>
+        <td>{{ delivery_note.cliente_nombre }}</td>
+    </tr>
+    {% endif %}
+    {% if delivery_note.direccion_entrega %}
+    <tr>
+        <th>Dirección Entrega</th>
+        <td>{{ delivery_note.direccion_entrega }}</td>
+    </tr>
+    {% endif %}
+</table>
+
+<h3>Items</h3>
+{% if items %}
+<table>
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Unidad</th>
+            <th>Cantidad</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.producto }}</td>
+            <td>{{ item.unidad_medida }}</td>
+            <td>{{ "%.2f"|format(item.cantidad) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No hay items en esta nota de entrega.</p>
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block title %}Orden de Compra #{{ purchase_order.id }} - Industrias Feris{% endblock %}
+
+{% block content %}
+<h2>Orden de Compra #{{ purchase_order.id }}</h2>
+
+<div style="margin-bottom: 1rem;">
+    <a href="/purchase-orders" class="btn">← Volver a Lista</a>
+</div>
+
+<h3>Información General</h3>
+<table>
+    <tr>
+        <th>Fecha</th>
+        <td>{{ purchase_order.fecha }}</td>
+    </tr>
+    <tr>
+        <th>Número</th>
+        <td>{{ purchase_order.numero }}</td>
+    </tr>
+    {% if purchase_order.numero_contrato %}
+    <tr>
+        <th>Contrato</th>
+        <td>{{ purchase_order.numero_contrato }}</td>
+    </tr>
+    {% endif %}
+    {% if purchase_order.cliente_nombre %}
+    <tr>
+        <th>Cliente</th>
+        <td>{{ purchase_order.cliente_nombre }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <th>Modo</th>
+        <td>{{ purchase_order.sync_mode }}</td>
+    </tr>
+</table>
+
+<h3>Items</h3>
+{% if items %}
+<table>
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Unidad</th>
+            <th>Cantidad</th>
+            <th>Precio Unitario</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.producto }}</td>
+            <td>{{ item.unidad_medida }}</td>
+            <td>{{ "%.2f"|format(item.cantidad) }}</td>
+            <td>{{ "%.2f"|format(item.precio_unitario) }}</td>
+            <td>{{ "%.2f"|format(item.cantidad * item.precio_unitario) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="4">Total</th>
+            <th>{{ "%.2f"|format(monto_total) }}</th>
+        </tr>
+    </tfoot>
+</table>
+{% else %}
+<p>No hay items en esta orden de compra.</p>
+{% endif %}
+{% endblock %}
+
