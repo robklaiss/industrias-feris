@@ -17,6 +17,7 @@ import os
 import logging
 from typing import Dict, Any, Optional, TYPE_CHECKING
 from pathlib import Path
+from urllib.parse import urlparse, urlunparse
 
 try:
     # Import lxml.etree - el linter puede no reconocerlo, pero funciona correctamente
@@ -46,7 +47,7 @@ except ImportError:
 from requests import Session
 from requests.adapters import HTTPAdapter
 
-from .config import SifenConfig
+from .config import SifenConfig, get_mtls_cert_path_and_password
 from .exceptions import (
     SifenClientError,
     SifenSizeLimitError,
@@ -60,7 +61,7 @@ SIFEN_NS = "http://ekuatia.set.gov.py/sifen/xsd"
 DS_NS = "http://www.w3.org/2000/09/xmldsig#"
 SOAP_NS = "http://www.w3.org/2003/05/soap-envelope"
 XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
-SIFEN_SCHEMA_LOCATION = "http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd"
+SIFEN_SCHEMA_LOCATION = "http://ekuatia.set.gov.py/sifen/xsd/siRecepDE_v150.xsd"
 
 # Límites de tamaño según requisitos SIFEN (en bytes)
 SIZE_LIMITS = {
@@ -263,23 +264,20 @@ class SoapClient:
             )
 
         else:
-            # Modo 2: PKCS12 (fallback) - usar helper unificado
-            from .config import get_cert_path_and_password
+            # Modo 2: PKCS12 (fallback) - usar helper para mTLS
+            resolved_cert_path, resolved_cert_password = get_mtls_cert_path_and_password()
             
-            resolved_cert_path = getattr(self.config, "cert_path", None)
-            resolved_cert_password = getattr(self.config, "cert_password", None)
-            
-            # Si no están en config, usar helper unificado
-            if not resolved_cert_path or not resolved_cert_password:
-                env_cert_path, env_cert_password = get_cert_path_and_password()
-                resolved_cert_path = resolved_cert_path or env_cert_path
-                resolved_cert_password = resolved_cert_password or env_cert_password
+            # Fallback a config si no hay env vars
+            if not resolved_cert_path:
+                resolved_cert_path = getattr(self.config, "cert_path", None)
+            if not resolved_cert_password:
+                resolved_cert_password = getattr(self.config, "cert_password", None)
 
             missing = []
             if not resolved_cert_path:
-                missing.append("SIFEN_CERT_PATH")
+                missing.append("SIFEN_MTLS_P12_PATH o SIFEN_CERT_PATH")
             if not resolved_cert_password:
-                missing.append("SIFEN_CERT_PASSWORD")
+                missing.append("SIFEN_MTLS_P12_PASSWORD o SIFEN_CERT_PASSWORD")
 
             if missing:
                 raise SifenClientError(
@@ -287,8 +285,8 @@ class SoapClient:
                     + ", ".join(missing)
                     + ". Opciones: 1) export SIFEN_CERT_PEM_PATH=... "
                     "y SIFEN_KEY_PEM_PATH=... "
-                    "2) export SIFEN_CERT_PATH=/ruta/al/certificado.p12 "
-                    "y SIFEN_CERT_PASSWORD=..."
+                    "2) export SIFEN_MTLS_P12_PATH=/ruta/al/certificado.p12 "
+                    "y SIFEN_MTLS_P12_PASSWORD=..."
                 )
 
             # resolved_cert_path está garantizado como no-None
@@ -308,10 +306,19 @@ class SoapClient:
                     )
                     self._temp_pem_files = (cert_pem_path, key_pem_path)
                     session.cert = (cert_pem_path, key_pem_path)
-                    logger.info(
-                        f"Certificado P12 convertido a PEM temporales para mTLS: "
-                        f"{Path(cert_pem_path).name}, {Path(key_pem_path).name}"
-                    )
+                    
+                    # Debug: guardar paths si está habilitado
+                    debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+                    if debug_enabled:
+                        logger.info(
+                            f"mTLS: Certificado P12 convertido a PEM temporales: "
+                            f"cert={cert_pem_path}, key={key_pem_path}"
+                        )
+                    else:
+                        logger.info(
+                            f"Certificado P12 convertido a PEM temporales para mTLS: "
+                            f"{Path(cert_pem_path).name}, {Path(key_pem_path).name}"
+                        )
                 except PKCS12Error as e:
                     raise SifenClientError(
                         f"Error al convertir certificado P12 a PEM: {e}"
@@ -677,11 +684,15 @@ class SoapClient:
         return xml_root
 
     def _build_raw_envelope_with_original_content(
-        self, r_envi_de_bytes: bytes
+        self, r_envi_de_bytes: bytes, action: Optional[str] = None
     ) -> bytes:
         """Construye SOAP 1.2 envelope embebiendo el rEnviDe original sin modificar.
 
         Esto preserva namespaces, prefijos y firma digital intactos.
+        
+        Args:
+            r_envi_de_bytes: XML bytes a embeder (rEnviDe, rEnvioLote, rEnviConsLoteDe, etc.)
+            action: Acción SOAP (opcional, para headers)
         """
         import lxml.etree as etree  # noqa: F401
 
@@ -698,6 +709,169 @@ class SoapClient:
         return etree.tostring(
             envelope, xml_declaration=True, encoding="UTF-8", pretty_print=False
         )
+
+    # ---------------------------------------------------------------------
+    # SOAP Helpers
+    # ---------------------------------------------------------------------
+    def _soap_headers(self, version: str, action: str) -> dict:
+        """
+        Genera headers HTTP según versión SOAP.
+        
+        Args:
+            version: "1.2" o "1.1"
+            action: Nombre de la acción SOAP (ej: "siRecepLoteDE")
+            
+        Returns:
+            Dict con headers HTTP
+        """
+        if version == "1.2":
+            return {
+                "Content-Type": f'application/soap+xml; charset=utf-8; action="{action}"',
+                "Accept": "application/soap+xml, text/xml, */*",
+            }
+        elif version == "1.1":
+            return {
+                "Content-Type": "text/xml; charset=utf-8",
+                "SOAPAction": f'"{action}"',
+                "Accept": "text/xml, */*",
+            }
+        else:
+            raise ValueError(f"Versión SOAP no soportada: {version}")
+
+    def _wrap_body(self, payload_xml: bytes, wrapper: bool, action: str, ns: str) -> bytes:
+        """
+        Envuelve el payload XML en un Body SOAP, opcionalmente con wrapper de operación.
+        
+        Args:
+            payload_xml: XML del payload (ej: <rEnvioLote>...</rEnvioLote>)
+            wrapper: Si True, envuelve en <action>...</action>
+            action: Nombre de la acción (ej: "siRecepLoteDE")
+            ns: Namespace para el wrapper (ej: SIFEN_NS)
+            
+        Returns:
+            Bytes del Body SOAP
+        """
+        if etree is None:
+            raise SifenClientError("lxml.etree no está disponible")
+        
+        if wrapper:
+            # Crear wrapper <action xmlns="ns"> + payload + </action>
+            wrapper_elem = etree.Element(etree.QName(ns, action), nsmap={None: ns})  # type: ignore
+            payload_root = etree.fromstring(payload_xml)  # type: ignore
+            wrapper_elem.append(payload_root)
+            return etree.tostring(wrapper_elem, xml_declaration=False, encoding="UTF-8")  # type: ignore
+        else:
+            # Retornar payload directo
+            return payload_xml
+
+    def _build_soap_envelope(
+        self,
+        body_content: bytes,
+        version: str,
+        header_msg_did: Optional[str] = None,
+    ) -> bytes:
+        """
+        Construye un envelope SOAP 1.1 o 1.2.
+        
+        Args:
+            body_content: Contenido del Body (ya envuelto si corresponde)
+            version: "1.2" o "1.1"
+            header_msg_did: dId para HeaderMsg (opcional)
+            
+        Returns:
+            Bytes del envelope SOAP completo
+        """
+        if etree is None:
+            raise SifenClientError("lxml.etree no está disponible")
+        
+        if version == "1.2":
+            envelope_ns = "http://www.w3.org/2003/05/soap-envelope"
+            prefix = "soap-env"
+        elif version == "1.1":
+            envelope_ns = "http://schemas.xmlsoap.org/soap/envelope/"
+            prefix = "soap"
+        else:
+            raise ValueError(f"Versión SOAP no soportada: {version}")
+
+        envelope = etree.Element(f"{{{envelope_ns}}}Envelope", nsmap={prefix: envelope_ns})  # type: ignore
+        
+        # Header (si hay HeaderMsg)
+        if header_msg_did is not None:
+            header = etree.SubElement(envelope, f"{{{envelope_ns}}}Header")  # type: ignore
+            header_msg = etree.SubElement(  # type: ignore
+                header, f"{{{SIFEN_NS}}}HeaderMsg", nsmap={None: SIFEN_NS}
+            )
+            header_d_id = etree.SubElement(header_msg, f"{{{SIFEN_NS}}}dId")  # type: ignore
+            header_d_id.text = str(header_msg_did)
+        else:
+            # Header vacío para SOAP 1.2
+            if version == "1.2":
+                header = etree.SubElement(envelope, f"{{{envelope_ns}}}Header")  # type: ignore
+        
+        # Body
+        body = etree.SubElement(envelope, f"{{{envelope_ns}}}Body")  # type: ignore
+        body_root = etree.fromstring(body_content)  # type: ignore
+        body.append(body_root)
+        
+        return etree.tostring(envelope, xml_declaration=True, encoding="UTF-8", pretty_print=False)  # type: ignore
+
+    def _save_http_debug(
+        self,
+        post_url: str,
+        original_url: str,
+        version: str,
+        action: str,
+        headers: dict,
+        soap_bytes: bytes,
+        response_status: Optional[int] = None,
+        response_headers: Optional[dict] = None,
+        response_body: Optional[bytes] = None,
+        mtls_cert_path: Optional[str] = None,
+        mtls_key_path: Optional[str] = None,
+    ):
+        """
+        Guarda debug completo de un intento HTTP/SOAP.
+        """
+        import hashlib
+        
+        debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+        if not debug_enabled and response_status == 200:
+            return  # Solo guardar en error si no está habilitado
+        
+        try:
+            debug_file = Path("artifacts") / "soap_last_http_debug.txt"
+            debug_file.parent.mkdir(exist_ok=True)
+            
+            soap_sha256 = hashlib.sha256(soap_bytes).hexdigest()
+            soap_str = soap_bytes.decode("utf-8", errors="replace")
+            
+            with open(debug_file, "w", encoding="utf-8") as f:
+                f.write(f"POST_URL={post_url}\n")
+                f.write(f"ORIGINAL_URL={original_url}\n")
+                f.write(f"VERSION={version}\n")
+                f.write(f"ACTION={action}\n")
+                f.write(f"HEADERS={headers}\n")
+                if mtls_cert_path:
+                    f.write(f"MTLS_CERT={mtls_cert_path}\n")
+                if mtls_key_path:
+                    f.write(f"MTLS_KEY={mtls_key_path}\n")
+                f.write(f"SOAP_BYTES_SHA256={soap_sha256}\n")
+                f.write(f"SOAP_BYTES_LEN={len(soap_bytes)}\n")
+                f.write("---- SOAP BEGIN ----\n")
+                f.write(soap_str)
+                f.write("\n---- SOAP END ----\n")
+                
+                if response_status is not None:
+                    f.write(f"RESPONSE_STATUS={response_status}\n")
+                if response_headers:
+                    f.write(f"RESPONSE_HEADERS={response_headers}\n")
+                if response_body:
+                    body_str = response_body.decode("utf-8", errors="replace")
+                    f.write(f"RESPONSE_BODY_FIRST_2000={body_str[:2000]}\n")
+            
+            logger.debug(f"HTTP debug guardado en: {debug_file}")
+        except Exception as e:
+            logger.warning(f"Error al guardar HTTP debug: {e}")
 
     # ---------------------------------------------------------------------
     # RAW POST (requests)
@@ -734,6 +908,8 @@ class SoapClient:
             # Determinar la acción según el servicio
             if service_key == "recibe_lote":
                 action = "rEnvioLote"
+            elif service_key == "consulta_lote":
+                action = "siConsLoteDE"
             else:
                 action = "rEnviDe"  # default para "recibe"
             headers = {
@@ -998,6 +1174,13 @@ class SoapClient:
                     f"XML root debe ser 'rEnvioLote', encontrado: {xml_root.tag}"
                 )
 
+        # Extraer dId del rEnvioLote para el HeaderMsg
+        d_id_elem = xml_root.find(f".//{{{SIFEN_NS}}}dId")
+        if d_id_elem is None:
+            # Fallback: buscar sin namespace
+            d_id_elem = xml_root.find(".//dId")
+        d_id_value = d_id_elem.text if d_id_elem is not None and d_id_elem.text else "1"
+
         # Re-serializar el XML para extraer el substring
         r_envio_lote_content = etree.tostring(
             xml_root,
@@ -1007,25 +1190,352 @@ class SoapClient:
             method="xml",
         )
 
-        # Construir envelope SOAP 1.2 con el rEnvioLote embebido
-        soap_bytes = self._build_raw_envelope_with_original_content(
-            r_envio_lote_content
+        # Obtener URL base (sin ?wsdl)
+        service_key = "recibe_lote"
+        if service_key not in self._soap_address:
+            self._get_client(service_key)
+        if service_key not in self._soap_address:
+            wsdl_url = self._normalize_wsdl_url(
+                self.config.get_soap_service_url(service_key)
+            )
+            addr = self._extract_soap_address_from_wsdl(wsdl_url)
+            if addr:
+                self._soap_address[service_key] = addr
+        
+        if service_key not in self._soap_address:
+            raise SifenClientError(
+                f"No se encontró SOAP address para servicio '{service_key}'."
+            )
+        
+        original_url = self._soap_address[service_key]
+        
+        # Quitar solo querystring, mantener .wsdl
+        parsed = urlparse(original_url)
+        post_url = urlunparse((
+            parsed.scheme,
+            parsed.netloc,
+            parsed.path,  # Mantiene .wsdl
+            parsed.params,
+            "",  # Sin query
+            parsed.fragment
+        ))
+        
+        # Construir SOAP 1.2 exacto: Header vacío, Body con rEnvioLote directamente
+        envelope = etree.Element(
+            f"{{{SOAP_NS}}}Envelope",
+            nsmap={"soap": SOAP_NS, "xsd": SIFEN_NS}
         )
+        
+        # Header vacío
+        header = etree.SubElement(envelope, f"{{{SOAP_NS}}}Header")
+        
+        # Body con rEnvioLote directamente (sin wrapper)
+        body = etree.SubElement(envelope, f"{{{SOAP_NS}}}Body")
+        r_envio_lote_elem = etree.fromstring(r_envio_lote_content)
+        body.append(r_envio_lote_elem)
+        
+        soap_bytes = etree.tostring(
+            envelope, xml_declaration=True, encoding="UTF-8", pretty_print=False
+        )
+        
+        # Headers SOAP 1.2
+        headers = {
+            "Content-Type": "application/soap+xml; charset=utf-8",
+            "Accept": "application/soap+xml, text/xml, */*",
+        }
+        
+        # POST con mTLS (la sesión ya tiene cert configurado)
+        session = self.transport.session
+        
+        # Obtener paths de certificado para debug
+        mtls_cert_path = None
+        mtls_key_path = None
+        if hasattr(self, '_temp_pem_files') and self._temp_pem_files:
+            mtls_cert_path, mtls_key_path = self._temp_pem_files
+        elif session.cert:
+            if isinstance(session.cert, tuple):
+                mtls_cert_path, mtls_key_path = session.cert
+            else:
+                mtls_cert_path = session.cert
+        
+        try:
+            resp = session.post(
+                post_url,
+                data=soap_bytes,
+                headers=headers,
+                timeout=(self.connect_timeout, self.read_timeout),
+            )
+            
+            # Guardar debug
+            self._save_http_debug(
+                post_url=post_url,
+                original_url=original_url,
+                version="1.2",
+                action="siRecepLoteDE",
+                headers=headers,
+                soap_bytes=soap_bytes,
+                response_status=resp.status_code,
+                response_headers=dict(resp.headers),
+                response_body=resp.content,
+                mtls_cert_path=mtls_cert_path,
+                mtls_key_path=mtls_key_path,
+            )
+            
+            # Verificar éxito
+            is_success = False
+            if resp.status_code == 200:
+                is_success = True
+            else:
+                # Verificar si hay respuesta XML válida aunque HTTP != 200
+                try:
+                    resp_body_str = resp.content.decode("utf-8", errors="replace")
+                    if "<rRetEnviDe" in resp_body_str or "<dCodRes>" in resp_body_str:
+                        is_success = True
+                except Exception:
+                    pass
+            
+            if is_success:
+                # Guardar SOAP debug adicional
+                self._save_raw_soap_debug(soap_bytes, resp.content, suffix="_lote")
+                
+                try:
+                    resp_root = etree.fromstring(resp.content)
+                    return self._parse_recepcion_response_from_xml(resp_root)
+                except Exception as e:
+                    raise SifenClientError(f"Error al parsear respuesta XML de SIFEN: {e}")
+            else:
+                # Error HTTP pero con respuesta XML válida
+                error_msg = f"Error HTTP {resp.status_code} al enviar SOAP: {resp.text[:500]}"
+                self._save_raw_soap_debug(soap_bytes, resp.content, suffix="_lote")
+                raise SifenClientError(error_msg)
+                
+        except Exception as e:
+            # Guardar debug incluso en error
+            self._save_http_debug(
+                post_url=post_url,
+                original_url=original_url,
+                version="1.2",
+                action="siRecepLoteDE",
+                headers=headers,
+                soap_bytes=soap_bytes,
+                response_status=None,
+                response_headers=None,
+                response_body=None,
+                mtls_cert_path=mtls_cert_path,
+                mtls_key_path=mtls_key_path,
+            )
+            self._save_raw_soap_debug(soap_bytes, None, suffix="_lote")
+            raise SifenClientError(f"Error al enviar SOAP a SIFEN: {e}") from e
 
+    def consulta_lote(self, xml_renvi_cons_lote_de: str, timeout: int = 60) -> Dict[str, Any]:
+        """Envía un rEnviConsLoteDe (siConsLoteDE) a SIFEN vía SOAP 1.2 (RAW).
+        
+        Args:
+            xml_renvi_cons_lote_de: XML del rEnviConsLoteDe (string o bytes)
+            timeout: Timeout en segundos (se usa en _post_raw_soap)
+            
+        Returns:
+            Dict con response_xml, cod_res_lot, msg_res_lot, etc.
+        """
+        service_key = "consulta_lote"
+        service_action = "siConsLoteDE"
+        
+        if isinstance(xml_renvi_cons_lote_de, bytes):
+            xml_renvi_cons_lote_de = xml_renvi_cons_lote_de.decode("utf-8")
+        
+        self._validate_size(service_action, xml_renvi_cons_lote_de)
+        
+        # Validación mínima: verificar que el root sea rEnviConsLoteDe
+        import lxml.etree as etree  # noqa: F401
+        
+        try:
+            xml_root = etree.fromstring(xml_renvi_cons_lote_de.encode("utf-8"))
+        except Exception as e:
+            raise SifenClientError(f"Error al parsear XML rEnviConsLoteDe: {e}")
+        
+        # Verificar root (con o sin namespace)
+        expected_tag = f"{{{SIFEN_NS}}}rEnviConsLoteDe"
+        if xml_root.tag != expected_tag and xml_root.tag != "rEnviConsLoteDe":
+            try:
+                if etree.QName(xml_root).localname != "rEnviConsLoteDe":
+                    raise SifenClientError(
+                        f"XML root debe ser 'rEnviConsLoteDe', encontrado: {xml_root.tag}"
+                    )
+            except Exception:
+                raise SifenClientError(
+                    f"XML root debe ser 'rEnviConsLoteDe', encontrado: {xml_root.tag}"
+                )
+        
+        # Re-serializar el XML para el envelope
+        r_envi_cons_lote_de_content = etree.tostring(
+            xml_root,
+            xml_declaration=False,
+            encoding="UTF-8",
+            pretty_print=False,
+            method="xml",
+        )
+        
+        # Construir envelope SOAP 1.2 con el rEnviConsLoteDe embebido
+        soap_bytes = self._build_raw_envelope_with_original_content(
+            r_envi_cons_lote_de_content, action=service_action
+        )
+        
         response_bytes = None
         try:
-            response_bytes = self._post_raw_soap("recibe_lote", soap_bytes)
-            self._save_raw_soap_debug(soap_bytes, response_bytes, suffix="_lote")
+            response_bytes = self._post_raw_soap(service_key, soap_bytes)
+            self._save_raw_soap_debug(soap_bytes, response_bytes, suffix="_consulta")
         except Exception:
-            self._save_raw_soap_debug(soap_bytes, None, suffix="_lote")
+            self._save_raw_soap_debug(soap_bytes, None, suffix="_consulta")
             raise
-
+        
         try:
             resp_root = etree.fromstring(response_bytes)
         except Exception as e:
             raise SifenClientError(f"Error al parsear respuesta XML de SIFEN: {e}")
+        
+        return self._parse_consulta_lote_response_from_xml(resp_root)
 
-        return self._parse_recepcion_response_from_xml(resp_root)
+    def _parse_consulta_lote_response_from_xml(self, xml_root: Any) -> Dict[str, Any]:
+        """Parsea la respuesta de consulta de lote desde XML."""
+        import lxml.etree as etree  # noqa: F401
+        
+        result: Dict[str, Any] = {
+            "ok": False,
+            "response_xml": etree.tostring(xml_root, encoding="unicode"),
+            "cod_res_lot": None,
+            "msg_res_lot": None,
+        }
+        
+        def find_text(xpath_expr: str) -> Optional[str]:
+            try:
+                nodes = xml_root.xpath(xpath_expr)
+                if nodes:
+                    val = nodes[0].text
+                    return val.strip() if val else None
+            except Exception:
+                return None
+            return None
+        
+        # Buscar campos de respuesta de consulta lote
+        result["cod_res_lot"] = find_text('//*[local-name()="dCodResLot"]')
+        result["msg_res_lot"] = find_text('//*[local-name()="dMsgResLot"]')
+        
+        # Determinar éxito basado en código
+        cod_res_lot = result.get("cod_res_lot", "")
+        if cod_res_lot in ("0361", "0362"):
+            result["ok"] = True
+        elif cod_res_lot == "0364":
+            result["ok"] = False  # Requiere CDC
+        else:
+            result["ok"] = False
+        
+        return result
+
+    def consulta_lote_raw(self, dprot_cons_lote: str, did: int = 1) -> Dict[str, Any]:
+        """Consulta lote sin depender del WSDL (POST directo al endpoint).
+        
+        Args:
+            dprot_cons_lote: dProtConsLote (número de lote)
+            did: dId (default: 1)
+            
+        Returns:
+            Dict con http_status, raw_xml, y opcionalmente dCodResLot/dMsgResLot
+        """
+        import lxml.etree as etree  # noqa: F401
+        
+        # Construir SOAP envelope manualmente (SIN HeaderMsg)
+        envelope = etree.Element(f"{{{SOAP_NS}}}Envelope", nsmap={"soap-env": SOAP_NS})
+        body = etree.SubElement(envelope, f"{{{SOAP_NS}}}Body")
+        
+        r_envi_cons = etree.SubElement(
+            body, f"{{{SIFEN_NS}}}rEnviConsLoteDe", nsmap={None: SIFEN_NS}
+        )
+        d_id_elem = etree.SubElement(r_envi_cons, f"{{{SIFEN_NS}}}dId")
+        d_id_elem.text = str(did)
+        d_prot_elem = etree.SubElement(r_envi_cons, f"{{{SIFEN_NS}}}dProtConsLote")
+        d_prot_elem.text = str(dprot_cons_lote)
+        
+        soap_bytes = etree.tostring(
+            envelope, xml_declaration=True, encoding="UTF-8", pretty_print=False
+        )
+        
+        # Determinar endpoint según ambiente (con .wsdl al final)
+        if self.config.env == "test":
+            endpoint = "https://sifen-test.set.gov.py/de/ws/consultas/consulta-lote.wsdl"
+        else:
+            endpoint = "https://sifen.set.gov.py/de/ws/consultas/consulta-lote.wsdl"
+        
+        # Headers SOAP 1.2 (solo Content-Type, sin action, sin SOAPAction)
+        headers = {
+            "Content-Type": "application/soap+xml; charset=utf-8",
+        }
+        
+        # Guardar debug antes de enviar
+        debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+        if debug_enabled:
+            try:
+                from pathlib import Path
+                out_dir = Path("artifacts")
+                out_dir.mkdir(exist_ok=True)
+                sent_file = out_dir / "soap_last_sent_consulta.xml"
+                sent_file.write_bytes(soap_bytes)
+            except Exception:
+                pass  # No romper el flujo si falla debug
+        
+        # POST usando la sesión existente con mTLS
+        session = self.transport.session
+        result: Dict[str, Any] = {
+            "http_status": 0,
+            "raw_xml": "",
+        }
+        
+        try:
+            resp = session.post(
+                endpoint,
+                data=soap_bytes,
+                headers=headers,
+                timeout=(self.connect_timeout, self.read_timeout),
+            )
+            result["http_status"] = resp.status_code
+            result["raw_xml"] = resp.text
+            
+            # Guardar debug incluso si HTTP != 200
+            if debug_enabled:
+                try:
+                    from pathlib import Path
+                    out_dir = Path("artifacts")
+                    out_dir.mkdir(exist_ok=True)
+                    received_file = out_dir / "soap_last_received_consulta.xml"
+                    received_file.write_bytes(resp.content)
+                except Exception:
+                    pass  # No romper el flujo si falla debug
+            
+            # Intentar parsear XML y extraer dCodResLot/dMsgResLot si existen
+            try:
+                resp_root = etree.fromstring(resp.content)
+                cod_res = resp_root.find(".//{http://ekuatia.set.gov.py/sifen/xsd}dCodResLot")
+                msg_res = resp_root.find(".//{http://ekuatia.set.gov.py/sifen/xsd}dMsgResLot")
+                if cod_res is not None and cod_res.text:
+                    result["dCodResLot"] = cod_res.text.strip()
+                if msg_res is not None and msg_res.text:
+                    result["dMsgResLot"] = msg_res.text.strip()
+            except Exception:
+                pass  # Si no se puede parsear, solo devolver raw_xml
+            
+        except Exception as e:
+            # Guardar debug incluso si hay excepción
+            if debug_enabled:
+                try:
+                    from pathlib import Path
+                    out_dir = Path("artifacts")
+                    out_dir.mkdir(exist_ok=True)
+                    received_file = out_dir / "soap_last_received_consulta.xml"
+                    received_file.write_bytes(b"")  # Vacío si no hay respuesta
+                except Exception:
+                    pass
+            raise SifenClientError(f"Error al consultar lote: {e}") from e
+        
+        return result
 
     def close(self) -> None:
         if (

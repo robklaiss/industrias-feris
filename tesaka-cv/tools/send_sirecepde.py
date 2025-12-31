@@ -16,6 +16,7 @@ Uso:
 import sys
 import argparse
 import os
+import re
 from pathlib import Path
 from typing import Optional
 from datetime import datetime
@@ -35,7 +36,7 @@ load_dotenv()
 SIFEN_NS = "http://ekuatia.set.gov.py/sifen/xsd"
 
 try:
-    from lxml import etree
+    import lxml.etree as etree  # noqa: F401
 except ImportError:
     print("❌ Error: lxml no está instalado")
     print("   Instale con: pip install lxml")
@@ -237,12 +238,129 @@ def _local(tag: str) -> str:
     return tag.split("}", 1)[-1] if "}" in tag else tag
 
 
+def normalize_rde_before_sign(xml_bytes: bytes) -> bytes:
+    """
+    Normaliza el XML rDE antes de firmar:
+    - Cambia dDesPaisRec -> dDesPaisRe (si existe)
+    - Mueve gCamFuFD de dentro de <DE> a fuera, dentro de <rDE>, antes de <Signature>
+    """
+    parser = etree.XMLParser(remove_blank_text=False)
+    root = etree.fromstring(xml_bytes, parser)
+
+    def local(tag): return tag.split("}", 1)[-1] if "}" in tag else tag
+    def find_by_local(el, name):
+        for x in el.iter():
+            if local(x.tag) == name:
+                return x
+        return None
+
+    # Tomar rDE (raíz o anidado)
+    rde = root if local(root.tag) == "rDE" else find_by_local(root, "rDE")
+    if rde is None:
+        return xml_bytes
+
+    # 1) dDesPaisRec -> dDesPaisRe (si existe)
+    dd_rec = find_by_local(rde, "dDesPaisRec")
+    if dd_rec is not None:
+        parent = dd_rec.getparent()
+        idx = parent.index(dd_rec)
+        new_el = etree.Element(etree.QName(SIFEN_NS, "dDesPaisRe"))
+        new_el.text = dd_rec.text
+        parent.remove(dd_rec)
+        parent.insert(idx, new_el)
+
+    # 2) gCamFuFD debe ser hijo de rDE, no de DE
+    de = None
+    for ch in rde:
+        if local(ch.tag) == "DE":
+            de = ch
+            break
+
+    if de is not None:
+        gcam = None
+        for ch in list(de):
+            if local(ch.tag) == "gCamFuFD":
+                gcam = ch
+                break
+
+        if gcam is not None:
+            de.remove(gcam)
+
+            # Insertar antes de Signature si existe; si no, al final
+            sig = None
+            for ch in rde:
+                if local(ch.tag) == "Signature":
+                    sig = ch
+                    break
+
+            if sig is not None:
+                rde.insert(rde.index(sig), gcam)
+            else:
+                rde.append(gcam)
+
+    return etree.tostring(root, xml_declaration=True, encoding="utf-8")
+
+
+def reorder_signature_before_gcamfufd(xml_bytes: bytes) -> bytes:
+    """
+    Reordena los hijos de <rDE> para que Signature venga antes de gCamFuFD.
+    Orden esperado: dVerFor, DE, Signature, gCamFuFD
+    NO rompe la firma: solo cambia el orden de hermanos.
+    """
+    def local(tag: str) -> str:
+        return tag.split("}", 1)[-1] if "}" in tag else tag
+
+    root = etree.fromstring(xml_bytes)
+
+    # Localizar <rDE> (puede ser raíz o anidado)
+    rde = root if local(root.tag) == "rDE" else next((e for e in root.iter() if local(e.tag) == "rDE"), None)
+    if rde is None:
+        return xml_bytes
+
+    # Encontrar Signature y gCamFuFD como hijos directos de rDE
+    children = list(rde)
+    sig = next((c for c in children if local(c.tag) == "Signature"), None)
+    gcam = next((c for c in children if local(c.tag) == "gCamFuFD"), None)
+
+    # Si no hay ambos, no hay nada que reordenar
+    if sig is None or gcam is None:
+        return xml_bytes
+
+    # Obtener índices
+    sig_idx = children.index(sig)
+    gcam_idx = children.index(gcam)
+
+    # Si Signature ya está antes de gCamFuFD, no hacer nada
+    if sig_idx < gcam_idx:
+        return xml_bytes
+
+    # Si Signature está después de gCamFuFD, moverlo antes
+    # Remover Signature y reinsertarlo justo antes de gCamFuFD
+    rde.remove(sig)
+    # Recalcular índice de gCamFuFD después de remover sig
+    children_after = list(rde)
+    gcam_idx_after = children_after.index(gcam)
+    rde.insert(gcam_idx_after, sig)
+
+    return etree.tostring(root, xml_declaration=True, encoding="utf-8")
+
+
 def _find_by_localname(root: etree._Element, name: str) -> Optional[etree._Element]:
     """Busca un elemento por nombre local (ignorando namespace) en todo el árbol."""
     for el in root.iter():
         if _local(el.tag) == name:
             return el
     return None
+
+
+def _ensure_rde_has_xmlns(lote_xml: str) -> str:
+    """Asegura que el tag <rDE> tenga xmlns explícito."""
+    return re.sub(
+        r"<rDE(?![^>]*\sxmlns=)",
+        '<rDE xmlns="http://ekuatia.set.gov.py/sifen/xsd"',
+        lote_xml,
+        count=1
+    )
 
 
 def extract_rde_element(xml_bytes: bytes) -> bytes:
@@ -269,21 +387,90 @@ def extract_rde_element(xml_bytes: bytes) -> bytes:
 
 def build_lote_base64_from_single_xml(xml_bytes: bytes) -> str:
     """
-    Crea:
-      - rLoteDE con 1 rDE
-      - lo comprime en ZIP
-      - lo devuelve en Base64 (string) para poner en <xDE>
+    Crea un ZIP con el rDE firmado directamente (sin wrapper rLoteDE).
+    
+    El ZIP contiene un único archivo "lote.xml" con el <rDE> completo
+    (ya normalizado, firmado y reordenado).
+    
+    Args:
+        xml_bytes: XML que contiene el rDE (puede ser rDE root o tener rDE anidado)
+        
+    Returns:
+        Base64 del ZIP como string
     """
+    # Extraer el nodo rDE completo
     rde_bytes = extract_rde_element(xml_bytes)
-
-    lote = etree.Element(etree.QName(SIFEN_NS, "rLoteDE"), nsmap={None: SIFEN_NS})
-    lote.append(etree.fromstring(rde_bytes))
-    lote_xml_bytes = etree.tostring(lote, xml_declaration=True, encoding="utf-8")
-
+    
+    # Parsear rDE para asegurar que tenga sus atributos xmlns
+    rde_elem = etree.fromstring(rde_bytes)
+    
+    # Asegurar que rDE tenga xsi:schemaLocation
+    XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
+    if not rde_elem.get(f"{{{XSI_NS}}}schemaLocation"):
+        rde_elem.set(f"{{{XSI_NS}}}schemaLocation", "http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd")
+    
+    # Verificar si ya tiene xmlns:xsi en el nsmap
+    has_xsi = "xsi" in rde_elem.nsmap or XSI_NS in rde_elem.nsmap.values()
+    
+    # Serializar rDE con declaración XML y nsmap explícito
+    nsmap: dict[Optional[str], str] = {None: SIFEN_NS}
+    if not has_xsi:
+        nsmap["xsi"] = XSI_NS  # type: ignore[assignment]
+    
+    # Reconstruir rDE con nsmap correcto
+    rde_new = etree.Element(etree.QName(SIFEN_NS, "rDE"), nsmap=nsmap)
+    # Copiar atributos (incluyendo schemaLocation)
+    for key, value in rde_elem.attrib.items():
+        rde_new.set(key, value)
+    # Copiar hijos
+    for child in rde_elem:
+        rde_new.append(child)
+    
+    # Serializar
+    rde_xml_bytes = etree.tostring(rde_new, xml_declaration=True, encoding="utf-8")
+    
+    # Asegurar que rDE tenga xmlns explícito en el tag (por si acaso)
+    rde_xml_str = rde_xml_bytes.decode("utf-8") if isinstance(rde_xml_bytes, bytes) else rde_xml_bytes
+    rde_xml_str = _ensure_rde_has_xmlns(rde_xml_str)
+    
+    rde_xml_bytes = rde_xml_str.encode("utf-8")
+    
+    # Crear ZIP con el rDE directamente (sin wrapper rLoteDE)
     mem = BytesIO()
     with zipfile.ZipFile(mem, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
-        zf.writestr("lote.xml", lote_xml_bytes)
+        zf.writestr("lote.xml", rde_xml_bytes)
     zip_bytes = mem.getvalue()
+    
+    # DEBUG: verificar contenido del ZIP si está habilitado
+    if os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True"):
+        try:
+            # Listar archivos del ZIP
+            with zipfile.ZipFile(BytesIO(zip_bytes), "r") as zf:
+                zip_files = zf.namelist()
+                print(f"🧪 DEBUG ZIP files: {zip_files}")
+                
+                # Leer contenido de lote.xml
+                if "lote.xml" in zip_files:
+                    lote_content = zf.read("lote.xml")
+                    print(f"🧪 DEBUG lote.xml size: {len(lote_content)} bytes")
+                    print(f"🧪 DEBUG lote.xml first 80 bytes: {lote_content[:80]}")
+                    
+                    # Parsear para verificar root
+                    lote_root = etree.fromstring(lote_content)
+                    def local_debug(tag): return tag.split("}", 1)[-1] if "}" in tag else tag
+                    root_tag = local_debug(lote_root.tag)
+                    print(f"🧪 DEBUG lote.xml root: {root_tag}")
+                    
+                    # Si es rDE, mostrar orden de hijos
+                    if root_tag == "rDE":
+                        children_order = [local_debug(c.tag) for c in list(lote_root)]
+                        print(f"🧪 DEBUG lote.xml rDE children: {', '.join(children_order)}")
+                    
+                    # Guardar contenido a /tmp/lote_xml_payload.xml
+                    Path("/tmp/lote_xml_payload.xml").write_bytes(lote_content)
+                    print("🧪 DEBUG escrito: /tmp/lote_xml_payload.xml")
+        except Exception as e:
+            print(f"🧪 DEBUG error al inspeccionar ZIP: {e}")
 
     return base64.b64encode(zip_bytes).decode("ascii")
 
@@ -356,16 +543,19 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
     Returns:
         Diccionario con resultado del envío
     """
-    # Leer XML
+    # Leer XML como bytes
     print(f"📄 Cargando XML: {xml_path}")
     try:
-        xml_content = xml_path.read_text(encoding="utf-8")
+        xml_bytes = xml_path.read_bytes()
     except Exception as e:
         return {
             "success": False,
             "error": f"Error al leer archivo XML: {str(e)}",
             "error_type": type(e).__name__
         }
+    
+    # Normalizar rDE antes de firmar (dDesPaisRec -> dDesPaisRe, mover gCamFuFD)
+    xml_bytes = normalize_rde_before_sign(xml_bytes)
     
     # Firmar XML si hay certificado de firma disponible
     sign_p12_path = os.getenv("SIFEN_SIGN_P12_PATH")
@@ -375,8 +565,32 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
         try:
             from app.sifen_client.xmlsec_signer import sign_de_with_p12
             print(f"🔐 Firmando XML con certificado: {Path(sign_p12_path).name}")
-            xml_content = sign_de_with_p12(xml_content.encode('utf-8'), sign_p12_path, sign_p12_password).decode('utf-8')
+            xml_signed = sign_de_with_p12(xml_bytes, sign_p12_path, sign_p12_password)
             print("✓ XML firmado exitosamente\n")
+            
+            # ✅ Reordenar: Signature debe venir antes de gCamFuFD (POST-FIRMA)
+            xml_signed = reorder_signature_before_gcamfufd(xml_signed)
+            
+            # DEBUG: verificar orden de hijos de rDE
+            if os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True"):
+                try:
+                    root_debug = etree.fromstring(xml_signed)
+                    def local_debug(tag): return tag.split("}", 1)[-1] if "}" in tag else tag
+                    rde_debug = root_debug if local_debug(root_debug.tag) == "rDE" else next(
+                        (e for e in root_debug.iter() if local_debug(e.tag) == "rDE"), None
+                    )
+                    if rde_debug is not None:
+                        children_order = [local_debug(c.tag) for c in list(rde_debug)]
+                        print(f"🧪 DEBUG orden hijos rDE: {', '.join(children_order)}")
+                except Exception:
+                    pass  # No romper el flujo si falla el debug
+            
+            # DEBUG: guardar para inspección rápida
+            Path("/tmp/rde_signed_reordered.xml").write_bytes(xml_signed)
+            print("🧪 DEBUG escrito: /tmp/rde_signed_reordered.xml")
+            
+            # Usar xml_signed para el resto del flujo
+            xml_bytes = xml_signed
         except Exception as e:
             return {
                 "success": False,
@@ -391,7 +605,7 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
             "error_type": "ConfigurationError"
         }
     
-    xml_size = len(xml_content.encode('utf-8'))
+    xml_size = len(xml_bytes)
     print(f"   Tamaño: {xml_size} bytes ({xml_size / 1024:.2f} KB)\n")
     
     # Validar RUC del emisor antes de enviar (evitar código 1264)
@@ -406,7 +620,8 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
         except:
             expected_ruc = os.getenv("SIFEN_EMISOR_RUC") or os.getenv("SIFEN_TEST_RUC")
         
-        is_valid, error_msg = validate_emisor_ruc(xml_content, expected_ruc=expected_ruc)
+        xml_content_str = xml_bytes.decode('utf-8') if isinstance(xml_bytes, bytes) else xml_bytes
+        is_valid, error_msg = validate_emisor_ruc(xml_content_str, expected_ruc=expected_ruc)
         
         if not is_valid:
             print(f"❌ RUC emisor inválido/dummy/no coincide; no se envía a SIFEN:")
@@ -458,7 +673,7 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
         print("📦 Construyendo lote desde XML individual...")
         # Obtener dId del XML original si está disponible, sino usar 1
         try:
-            xml_root = etree.fromstring(xml_content.encode("utf-8"))
+            xml_root = etree.fromstring(xml_bytes)
             d_id_elem = xml_root.find(f".//{{{SIFEN_NS}}}dId")
             if d_id_elem is not None and d_id_elem.text:
                 did = int(d_id_elem.text)
@@ -467,12 +682,12 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
         except:
             did = 1
         
-        # Construir el ZIP base64 primero para poder loguear tamaños
-        zip_base64 = build_lote_base64_from_single_xml(xml_content.encode("utf-8"))
+        # Construir el ZIP base64 primero para poder loguear tamaños (usar bytes directamente)
+        zip_base64 = build_lote_base64_from_single_xml(xml_bytes)
         zip_bytes = base64.b64decode(zip_base64)
         
         # Construir el payload de lote completo (reutilizando zip_base64)
-        payload_xml = build_r_envio_lote_xml(did=did, xml_bytes=xml_content.encode("utf-8"), zip_base64=zip_base64)
+        payload_xml = build_r_envio_lote_xml(did=did, xml_bytes=xml_bytes, zip_base64=zip_base64)
         
         print(f"✓ Lote construido:")
         print(f"   dId: {did}")
@@ -548,12 +763,14 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
             # Instrumentación para debug del error 1264
             if codigo_respuesta == "1264" and artifacts_dir:
                 print("\n🔍 Error 1264 detectado: Guardando archivos de debug...")
+                # Convertir xml_bytes a string para debug
+                xml_content_str = xml_bytes.decode('utf-8') if isinstance(xml_bytes, bytes) else xml_bytes
                 _save_1264_debug(
                     artifacts_dir=artifacts_dir,
                     payload_xml=payload_xml,
                     zip_bytes=zip_bytes,
                     zip_base64=zip_base64,
-                    xml_content=xml_content,
+                    xml_content=xml_content_str,
                     wsdl_url=wsdl_url,
                     service_key=service_key,
                     client=client

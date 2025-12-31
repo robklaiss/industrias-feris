@@ -30,6 +30,31 @@ def get_cert_path_and_password() -> Tuple[Optional[str], Optional[str]]:
     return cert_path, cert_password
 
 
+def get_mtls_cert_path_and_password() -> Tuple[Optional[str], Optional[str]]:
+    """
+    Helper para obtener certificado P12 y contraseña para mTLS desde variables de entorno.
+    
+    Prioridad:
+    1. SIFEN_MTLS_P12_PATH / SIFEN_MTLS_P12_PASSWORD (específico para mTLS)
+    2. SIFEN_CERT_PATH / SIFEN_CERT_PASSWORD (fallback)
+    3. SIFEN_SIGN_P12_PATH / SIFEN_SIGN_P12_PASSWORD (fallback)
+    
+    Returns:
+        Tupla (cert_path, cert_password) o (None, None) si no están configuradas
+    """
+    cert_path = (
+        os.getenv("SIFEN_MTLS_P12_PATH") or
+        os.getenv("SIFEN_CERT_PATH") or
+        os.getenv("SIFEN_SIGN_P12_PATH")
+    )
+    cert_password = (
+        os.getenv("SIFEN_MTLS_P12_PASSWORD") or
+        os.getenv("SIFEN_CERT_PASSWORD") or
+        os.getenv("SIFEN_SIGN_P12_PASSWORD")
+    )
+    return cert_path, cert_password
+
+
 class SifenConfig:
     """Configuración del cliente SIFEN por ambiente"""
     
@@ -55,7 +80,7 @@ class SifenConfig:
             "recibe": "https://sifen-test.set.gov.py/de/ws/sync/recibe.wsdl",
             "recibe_lote": "https://sifen-test.set.gov.py/de/ws/async/recibe-lote.wsdl?wsdl",
             "evento": "https://sifen-test.set.gov.py/de/ws/eventos/evento.wsdl",
-            "consulta_lote": "https://sifen-test.set.gov.py/de/ws/consultas/consulta-lote.wsdl",
+            "consulta_lote": "https://sifen-test.set.gov.py/de/ws/consultas/consulta-lote.wsdl?wsdl",
             "consulta_ruc": "https://sifen-test.set.gov.py/de/ws/consultas/consulta-ruc.wsdl",
             "consulta": "https://sifen-test.set.gov.py/de/ws/consultas/consulta.wsdl",
         },
@@ -63,7 +88,7 @@ class SifenConfig:
             "recibe": "https://sifen.set.gov.py/de/ws/sync/recibe.wsdl",
             "recibe_lote": "https://sifen.set.gov.py/de/ws/async/recibe-lote.wsdl",
             "evento": "https://sifen.set.gov.py/de/ws/eventos/evento.wsdl",
-            "consulta_lote": "https://sifen.set.gov.py/de/ws/consultas/consulta-lote.wsdl",
+            "consulta_lote": "https://sifen.set.gov.py/de/ws/consultas/consulta-lote.wsdl?wsdl",
             "consulta_ruc": "https://sifen.set.gov.py/de/ws/consultas/consulta-ruc.wsdl",
             "consulta": "https://sifen.set.gov.py/de/ws/consultas/consulta.wsdl",
         }
