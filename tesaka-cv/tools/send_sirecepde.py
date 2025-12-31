@@ -434,10 +434,8 @@ def ensure_rde_default_namespace(xml_bytes: bytes) -> bytes:
         # Ya tiene xmlns default, no modificar
         return xml_bytes
     
-    # Verificar si tiene xmlns con prefijo (ej: xmlns:ns="...")
-    if 'xmlns:' in attrs_str:
-        # Tiene xmlns con prefijo, no agregar xmlns default (podría causar conflicto)
-        return xml_bytes
+    # Si tiene xmlns con prefijo (ej: xmlns:xsi="...") pero NO tiene xmlns default,
+    # podemos agregar xmlns default sin problema (no hay conflicto)
     
     # Insertar xmlns="http://ekuatia.set.gov.py/sifen/xsd" en los atributos
     # Insertar al inicio de los atributos (después del espacio si hay otros attrs)
