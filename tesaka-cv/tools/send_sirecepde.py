@@ -765,8 +765,14 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
             did = 1
         
         # Construir el ZIP base64 primero para poder loguear tamaños (usar bytes directamente)
-        zip_base64 = build_lote_base64_from_single_xml(xml_bytes)
-        zip_bytes = base64.b64decode(zip_base64)
+        # También obtener lote_xml_bytes para validación XSD
+        result = build_lote_base64_from_single_xml(xml_bytes, return_debug=True)
+        if isinstance(result, tuple):
+            zip_base64, lote_xml_bytes, zip_bytes = result
+        else:
+            zip_base64 = result
+            zip_bytes = base64.b64decode(zip_base64)
+            lote_xml_bytes = None
         
         # Construir el payload de lote completo (reutilizando zip_base64)
         payload_xml = build_r_envio_lote_xml(did=did, xml_bytes=xml_bytes, zip_base64=zip_base64)
