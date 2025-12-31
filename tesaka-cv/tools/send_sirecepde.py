@@ -791,6 +791,11 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
     # Normalizar rDE antes de firmar (dDesPaisRec -> dDesPaisRe, mover gCamFuFD)
     xml_bytes = normalize_rde_before_sign(xml_bytes)
     
+    # Asegurar que rDE tenga namespace default SIFEN_NS antes de firmar
+    # Esto es crítico: si rDE no tiene xmlns, cuando lo envolvemos en rLoteDE (sin namespace),
+    # el rDE queda sin namespace y SIFEN rechazará con 0160
+    xml_bytes = ensure_rde_default_namespace(xml_bytes)
+    
     # Firmar XML si hay certificado de firma disponible
     sign_p12_path = os.getenv("SIFEN_SIGN_P12_PATH")
     sign_p12_password = os.getenv("SIFEN_SIGN_P12_PASSWORD")
@@ -801,6 +806,18 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
             print(f"🔐 Firmando XML con certificado: {Path(sign_p12_path).name}")
             xml_signed = sign_de_with_p12(xml_bytes, sign_p12_path, sign_p12_password)
             print("✓ XML firmado exitosamente\n")
+            
+            # Hard-guard: verificar que el rDE firmado tiene xmlns default SIFEN_NS
+            # Si no lo tiene, cuando lo envolvemos en rLoteDE (sin namespace), el rDE quedará sin namespace
+            rde_fragment = _extract_rde_fragment_bytes(xml_signed)
+            if b'xmlns="' + SIFEN_NS.encode('utf-8') + b'"' not in rde_fragment:
+                # Verificar también con comillas simples
+                if b"xmlns='" + SIFEN_NS.encode('utf-8') + b"'" not in rde_fragment:
+                    raise RuntimeError(
+                        f"ERROR CRÍTICO: El rDE firmado NO contiene xmlns=\"{SIFEN_NS}\" en su tag de apertura. "
+                        "Esto causará que cuando se envuelva en rLoteDE (sin namespace), el rDE quede sin namespace "
+                        "y SIFEN rechazará con 0160. Verificar ensure_rde_default_namespace()."
+                    )
             
             # ✅ Reordenar: Signature debe venir antes de gCamFuFD (POST-FIRMA)
             xml_signed = reorder_signature_before_gcamfufd(xml_signed)
