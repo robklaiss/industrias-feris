@@ -1222,33 +1222,35 @@ class SoapClient:
         
         post_url = self._soap_address[service_key]
         
-        # Construir SOAP 1.2 envelope con Header vacío y Body con rEnvioLote directo (con prefijo xsd)
+        # Construir SOAP 1.2 envelope con Header vacío y Body con rEnvioLote directo (SIN prefijo, namespace default)
+        # Según WSDL document/literal: el elemento debe estar en namespace default, no con prefijo
         envelope = etree.Element(
             f"{{{SOAP_NS}}}Envelope",
-            nsmap={"soap-env": SOAP_NS, "xsd": SIFEN_NS}
+            nsmap={"soap-env": SOAP_NS}
         )
         
         # Header vacío (NO HeaderMsg)
         header = etree.SubElement(envelope, f"{{{SOAP_NS}}}Header")
         
-        # Body con rEnvioLote directo (SIN wrapper siRecepLoteDE)
+        # Body con rEnvioLote directo (SIN wrapper siRecepLoteDE, SIN prefijo xsd)
         body = etree.SubElement(envelope, f"{{{SOAP_NS}}}Body")
         
-        # Parsear rEnvioLote y reconstruirlo con prefijo xsd
+        # Parsear rEnvioLote y reconstruirlo en namespace default (sin prefijo)
         r_envio_lote_elem = etree.fromstring(r_envio_lote_content)
         
-        # Crear nuevo rEnvioLote con prefijo xsd
-        r_envio_lote_xsd = etree.Element(
+        # Crear nuevo rEnvioLote en namespace default (sin prefijo)
+        # Esto es crítico: según WSDL document/literal, el elemento debe estar en namespace default
+        r_envio_lote_default = etree.Element(
             etree.QName(SIFEN_NS, "rEnvioLote"),
-            nsmap={"xsd": SIFEN_NS}
+            nsmap={None: SIFEN_NS}  # Namespace default, sin prefijo
         )
         
-        # Copiar hijos (dId y xDE) con prefijo xsd
+        # Copiar hijos (dId y xDE) en namespace default
         for child in r_envio_lote_elem:
             child_local = etree.QName(child).localname
             new_child = etree.SubElement(
-                r_envio_lote_xsd,
-                etree.QName(SIFEN_NS, child_local)
+                r_envio_lote_default,
+                etree.QName(SIFEN_NS, child_local)  # En namespace SIFEN, sin prefijo
             )
             new_child.text = child.text
             new_child.tail = child.tail
@@ -1256,7 +1258,7 @@ class SoapClient:
             for attr_name, attr_value in child.attrib.items():
                 new_child.set(attr_name, attr_value)
         
-        body.append(r_envio_lote_xsd)
+        body.append(r_envio_lote_default)
         
         soap_bytes = etree.tostring(
             envelope, xml_declaration=True, encoding="UTF-8", pretty_print=False
