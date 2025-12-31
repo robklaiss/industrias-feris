@@ -523,9 +523,15 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
         b"</rLoteDE>"
     )
     
-    # Hard-guard: si aparece xmlns en rLoteDE, abortar (así no perdés horas)
-    if b"<rLoteDE" in lote_xml_bytes and b"xmlns=" in lote_xml_bytes.split(b">", 1)[0]:
-        raise RuntimeError("BUG: rLoteDE salió con xmlns= (debe ser SIN namespace)")
+    # Hard-guard: si aparece xmlns en el tag de apertura de rLoteDE, abortar (así no perdés horas)
+    # Buscar el tag de apertura <rLoteDE ...> y verificar que NO tenga xmlns=
+    rlote_tag_start = lote_xml_bytes.find(b"<rLoteDE")
+    if rlote_tag_start >= 0:
+        rlote_tag_end = lote_xml_bytes.find(b">", rlote_tag_start)
+        if rlote_tag_end > rlote_tag_start:
+            rlote_tag = lote_xml_bytes[rlote_tag_start:rlote_tag_end]
+            if b"xmlns=" in rlote_tag:
+                raise RuntimeError(f"BUG: rLoteDE salió con xmlns= (debe ser SIN namespace). Tag: {rlote_tag}")
     
     # Guardar para inspección (antes de crear ZIP)
     if debug_enabled:
