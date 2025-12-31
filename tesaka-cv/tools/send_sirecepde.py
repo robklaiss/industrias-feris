@@ -411,21 +411,28 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
     Crea un ZIP con el rDE firmado envuelto en rLoteDE.
     
     El ZIP contiene un único archivo "lote.xml" con:
-    - Root: <rLoteDE xmlns="http://ekuatia.set.gov.py/sifen/xsd">
+    - Root: <rLoteDE> (SIN namespace, sin xmlns)
     - Contenido: un <rDE> completo (ya normalizado, firmado y reordenado) como hijo directo.
+      El rDE mantiene su xmlns="http://ekuatia.set.gov.py/sifen/xsd" declarado en su propio tag.
     
     IMPORTANTE: 
     - Selecciona SIEMPRE el rDE que tiene <ds:Signature> como hijo directo.
     - NO modifica la firma ni los hijos del rDE, solo lo envuelve en rLoteDE.
+    - Usa extracción por regex desde bytes originales (NO re-serializa con lxml) para preservar
+      exactamente la firma, namespaces y whitespace del rDE firmado.
+    - Según ejemplos oficiales SIFEN: rLoteDE NO debe tener namespace; el namespace debe estar
+      declarado en rDE (no en rLoteDE). Esto evita que lxml "hoistee" el xmlns al wrapper.
     
     Args:
         xml_bytes: XML que contiene el rDE (puede ser rDE root o tener rDE anidado)
+        return_debug: Si True, retorna tupla (base64, lote_xml_bytes, zip_bytes)
         
     Returns:
-        Base64 del ZIP como string
+        Base64 del ZIP como string, o tupla si return_debug=True
         
     Raises:
         ValueError: Si no se encuentra rDE o si el rDE no tiene Signature como hijo directo
+        RuntimeError: Si rLoteDE sale con xmlns= (bug de construcción)
     """
     import copy
     
