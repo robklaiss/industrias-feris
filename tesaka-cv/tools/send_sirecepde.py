@@ -44,6 +44,7 @@ except ImportError:
 
 try:
     from app.sifen_client import SoapClient, get_sifen_config, SifenClientError, SifenResponseError, SifenSizeLimitError
+    from app.sifen_client.xsd_validator import validate_rde_and_lote
 except ImportError as e:
     print("❌ Error: No se pudo importar módulos SIFEN")
     print(f"   Error: {e}")
@@ -782,6 +783,81 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
         print(f"   ZIP bytes: {len(zip_bytes)} ({len(zip_bytes) / 1024:.2f} KB)")
         print(f"   Base64 len: {len(zip_base64)}")
         print(f"   Payload XML total: {len(payload_xml.encode('utf-8'))} bytes ({len(payload_xml.encode('utf-8')) / 1024:.2f} KB)\n")
+        
+        # Validación XSD local (offline)
+        validate_xsd = os.getenv("SIFEN_VALIDATE_XSD", "")
+        debug_soap = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+        
+        # Por defecto: validar si SIFEN_DEBUG_SOAP=1, o si SIFEN_VALIDATE_XSD=1 explícitamente
+        should_validate = (
+            validate_xsd == "1" or
+            (validate_xsd != "0" and debug_soap)
+        )
+        
+        if should_validate:
+            # Determinar xsd_dir
+            xsd_dir_env = os.getenv("SIFEN_XSD_DIR")
+            if xsd_dir_env:
+                xsd_dir = Path(xsd_dir_env)
+            else:
+                # Default: tesaka-cv/docs/set/ekuatia.set.gov.py/sifen/xsd
+                repo_root = Path(__file__).parent.parent
+                xsd_dir = repo_root / "docs" / "set" / "ekuatia.set.gov.py" / "sifen" / "xsd"
+            
+            print("🧾 Validando rDE/lote contra XSD local...")
+            print(f"   XSD dir: {xsd_dir}")
+            
+            if not xsd_dir.exists():
+                print(f"⚠️  WARNING: Directorio XSD no existe: {xsd_dir}")
+                print("   Omitiendo validación XSD. Configurar SIFEN_XSD_DIR o crear el directorio.")
+            else:
+                validation_result = validate_rde_and_lote(
+                    rde_signed_bytes=xml_bytes,
+                    lote_xml_bytes=lote_xml_bytes,
+                    xsd_dir=xsd_dir
+                )
+                
+                # Mostrar resultados
+                if validation_result["rde_ok"]:
+                    print(f"✅ XSD OK (rDE)")
+                    print(f"   Schema: {validation_result['schema_rde']}")
+                else:
+                    print(f"❌ XSD FAIL (rDE)")
+                    print(f"   Schema: {validation_result['schema_rde']}")
+                    for error in validation_result["rde_errors"]:
+                        print(f"   {error}")
+                
+                if validation_result["lote_ok"] is not None:
+                    if validation_result["lote_ok"]:
+                        print(f"✅ XSD OK (rLoteDE)")
+                        if validation_result["schema_lote"]:
+                            print(f"   Schema: {validation_result['schema_lote']}")
+                    else:
+                        print(f"❌ XSD FAIL (rLoteDE)")
+                        if validation_result["schema_lote"]:
+                            print(f"   Schema: {validation_result['schema_lote']}")
+                        for error in validation_result["lote_errors"]:
+                            print(f"   {error}")
+                elif validation_result.get("warning"):
+                    print(f"⚠️  {validation_result['warning']}")
+                
+                # Si falla validación, abortar envío
+                if not validation_result["rde_ok"] or \
+                   (validation_result["lote_ok"] is not None and not validation_result["lote_ok"]):
+                    error_msg = "Validación XSD falló. Corregir errores antes de enviar a SIFEN."
+                    if validation_result["rde_errors"]:
+                        error_msg += f"\nErrores rDE: {len(validation_result['rde_errors'])}"
+                    if validation_result["lote_errors"]:
+                        error_msg += f"\nErrores lote: {len(validation_result['lote_errors'])}"
+                    
+                    return {
+                        "success": False,
+                        "error": error_msg,
+                        "error_type": "XSDValidationError",
+                        "validation_result": validation_result
+                    }
+                
+                print()  # Línea en blanco después de validación
     except Exception as e:
         return {
             "success": False,
