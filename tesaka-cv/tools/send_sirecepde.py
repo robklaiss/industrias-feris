@@ -995,7 +995,10 @@ def main():
         description="Envía XML siRecepLoteDE (rEnvioLote) al servicio SOAP de Recepción Lote DE (async) de SIFEN",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Ejemplos:
+Ejemplos básicos:
+  # Activar entorno virtual (recomendado)
+  source .venv/bin/activate
+  
   # Enviar archivo específico a test
   python -m tools.send_sirecepde --env test --xml artifacts/sirecepde_20251226_233653.xml
   
@@ -1005,8 +1008,10 @@ Ejemplos:
   # Enviar a producción
   python -m tools.send_sirecepde --env prod --xml latest
   
-  # Con debug SOAP y compatibilidad Roshka
-  SIFEN_DEBUG_SOAP=1 SIFEN_SOAP_COMPAT=roshka python -m tools.send_sirecepde --env test --xml artifacts/signed.xml
+  # Con debug SOAP y validación XSD
+  SIFEN_DEBUG_SOAP=1 SIFEN_VALIDATE_XSD=1 python -m tools.send_sirecepde --env test --xml latest
+  
+  Ver docs/USAGE_SEND_SIRECEPDE.md para más ejemplos y opciones avanzadas.
 
 Configuración requerida (variables de entorno):
   SIFEN_ENV              Ambiente (test/prod) - opcional, puede usar --env
