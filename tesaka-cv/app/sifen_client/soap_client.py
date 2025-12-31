@@ -163,8 +163,9 @@ class SoapClient:
         return url
 
     def _extract_soap_address_from_wsdl(self, wsdl_url: str) -> Optional[str]:
-        """Parsea el SOAP address (location) desde el XML del WSDL.
+        """Parsea el SOAP address (location) desde el XML del WSDL usando mTLS.
 
+        Busca soap12:address/@location primero, luego soap:address/@location como fallback.
         Normaliza el WSDL URL y el endpoint resultante.
         """
         try:
@@ -828,6 +829,9 @@ class SoapClient:
         response_body: Optional[bytes] = None,
         mtls_cert_path: Optional[str] = None,
         mtls_key_path: Optional[str] = None,
+        wsdl_url: Optional[str] = None,
+        soap_address: Optional[str] = None,
+        response_root: Optional[str] = None,
     ):
         """
         Guarda debug completo de un intento HTTP/SOAP.
@@ -846,6 +850,11 @@ class SoapClient:
             soap_str = soap_bytes.decode("utf-8", errors="replace")
             
             with open(debug_file, "w", encoding="utf-8") as f:
+                # Nuevos campos de debug (opcionales)
+                if wsdl_url:
+                    f.write(f"WSDL_URL={wsdl_url}\n")
+                if soap_address:
+                    f.write(f"SOAP_ADDRESS={soap_address}\n")
                 f.write(f"POST_URL={post_url}\n")
                 f.write(f"ORIGINAL_URL={original_url}\n")
                 f.write(f"VERSION={version}\n")
@@ -865,6 +874,8 @@ class SoapClient:
                     f.write(f"RESPONSE_STATUS={response_status}\n")
                 if response_headers:
                     f.write(f"RESPONSE_HEADERS={response_headers}\n")
+                if response_root:
+                    f.write(f"RESPONSE_ROOT={response_root}\n")
                 if response_body:
                     body_str = response_body.decode("utf-8", errors="replace")
                     f.write(f"RESPONSE_BODY_FIRST_2000={body_str[:2000]}\n")
@@ -1142,9 +1153,13 @@ class SoapClient:
         return self._parse_recepcion_response_from_xml(resp_root)
 
     def recepcion_lote(self, xml_renvio_lote: str) -> Dict[str, Any]:
-        """Envía un rEnvioLote (siRecepLoteDE) a SIFEN vía SOAP 1.2 (RAW).
+        """Envía un rEnvioLote (siRecepLoteDE) a SIFEN vía SOAP 1.2 document/literal wrapped.
 
-        Similar a recepcion_de() pero para envío de lotes.
+        Formato esperado:
+        - SOAP 1.2 envelope con Header vacío
+        - Body con wrapper <siRecepLoteDE> que contiene <rEnvioLote>
+        - Headers HTTP sin action= en Content-Type
+        - Endpoint extraído del WSDL usando mTLS
         """
         service = "siRecepLoteDE"
 
@@ -1174,14 +1189,7 @@ class SoapClient:
                     f"XML root debe ser 'rEnvioLote', encontrado: {xml_root.tag}"
                 )
 
-        # Extraer dId del rEnvioLote para el HeaderMsg
-        d_id_elem = xml_root.find(f".//{{{SIFEN_NS}}}dId")
-        if d_id_elem is None:
-            # Fallback: buscar sin namespace
-            d_id_elem = xml_root.find(".//dId")
-        d_id_value = d_id_elem.text if d_id_elem is not None and d_id_elem.text else "1"
-
-        # Re-serializar el XML para extraer el substring
+        # Re-serializar el XML del rEnvioLote (payload)
         r_envio_lote_content = etree.tostring(
             xml_root,
             xml_declaration=False,
@@ -1190,55 +1198,52 @@ class SoapClient:
             method="xml",
         )
 
-        # Obtener URL base (sin ?wsdl)
+        # Obtener WSDL URL y extraer SOAP address usando mTLS
         service_key = "recibe_lote"
-        if service_key not in self._soap_address:
-            self._get_client(service_key)
-        if service_key not in self._soap_address:
-            wsdl_url = self._normalize_wsdl_url(
-                self.config.get_soap_service_url(service_key)
-            )
-            addr = self._extract_soap_address_from_wsdl(wsdl_url)
-            if addr:
-                self._soap_address[service_key] = addr
-        
-        if service_key not in self._soap_address:
-            raise SifenClientError(
-                f"No se encontró SOAP address para servicio '{service_key}'."
-            )
-        
-        original_url = self._soap_address[service_key]
-        
-        # Quitar solo querystring, mantener .wsdl
-        parsed = urlparse(original_url)
-        post_url = urlunparse((
-            parsed.scheme,
-            parsed.netloc,
-            parsed.path,  # Mantiene .wsdl
-            parsed.params,
-            "",  # Sin query
-            parsed.fragment
-        ))
-        
-        # Construir SOAP 1.2 exacto: Header vacío, Body con rEnvioLote directamente
-        envelope = etree.Element(
-            f"{{{SOAP_NS}}}Envelope",
-            nsmap={"soap": SOAP_NS, "xsd": SIFEN_NS}
+        wsdl_url = self._normalize_wsdl_url(
+            self.config.get_soap_service_url(service_key)
         )
         
-        # Header vacío
+        # Extraer SOAP address del WSDL usando el transporte mTLS
+        if service_key not in self._soap_address:
+            soap_address = self._extract_soap_address_from_wsdl(wsdl_url)
+            if soap_address:
+                self._soap_address[service_key] = soap_address
+            else:
+                raise SifenClientError(
+                    f"No se pudo extraer SOAP address del WSDL: {wsdl_url}"
+                )
+        
+        post_url = self._soap_address[service_key]
+        
+        # Construir SOAP 1.2 envelope con Header vacío y Body con wrapper
+        envelope = etree.Element(
+            f"{{{SOAP_NS}}}Envelope",
+            nsmap={"soap-env": SOAP_NS}
+        )
+        
+        # Header vacío (NO HeaderMsg)
         header = etree.SubElement(envelope, f"{{{SOAP_NS}}}Header")
         
-        # Body con rEnvioLote directamente (sin wrapper)
+        # Body con wrapper <siRecepLoteDE>
         body = etree.SubElement(envelope, f"{{{SOAP_NS}}}Body")
+        
+        # Wrapper de operación
+        wrapper = etree.SubElement(
+            body,
+            etree.QName(SIFEN_NS, "siRecepLoteDE"),
+            nsmap={None: SIFEN_NS}
+        )
+        
+        # Agregar el rEnvioLote dentro del wrapper
         r_envio_lote_elem = etree.fromstring(r_envio_lote_content)
-        body.append(r_envio_lote_elem)
+        wrapper.append(r_envio_lote_elem)
         
         soap_bytes = etree.tostring(
             envelope, xml_declaration=True, encoding="UTF-8", pretty_print=False
         )
         
-        # Headers SOAP 1.2
+        # Headers SOAP 1.2 (SIN action=)
         headers = {
             "Content-Type": "application/soap+xml; charset=utf-8",
             "Accept": "application/soap+xml, text/xml, */*",
@@ -1266,10 +1271,19 @@ class SoapClient:
                 timeout=(self.connect_timeout, self.read_timeout),
             )
             
+            # Parsear respuesta para debug
+            resp_root = None
+            resp_root_localname = None
+            try:
+                resp_root = etree.fromstring(resp.content)
+                resp_root_localname = etree.QName(resp_root).localname
+            except Exception:
+                pass
+            
             # Guardar debug
             self._save_http_debug(
                 post_url=post_url,
-                original_url=original_url,
+                original_url=wsdl_url,
                 version="1.2",
                 action="siRecepLoteDE",
                 headers=headers,
@@ -1279,6 +1293,9 @@ class SoapClient:
                 response_body=resp.content,
                 mtls_cert_path=mtls_cert_path,
                 mtls_key_path=mtls_key_path,
+                wsdl_url=wsdl_url,
+                soap_address=post_url,
+                response_root=resp_root_localname,
             )
             
             # Verificar éxito
@@ -1289,7 +1306,7 @@ class SoapClient:
                 # Verificar si hay respuesta XML válida aunque HTTP != 200
                 try:
                     resp_body_str = resp.content.decode("utf-8", errors="replace")
-                    if "<rRetEnviDe" in resp_body_str or "<dCodRes>" in resp_body_str:
+                    if "<rResEnviLoteDe" in resp_body_str or "<rRetEnviDe" in resp_body_str or "<dCodRes>" in resp_body_str:
                         is_success = True
                 except Exception:
                     pass
@@ -1298,11 +1315,13 @@ class SoapClient:
                 # Guardar SOAP debug adicional
                 self._save_raw_soap_debug(soap_bytes, resp.content, suffix="_lote")
                 
-                try:
-                    resp_root = etree.fromstring(resp.content)
-                    return self._parse_recepcion_response_from_xml(resp_root)
-                except Exception as e:
-                    raise SifenClientError(f"Error al parsear respuesta XML de SIFEN: {e}")
+                if resp_root is None:
+                    try:
+                        resp_root = etree.fromstring(resp.content)
+                    except Exception as e:
+                        raise SifenClientError(f"Error al parsear respuesta XML de SIFEN: {e}")
+                
+                return self._parse_recepcion_response_from_xml(resp_root)
             else:
                 # Error HTTP pero con respuesta XML válida
                 error_msg = f"Error HTTP {resp.status_code} al enviar SOAP: {resp.text[:500]}"
@@ -1313,7 +1332,7 @@ class SoapClient:
             # Guardar debug incluso en error
             self._save_http_debug(
                 post_url=post_url,
-                original_url=original_url,
+                original_url=wsdl_url,
                 version="1.2",
                 action="siRecepLoteDE",
                 headers=headers,
@@ -1323,6 +1342,9 @@ class SoapClient:
                 response_body=None,
                 mtls_cert_path=mtls_cert_path,
                 mtls_key_path=mtls_key_path,
+                wsdl_url=wsdl_url,
+                soap_address=post_url,
+                response_root=None,
             )
             self._save_raw_soap_debug(soap_bytes, None, suffix="_lote")
             raise SifenClientError(f"Error al enviar SOAP a SIFEN: {e}") from e
