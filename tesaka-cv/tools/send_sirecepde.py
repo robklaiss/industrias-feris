@@ -1074,8 +1074,16 @@ Configuración requerida (variables de entorno):
         artifacts_dir=artifacts_dir
     )
     
-    # Retornar código de salida
-    return 0 if result.get("success") else 1
+    # Retornar código de salida (0 solo si success es True explícitamente)
+    success = result.get("success") is True
+    exit_code = 0 if success else 1
+    
+    # Debug output
+    debug_soap = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+    if debug_soap:
+        print(f"EXITING_WITH={exit_code}")
+    
+    return exit_code
 
 
 if __name__ == "__main__":

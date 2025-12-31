@@ -143,6 +143,66 @@ def validate_xml_bytes(
     return (False, errors)
 
 
+def extract_element_as_doc(
+    xml_bytes: bytes,
+    localname: str,
+    ns: str = SIFEN_NS
+) -> bytes:
+    """
+    Extrae un elemento por localname del XML y lo devuelve como documento standalone.
+    
+    Args:
+        xml_bytes: XML completo (puede tener wrapper)
+        localname: Nombre local del elemento a extraer (ej: "rDE")
+        ns: Namespace del elemento (default: SIFEN_NS)
+        
+    Returns:
+        Bytes del elemento extraído como documento XML standalone (con XML declaration)
+        
+    Raises:
+        ValueError: Si no se encuentra el elemento
+    """
+    try:
+        root = etree.fromstring(xml_bytes)
+    except Exception as e:
+        raise ValueError(f"Error al parsear XML: {e}")
+    
+    def get_localname(tag: str) -> str:
+        """Obtiene el localname de un tag (sin namespace)."""
+        if "}" in tag:
+            return tag.split("}", 1)[-1]
+        return tag
+    
+    # Caso 1: el root es el elemento buscado
+    if get_localname(root.tag) == localname:
+        element = root
+    else:
+        # Caso 2: buscar con namespace
+        element = root.find(f".//{{{ns}}}{localname}")
+        if element is None:
+            # Caso 3: buscar por localname sin namespace
+            element = root.xpath(f".//*[local-name()='{localname}']")
+            if element:
+                element = element[0]
+            else:
+                element = None
+    
+    if element is None:
+        root_local = get_localname(root.tag)
+        raise ValueError(
+            f"No se encontró elemento '{localname}' en el XML. "
+            f"Root encontrado: {root_local}"
+        )
+    
+    # Serializar el elemento como documento standalone
+    return etree.tostring(
+        element,
+        xml_declaration=True,
+        encoding="utf-8",
+        pretty_print=False
+    )
+
+
 def find_xsd_declaring_global_element(
     xsd_dir: Path,
     element_name: str
