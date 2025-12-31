@@ -2,11 +2,32 @@
 Configuración para cliente SIFEN
 """
 import os
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Tuple
 from pathlib import Path
-from dotenv import load_dotenv
 
-load_dotenv()
+# Cargar dotenv si está disponible (opcional)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    # dotenv no está instalado, continuar sin cargar .env
+    pass
+
+
+def get_cert_path_and_password() -> Tuple[Optional[str], Optional[str]]:
+    """
+    Helper unificado para obtener certificado P12 y contraseña desde variables de entorno.
+    
+    Prioridad:
+    1. SIFEN_CERT_PATH / SIFEN_CERT_PASSWORD (estándar)
+    2. SIFEN_SIGN_P12_PATH / SIFEN_SIGN_P12_PASSWORD (alias, compatibilidad)
+    
+    Returns:
+        Tupla (cert_path, cert_password) o (None, None) si no están configuradas
+    """
+    cert_path = os.getenv("SIFEN_CERT_PATH") or os.getenv("SIFEN_SIGN_P12_PATH")
+    cert_password = os.getenv("SIFEN_CERT_PASSWORD") or os.getenv("SIFEN_SIGN_P12_PASSWORD")
+    return cert_path, cert_password
 
 
 class SifenConfig:
@@ -26,18 +47,24 @@ class SifenConfig:
     # Fuente: Guía de Mejores Prácticas, pág. 4
     PREVALIDADOR_URL = "https://ekuatia.set.gov.py/prevalidador/"
     
-    # Servicios Web SOAP según Guía de Mejores Prácticas
-    # Los documentos electrónicos se envían en lotes (hasta 50 DE por lote)
-    # Fuente: Guía de Mejores Prácticas, pág. 5-6
+    # Servicios Web SOAP según Manual Técnico SIFEN V150
+    # SOAP 1.2 Document/Literal
+    # Fuente: Manual Técnico SIFEN V150
     SOAP_SERVICES = {
         "test": {
-            "recibe_lote": "https://sifen-test.set.gov.py/de/ws/async/recibe-lote.wsdl",
+            "recibe": "https://sifen-test.set.gov.py/de/ws/sync/recibe.wsdl",
+            "recibe_lote": "https://sifen-test.set.gov.py/de/ws/async/recibe-lote.wsdl?wsdl",
+            "evento": "https://sifen-test.set.gov.py/de/ws/eventos/evento.wsdl",
             "consulta_lote": "https://sifen-test.set.gov.py/de/ws/consultas/consulta-lote.wsdl",
+            "consulta_ruc": "https://sifen-test.set.gov.py/de/ws/consultas/consulta-ruc.wsdl",
             "consulta": "https://sifen-test.set.gov.py/de/ws/consultas/consulta.wsdl",
         },
         "prod": {
+            "recibe": "https://sifen.set.gov.py/de/ws/sync/recibe.wsdl",
             "recibe_lote": "https://sifen.set.gov.py/de/ws/async/recibe-lote.wsdl",
+            "evento": "https://sifen.set.gov.py/de/ws/eventos/evento.wsdl",
             "consulta_lote": "https://sifen.set.gov.py/de/ws/consultas/consulta-lote.wsdl",
+            "consulta_ruc": "https://sifen.set.gov.py/de/ws/consultas/consulta-ruc.wsdl",
             "consulta": "https://sifen.set.gov.py/de/ws/consultas/consulta.wsdl",
         }
     }
@@ -62,24 +89,35 @@ class SifenConfig:
         self.env = env
         self.base_url = self.BASE_URLS[env]
         
-        # Autenticación - REQUIERE CONFIRMACIÓN
-        # TODO: Verificar tipo de autenticación desde documentación
-        self.use_mtls = os.getenv("SIFEN_USE_MTLS", "false").lower() == "true"
+        # Autenticación - mTLS es REQUERIDO según Manual Técnico SIFEN V150
+        # TLS 1.2 con autenticación mutua usando certificados X.509 v3
+        self.use_mtls = os.getenv("SIFEN_USE_MTLS", "true").lower() == "true"
+        
+        # Atributos de certificado (mTLS) - inicializados como None
+        # Se pueden asignar desde variables de entorno en get_sifen_config()
+        self.cert_path: Optional[str] = None
+        self.cert_password: Optional[str] = None
+        
+        # Atributos para mTLS con PEM directo (cert + key separados)
+        # Prioridad: si están presentes, se usan en lugar de PKCS12
+        self.cert_pem_path: Optional[str] = None
+        self.key_pem_path: Optional[str] = None
         
         if self.use_mtls:
-            # Configuración mTLS (mutual TLS)
-            cert_path = os.getenv("SIFEN_CERT_PATH")
-            cert_password = os.getenv("SIFEN_CERT_PASSWORD", "")
+            # Configuración mTLS (mutual TLS) - usar helper unificado
+            cert_path, cert_password = get_cert_path_and_password()
             ca_bundle_path = os.getenv("SIFEN_CA_BUNDLE_PATH")
             
-            if not cert_path:
-                raise ValueError("SIFEN_CERT_PATH debe estar configurado cuando SIFEN_USE_MTLS=true")
+            if cert_path:
+                self.cert_path = cert_path
+            if cert_password:
+                self.cert_password = cert_password
             
-            self.cert_path = Path(cert_path)
-            self.cert_password = cert_password
+            # ca_bundle_path se mantiene como Path para compatibilidad
             self.ca_bundle_path = Path(ca_bundle_path) if ca_bundle_path else None
             
-            if not self.cert_path.exists():
+            # Validar que el certificado existe si se proporcionó
+            if self.cert_path and not Path(self.cert_path).exists():
                 raise FileNotFoundError(f"Certificado no encontrado: {self.cert_path}")
         else:
             # Otro tipo de autenticación (API Key, OAuth, etc.)
@@ -114,8 +152,9 @@ class SifenConfig:
         Returns:
             URL del WSDL del servicio
         """
-        if service_key not in ["recibe_lote", "consulta_lote", "consulta"]:
-            raise ValueError(f"Servicio SOAP inválido: {service_key}")
+        valid_keys = ["recibe", "recibe_lote", "evento", "consulta_lote", "consulta_ruc", "consulta"]
+        if service_key not in valid_keys:
+            raise ValueError(f"Servicio SOAP inválido: {service_key}. Válidos: {valid_keys}")
         
         return self.SOAP_SERVICES[self.env][service_key]
     
@@ -155,5 +194,21 @@ def get_sifen_config(env: Optional[str] = None) -> SifenConfig:
     if env is None:
         env = os.getenv("SIFEN_ENV", SifenConfig.ENV_TEST)
     
-    return SifenConfig(env)
+    cfg = SifenConfig(env)
+    
+    # Cargar certificado desde variables de entorno si no están ya asignados
+    # (esto permite que funcionen incluso si use_mtls=False en el __init__)
+    # Usar helper unificado para mantener compatibilidad con ambos nombres
+    if not cfg.cert_path or not cfg.cert_password:
+        env_cert_path, env_cert_password = get_cert_path_and_password()
+        cfg.cert_path = cfg.cert_path or env_cert_path
+        cfg.cert_password = cfg.cert_password or env_cert_password
+    
+    # Cargar rutas PEM directas (prioridad sobre PKCS12)
+    if not cfg.cert_pem_path:
+        cfg.cert_pem_path = os.getenv("SIFEN_CERT_PEM_PATH")
+    if not cfg.key_pem_path:
+        cfg.key_pem_path = os.getenv("SIFEN_KEY_PEM_PATH")
+    
+    return cfg
 
