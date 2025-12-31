@@ -385,7 +385,7 @@ def extract_rde_element(xml_bytes: bytes) -> bytes:
     return etree.tostring(rde_el, xml_declaration=False, encoding="utf-8")
 
 
-def build_lote_base64_from_single_xml(xml_bytes: bytes) -> str:
+def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = False) -> str | tuple[str, bytes, bytes]:
     """
     Crea un ZIP con el rDE firmado envuelto en rLoteDE.
     
