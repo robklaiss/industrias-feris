@@ -252,8 +252,11 @@ def validate_rde_and_lote(
     """
     Valida rDE firmado y (opcionalmente) lote.xml contra XSD locales.
     
+    Extrae el elemento rDE del XML completo (puede venir envuelto en rEnviDe u otro wrapper)
+    y lo valida como documento standalone.
+    
     Args:
-        rde_signed_bytes: XML del rDE firmado (bytes)
+        rde_signed_bytes: XML del rDE firmado (bytes) - puede tener wrapper como rEnviDe
         lote_xml_bytes: XML del lote.xml (bytes) o None si no se proporciona
         xsd_dir: Directorio base donde están los XSD
         
@@ -266,10 +269,13 @@ def validate_rde_and_lote(
             "lote_errors": List[str],
             "schema_rde": str (path),
             "schema_lote": Optional[str] (path),
-            "warning": Optional[str]
+            "warning": Optional[str],
+            "root_original": str (localname del root original),
+            "extracted_rde_root": str (siempre "rDE")
         }
     """
     xsd_dir = Path(xsd_dir).resolve()
+    debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
     
     result = {
         "rde_ok": False,
@@ -278,16 +284,33 @@ def validate_rde_and_lote(
         "lote_errors": [],
         "schema_rde": "",
         "schema_lote": None,
-        "warning": None
+        "warning": None,
+        "root_original": "",
+        "extracted_rde_root": "rDE"
     }
     
-    # 1) Validar rDE
-    # Preferir siRecepDE_v150.xsd si existe
-    schema_rde_path = xsd_dir / "siRecepDE_v150.xsd"
-    if not schema_rde_path.exists():
-        # Buscar XSD que declare elemento global "rDE"
-        schema_rde_path = find_xsd_declaring_global_element(xsd_dir, "rDE")
-        if schema_rde_path is None:
+    # Detectar root original del XML completo
+    try:
+        root = etree.fromstring(rde_signed_bytes)
+        def get_localname(tag: str) -> str:
+            return tag.split("}", 1)[-1] if "}" in tag else tag
+        result["root_original"] = get_localname(root.tag)
+    except Exception:
+        result["root_original"] = "?"
+    
+    # 1) Extraer rDE del XML completo
+    try:
+        rde_doc_bytes = extract_element_as_doc(rde_signed_bytes, "rDE", SIFEN_NS)
+    except ValueError as e:
+        result["rde_errors"] = [f"Error al extraer rDE del XML: {e}"]
+        return result
+    
+    # 2) Buscar XSD que declare elemento global "rDE"
+    schema_rde_path = find_xsd_declaring_global_element(xsd_dir, "rDE")
+    if schema_rde_path is None:
+        # Fallback a siRecepDE_v150.xsd si existe
+        schema_rde_path = xsd_dir / "siRecepDE_v150.xsd"
+        if not schema_rde_path.exists():
             result["rde_errors"] = [
                 f"No se encontró XSD para rDE en {xsd_dir}. "
                 "Buscar siRecepDE_v150.xsd o archivo que declare elemento global 'rDE'."
@@ -296,16 +319,17 @@ def validate_rde_and_lote(
     
     result["schema_rde"] = str(schema_rde_path)
     
+    # 3) Validar rDE extraído
     try:
         schema_rde = load_schema(schema_rde_path, xsd_dir)
-        rde_ok, rde_errors = validate_xml_bytes(rde_signed_bytes, schema_rde, xsd_dir)
+        rde_ok, rde_errors = validate_xml_bytes(rde_doc_bytes, schema_rde, xsd_dir)
         result["rde_ok"] = rde_ok
         result["rde_errors"] = rde_errors
     except Exception as e:
         result["rde_errors"] = [f"Error al cargar/validar XSD rDE: {e}"]
         return result
     
-    # 2) Validar lote.xml si se proporciona
+    # 4) Validar lote.xml si se proporciona
     if lote_xml_bytes is not None:
         schema_lote_path = find_xsd_declaring_global_element(xsd_dir, "rLoteDE")
         if schema_lote_path is None:
@@ -321,6 +345,16 @@ def validate_rde_and_lote(
             except Exception as e:
                 result["lote_errors"] = [f"Error al cargar/validar XSD lote: {e}"]
                 result["lote_ok"] = False
+    
+    # Debug output
+    if debug_enabled:
+        print(f"   ROOT_ORIGINAL={result['root_original']}")
+        print(f"   EXTRACTED_RDE_ROOT={result['extracted_rde_root']}")
+        print(f"   RDE_SCHEMA={result['schema_rde']}")
+        if result["schema_lote"]:
+            print(f"   LOTE_SCHEMA={result['schema_lote']}")
+        else:
+            print(f"   LOTE_SCHEMA=NONE")
     
     return result
 
