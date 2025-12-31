@@ -386,6 +386,26 @@ def extract_rde_element(xml_bytes: bytes) -> bytes:
     return etree.tostring(rde_el, xml_declaration=False, encoding="utf-8")
 
 
+def _extract_rde_fragment_bytes(xml_signed_bytes: bytes) -> bytes:
+    """
+    Extrae el fragmento <rDE ...>...</rDE> desde los bytes originales
+    para NO alterar firma / namespaces / whitespace.
+    """
+    import re
+    
+    # 1) Caso sin prefijo: <rDE ...>...</rDE>
+    m = re.search(br"<rDE\b[^>]*>.*?</rDE>", xml_signed_bytes, flags=re.DOTALL)
+    if m:
+        return m.group(0)
+    
+    # 2) Caso con prefijo: <ns:rDE ...>...</ns:rDE>
+    m = re.search(br"<([A-Za-z_][\w.-]*):rDE\b[^>]*>.*?</\1:rDE>", xml_signed_bytes, flags=re.DOTALL)
+    if m:
+        return m.group(0)
+    
+    raise ValueError("No pude extraer <rDE>...</rDE> en bytes desde el XML firmado")
+
+
 def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = False) -> str | tuple[str, bytes, bytes]:
     """
     Crea un ZIP con el rDE firmado envuelto en rLoteDE.
@@ -488,35 +508,42 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
     # - El namespace debe estar declarado en rDE (no en rLoteDE)
     # Esto evita que lxml "hoistee" el xmlns al wrapper y rompa la firma
     
-    # Serializar el rDE firmado preservando su namespace
-    rde_bytes = etree.tostring(
-        rde_el,
-        xml_declaration=False,
-        encoding="utf-8",
-        pretty_print=False
-    )
+    # Extraer el fragmento rDE desde los bytes originales (NO re-serializar con lxml)
+    # Esto preserva exactamente la firma, namespaces y whitespace del rDE firmado
+    rde_fragment = _extract_rde_fragment_bytes(xml_bytes)
     
-    # Construir lote.xml con rLoteDE sin namespace
-    # Formato: <?xml version="1.0" encoding="UTF-8" standalone="yes"?><rLoteDE>...rDE...</rLoteDE>
+    # IMPORTANTE: si el rDE no trae xmlns default, NO lo inventes acá (eso puede romper firma).
+    # Solo envolvemos EXACTO.
+    
+    # Construir lote.xml con rLoteDE sin namespace usando concatenación de bytes
     lote_xml_bytes = (
-        b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
-        b'<rLoteDE>'
-        + rde_bytes
-        + b'</rLoteDE>'
+        b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        b"<rLoteDE>"
+        + rde_fragment +
+        b"</rLoteDE>"
     )
     
-    # Crear ZIP con exactamente un archivo "lote.xml"
+    # Hard-guard: si aparece xmlns en rLoteDE, abortar (así no perdés horas)
+    if b"<rLoteDE" in lote_xml_bytes and b"xmlns=" in lote_xml_bytes.split(b">", 1)[0]:
+        raise RuntimeError("BUG: rLoteDE salió con xmlns= (debe ser SIN namespace)")
+    
+    # Guardar para inspección (antes de crear ZIP)
+    if debug_enabled:
+        Path("/tmp/lote_xml_payload.xml").write_bytes(lote_xml_bytes)
+    
+    # ZIP con lote.xml
     mem = BytesIO()
     with zipfile.ZipFile(mem, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
         zf.writestr("lote.xml", lote_xml_bytes)
     zip_bytes = mem.getvalue()
     
+    # Guardar ZIP también para debug
+    if debug_enabled:
+        Path("/tmp/lote_payload.zip").write_bytes(zip_bytes)
+    
     # Check rápido dentro de build_lote_base64_from_single_xml (solo cuando SIFEN_DEBUG_SOAP=1)
     if debug_enabled:
         try:
-            # Guardar lote.xml y ZIP para inspección
-            Path("/tmp/lote_xml_payload.xml").write_bytes(lote_xml_bytes)
-            Path("/tmp/lote_payload.zip").write_bytes(zip_bytes)
             print(f"🧪 DEBUG [build_lote_base64] Guardado: /tmp/lote_xml_payload.xml, /tmp/lote_payload.zip")
             
             # Abrir el ZIP en memoria y verificar
@@ -587,7 +614,10 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
             traceback.print_exc()
     
     # Base64 estándar sin saltos
-    return base64.b64encode(zip_bytes).decode("ascii")
+    b64 = base64.b64encode(zip_bytes).decode("ascii")
+    if return_debug:
+        return b64, lote_xml_bytes, zip_bytes
+    return b64
 
 
 def build_r_envio_lote_xml(did: int, xml_bytes: bytes, zip_base64: Optional[str] = None) -> str:
