@@ -672,7 +672,23 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
                             rde_ns = rde_tag.split("}", 1)[0][1:]
                         else:
                             # Buscar xmlns en el rDE o heredado
+                            # Si el tag no tiene namespace en el nombre, buscar en nsmap o en atributos
                             rde_ns = rde_found.nsmap.get(None, "VACÍO") if hasattr(rde_found, 'nsmap') else "VACÍO"
+                            # Si sigue VACÍO, verificar en el XML original (bytes) buscando xmlns en el tag rDE
+                            if rde_ns == "VACÍO":
+                                # Leer el contenido del ZIP y buscar xmlns en el tag rDE
+                                lote_content_str = lote_content.decode('utf-8', errors='replace')
+                                rde_tag_match = re.search(r'<rDE\b([^>]*)>', lote_content_str)
+                                if rde_tag_match:
+                                    attrs = rde_tag_match.group(1)
+                                    xmlns_match = re.search(r'xmlns="([^"]+)"', attrs)
+                                    if xmlns_match:
+                                        rde_ns = xmlns_match.group(1)
+                                    else:
+                                        # Intentar con comillas simples
+                                        xmlns_match = re.search(r"xmlns='([^']+)'", attrs)
+                                        if xmlns_match:
+                                            rde_ns = xmlns_match.group(1)
                         
                         print(f"🧪 DEBUG [build_lote_base64] rDE localname: {local_tag(rde_tag)}")
                         print(f"🧪 DEBUG [build_lote_base64] rDE namespace: {rde_ns}")
