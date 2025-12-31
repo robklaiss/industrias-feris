@@ -393,15 +393,35 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes) -> str:
     - Root: <rLoteDE xmlns="http://ekuatia.set.gov.py/sifen/xsd">
     - Contenido: un <rDE> completo (ya normalizado, firmado y reordenado) como hijo directo.
     
-    IMPORTANTE: NO modifica la firma ni los hijos del rDE, solo lo envuelve en rLoteDE.
+    IMPORTANTE: 
+    - Selecciona SIEMPRE el rDE que tiene <ds:Signature> como hijo directo.
+    - NO modifica la firma ni los hijos del rDE, solo lo envuelve en rLoteDE.
     
     Args:
         xml_bytes: XML que contiene el rDE (puede ser rDE root o tener rDE anidado)
         
     Returns:
         Base64 del ZIP como string
+        
+    Raises:
+        ValueError: Si no se encuentra rDE o si el rDE no tiene Signature como hijo directo
     """
     import copy
+    
+    # Namespace de firma digital
+    DSIG_NS = "http://www.w3.org/2000/09/xmldsig#"
+    
+    # Helper para obtener local name
+    def local_tag(tag: str) -> str:
+        return tag.split("}", 1)[-1] if "}" in tag else tag
+    
+    # Función para verificar si un rDE tiene Signature como hijo directo
+    def is_signed_rde(el) -> bool:
+        """Verifica si el rDE tiene <ds:Signature> como hijo directo."""
+        return any(
+            child.tag == f"{{{DSIG_NS}}}Signature"
+            for child in list(el)
+        )
     
     # Parsear xml_bytes
     try:
@@ -409,27 +429,57 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes) -> str:
     except Exception as e:
         raise ValueError(f"Error al parsear XML: {e}")
     
-    # Detectar el elemento rDE
-    rde_el = None
+    # Construir lista de candidatos rDE
+    candidates_rde = []
     
-    # Caso a) xml_bytes root == rDE
-    def local_tag(tag: str) -> str:
-        return tag.split("}", 1)[-1] if "}" in tag else tag
-    
+    # Caso a) si local-name(root) == "rDE"
     if local_tag(xml_root.tag) == "rDE":
-        rde_el = xml_root
+        candidates_rde = [xml_root]
     else:
-        # Caso b) buscar el primer .//{SIFEN_NS}rDE
-        rde_el = xml_root.find(f".//{{{SIFEN_NS}}}rDE")
-        if rde_el is None:
-            # Fallback: buscar sin namespace
-            rde_el = xml_root.find(".//rDE")
+        # Caso b) buscar todos los rDE con namespace SIFEN
+        candidates_rde = xml_root.findall(f".//{{{SIFEN_NS}}}rDE")
+        # Caso c) si sigue vacío, buscar sin namespace
+        if not candidates_rde:
+            candidates_rde = xml_root.xpath(".//*[local-name()='rDE']")
     
-    # Caso c) Si no se encuentra rDE -> levantar ValueError
-    if rde_el is None:
+    # Si no se encontró ningún rDE
+    if not candidates_rde:
         raise ValueError(
-            f"No se encontró elemento rDE en el XML. Root tag: {xml_root.tag}"
+            "No se encontró rDE en el XML de entrada (no se puede construir lote)."
         )
+    
+    # Seleccionar el candidato correcto: el que tiene Signature como hijo directo
+    signed = [el for el in candidates_rde if is_signed_rde(el)]
+    
+    if len(signed) >= 1:
+        rde_el = signed[0]
+    else:
+        # Opcional: buscar por gCamFuFD como fallback (pero igualmente validar Signature)
+        gcam = [
+            el for el in candidates_rde
+            if any(local_tag(child.tag) == "gCamFuFD" for child in list(el))
+        ]
+        if gcam:
+            rde_el = gcam[0]
+            # Validar que tenga Signature (si no, abortar)
+            if not is_signed_rde(rde_el):
+                raise ValueError(
+                    "Se encontró rDE pero NO contiene <ds:Signature> como hijo directo. "
+                    "Probablemente se pasó XML no firmado o se eligió el rDE equivocado."
+                )
+        else:
+            raise ValueError(
+                "Se encontró rDE pero NO contiene <ds:Signature> como hijo directo. "
+                "Probablemente se pasó XML no firmado o se eligió el rDE equivocado."
+            )
+    
+    # Debug: mostrar información de selección
+    debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+    if debug_enabled:
+        print(f"🧪 DEBUG [build_lote_base64] candidates_rDE: {len(candidates_rde)}")
+        print(f"🧪 DEBUG [build_lote_base64] selected_rDE_signed: {is_signed_rde(rde_el)}")
+        selected_children = [local_tag(c.tag) for c in list(rde_el)]
+        print(f"🧪 DEBUG [build_lote_base64] selected_rDE_children: {', '.join(selected_children)}")
     
     # IMPORTANTE: NO "reconstruyas" rDE ni cambies hijos; solo lo vas a envolver.
     # Usar deepcopy para no perder attrs o ns
@@ -457,7 +507,7 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes) -> str:
     zip_bytes = mem.getvalue()
     
     # Check rápido dentro de build_lote_base64_from_single_xml (solo cuando SIFEN_DEBUG_SOAP=1)
-    if os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True"):
+    if debug_enabled:
         try:
             # Abrir el ZIP en memoria y verificar
             with zipfile.ZipFile(BytesIO(zip_bytes), "r") as zf:
@@ -483,6 +533,14 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes) -> str:
                         # Mostrar orden de hijos del rDE interno
                         children_order = [local_tag(c.tag) for c in list(rde_found)]
                         print(f"🧪 DEBUG [build_lote_base64] rDE children: {', '.join(children_order)}")
+                        
+                        # Verificar que incluye Signature y gCamFuFD
+                        has_signature = any(local_tag(c.tag) == "Signature" for c in list(rde_found))
+                        has_gcam = any(local_tag(c.tag) == "gCamFuFD" for c in list(rde_found))
+                        if not has_signature:
+                            print(f"⚠️  WARNING [build_lote_base64] rDE interno NO tiene Signature")
+                        if not has_gcam:
+                            print(f"⚠️  WARNING [build_lote_base64] rDE interno NO tiene gCamFuFD")
                     elif root_tag != "rLoteDE":
                         print(f"⚠️  WARNING [build_lote_base64] root debería ser rLoteDE, es {root_tag}")
         except Exception as e:
