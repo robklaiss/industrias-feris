@@ -483,22 +483,26 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
         print(f"🧪 DEBUG [build_lote_base64] selected_rDE_children: {', '.join(selected_children)}")
     
     # IMPORTANTE: NO "reconstruyas" rDE ni cambies hijos; solo lo vas a envolver.
-    # Usar deepcopy para no perder attrs o ns
-    rde_copy = copy.deepcopy(rde_el)
+    # Según ejemplos oficiales SIFEN:
+    # - rLoteDE NO debe tener namespace (root sin xmlns)
+    # - El namespace debe estar declarado en rDE (no en rLoteDE)
+    # Esto evita que lxml "hoistee" el xmlns al wrapper y rompa la firma
     
-    # Construir wrapper rLoteDE
-    rlote_de = etree.Element(
-        etree.QName(SIFEN_NS, "rLoteDE"),
-        nsmap={None: SIFEN_NS}
-    )
-    rlote_de.append(rde_copy)
-    
-    # Serializar lote_content
-    lote_xml_bytes = etree.tostring(
-        rlote_de,
-        xml_declaration=True,
+    # Serializar el rDE firmado preservando su namespace
+    rde_bytes = etree.tostring(
+        rde_el,
+        xml_declaration=False,
         encoding="utf-8",
         pretty_print=False
+    )
+    
+    # Construir lote.xml con rLoteDE sin namespace
+    # Formato: <?xml version="1.0" encoding="UTF-8" standalone="yes"?><rLoteDE>...rDE...</rLoteDE>
+    lote_xml_bytes = (
+        b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+        b'<rLoteDE>'
+        + rde_bytes
+        + b'</rLoteDE>'
     )
     
     # Crear ZIP con exactamente un archivo "lote.xml"
@@ -510,6 +514,11 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
     # Check rápido dentro de build_lote_base64_from_single_xml (solo cuando SIFEN_DEBUG_SOAP=1)
     if debug_enabled:
         try:
+            # Guardar lote.xml y ZIP para inspección
+            Path("/tmp/lote_xml_payload.xml").write_bytes(lote_xml_bytes)
+            Path("/tmp/lote_payload.zip").write_bytes(zip_bytes)
+            print(f"🧪 DEBUG [build_lote_base64] Guardado: /tmp/lote_xml_payload.xml, /tmp/lote_payload.zip")
+            
             # Abrir el ZIP en memoria y verificar
             with zipfile.ZipFile(BytesIO(zip_bytes), "r") as zf:
                 zip_files = zf.namelist()
@@ -520,7 +529,17 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
                     lote_root = etree.fromstring(lote_content)
                     
                     root_tag = local_tag(lote_root.tag)
-                    print(f"🧪 DEBUG [build_lote_base64] root: {root_tag}")
+                    root_ns = lote_root.nsmap.get(None, "VACÍO") if hasattr(lote_root, 'nsmap') else "VACÍO"
+                    
+                    # Verificar namespace del root (debe ser VACÍO)
+                    if "}" in lote_root.tag:
+                        root_ns_from_tag = lote_root.tag.split("}", 1)[0][1:]
+                        root_ns = root_ns_from_tag if root_ns_from_tag else "VACÍO"
+                    else:
+                        root_ns = "VACÍO"
+                    
+                    print(f"🧪 DEBUG [build_lote_base64] root localname: {root_tag}")
+                    print(f"🧪 DEBUG [build_lote_base64] root namespace: {root_ns}")
                     
                     # Verificar que existe rDE dentro de rLoteDE
                     rde_found = lote_root.find(f".//{{{SIFEN_NS}}}rDE")
@@ -531,6 +550,18 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
                     print(f"🧪 DEBUG [build_lote_base64] has_rDE: {has_rde}")
                     
                     if has_rde and root_tag == "rLoteDE":
+                        # Verificar namespace del rDE (debe ser SIFEN_NS)
+                        rde_tag = rde_found.tag
+                        rde_ns = "VACÍO"
+                        if "}" in rde_tag:
+                            rde_ns = rde_tag.split("}", 1)[0][1:]
+                        else:
+                            # Buscar xmlns en el rDE o heredado
+                            rde_ns = rde_found.nsmap.get(None, "VACÍO") if hasattr(rde_found, 'nsmap') else "VACÍO"
+                        
+                        print(f"🧪 DEBUG [build_lote_base64] rDE localname: {local_tag(rde_tag)}")
+                        print(f"🧪 DEBUG [build_lote_base64] rDE namespace: {rde_ns}")
+                        
                         # Mostrar orden de hijos del rDE interno
                         children_order = [local_tag(c.tag) for c in list(rde_found)]
                         print(f"🧪 DEBUG [build_lote_base64] rDE children: {', '.join(children_order)}")
@@ -542,10 +573,18 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
                             print(f"⚠️  WARNING [build_lote_base64] rDE interno NO tiene Signature")
                         if not has_gcam:
                             print(f"⚠️  WARNING [build_lote_base64] rDE interno NO tiene gCamFuFD")
+                        
+                        # Verificar estructura esperada
+                        if root_ns != "VACÍO" and root_ns != "":
+                            print(f"⚠️  WARNING [build_lote_base64] rLoteDE NO debe tener namespace, tiene: {root_ns}")
+                        if rde_ns != SIFEN_NS:
+                            print(f"⚠️  WARNING [build_lote_base64] rDE debe tener namespace {SIFEN_NS}, tiene: {rde_ns}")
                     elif root_tag != "rLoteDE":
                         print(f"⚠️  WARNING [build_lote_base64] root debería ser rLoteDE, es {root_tag}")
         except Exception as e:
             print(f"⚠️  DEBUG [build_lote_base64] error al verificar ZIP: {e}")
+            import traceback
+            traceback.print_exc()
     
     # Base64 estándar sin saltos
     return base64.b64encode(zip_bytes).decode("ascii")

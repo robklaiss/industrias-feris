@@ -329,22 +329,75 @@ def validate_rde_and_lote(
         result["rde_errors"] = [f"Error al cargar/validar XSD rDE: {e}"]
         return result
     
-    # 4) Validar lote.xml si se proporciona
+    # 4) Validar lote.xml si se proporciona (validación estructural, no XSD)
+    # NOTA: No existe XSD que declare elemento global rLoteDE en el set actual de SIFEN.
+    # En su lugar, hacemos validación estructural del lote.xml.
     if lote_xml_bytes is not None:
-        schema_lote_path = find_xsd_declaring_global_element(xsd_dir, "rLoteDE")
-        if schema_lote_path is None:
-            result["warning"] = "No se encontró XSD para rLoteDE; se validó solo rDE"
-            result["lote_ok"] = None
-        else:
-            result["schema_lote"] = str(schema_lote_path)
-            try:
-                schema_lote = load_schema(schema_lote_path, xsd_dir)
-                lote_ok, lote_errors = validate_xml_bytes(lote_xml_bytes, schema_lote, xsd_dir)
-                result["lote_ok"] = lote_ok
-                result["lote_errors"] = lote_errors
-            except Exception as e:
-                result["lote_errors"] = [f"Error al cargar/validar XSD lote: {e}"]
+        try:
+            lote_root = etree.fromstring(lote_xml_bytes)
+            
+            def get_localname(tag: str) -> str:
+                return tag.split("}", 1)[-1] if "}" in tag else tag
+            
+            def get_namespace(tag: str) -> str:
+                if "}" in tag and tag.startswith("{"):
+                    return tag[1:].split("}", 1)[0]
+                return ""
+            
+            root_local = get_localname(lote_root.tag)
+            root_ns = get_namespace(lote_root.tag)
+            
+            # Validación estructural
+            structural_errors = []
+            
+            # 1. Root debe ser rLoteDE sin namespace
+            if root_local != "rLoteDE":
+                structural_errors.append(f"Root debe ser 'rLoteDE', encontrado: {root_local}")
+            if root_ns:
+                structural_errors.append(f"rLoteDE NO debe tener namespace, encontrado: {root_ns}")
+            
+            # 2. Debe contener exactamente 1 rDE
+            rde_candidates = []
+            for child in lote_root:
+                if get_localname(child.tag) == "rDE":
+                    rde_candidates.append(child)
+            
+            if len(rde_candidates) == 0:
+                structural_errors.append("rLoteDE debe contener exactamente 1 rDE, encontrado: 0")
+            elif len(rde_candidates) > 1:
+                structural_errors.append(f"rLoteDE debe contener exactamente 1 rDE, encontrado: {len(rde_candidates)}")
+            else:
+                rde_elem = rde_candidates[0]
+                rde_ns = get_namespace(rde_elem.tag)
+                
+                # 3. rDE debe tener namespace SIFEN
+                if rde_ns != SIFEN_NS:
+                    structural_errors.append(f"rDE debe tener namespace {SIFEN_NS}, encontrado: {rde_ns}")
+                
+                # 4. rDE debe contener Signature y gCamFuFD
+                rde_children = [get_localname(c.tag) for c in rde_elem]
+                has_signature = "Signature" in rde_children
+                has_gcam = "gCamFuFD" in rde_children
+                
+                if not has_signature:
+                    structural_errors.append("rDE debe contener elemento Signature")
+                if not has_gcam:
+                    structural_errors.append("rDE debe contener elemento gCamFuFD")
+            
+            if structural_errors:
                 result["lote_ok"] = False
+                result["lote_errors"] = structural_errors
+            else:
+                result["lote_ok"] = True
+                result["lote_errors"] = []
+            
+            result["warning"] = "Validación estructural de rLoteDE (no existe XSD global para rLoteDE)"
+            result["schema_lote"] = None
+            
+        except Exception as e:
+            result["lote_errors"] = [f"Error al validar estructura de lote.xml: {e}"]
+            result["lote_ok"] = False
+            result["schema_lote"] = None
     
     # Debug output
     if debug_enabled:
