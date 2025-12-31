@@ -832,6 +832,8 @@ class SoapClient:
         wsdl_url: Optional[str] = None,
         soap_address: Optional[str] = None,
         response_root: Optional[str] = None,
+        body_has_wrapper_sireceplotede: Optional[bool] = None,
+        body_has_renviolote: Optional[bool] = None,
     ):
         """
         Guarda debug completo de un intento HTTP/SOAP.
@@ -876,6 +878,10 @@ class SoapClient:
                     f.write(f"RESPONSE_HEADERS={response_headers}\n")
                 if response_root:
                     f.write(f"RESPONSE_ROOT={response_root}\n")
+                if body_has_wrapper_sireceplotede is not None:
+                    f.write(f"BODY_HAS_WRAPPER_SIRECEPLOTEDE={body_has_wrapper_sireceplotede}\n")
+                if body_has_renviolote is not None:
+                    f.write(f"BODY_HAS_RENVIOLOTE={body_has_renviolote}\n")
                 if response_body:
                     body_str = response_body.decode("utf-8", errors="replace")
                     f.write(f"RESPONSE_BODY_FIRST_2000={body_str[:2000]}\n")
@@ -1153,11 +1159,11 @@ class SoapClient:
         return self._parse_recepcion_response_from_xml(resp_root)
 
     def recepcion_lote(self, xml_renvio_lote: str) -> Dict[str, Any]:
-        """Envía un rEnvioLote (siRecepLoteDE) a SIFEN vía SOAP 1.2 document/literal wrapped.
+        """Envía un rEnvioLote (siRecepLoteDE) a SIFEN vía SOAP 1.2 document/literal.
 
-        Formato esperado:
+        Formato esperado según guía SIFEN:
         - SOAP 1.2 envelope con Header vacío
-        - Body con wrapper <siRecepLoteDE> que contiene <rEnvioLote>
+        - Body contiene DIRECTAMENTE <xsd:rEnvioLote> (con prefijo xsd, SIN wrapper siRecepLoteDE)
         - Headers HTTP sin action= en Content-Type
         - Endpoint extraído del WSDL usando mTLS
         """
@@ -1216,28 +1222,41 @@ class SoapClient:
         
         post_url = self._soap_address[service_key]
         
-        # Construir SOAP 1.2 envelope con Header vacío y Body con wrapper
+        # Construir SOAP 1.2 envelope con Header vacío y Body con rEnvioLote directo (con prefijo xsd)
         envelope = etree.Element(
             f"{{{SOAP_NS}}}Envelope",
-            nsmap={"soap-env": SOAP_NS}
+            nsmap={"soap-env": SOAP_NS, "xsd": SIFEN_NS}
         )
         
         # Header vacío (NO HeaderMsg)
         header = etree.SubElement(envelope, f"{{{SOAP_NS}}}Header")
         
-        # Body con wrapper <siRecepLoteDE>
+        # Body con rEnvioLote directo (SIN wrapper siRecepLoteDE)
         body = etree.SubElement(envelope, f"{{{SOAP_NS}}}Body")
         
-        # Wrapper de operación
-        wrapper = etree.SubElement(
-            body,
-            etree.QName(SIFEN_NS, "siRecepLoteDE"),
-            nsmap={None: SIFEN_NS}
+        # Parsear rEnvioLote y reconstruirlo con prefijo xsd
+        r_envio_lote_elem = etree.fromstring(r_envio_lote_content)
+        
+        # Crear nuevo rEnvioLote con prefijo xsd
+        r_envio_lote_xsd = etree.Element(
+            etree.QName(SIFEN_NS, "rEnvioLote"),
+            nsmap={"xsd": SIFEN_NS}
         )
         
-        # Agregar el rEnvioLote dentro del wrapper
-        r_envio_lote_elem = etree.fromstring(r_envio_lote_content)
-        wrapper.append(r_envio_lote_elem)
+        # Copiar hijos (dId y xDE) con prefijo xsd
+        for child in r_envio_lote_elem:
+            child_local = etree.QName(child).localname
+            new_child = etree.SubElement(
+                r_envio_lote_xsd,
+                etree.QName(SIFEN_NS, child_local)
+            )
+            new_child.text = child.text
+            new_child.tail = child.tail
+            # Copiar atributos si los hay
+            for attr_name, attr_value in child.attrib.items():
+                new_child.set(attr_name, attr_value)
+        
+        body.append(r_envio_lote_xsd)
         
         soap_bytes = etree.tostring(
             envelope, xml_declaration=True, encoding="UTF-8", pretty_print=False
@@ -1280,6 +1299,11 @@ class SoapClient:
             except Exception:
                 pass
             
+            # Verificar estructura del SOAP para debug
+            soap_str = soap_bytes.decode("utf-8", errors="replace")
+            body_has_wrapper = "<siRecepLoteDE" in soap_str
+            body_has_renviolote = "<xsd:rEnvioLote" in soap_str or ("<rEnvioLote" in soap_str and 'xmlns:xsd="http://ekuatia.set.gov.py/sifen/xsd"' in soap_str)
+            
             # Guardar debug
             self._save_http_debug(
                 post_url=post_url,
@@ -1296,6 +1320,8 @@ class SoapClient:
                 wsdl_url=wsdl_url,
                 soap_address=post_url,
                 response_root=resp_root_localname,
+                body_has_wrapper_sireceplotede=body_has_wrapper,
+                body_has_renviolote=body_has_renviolote,
             )
             
             # Verificar éxito
@@ -1329,6 +1355,11 @@ class SoapClient:
                 raise SifenClientError(error_msg)
                 
         except Exception as e:
+            # Verificar estructura del SOAP para debug
+            soap_str = soap_bytes.decode("utf-8", errors="replace")
+            body_has_wrapper = "<siRecepLoteDE" in soap_str
+            body_has_renviolote = "<xsd:rEnvioLote" in soap_str or ("<rEnvioLote" in soap_str and 'xmlns:xsd="http://ekuatia.set.gov.py/sifen/xsd"' in soap_str)
+            
             # Guardar debug incluso en error
             self._save_http_debug(
                 post_url=post_url,
@@ -1345,6 +1376,8 @@ class SoapClient:
                 wsdl_url=wsdl_url,
                 soap_address=post_url,
                 response_root=None,
+                body_has_wrapper_sireceplotede=body_has_wrapper,
+                body_has_renviolote=body_has_renviolote,
             )
             self._save_raw_soap_debug(soap_bytes, None, suffix="_lote")
             raise SifenClientError(f"Error al enviar SOAP a SIFEN: {e}") from e

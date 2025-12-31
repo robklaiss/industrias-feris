@@ -567,7 +567,8 @@ def build_r_envio_lote_xml(did: int, xml_bytes: bytes, zip_base64: Optional[str]
     else:
         xde_b64 = zip_base64
 
-    rEnvioLote = etree.Element(etree.QName(SIFEN_NS, "rEnvioLote"), nsmap={None: SIFEN_NS})
+    # Construir rEnvioLote con prefijo xsd (nsmap {"xsd": SIFEN_NS})
+    rEnvioLote = etree.Element(etree.QName(SIFEN_NS, "rEnvioLote"), nsmap={"xsd": SIFEN_NS})
     dId = etree.SubElement(rEnvioLote, etree.QName(SIFEN_NS, "dId"))
     dId.text = str(did)
     xDE = etree.SubElement(rEnvioLote, etree.QName(SIFEN_NS, "xDE"))
