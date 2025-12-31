@@ -836,10 +836,14 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
                         print(f"❌ XSD FAIL (rLoteDE)")
                         if validation_result["schema_lote"]:
                             print(f"   Schema: {validation_result['schema_lote']}")
-                        for error in validation_result["lote_errors"]:
-                            print(f"   {error}")
+                        print(f"   Errores encontrados: {len(validation_result['lote_errors'])}")
+                        for i, error in enumerate(validation_result["lote_errors"][:30], 1):
+                            print(f"   {i}. {error}")
                 elif validation_result.get("warning"):
                     print(f"⚠️  {validation_result['warning']}")
+                else:
+                    # Si no hay lote_xml_bytes, no se puede validar
+                    print(f"ℹ️  lote.xml no disponible para validación")
                 
                 # Si falla validación, abortar envío
                 if not validation_result["rde_ok"] or \
