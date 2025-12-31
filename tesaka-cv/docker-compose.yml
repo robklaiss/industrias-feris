@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16
+    container_name: tesaka_pg
+    environment:
+      POSTGRES_DB: tesaka
+      POSTGRES_USER: tesaka
+      POSTGRES_PASSWORD: tesaka_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - tesaka_pg_data:/var/lib/postgresql/data
+volumes:
+  tesaka_pg_data:

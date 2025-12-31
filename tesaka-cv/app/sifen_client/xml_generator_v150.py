@@ -9,40 +9,95 @@ import hashlib
 import base64
 
 
-def generate_cdc(ruc: str, timbrado: str, establecimiento: str, punto_expedicion: str, 
+def generate_cdc(ruc: str, timbrado: str, establecimiento: str, punto_expedicion: str,
                  numero_documento: str, tipo_documento: str, fecha: str, monto: str) -> str:
     """
-    Genera un CDC (Código de Control) básico para pruebas
-    
-    Formato requerido: [0-9]{2}([0-9]{7}[0-9A-D])[0-9]{34}
-    Total: 44 caracteres
-    
-    NOTA: En producción, el CDC debe generarse según algoritmo oficial de SIFEN.
-    Este es solo para pruebas.
+    CDC numérico de 44 dígitos (43 + DV módulo 11).
+    Conformación base (43):
+      2  TipoDocumento
+      8  RUC (sin DV, zero-left)
+      1  DV RUC
+      3  Establecimiento
+      3  Punto expedición
+      7  Número documento
+      1  Tipo contribuyente
+      8  Fecha (YYYYMMDD)
+      1  Tipo emis   9  Código seguridad (dCodSeg)
+    +  1  DV final (módulo 11 sobre los 43)
     """
-    # Asegurar que timbrado tenga al menos 7 dígitos
-    timbrado_clean = (timbrado or "").zfill(8)[:7]
-    if not timbrado_clean or not timbrado_clean.isdigit():
-        timbrado_clean = "1234567"
-    
-    # Para pruebas: generar CDC con formato válido
-    # 2 dígitos iniciales
-    cdc = "01"
-    # 7 dígitos + 1 dígito hexadecimal (A-D) = 8 caracteres
-    cdc += f"{int(timbrado_clean):07d}A"
-    # 34 dígitos más (rellenar con números hasta 44 caracteres)
-    # Usar hash para generar números pseudoaleatorios
-    data = f"{ruc}{timbrado}{establecimiento}{punto_expedicion}{numero_documento}{fecha}"
-    hash_hex = hashlib.md5(data.encode()).hexdigest()
-    # Tomar solo dígitos del hash y completar hasta 34
-    digits = ''.join(c for c in hash_hex if c.isdigit())
-    if len(digits) < 34:
-        digits = (digits * 10)[:34]
+    import os
+    import re
+
+    # 1) Tipo documento (2)
+    tipo = str(tipo_documento or "").zfill(2)[:2]
+    if not tipo.isdigit():
+        raise ValueError(f"tipo_documento inválido: {tipo_documento!r}")
+
+    # 2) RUC base (8) + DV (1)
+    ruc_raw = str(ruc or "").strip()
+    dv_ruc = None
+
+    m = re.match(r"^\s*(\d+)-(\d)\s*$", ruc_raw)
+    if m:
+        ruc_num = m.group(1)
+        dv_ruc = m.group(2)
     else:
-        digits = digits[:34]
-    cdc += digits
-    
-    return cdc[:44]
+        ruc_num = re.sub(r"\D", "", ruc_raw)
+
+    if not dv_ruc:
+        env = os.getenv("SIFEN_EMISOR_RUC", "").strip()
+        m2 = re.match(r"^\s*(\d+)-(\d)\s*$", env)
+        if m2:
+            if not ruc_num:
+                ruc_num = m2.group(1)
+            dv_ruc = m2.group(2)
+
+    if not ruc_num:
+     raise ValueError("RUC vacío para generar CDC.")
+    if not dv_ruc:
+        raise ValueError("Falta DV del RUC. Seteá SIFEN_EMISOR_RUC='RUC-DV' (ej: 4554737-8).")
+
+    ruc8 = str(ruc_num).zfill(8)[-8:]
+    dv_ruc = str(dv_ruc).strip()[:1]
+    if not (ruc8.isdigit() and dv_ruc.isdigit()):
+        raise ValueError(f"RUC/DV inválidos: ruc8={ruc8!r} dv={dv_ruc!r}")
+
+    # 3) Est / Punto / Número
+    est = str(establecimiento or "").zfill(3)[-3:]
+    pun = str(punto_expedicion or "").zfill(3)[-3:]
+    num = str(numero_documento or "").zfill(7)[-7:]
+    if not (est.isdigit() and pun.isdigit() and num.isdigit()):
+        raise ValueError(f"est/pun/num inválidos: {est}-{pun}-{num}")
+
+    # 4) Tipo contribuyente (1)
+    tip_cont = os.getenv("SIFEN_TIP_CONT", "1").strip()[:1]
+    if not tip_cont.isdigit():
+        tip_cont = "1"
+
+    # 5) Fecha YYYYMMDD (del ISO)
+    fecha8 = re.sub(r"\D", "", str(fecha or ""))[:8]
+    if len(fecha8) != 8 or (not fecha8.isdigit()):
+        raise ValueError(f"Fecha inválida para CDC: {fecha!r} -> {fecha8!r}")
+
+    # 6) Tipo emisión (1)
+    tip_emi = os.getenv("SI_TIP_EMI", "1").strip()[:1]
+    if not tip_emi.isdigit():
+        tip_emi = "1"
+
+    # 7) Código seguridad (9)
+    codseg = os.getenv("SIFEN_CODSEG", "123456789").strip()
+    if not re.fullmatch(r"\d{9}", codseg):
+        raise ValueError("SIFEN_CODSEG debe ser 9 dígitos (ej: 123456789).")
+
+    base43 = f"{tipo}{ruc8}{dv_ruc}{est}{pun}{num}{tip_cont}{fecha8}{tip_emi}{codseg}"
+    if len(base43) != 43 or (not base43.isdigit()):
+        raise ValueError(f"Base CDC inválida ({len(base43)}): {base43}")
+
+    dv_id = str(calculate_digit_verifier(base43)).strip()[-1:]
+    if not dv_id.isdigit():
+        raise ValueError(f"DV inválido: {dv_id!r}")
+
+    return base43 + dv_id
 
 
 def calculate_digit_verifier(cdc: str) -> str:
@@ -177,7 +232,7 @@ def create_rde_xml_v150(
                 <iNatRec>1</iNatRec>
                 <iTiOpe>1</iTiOpe>
                 <cPaisRec>PRY</cPaisRec>
-                <dDesPaisRe>Paraguay</dDesPaisRe>
+                <dDesPaisRec>Paraguay</dDesPaisRec>
                 <dRucRec>80012345</dRucRec>
                 <dDVRec>7</dDVRec>
                 <dNomRec>Cliente de Prueba</dNomRec>

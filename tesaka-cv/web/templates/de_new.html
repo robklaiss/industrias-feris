@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Factura - TESAKA-SIFEN{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Nueva Factura</h2>
+    <a href="/" class="btn-back">← Volver</a>
+</div>
+
+<form method="POST" action="/de/new" class="de-form" id="deForm">
+    <h3>Datos del Documento</h3>
+    
+    <div class="form-group">
+        <label for="timbrado">Timbrado *</label>
+        <input 
+            type="text" 
+            id="timbrado" 
+            name="timbrado" 
+            required 
+            pattern="[0-9]{8}" 
+            placeholder="12345678"
+            title="Debe tener exactamente 8 dígitos"
+        />
+        <small>8 dígitos (ej: 12345678)</small>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="establecimiento">Establecimiento</label>
+            <input 
+                type="text" 
+                id="establecimiento" 
+                name="establecimiento" 
+                value="001"
+                pattern="[0-9]{3}"
+                title="3 dígitos"
+            />
+        </div>
+
+        <div class="form-group">
+            <label for="punto_expedicion">Punto de Expedición</label>
+            <input 
+                type="text" 
+                id="punto_expedicion" 
+                name="punto_expedicion" 
+                value="001"
+                pattern="[0-9]{3}"
+                title="3 dígitos"
+            />
+        </div>
+
+        <div class="form-group">
+            <label for="numero_documento">Número de Documento</label>
+            <input 
+                type="text" 
+                id="numero_documento" 
+                name="numero_documento" 
+                value="0000001"
+                pattern="[0-9]+"
+                title="Solo dígitos"
+            />
+        </div>
+    </div>
+
+    <h3>Items de la Factura</h3>
+    <div id="items-container">
+        <div class="item-row" data-item-index="0">
+            <div class="form-group">
+                <label>Código</label>
+                <input type="text" name="item_codigo_0" value="001" required />
+            </div>
+            <div class="form-group">
+                <label>Descripción *</label>
+                <input type="text" name="item_descripcion_0" placeholder="Producto o Servicio" required />
+            </div>
+            <div class="form-group">
+                <label>Cantidad *</label>
+                <input type="number" name="item_cantidad_0" step="0.01" min="0" value="1.00" required />
+            </div>
+            <div class="form-group">
+                <label>Precio Unitario *</label>
+                <input type="number" name="item_precio_0" step="0.01" min="0" value="100000" required />
+            </div>
+            <div class="form-group">
+                <label>Tasa IVA (%)</label>
+                <select name="item_tasa_iva_0">
+                    <option value="0">0% (Exento)</option>
+                    <option value="5" selected>5%</option>
+                    <option value="10">10%</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Total Item</label>
+                <input type="text" class="item-total" readonly value="105000" />
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn-remove-item" onclick="removeItem(this)" style="display:none;">×</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-actions-inline">
+        <button type="button" class="btn-secondary" onclick="addItem()">+ Agregar Item</button>
+    </div>
+
+    <div class="totals-section">
+        <h3>Totales</h3>
+        <div class="totals-row">
+            <div class="total-item">
+                <label>Subtotal:</label>
+                <span id="subtotal">0</span>
+            </div>
+            <div class="total-item">
+                <label>IVA 5%:</label>
+                <span id="iva5">0</span>
+            </div>
+            <div class="total-item">
+                <label>IVA 10%:</label>
+                <span id="iva10">0</span>
+            </div>
+            <div class="total-item total-final">
+                <label>Total General:</label>
+                <span id="total-general">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn-primary">Generar DE</button>
+        <a href="/" class="btn-secondary">Cancelar</a>
+    </div>
+</form>
+
+<script>
+let itemIndex = 1;
+
+function addItem() {
+    const container = document.getElementById('items-container');
+    const newItem = document.createElement('div');
+    newItem.className = 'item-row';
+    newItem.setAttribute('data-item-index', itemIndex);
+    
+    newItem.innerHTML = `
+        <div class="form-group">
+            <label>Código</label>
+            <input type="text" name="item_codigo_${itemIndex}" value="${String(itemIndex).padStart(3, '0')}" required />
+        </div>
+        <div class="form-group">
+            <label>Descripción *</label>
+            <input type="text" name="item_descripcion_${itemIndex}" placeholder="Producto o Servicio" required />
+        </div>
+        <div class="form-group">
+            <label>Cantidad *</label>
+            <input type="number" name="item_cantidad_${itemIndex}" step="0.01" min="0" value="1.00" required onchange="calculateTotals()" />
+        </div>
+        <div class="form-group">
+            <label>Precio Unitario *</label>
+            <input type="number" name="item_precio_${itemIndex}" step="0.01" min="0" value="100000" required onchange="calculateTotals()" />
+        </div>
+        <div class="form-group">
+            <label>Tasa IVA (%)</label>
+            <select name="item_tasa_iva_${itemIndex}" onchange="calculateTotals()">
+                <option value="0">0% (Exento)</option>
+                <option value="5" selected>5%</option>
+                <option value="10">10%</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Total Item</label>
+            <input type="text" class="item-total" readonly value="105000" />
+        </div>
+        <div class="form-group">
+            <button type="button" class="btn-remove-item" onclick="removeItem(this)">×</button>
+        </div>
+    `;
+    
+    container.appendChild(newItem);
+    itemIndex++;
+    updateRemoveButtons();
+    calculateTotals();
+}
+
+function removeItem(btn) {
+    const itemRow = btn.closest('.item-row');
+    itemRow.remove();
+    updateRemoveButtons();
+    calculateTotals();
+}
+
+function updateRemoveButtons() {
+    const items = document.querySelectorAll('.item-row');
+    items.forEach((item, index) => {
+        const btn = item.querySelector('.btn-remove-item');
+        if (items.length > 1) {
+            btn.style.display = 'block';
+        } else {
+            btn.style.display = 'none';
+        }
+    });
+}
+
+function calculateTotals() {
+    const items = document.querySelectorAll('.item-row');
+    let subtotal = 0;
+    let iva5 = 0;
+    let iva10 = 0;
+    
+    items.forEach(item => {
+        const cantidad = parseFloat(item.querySelector('input[name^="item_cantidad"]').value) || 0;
+        const precio = parseFloat(item.querySelector('input[name^="item_precio"]').value) || 0;
+        const tasa = parseFloat(item.querySelector('select[name^="item_tasa_iva"]').value) || 0;
+        
+        const subtotalItem = cantidad * precio;
+        const ivaItem = subtotalItem * (tasa / 100);
+        const totalItem = subtotalItem + ivaItem;
+        
+        item.querySelector('.item-total').value = totalItem.toFixed(0);
+        
+        subtotal += subtotalItem;
+        if (tasa === 5) {
+            iva5 += ivaItem;
+        } else if (tasa === 10) {
+            iva10 += ivaItem;
+        }
+    });
+    
+    const totalGeneral = subtotal + iva5 + iva10;
+    
+    document.getElementById('subtotal').textContent = subtotal.toFixed(0);
+    document.getElementById('iva5').textContent = iva5.toFixed(0);
+    document.getElementById('iva10').textContent = iva10.toFixed(0);
+    document.getElementById('total-general').textContent = totalGeneral.toFixed(0);
+}
+
+// Calcular totales al cargar y cuando cambian los valores
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('input[name^="item_cantidad"], input[name^="item_precio"], select[name^="item_tasa_iva"]');
+    inputs.forEach(input => {
+        input.addEventListener('change', calculateTotals);
+        input.addEventListener('input', calculateTotals);
+    });
+    calculateTotals();
+    updateRemoveButtons();
+});
+</script>
+{% endblock %}

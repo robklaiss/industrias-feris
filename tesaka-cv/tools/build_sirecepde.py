@@ -16,7 +16,9 @@ import argparse
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from datetime import datetime
+from typing import Optional
 import re
+import os
 
 # Agregar el directorio padre al path para imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -53,7 +55,9 @@ def strip_xml_declaration(xml_content: str) -> str:
 
 def build_sirecepde_xml(
     de_xml_content: str,
-    d_id: str = "1"
+    d_id: str = "1",
+    sign_p12_path: Optional[str] = None,
+    sign_p12_password: Optional[str] = None
 ) -> str:
     """
     Wrappea un DE crudo dentro de rEnviDe según WS_SiRecepDE_v150.xsd
@@ -68,6 +72,16 @@ def build_sirecepde_xml(
     Returns:
         XML siRecepDE completo (rEnviDe con xDE) con declaración XML única al inicio
     """
+    # Firmar el DE si se proporciona certificado
+    if sign_p12_path and sign_p12_password:
+        try:
+            from app.sifen_client.xmldsig_signer import sign_de_xml
+            print(f"🔐 Firmando DE con certificado: {Path(sign_p12_path).name}")
+            de_xml_content = sign_de_xml(de_xml_content, sign_p12_path, sign_p12_password)
+            print("✓ DE firmado exitosamente")
+        except Exception as e:
+            raise ValueError(f"Error al firmar DE: {e}")
+    
     # Remover declaración XML del DE para evitar conflicto
     de_without_declaration = strip_xml_declaration(de_xml_content)
     
@@ -201,13 +215,33 @@ def main():
         help="Archivo de salida (default: sirecepde_test.xml)"
     )
     parser.add_argument(
+        "--env",
+        choices=["test", "prod"],
+        default=None,
+        help="Ambiente SIFEN (para validación de RUC)"
+    )
+    parser.add_argument(
         "--did",
         type=str,
         default="1",
         help="Identificador de control de envío (default: 1)"
     )
+    parser.add_argument(
+        "--sign-p12",
+        type=Path,
+        help="Ruta al certificado P12/PFX para firmar (default: SIFEN_SIGN_P12_PATH)"
+    )
+    parser.add_argument(
+        "--sign-password",
+        type=str,
+        help="Contraseña del certificado (default: SIFEN_SIGN_P12_PASSWORD)"
+    )
     
     args = parser.parse_args()
+    
+    # Resolver certificado de firma desde args o env vars
+    sign_p12_path = str(args.sign_p12) if args.sign_p12 else os.getenv("SIFEN_SIGN_P12_PATH")
+    sign_p12_password = args.sign_password or os.getenv("SIFEN_SIGN_P12_PASSWORD")
     
     # Leer DE crudo
     de_path = Path(args.de)
@@ -217,8 +251,42 @@ def main():
     
     de_content = de_path.read_text(encoding="utf-8")
     
-    # Generar siRecepDE
-    sirecepde_xml = build_sirecepde_xml(de_content, d_id=args.did)
+    # Validar RUC del emisor antes de construir siRecepDE (evitar código 1264)
+    try:
+        from app.sifen_client.ruc_validator import validate_emisor_ruc
+        from app.sifen_client.config import get_sifen_config
+        
+        # Obtener RUC esperado del config si está disponible
+        env = args.env or os.getenv("SIFEN_ENV", "test")
+        try:
+            config = get_sifen_config(env=env)
+            expected_ruc = os.getenv("SIFEN_EMISOR_RUC") or getattr(config, 'test_ruc', None)
+        except:
+            expected_ruc = os.getenv("SIFEN_EMISOR_RUC") or os.getenv("SIFEN_TEST_RUC")
+        
+        is_valid, error_msg = validate_emisor_ruc(de_content, expected_ruc=expected_ruc)
+        
+        if not is_valid:
+            print(f"❌ Validación de RUC del emisor falló:")
+            print(f"   {error_msg}")
+            print(f"\n   Configure SIFEN_EMISOR_RUC con el RUC real del contribuyente habilitado (formato: RUC-DV, ej: 4554737-8).")
+            return 1
+        
+        print("✓ RUC del emisor validado (no es dummy)")
+    except ImportError:
+        # Si no se puede importar el validador, continuar sin validación (no crítico)
+        print("⚠️  No se pudo importar validador de RUC, continuando sin validación")
+    except Exception as e:
+        # Si falla la validación por otro motivo, continuar (no bloquear)
+        print(f"⚠️  Error al validar RUC del emisor: {e}, continuando sin validación")
+    
+    # Generar siRecepDE (firmando si hay certificado)
+    sirecepde_xml = build_sirecepde_xml(
+        de_content, 
+        d_id=args.did,
+        sign_p12_path=sign_p12_path,
+        sign_p12_password=sign_p12_password
+    )
     
     # Escribir archivo (asegurando que comienza con <?xml sin espacios)
     output_path = Path(args.output)

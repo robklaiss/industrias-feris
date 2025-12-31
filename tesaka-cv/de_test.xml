@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DE xmlns="http://ekuatia.set.gov.py/sifen/xsd" Id="011234567A1747642286537210927750174764228653">
+    <dDVId>3</dDVId>
+    <dFecFirma>2025-12-29T20:44:54</dFecFirma>
+    <dSisFact>1</dSisFact>
+    <gOpeDE>
+        <iTipEmi>1</iTipEmi>
+        <dDesTipEmi>Normal</dDesTipEmi>
+        <dCodSeg>123456789</dCodSeg>
+    </gOpeDE>
+    <gTimb>
+        <iTiDE>1</iTiDE>
+        <dDesTiDE>Factura electrónica</dDesTiDE>
+        <dNumTim>12345678</dNumTim>
+        <dEst>001</dEst>
+        <dPunExp>001</dPunExp>
+        <dNumDoc>0000001</dNumDoc>
+        <dFeIniT>2025-12-29</dFeIniT>
+    </gTimb>
+    <gDatGralOpe>
+        <dFeEmiDE>2025-12-29T20:44:54</dFeEmiDE>
+        <gEmis>
+            <dRucEm>4554737</dRucEm>
+            <dDVEmi>8</dDVEmi>
+            <iTipCont>1</iTipCont>
+            <dNomEmi>Contribuyente de Prueba S.A.</dNomEmi>
+            <dDirEmi>Asunción</dDirEmi>
+            <dNumCas>1234</dNumCas>
+            <cDepEmi>1</cDepEmi>
+            <dDesDepEmi>CAPITAL</dDesDepEmi>
+            <cCiuEmi>1</cCiuEmi>
+            <dDesCiuEmi>Asunción</dDesCiuEmi>
+            <dTelEmi>021123456</dTelEmi>
+            <dEmailE>test@example.com</dEmailE>
+            <gActEco>
+                <cActEco>471100</cActEco>
+                <dDesActEco>Venta al por menor en comercios no especializados</dDesActEco>
+            </gActEco>
+        </gEmis>
+        <gDatRec>
+            <iNatRec>1</iNatRec>
+            <iTiOpe>1</iTiOpe>
+            <cPaisRec>PRY</cPaisRec>
+            <dDesPaisRe>Paraguay</dDesPaisRe>
+            <dRucRec>80012345</dRucRec>
+            <dDVRec>7</dDVRec>
+            <dNomRec>Cliente de Prueba</dNomRec>
+            <dDirRec>Asunción</dDirRec>
+            <dNumCasRec>5678</dNumCasRec>
+            <cDepRec>1</cDepRec>
+            <dDesDepRec>CAPITAL</dDesDepRec>
+            <cCiuRec>1</cCiuRec>
+            <dDesCiuRec>Asunción</dDesCiuRec>
+        </gDatRec>
+    </gDatGralOpe>
+    <gDtipDE>
+        <gCamItem>
+            <dCodInt>001</dCodInt>
+            <dDesProSer>Producto de Prueba</dDesProSer>
+            <cUniMed>77</cUniMed>
+            <dDesUniMed>UNI</dDesUniMed>
+            <dCantProSer>1.00</dCantProSer>
+            <gValorItem>
+                <dPUniProSer>100000</dPUniProSer>
+                <dTotBruOpeItem>100000</dTotBruOpeItem>
+                <gValorRestaItem>
+                    <dTotOpeItem>100000</dTotOpeItem>
+                </gValorRestaItem>
+            </gValorItem>
+        </gCamItem>
+    </gDtipDE>
+    <gTotSub>
+        <dSubExe>0</dSubExe>
+        <dSubExo>0</dSubExo>
+        <dSub5>0</dSub5>
+        <dSub10>0</dSub10>
+        <dTotOpe>100000</dTotOpe>
+        <dTotDesc>0</dTotDesc>
+        <dTotDescGlotem>0</dTotDescGlotem>
+        <dTotAntItem>0</dTotAntItem>
+        <dTotAnt>0</dTotAnt>
+        <dPorcDescTotal>0</dPorcDescTotal>
+        <dDescTotal>0</dDescTotal>
+        <dAnticipo>0</dAnticipo>
+        <dRedon>0</dRedon>
+        <dTotGralOpe>100000</dTotGralOpe>
+        <dIVA5>0</dIVA5>
+        <dIVA10>0</dIVA10>
+        <dLiqTotIVA5>0</dLiqTotIVA5>
+        <dLiqTotIVA10>0</dLiqTotIVA10>
+        <dIVAComi>0</dIVAComi>
+        <dTotIVA>0</dTotIVA>
+        <dBaseGrav5>0</dBaseGrav5>
+        <dBaseGrav10>0</dBaseGrav10>
+        <dTBasGraIVA>0</dTBasGraIVA>
+        <dTotalGs>100000</dTotalGs>
+    </gTotSub>
+    <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:SignedInfo>
+            <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+            <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+            <ds:Reference URI="">
+                <ds:Transforms>
+                    <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                </ds:Transforms>
+                <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                <ds:DigestValue>dGhpcyBpcyBhIHRlc3QgZGlnZXN0IHZhbHVl</ds:DigestValue>
+            </ds:Reference>
+        </ds:SignedInfo>
+        <ds:SignatureValue>dGhpcyBpcyBhIHRlc3Qgc2lnbmF0dXJlIHZhbHVlIGZvciBwcnVlYmFzIG9ubHk=</ds:SignatureValue>
+        <ds:KeyInfo>
+            <ds:X509Data>
+                <ds:X509Certificate>LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVKakNDQWpLZ0F3SUJBZ0lEQW5CZ2txaGtpRzl3MEJBUXNGQUFEV1lqRU1NQW9HQTFVRUNoTURVbVZzWVcKd2dnRWlNQTBHQ1NxR1NJYjM=</ds:X509Certificate>
+            </ds:X509Data>
+        </ds:KeyInfo>
+    </ds:Signature>
+    <gCamFuFD>
+        <dCarQR>TESTQRCODE12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890</dCarQR>
+    </gCamFuFD>
+</DE>

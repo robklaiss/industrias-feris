@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Documento {{ doc.id }} - TESAKA-SIFEN{% endblock %}
+
+{% block content %}
+<div class="doc-detail">
+    <div class="doc-header">
+        <h2>Documento #{{ doc.id }}</h2>
+        <div class="header-actions">
+            {% if doc.last_status == 'pending' or doc.last_status == 'error' %}
+            <form method="POST" action="/de/{{ doc.id }}/send" style="display: inline;">
+                <button type="submit" class="btn-primary" onclick="return confirm('¿Enviar este documento a SIFEN?');">
+                    📤 Enviar a SIFEN
+                </button>
+            </form>
+            {% endif %}
+            <a href="/" class="btn-back">← Volver</a>
+        </div>
+    </div>
+
+    <div class="doc-metadata">
+        <h3>Información General</h3>
+        <table class="metadata-table">
+            <tr>
+                <th>ID:</th>
+                <td>{{ doc.id }}</td>
+            </tr>
+            <tr>
+                <th>CDC:</th>
+                <td><code>{{ doc.cdc or 'N/A' }}</code></td>
+            </tr>
+            <tr>
+                <th>RUC Emisor:</th>
+                <td>{{ doc.ruc_emisor or 'N/A' }}</td>
+            </tr>
+            <tr>
+                <th>Timbrado:</th>
+                <td>{{ doc.timbrado or 'N/A' }}</td>
+            </tr>
+            <tr>
+                <th>Fecha de Creación:</th>
+                <td>{{ doc.created_at if doc.created_at else 'N/A' }}</td>
+            </tr>
+            <tr>
+                <th>Estado:</th>
+                <td>
+                    <span class="status-badge status-{{ doc.last_status|lower|replace(' ', '-') if doc.last_status else 'unknown' }}">
+                        {{ doc.last_status or 'N/A' }}
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <th>Código:</th>
+                <td><code>{{ doc.last_code or 'N/A' }}</code></td>
+            </tr>
+            <tr>
+                <th>Mensaje:</th>
+                <td>{{ doc.last_message or 'N/A' }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="doc-xmls">
+        <h3>XML del Documento Electrónico</h3>
+        <details class="xml-block" open>
+            <summary>DE (Documento Electrónico)</summary>
+            <pre class="xml-content">{{ doc.de_xml or '(vacío)' }}</pre>
+        </details>
+    </div>
+</div>
+{% endblock %}
+

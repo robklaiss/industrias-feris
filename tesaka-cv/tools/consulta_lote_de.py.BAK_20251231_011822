@@ -1,0 +1,19 @@
+        # Si el usuario pasó un XML cuya raíz es <DE>, envolverlo en <rDE> v150
+        # (el flujo de envío espera rDE dentro de rEnviDe/rLoteDE)
+        if root_tag_local == "DE" or "<DE" in xml_text[:500]:
+            # Quitar declaración XML si existe (para no duplicarla)
+            cleaned = xml_text.lstrip()
+            if cleaned.startswith("<?xml"):
+                cleaned = cleaned.split("?>", 1)[-1].lstrip()
+
+            xml_text = (
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                "<rDE xmlns=\"http://ekuatia.set.gov.py/sifen/xsd\" "
+                "xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\">\n"
+                "  <dVerFor>150</dVerFor>\n"
+                f"  {cleaned}\n"
+                "</rDE>"
+            )
+            return xml_text
+
+        raise ValueError("No se encontró <rDE> en el XML (ni como raíz ni anidado).")

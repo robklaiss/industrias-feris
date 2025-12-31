@@ -882,6 +882,24 @@ class SoapClient:
                     f.write(f"BODY_HAS_WRAPPER_SIRECEPLOTEDE={body_has_wrapper_sireceplotede}\n")
                 if body_has_renviolote is not None:
                     f.write(f"BODY_HAS_RENVIOLOTE={body_has_renviolote}\n")
+                if body_root_localname:
+                    f.write(f"BODY_ROOT_LOCALNAME={body_root_localname}\n")
+                if body_root_ns:
+                    f.write(f"BODY_ROOT_NS={body_root_ns}\n")
+                if body_wrapper_localname:
+                    f.write(f"BODY_WRAPPER_LOCALNAME={body_wrapper_localname}\n")
+                if body_wrapper_ns:
+                    f.write(f"BODY_WRAPPER_NS={body_wrapper_ns}\n")
+                if body_preview:
+                    f.write(f"FIRST_300_CHARS_OF_BODY={body_preview}\n")
+                # Content-Type y action
+                content_type = headers.get("Content-Type", "")
+                f.write(f"CONTENT_TYPE_USED={content_type}\n")
+                if "action=" in content_type:
+                    action_val = content_type.split("action=", 1)[1].split(";", 1)[0].strip('"\'')
+                    f.write(f"ACTION_HEADER_USED={action_val}\n")
+                else:
+                    f.write(f"ACTION_HEADER_USED=(none)\n")
                 if response_body:
                     body_str = response_body.decode("utf-8", errors="replace")
                     f.write(f"RESPONSE_BODY_FIRST_2000={body_str[:2000]}\n")
@@ -1264,7 +1282,9 @@ class SoapClient:
             envelope, xml_declaration=True, encoding="UTF-8", pretty_print=False
         )
         
-        # Headers SOAP 1.2 (SIN action=)
+        # Headers SOAP 1.2
+        # Según WSDL: soapAction="" y soapActionRequired="false"
+        # NO incluir action= en Content-Type (SOAP 1.2 sin action requerido)
         headers = {
             "Content-Type": "application/soap+xml; charset=utf-8",
             "Accept": "application/soap+xml, text/xml, */*",

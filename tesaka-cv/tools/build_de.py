@@ -10,6 +10,7 @@ Uso:
 """
 import sys
 import argparse
+import os
 from pathlib import Path
 from datetime import datetime
 from typing import Optional
@@ -31,6 +32,7 @@ def build_de_xml(
     fecha: Optional[str] = None,
     hora: Optional[str] = None,
     csc: Optional[str] = None,
+    env: str = "test",
 ) -> str:
     """
     Genera un XML DE crudo (elemento DE de tipo tDE) que valida contra DE_v150.xsd
@@ -58,11 +60,42 @@ def build_de_xml(
     fecha_firma = f"{fecha}T{hora}"
     fecha_emision = fecha_firma
     
+    # Parsear RUC: puede venir como "RUC-DV" (ej: "4554737-8") o solo "RUC" (ej: "80012345")
+    ruc_str = str(ruc or "").strip()
+    if not ruc_str:
+        ruc_str = os.getenv("SIFEN_EMISOR_RUC") or os.getenv("SIFEN_TEST_RUC") or "80012345"
+    
+    # Separar RUC y DV si viene en formato RUC-DV
+    if "-" in ruc_str:
+        ruc_num, dv_ruc = ruc_str.split("-", 1)
+        ruc_num = ruc_num.strip()
+        dv_ruc = dv_ruc.strip()
+        # Validar que DV sea un dígito
+        if not dv_ruc.isdigit() or len(dv_ruc) != 1:
+            raise ValueError(f"DV del RUC debe ser exactamente 1 dígito. Valor recibido: '{dv_ruc}'")
+    else:
+        # Si no viene con DV, usar el RUC tal cual y calcular DV
+        ruc_num = ruc_str.strip()
+        # Calcular DV del RUC
+        try:
+            ruc_digits = ''.join(c for c in ruc_num if c.isdigit())
+            if ruc_digits:
+                dv_ruc = str(sum(int(d) for d in ruc_digits) % 10)
+            else:
+                dv_ruc = "0"
+        except:
+            dv_ruc = "0"
+    
+    # Limpiar RUC: solo dígitos, sin zero-padding (mantener longitud original)
+    ruc_clean = ''.join(c for c in ruc_num if c.isdigit())
+    if not ruc_clean:
+        raise ValueError(f"RUC debe contener al menos un dígito. Valor recibido: '{ruc_num}'")
+    
     # Monto para CDC (simplificado)
     monto = "100000"
     
-    # Generar CDC
-    cdc = generate_cdc(ruc, timbrado, establecimiento, punto_expedicion, 
+    # Generar CDC (usar solo el número del RUC, sin DV)
+    cdc = generate_cdc(ruc_clean, timbrado, establecimiento, punto_expedicion, 
                       numero_documento, tipo_documento, fecha.replace("-", ""), monto)
     
     # Calcular dígito verificador
@@ -76,26 +109,19 @@ def build_de_xml(
     else:
         cod_seg = "123456789"
     
-    # RUC debe ser máximo 8 dígitos
-    ruc_str = str(ruc or "")
-    if not ruc_str or not ruc_str.strip():
-        ruc_str = "80012345"
-    ruc_clean = ruc_str[:8].zfill(8) if len(ruc_str) < 8 else ruc_str[:8]
-    
-    # Calcular DV del RUC
-    dv_ruc = "0"
-    try:
-        ruc_digits = ''.join(c for c in ruc_clean if c.isdigit())
-        if ruc_digits:
-            dv_ruc = str(sum(int(d) for d in ruc_digits) % 10)
-    except:
-        dv_ruc = "0"
-    
     # Timbrado debe tener al menos 7 dígitos
     timbrado_str = str(timbrado or "")
     if not timbrado_str or not timbrado_str.strip():
         timbrado_str = "12345678"
     timbrado_clean = timbrado_str.strip()
+    
+    # Determinar nombre del emisor según ambiente
+    if env == "test":
+        d_nom_emi = "DE generado en ambiente de prueba - sin valor comercial ni fiscal"
+    else:
+        d_nom_emi = (os.getenv("SIFEN_EMISOR_NOMBRE") or "Emisor").strip()
+        if not d_nom_emi:
+            d_nom_emi = "Emisor"
     
     # Generar XML DE crudo (solo el elemento DE, sin wrapper rDE)
     # Este XML valida contra DE_v150.xsd (tipo tDE)
@@ -123,7 +149,7 @@ def build_de_xml(
             <dRucEm>{ruc_clean}</dRucEm>
             <dDVEmi>{dv_ruc}</dDVEmi>
             <iTipCont>1</iTipCont>
-            <dNomEmi>Contribuyente de Prueba S.A.</dNomEmi>
+            <dNomEmi>{d_nom_emi}</dNomEmi>
             <dDirEmi>Asunción</dDirEmi>
             <dNumCas>1234</dNumCas>
             <cDepEmi>1</cDepEmi>
@@ -141,7 +167,7 @@ def build_de_xml(
             <iNatRec>1</iNatRec>
             <iTiOpe>1</iTiOpe>
             <cPaisRec>PRY</cPaisRec>
-            <dDesPaisRe>Paraguay</dDesPaisRe>
+            <dDesPaisRec>Paraguay</dDesPaisRec>
             <dRucRec>80012345</dRucRec>
             <dDVRec>7</dDVRec>
             <dNomRec>Cliente de Prueba</dNomRec>
@@ -282,24 +308,55 @@ def main():
         type=str,
         help="Hora de emisión (HH:MM:SS, default: ahora)"
     )
+    parser.add_argument(
+        "--env",
+        type=str,
+        choices=["test", "prod"],
+        default="test",
+        help="Ambiente SIFEN (test/prod, default: test)"
+    )
     
     args = parser.parse_args()
     
-    # Obtener valores desde .env si no se proporcionaron
-    if not args.ruc or not args.timbrado:
-        try:
-            config = get_sifen_config(env="test")
-            ruc = args.ruc or config.test_ruc or "80012345"
-            timbrado = args.timbrado or config.test_timbrado or "12345678"
-            csc = args.csc or config.test_csc
-        except:
-            ruc = args.ruc or "80012345"
-            timbrado = args.timbrado or "12345678"
-            csc = args.csc
+    # Obtener timbrado: --timbrado tiene prioridad, luego SIFEN_TIMBRADO
+    timbrado = args.timbrado
+    if not timbrado:
+        timbrado = os.getenv("SIFEN_TIMBRADO")
+        if timbrado:
+            timbrado = timbrado.strip()
+    
+    # Validar que timbrado no esté vacío
+    if not timbrado or not timbrado.strip():
+        print("❌ Error: Timbrado requerido (--timbrado o SIFEN_TIMBRADO)")
+        return 1
+    
+    # Obtener RUC desde .env si no se proporcionó
+    # IMPORTANTE: pasar el RUC completo (RUC-DV si existe) a build_de_xml()
+    if not args.ruc:
+        # Prioridad: SIFEN_EMISOR_RUC o SIFEN_TEST_RUC (puede venir como RUC-DV)
+        env_ruc = os.getenv("SIFEN_EMISOR_RUC") or os.getenv("SIFEN_TEST_RUC")
+        if env_ruc:
+            ruc = env_ruc.strip()
+        else:
+            # Fallback a config
+            try:
+                config = get_sifen_config(env=args.env)
+                ruc = config.test_ruc if args.env == "test" else getattr(config, "prod_ruc", None)
+                if not ruc:
+                    ruc = "80012345"
+            except:
+                ruc = "80012345"
     else:
         ruc = args.ruc
-        timbrado = args.timbrado
-        csc = args.csc
+    
+    # Obtener CSC
+    csc = args.csc
+    if not csc:
+        try:
+            config = get_sifen_config(env=args.env)
+            csc = config.test_csc if args.env == "test" else getattr(config, "prod_csc", None)
+        except:
+            csc = None
     
     # Generar XML DE crudo
     de_xml = build_de_xml(
@@ -311,7 +368,8 @@ def main():
         tipo_documento=args.tipo_documento,
         fecha=args.fecha,
         hora=args.hora,
-        csc=csc
+        csc=csc,
+        env=args.env
     )
     
     # Agregar prolog XML
@@ -327,6 +385,17 @@ def main():
     print(f"   Validar con: python -m tools.validate_xsd --schema de {output_path}")
     
     return 0
+
+
+# SMOKETEST MANUAL (comentario para referencia):
+# export SIFEN_EMISOR_RUC="4554737-8"
+# export SIFEN_TIMBRADO="12345678"
+# unset SIFEN_TEST_RUC
+# python -m tools.build_de --output artifacts/de_real.xml --env test
+# grep -n "<dRucEm>\\|<dDVEmi>" artifacts/de_real.xml
+# # Esperado:
+# #   <dRucEm>4554737</dRucEm>
+# #   <dDVEmi>8</dDVEmi>
 
 
 if __name__ == "__main__":
