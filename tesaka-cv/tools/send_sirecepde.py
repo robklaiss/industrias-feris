@@ -387,10 +387,13 @@ def extract_rde_element(xml_bytes: bytes) -> bytes:
 
 def build_lote_base64_from_single_xml(xml_bytes: bytes) -> str:
     """
-    Crea un ZIP con el rDE firmado directamente (sin wrapper rLoteDE).
+    Crea un ZIP con el rDE firmado envuelto en rLoteDE.
     
-    El ZIP contiene un único archivo "lote.xml" con el <rDE> completo
-    (ya normalizado, firmado y reordenado).
+    El ZIP contiene un único archivo "lote.xml" con:
+    - Root: <rLoteDE xmlns="http://ekuatia.set.gov.py/sifen/xsd">
+    - Contenido: un <rDE> completo (ya normalizado, firmado y reordenado) como hijo directo.
+    
+    IMPORTANTE: NO modifica la firma ni los hijos del rDE, solo lo envuelve en rLoteDE.
     
     Args:
         xml_bytes: XML que contiene el rDE (puede ser rDE root o tener rDE anidado)
@@ -398,80 +401,94 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes) -> str:
     Returns:
         Base64 del ZIP como string
     """
-    # Extraer el nodo rDE completo
-    rde_bytes = extract_rde_element(xml_bytes)
+    import copy
     
-    # Parsear rDE para asegurar que tenga sus atributos xmlns
-    rde_elem = etree.fromstring(rde_bytes)
+    # Parsear xml_bytes
+    try:
+        xml_root = etree.fromstring(xml_bytes)
+    except Exception as e:
+        raise ValueError(f"Error al parsear XML: {e}")
     
-    # Asegurar que rDE tenga xsi:schemaLocation
-    XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
-    if not rde_elem.get(f"{{{XSI_NS}}}schemaLocation"):
-        rde_elem.set(f"{{{XSI_NS}}}schemaLocation", "http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd")
+    # Detectar el elemento rDE
+    rde_el = None
     
-    # Verificar si ya tiene xmlns:xsi en el nsmap
-    has_xsi = "xsi" in rde_elem.nsmap or XSI_NS in rde_elem.nsmap.values()
+    # Caso a) xml_bytes root == rDE
+    def local_tag(tag: str) -> str:
+        return tag.split("}", 1)[-1] if "}" in tag else tag
     
-    # Serializar rDE con declaración XML y nsmap explícito
-    nsmap: dict[Optional[str], str] = {None: SIFEN_NS}
-    if not has_xsi:
-        nsmap["xsi"] = XSI_NS  # type: ignore[assignment]
+    if local_tag(xml_root.tag) == "rDE":
+        rde_el = xml_root
+    else:
+        # Caso b) buscar el primer .//{SIFEN_NS}rDE
+        rde_el = xml_root.find(f".//{{{SIFEN_NS}}}rDE")
+        if rde_el is None:
+            # Fallback: buscar sin namespace
+            rde_el = xml_root.find(".//rDE")
     
-    # Reconstruir rDE con nsmap correcto
-    rde_new = etree.Element(etree.QName(SIFEN_NS, "rDE"), nsmap=nsmap)
-    # Copiar atributos (incluyendo schemaLocation)
-    for key, value in rde_elem.attrib.items():
-        rde_new.set(key, value)
-    # Copiar hijos
-    for child in rde_elem:
-        rde_new.append(child)
+    # Caso c) Si no se encuentra rDE -> levantar ValueError
+    if rde_el is None:
+        raise ValueError(
+            f"No se encontró elemento rDE en el XML. Root tag: {xml_root.tag}"
+        )
     
-    # Serializar
-    rde_xml_bytes = etree.tostring(rde_new, xml_declaration=True, encoding="utf-8")
+    # IMPORTANTE: NO "reconstruyas" rDE ni cambies hijos; solo lo vas a envolver.
+    # Usar deepcopy para no perder attrs o ns
+    rde_copy = copy.deepcopy(rde_el)
     
-    # Asegurar que rDE tenga xmlns explícito en el tag (por si acaso)
-    rde_xml_str = rde_xml_bytes.decode("utf-8") if isinstance(rde_xml_bytes, bytes) else rde_xml_bytes
-    rde_xml_str = _ensure_rde_has_xmlns(rde_xml_str)
+    # Construir wrapper rLoteDE
+    rlote_de = etree.Element(
+        etree.QName(SIFEN_NS, "rLoteDE"),
+        nsmap={None: SIFEN_NS}
+    )
+    rlote_de.append(rde_copy)
     
-    rde_xml_bytes = rde_xml_str.encode("utf-8")
+    # Serializar lote_content
+    lote_xml_bytes = etree.tostring(
+        rlote_de,
+        xml_declaration=True,
+        encoding="utf-8",
+        pretty_print=False
+    )
     
-    # Crear ZIP con el rDE directamente (sin wrapper rLoteDE)
+    # Crear ZIP con exactamente un archivo "lote.xml"
     mem = BytesIO()
     with zipfile.ZipFile(mem, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
-        zf.writestr("lote.xml", rde_xml_bytes)
+        zf.writestr("lote.xml", lote_xml_bytes)
     zip_bytes = mem.getvalue()
     
-    # DEBUG: verificar contenido del ZIP si está habilitado
+    # Check rápido dentro de build_lote_base64_from_single_xml (solo cuando SIFEN_DEBUG_SOAP=1)
     if os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True"):
         try:
-            # Listar archivos del ZIP
+            # Abrir el ZIP en memoria y verificar
             with zipfile.ZipFile(BytesIO(zip_bytes), "r") as zf:
                 zip_files = zf.namelist()
-                print(f"🧪 DEBUG ZIP files: {zip_files}")
+                print(f"🧪 DEBUG [build_lote_base64] ZIP files: {zip_files}")
                 
-                # Leer contenido de lote.xml
                 if "lote.xml" in zip_files:
                     lote_content = zf.read("lote.xml")
-                    print(f"🧪 DEBUG lote.xml size: {len(lote_content)} bytes")
-                    print(f"🧪 DEBUG lote.xml first 80 bytes: {lote_content[:80]}")
-                    
-                    # Parsear para verificar root
                     lote_root = etree.fromstring(lote_content)
-                    def local_debug(tag): return tag.split("}", 1)[-1] if "}" in tag else tag
-                    root_tag = local_debug(lote_root.tag)
-                    print(f"🧪 DEBUG lote.xml root: {root_tag}")
                     
-                    # Si es rDE, mostrar orden de hijos
-                    if root_tag == "rDE":
-                        children_order = [local_debug(c.tag) for c in list(lote_root)]
-                        print(f"🧪 DEBUG lote.xml rDE children: {', '.join(children_order)}")
+                    root_tag = local_tag(lote_root.tag)
+                    print(f"🧪 DEBUG [build_lote_base64] root: {root_tag}")
                     
-                    # Guardar contenido a /tmp/lote_xml_payload.xml
-                    Path("/tmp/lote_xml_payload.xml").write_bytes(lote_content)
-                    print("🧪 DEBUG escrito: /tmp/lote_xml_payload.xml")
+                    # Verificar que existe rDE dentro de rLoteDE
+                    rde_found = lote_root.find(f".//{{{SIFEN_NS}}}rDE")
+                    if rde_found is None:
+                        rde_found = lote_root.find(".//rDE")
+                    
+                    has_rde = rde_found is not None
+                    print(f"🧪 DEBUG [build_lote_base64] has_rDE: {has_rde}")
+                    
+                    if has_rde and root_tag == "rLoteDE":
+                        # Mostrar orden de hijos del rDE interno
+                        children_order = [local_tag(c.tag) for c in list(rde_found)]
+                        print(f"🧪 DEBUG [build_lote_base64] rDE children: {', '.join(children_order)}")
+                    elif root_tag != "rLoteDE":
+                        print(f"⚠️  WARNING [build_lote_base64] root debería ser rLoteDE, es {root_tag}")
         except Exception as e:
-            print(f"🧪 DEBUG error al inspeccionar ZIP: {e}")
-
+            print(f"⚠️  DEBUG [build_lote_base64] error al verificar ZIP: {e}")
+    
+    # Base64 estándar sin saltos
     return base64.b64encode(zip_bytes).decode("ascii")
 
 
@@ -654,17 +671,23 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
         }
     
     # Configurar cliente SIFEN
+    print(f"🔧 Configurando cliente SIFEN (ambiente: {env})...")
     try:
-        print(f"🔧 Configurando cliente SIFEN (ambiente: {env})")
         config = get_sifen_config(env=env)
         service_key = "recibe_lote"  # Usar servicio de lote (async)
         wsdl_url = config.get_soap_service_url(service_key)
         print(f"   WSDL (recibe_lote): {wsdl_url}")
         print(f"   Operación: siRecepLoteDE\n")
     except Exception as e:
+        error_msg = f"Error al configurar cliente SIFEN: {str(e)}"
+        print(f"❌ {error_msg}")
+        debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+        if debug_enabled:
+            import traceback
+            traceback.print_exc()
         return {
             "success": False,
-            "error": f"Error al configurar cliente SIFEN: {str(e)}",
+            "error": error_msg,
             "error_type": type(e).__name__
         }
     
