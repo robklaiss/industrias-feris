@@ -386,6 +386,83 @@ def extract_rde_element(xml_bytes: bytes) -> bytes:
     return etree.tostring(rde_el, xml_declaration=False, encoding="utf-8")
 
 
+def ensure_rde_default_namespace(xml_bytes: bytes) -> bytes:
+    """
+    Asegura que el elemento rDE tenga namespace default SIFEN_NS en su tag de apertura.
+    
+    Inserta xmlns="http://ekuatia.set.gov.py/sifen/xsd" en el tag de apertura de rDE
+    si no lo tiene, sin modificar el resto del documento.
+    
+    Args:
+        xml_bytes: XML que contiene rDE (puede ser rDE root o tener rDE anidado)
+        
+    Returns:
+        XML con rDE que tiene xmlns default SIFEN_NS
+        
+    Raises:
+        ValueError: Si no se encuentra rDE en el XML
+    """
+    import re
+    
+    # Buscar el tag de apertura de rDE (sin prefijo)
+    pattern_no_prefix = br"<rDE\b([^>]*)>"
+    match = re.search(pattern_no_prefix, xml_bytes)
+    
+    if not match:
+        # Buscar con prefijo (ej: <ns:rDE ...>)
+        pattern_with_prefix = br"<([A-Za-z_][\w.-]*):rDE\b([^>]*)>"
+        match = re.search(pattern_with_prefix, xml_bytes)
+        if match:
+            # Si tiene prefijo y ya tiene xmlns para ese prefijo, no modificar
+            prefix = match.group(1).decode('utf-8')
+            attrs = match.group(2)
+            if f'xmlns:{prefix}='.encode('utf-8') in attrs:
+                # Ya tiene namespace declarado para el prefijo, no modificar
+                return xml_bytes
+            # Si tiene prefijo pero no xmlns, no podemos agregar xmlns default fácilmente
+            # En este caso, retornar sin modificar (asumir que está bien)
+            return xml_bytes
+    
+    if not match:
+        raise ValueError("No se encontró tag <rDE> en el XML")
+    
+    # Extraer atributos del tag de apertura
+    attrs_str = match.group(1 if not match.lastindex or match.lastindex == 1 else 2).decode('utf-8')
+    
+    # Verificar si ya tiene xmlns default (sin prefijo)
+    if 'xmlns="' in attrs_str or 'xmlns=\'' in attrs_str:
+        # Ya tiene xmlns default, no modificar
+        return xml_bytes
+    
+    # Verificar si tiene xmlns con prefijo (ej: xmlns:ns="...")
+    if 'xmlns:' in attrs_str:
+        # Tiene xmlns con prefijo, no agregar xmlns default (podría causar conflicto)
+        return xml_bytes
+    
+    # Insertar xmlns="http://ekuatia.set.gov.py/sifen/xsd" en los atributos
+    # Insertar al inicio de los atributos (después del espacio si hay otros attrs)
+    if attrs_str.strip():
+        new_attrs = f' xmlns="{SIFEN_NS}" {attrs_str}'
+    else:
+        new_attrs = f' xmlns="{SIFEN_NS}"'
+    
+    # Reemplazar el tag de apertura
+    if match.lastindex and match.lastindex > 1:
+        # Caso con prefijo: reemplazar todo el tag
+        prefix = match.group(1).decode('utf-8')
+        old_tag = f'<{prefix}:rDE{attrs_str}>'.encode('utf-8')
+        new_tag = f'<{prefix}:rDE{new_attrs}>'.encode('utf-8')
+    else:
+        # Caso sin prefijo
+        old_tag = f'<rDE{attrs_str}>'.encode('utf-8')
+        new_tag = f'<rDE{new_attrs}>'.encode('utf-8')
+    
+    # Reemplazar solo la primera ocurrencia (el tag de apertura)
+    result = xml_bytes.replace(old_tag, new_tag, 1)
+    
+    return result
+
+
 def _extract_rde_fragment_bytes(xml_signed_bytes: bytes) -> bytes:
     """
     Extrae el fragmento <rDE ...>...</rDE> desde los bytes originales
