@@ -1083,10 +1083,3 @@ if __name__ == "__main__":
         print("❌ EXCEPCIÓN NO MOSTRADA:", repr(e), file=sys.stderr)
         traceback.print_exc()
         sys.exit(1)
-
-# Prueba rápida de validación XSD:
-# export SIFEN_DEBUG_SOAP=1
-# export SIFEN_VALIDATE_XSD=1
-# export SIFEN_XSD_DIR="/Users/robinklaiss/Dev/industrias-feris-facturacion-electronica-simplificado/rshk-jsifenlib/docs/set/ekuatia.set.gov.py/sifen/xsd"
-# python -m tools.send_sirecepde --env test --xml latest
-# Esperado: si hay algo inválido, ver el/los elementos exactos en consola (línea + mensaje), y NO se hace POST.
