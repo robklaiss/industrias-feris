@@ -60,7 +60,7 @@ def call_consulta_lote_raw(
         session: requests.Session con mTLS configurado (puede ser None, se creará uno nuevo)
         env: Ambiente ('test' o 'prod')
         prot: dProtConsLote (número de lote)
-        timeout: Timeout en segundos
+        timeout: Timeout en segundos (no usado, se mantiene para compatibilidad)
         
     Returns:
         XML de respuesta como string
@@ -76,25 +76,8 @@ def call_consulta_lote_raw(
     client = SoapClient(config=config)
     
     try:
-        # Construir XML rEnviConsLoteDe
-        SIFEN_NS = "http://ekuatia.set.gov.py/sifen/xsd"
-        r_envi_cons = etree.Element(
-            etree.QName(SIFEN_NS, "rEnviConsLoteDe"),
-            nsmap={None: SIFEN_NS}
-        )
-        d_id = etree.SubElement(r_envi_cons, etree.QName(SIFEN_NS, "dId"))
-        d_id.text = "1"
-        d_prot_cons_lote = etree.SubElement(
-            r_envi_cons, etree.QName(SIFEN_NS, "dProtConsLote")
-        )
-        d_prot_cons_lote.text = str(prot)
-        
-        xml_renvi_cons = etree.tostring(
-            r_envi_cons, xml_declaration=True, encoding="UTF-8"
-        ).decode("utf-8")
-        
-        # Usar método consulta_lote de SoapClient (usa WSDL correcto y guarda debug automáticamente)
-        response_dict = client.consulta_lote(xml_renvi_cons, timeout=timeout)
+        # Usar método consulta_lote_de de SoapClient (usa WSDL correcto y guarda debug automáticamente)
+        response_dict = client.consulta_lote_de(dprot_cons_lote=prot, did=1)
         
         # Retornar XML de respuesta
         return response_dict.get("response_xml", "")
@@ -129,6 +112,11 @@ def main() -> int:
         action="store_true",
         help="Logs extra de debug",
     )
+    parser.add_argument(
+        "--wsdl",
+        default=None,
+        help="Override WSDL (opcional). Ej: https://sifen-test.set.gov.py/de/ws/async/recibe-lote.wsdl?wsdl",
+    )
     args = parser.parse_args()
     
     # Validar prot
@@ -156,6 +144,18 @@ def main() -> int:
             print("\n❌ Operación cancelada.", file=sys.stderr)
             sys.exit(1)
     
+    # Configurar WSDL override si se proporciona --wsdl
+    if args.wsdl:
+        wsdl_url = args.wsdl.strip()
+        os.environ["SIFEN_WSDL_CONSULTA_LOTE"] = wsdl_url
+    elif os.getenv("SIFEN_WSDL_CONSULTA_LOTE"):
+        wsdl_url = os.getenv("SIFEN_WSDL_CONSULTA_LOTE").strip()
+    else:
+        # Usar WSDL por defecto según ambiente
+        from app.sifen_client.config import SifenConfig
+        config_temp = SifenConfig(env=args.env)
+        wsdl_url = config_temp.get_soap_service_url("consulta_lote")
+    
     # Configurar cliente SIFEN
     try:
         config = get_sifen_config(env=args.env)
@@ -169,51 +169,67 @@ def main() -> int:
     
     # Mostrar información
     print(f"🔧 Ambiente: {args.env}")
+    print(f"🌐 WSDL (consulta_lote): {wsdl_url}")
     print(f"🔎 dProtConsLote: {prot}")
     if args.debug:
         print(f"🔐 Cert: {p12_path}")
     
-    # Consultar lote usando SoapClient (sin WSDL)
+    # Consultar lote usando SoapClient (WSDL-driven)
     try:
         with SoapClient(config=config) as client:
             try:
-                # Usar método consulta_lote_raw (no depende de WSDL)
-                response_dict = client.consulta_lote_raw(dprot_cons_lote=prot, did=1)
+                # Usar método consulta_lote_de (WSDL-driven)
+                response_dict = client.consulta_lote_de(dprot_cons_lote=prot, did=1)
                 
                 # Extraer campos principales
                 result: Dict[str, Any] = {
-                    "success": True,
+                    "success": response_dict.get("ok", False),
                     "dProtConsLote": prot,
-                    "http_status": response_dict.get("http_status", 0),
-                    "response_xml": response_dict.get("raw_xml", ""),
+                    "response_xml": response_dict.get("response_xml", ""),
                 }
                 
-                # Mostrar HTTP status
-                http_status = response_dict.get("http_status", 0)
-                print(f"📡 HTTP Status: {http_status}")
+                # Extraer código y mensaje
+                codigo_respuesta = response_dict.get("codigo_respuesta")
+                mensaje = response_dict.get("mensaje")
                 
-                # Extraer dCodResLot y dMsgResLot si existen
-                if "dCodResLot" in response_dict:
-                    result["dCodResLot"] = response_dict["dCodResLot"]
-                if "dMsgResLot" in response_dict:
-                    result["dMsgResLot"] = response_dict["dMsgResLot"]
+                if codigo_respuesta:
+                    result["dCodResLot"] = codigo_respuesta
+                if mensaje:
+                    result["dMsgResLot"] = mensaje
                 
-                # Determinar éxito basado en código
-                cod_res_lot = result.get("dCodResLot", "")
-                if cod_res_lot in ("0361", "0362"):
-                    result["status"] = "ok"
+                # Extraer parsed_fields para información adicional
+                parsed_fields = response_dict.get("parsed_fields", {})
+                
+                # Mostrar resultado
+                if response_dict.get("ok"):
                     print("✅ Consulta OK")
-                elif cod_res_lot == "0364":
-                    result["status"] = "requires_cdc"
-                    print("⚠️  Lote requiere consulta por CDC")
+                    result["status"] = "ok"
                 else:
-                    result["status"] = "error"
-                    print("❌ Error en consulta")
+                    if codigo_respuesta == "0364":
+                        result["status"] = "requires_cdc"
+                        print("⚠️  Lote requiere consulta por CDC")
+                    else:
+                        result["status"] = "error"
+                        print("❌ Error en consulta")
                 
-                if cod_res_lot:
-                    print(f"   Código: {cod_res_lot}")
-                if result.get("dMsgResLot"):
-                    print(f"   Mensaje: {result['dMsgResLot']}")
+                if codigo_respuesta:
+                    print(f"   Código: {codigo_respuesta}")
+                if mensaje:
+                    print(f"   Mensaje: {mensaje}")
+                
+                # Mostrar gResProcLote si está presente (resultados por DE)
+                g_res_proc_lote = parsed_fields.get("gResProcLote")
+                if g_res_proc_lote and isinstance(g_res_proc_lote, list):
+                    print(f"\n   Documentos en lote: {len(g_res_proc_lote)}")
+                    for idx, de_res in enumerate(g_res_proc_lote, 1):
+                        de_id = de_res.get("dId", "N/A")
+                        de_est_res = de_res.get("dEstRes", "N/A")
+                        de_cod_res = de_res.get("dCodRes", "N/A")
+                        de_msg_res = de_res.get("dMsgRes", "N/A")
+                        print(f"   DE #{idx}: id={de_id}, estado={de_est_res}, código={de_cod_res}")
+                        if de_msg_res and de_msg_res != "N/A":
+                            print(f"      mensaje: {de_msg_res}")
+                    result["gResProcLote"] = g_res_proc_lote
                 
             except Exception as e:
                 _die(f"Error al consultar lote: {e}")

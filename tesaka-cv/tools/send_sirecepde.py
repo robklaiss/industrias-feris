@@ -18,7 +18,7 @@ import argparse
 import os
 import re
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union, Tuple
 from datetime import datetime
 from io import BytesIO
 import base64
@@ -34,6 +34,29 @@ load_dotenv()
 
 # Constantes de namespace SIFEN
 SIFEN_NS = "http://ekuatia.set.gov.py/sifen/xsd"
+NS = {"s": SIFEN_NS}
+
+# Helper regex para detectar XML declaration
+_XML_DECL_RE = re.compile(br"^\s*<\?xml[^>]*\?>\s*", re.I)
+
+
+def _strip_xml_decl(b: bytes) -> bytes:
+    """Remueve la declaración XML (<?xml ...?>) del inicio de bytes."""
+    return _XML_DECL_RE.sub(b"", b, count=1)
+
+
+def _root_info(xml_bytes: bytes) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Detecta el localname y namespace del root del XML (rápido y tolerante).
+    Retorna (localname, namespace) o (None, None) si falla.
+    """
+    try:
+        parser = etree.XMLParser(recover=True, remove_blank_text=False)
+        root = etree.fromstring(xml_bytes, parser)
+        q = etree.QName(root)
+        return q.localname, q.namespace
+    except Exception:
+        return None, None
 
 try:
     import lxml.etree as etree  # noqa: F401
@@ -104,6 +127,103 @@ def _extract_metadata_from_xml(xml_content: str) -> dict:
         pass
     
     return metadata
+
+
+def _save_precheck_artifacts(
+    artifacts_dir: Path,
+    payload_xml: str,
+    zip_bytes: bytes,
+    zip_base64: str,
+    wsdl_url: str,
+    lote_xml_bytes: Optional[bytes] = None
+):
+    """
+    Guarda artifacts del payload NUEVO incluso si PRECHECK falla.
+    
+    Args:
+        artifacts_dir: Directorio donde guardar archivos
+        payload_xml: XML rEnvioLote completo
+        zip_bytes: ZIP binario
+        zip_base64: Base64 del ZIP
+        wsdl_url: URL del WSDL que se usaría
+        lote_xml_bytes: Bytes del XML lote.xml (opcional, para guardar en /tmp)
+    """
+    artifacts_dir.mkdir(exist_ok=True)
+    
+    # Redactar xDE en el payload para el debug file
+    payload_redacted = re.sub(
+        r'<xDE[^>]*>.*?</xDE>',
+        f'<xDE>__BASE64_REDACTED_LEN_{len(zip_base64)}__</xDE>',
+        payload_xml,
+        flags=re.DOTALL
+    )
+    
+    # 1. Guardar soap_last_http_debug.txt con información del payload
+    debug_file = artifacts_dir / "soap_last_http_debug.txt"
+    with debug_file.open("w", encoding="utf-8") as f:
+        f.write("==== SOAP HTTP DEBUG (PRECHECK FAILED - NOT SENT) ====\n\n")
+        f.write(f"POST_URL_USED={wsdl_url.split('?')[0]}\n")  # Sin ?wsdl
+        f.write(f"SOAP_VERSION_USED=1.2\n")
+        f.write(f"ORIGINAL_URL={wsdl_url}\n")
+        f.write(f"ACTION_HEADER_USED=\n")
+        f.write(f"CONTENT_TYPE_USED=application/xml; charset=utf-8\n")
+        f.write(f"SOAP_ACTION_HEADER_USED=\n")
+        f.write(f"\n---- REQUEST_HEADERS_FINAL ----\n")
+        f.write(f"Content-Type: application/xml; charset=utf-8\n")
+        f.write(f"Accept: application/soap+xml, text/xml, */*\n")
+        f.write("---- END REQUEST_HEADERS_FINAL ----\n")
+        f.write(f"\nXDE_BASE64_LEN={len(zip_base64)}\n")
+        f.write(f"XDE_BASE64_HAS_WHITESPACE=no\n")
+        f.write(f"\n---- SOAP BEGIN (NOT SENT - PRECHECK FAILED) ----\n")
+        f.write(payload_redacted)
+        f.write("\n---- SOAP END ----\n")
+        f.write(f"\nNOTE: Este payload NO fue enviado a SIFEN porque PRECHECK falló.\n")
+        f.write(f"Para inspeccionar el ZIP real, usar: --zip-file /tmp/lote_payload.zip\n")
+    
+    # 2. Guardar soap_last_request_headers.txt
+    headers_file = artifacts_dir / "soap_last_request_headers.txt"
+    with headers_file.open("w", encoding="utf-8") as f:
+        f.write("Content-Type: application/xml; charset=utf-8\n")
+        f.write("Accept: application/soap+xml, text/xml, */*\n")
+    
+    # 3. Guardar soap_last_request.xml (payload redactado)
+    request_file = artifacts_dir / "soap_last_request.xml"
+    request_file.write_text(payload_redacted, encoding="utf-8")
+    
+    # 4. Guardar soap_last_response.xml (dummy indicando que NO se envió)
+    response_file = artifacts_dir / "soap_last_response.xml"
+    response_dummy = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<error>\n'
+        '  <message>NOT SENT (PRECHECK FAILED)</message>\n'
+        '  <note>Este request no fue enviado a SIFEN porque la validación preflight falló.</note>\n'
+        '  <zip_file>/tmp/lote_payload.zip</zip_file>\n'
+        '  <payload_file>/tmp/lote_xml_payload.xml</payload_file>\n'
+        '</error>\n'
+    )
+    response_file.write_text(response_dummy, encoding="utf-8")
+    
+    # 5. Guardar archivos temporales en /tmp (para debug_extract_lote_from_soap)
+    if lote_xml_bytes:
+        try:
+            Path("/tmp/lote_xml_payload.xml").write_bytes(lote_xml_bytes)
+        except Exception as e:
+            print(f"⚠️  No se pudo guardar /tmp/lote_xml_payload.xml: {e}")
+    
+    try:
+        Path("/tmp/lote_payload.zip").write_bytes(zip_bytes)
+    except Exception as e:
+        print(f"⚠️  No se pudo guardar /tmp/lote_payload.zip: {e}")
+    
+    print(f"\n💾 Artifacts guardados (aunque PRECHECK falló):")
+    print(f"   ✓ {debug_file.name}")
+    print(f"   ✓ {headers_file.name}")
+    print(f"   ✓ {request_file.name}")
+    print(f"   ✓ {response_file.name}")
+    if lote_xml_bytes:
+        print(f"   ✓ /tmp/lote_xml_payload.xml")
+    print(f"   ✓ /tmp/lote_payload.zip")
+    print(f"   Para inspeccionar ZIP real: python -m tools.debug_extract_lote_from_soap --zip-file /tmp/lote_payload.zip")
 
 
 def _save_1264_debug(
@@ -386,6 +506,219 @@ def extract_rde_element(xml_bytes: bytes) -> bytes:
     return etree.tostring(rde_el, xml_declaration=False, encoding="utf-8")
 
 
+def sign_and_normalize_rde_inside_xml(xml_bytes: bytes, cert_path: str, cert_password: str, artifacts_dir: Optional[Path] = None) -> bytes:
+    """
+    Garantiza que el rDE dentro del XML esté firmado y normalizado.
+    
+    - Encuentra el rDE (puede ser root o anidado en rEnviDe)
+    - Si no tiene ds:Signature como hijo directo, lo firma
+    - Reordena hijos de rDE a: dVerFor, DE, Signature, gCamFuFD (si existe)
+    - Devuelve el XML completo con rDE firmado y normalizado
+    
+    Args:
+        xml_bytes: XML que contiene rDE (puede ser rDE root o tener rDE anidado)
+        cert_path: Path al certificado P12 para firma
+        cert_password: Contraseña del certificado
+        artifacts_dir: Directorio para guardar artifacts de debug (opcional)
+        
+    Returns:
+        XML completo con rDE firmado y normalizado (bytes)
+    """
+    import traceback
+    DSIG_NS = "http://www.w3.org/2000/09/xmldsig#"
+    
+    def local_tag(tag: str) -> str:
+        return tag.split("}", 1)[-1] if "}" in tag else tag
+    
+    debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+    
+    # Parsear XML
+    try:
+        root = etree.fromstring(xml_bytes)
+    except Exception as e:
+        raise ValueError(f"Error al parsear XML: {e}")
+    
+    # Encontrar rDE
+    rde_el = None
+    is_root_rde = False
+    
+    if local_tag(root.tag) == "rDE":
+        rde_el = root
+        is_root_rde = True
+    else:
+        # Buscar rDE anidado
+        rde_el = _find_by_localname(root, "rDE")
+        if rde_el is None:
+            raise ValueError("No se encontró <rDE> en el XML (ni como raíz ni anidado).")
+    
+    # Verificar si tiene Signature como hijo directo
+    has_signature = any(
+        child.tag == f"{{{DSIG_NS}}}Signature" or local_tag(child.tag) == "Signature"
+        for child in list(rde_el)
+    )
+    
+    if debug_enabled:
+        children_before = [local_tag(c.tag) for c in list(rde_el)]
+        print(f"🔍 [sign_and_normalize_rde_inside_xml] rDE hijos antes: {', '.join(children_before)}")
+        print(f"🔍 [sign_and_normalize_rde_inside_xml] tiene Signature: {has_signature}")
+    
+    # Si no tiene Signature, firmarlo
+    if not has_signature:
+        print("🔐 Firmando XML completo (rDE no tiene Signature como hijo directo)...")
+        
+        # Guardar XML original antes de firmar (debug)
+        if debug_enabled and artifacts_dir:
+            artifacts_dir.mkdir(exist_ok=True)
+            (artifacts_dir / "xml_before_sign_normalize.xml").write_bytes(xml_bytes)
+            print(f"💾 Guardado: {artifacts_dir / 'xml_before_sign_normalize.xml'}")
+        
+        # Normalizar XML completo antes de firmar
+        xml_bytes = normalize_rde_before_sign(xml_bytes)
+        xml_bytes = ensure_rde_default_namespace(xml_bytes)
+        
+        # Firmar XML COMPLETO (no el fragmento rDE aislado)
+        try:
+            from app.sifen_client.xmlsec_signer import sign_de_with_p12
+            signed_full = sign_de_with_p12(xml_bytes, cert_path, cert_password)
+            print("✓ XML completo firmado exitosamente")
+        except Exception as e:
+            error_msg = f"Error al firmar XML completo: {e}"
+            print(f"❌ {error_msg}", file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
+            raise RuntimeError(error_msg)
+        
+        # Guardar XML firmado (debug)
+        if debug_enabled and artifacts_dir:
+            (artifacts_dir / "xml_after_sign_normalize.xml").write_bytes(signed_full)
+            print(f"💾 Guardado: {artifacts_dir / 'xml_after_sign_normalize.xml'}")
+        
+        # Re-parsear XML firmado y localizar rDE
+        try:
+            root = etree.fromstring(signed_full)
+        except Exception as e:
+            raise ValueError(f"Error al re-parsear XML firmado: {e}")
+        
+        # Buscar rDE en el XML firmado
+        if local_tag(root.tag) == "rDE":
+            rde_el = root
+            is_root_rde = True
+        else:
+            rde_el = _find_by_localname(root, "rDE")
+            if rde_el is None:
+                error_msg = "No se encontró <rDE> en el XML firmado"
+                print(f"❌ {error_msg}", file=sys.stderr)
+                print(f"   Root tag: {root.tag} (local: {local_tag(root.tag)})", file=sys.stderr)
+                raise ValueError(error_msg)
+            is_root_rde = False
+        
+        # Validar que ahora tenga Signature como hijo directo
+        has_signature_after = any(
+            child.tag == f"{{{DSIG_NS}}}Signature" or local_tag(child.tag) == "Signature"
+            for child in list(rde_el)
+        )
+        
+        if not has_signature_after:
+            # Diagnóstico detallado
+            root_tag = root.tag
+            root_local = local_tag(root_tag)
+            root_ns = root_tag.split("}", 1)[0][1:] if "}" in root_tag else "VACÍO"
+            rde_children = [local_tag(c.tag) for c in list(rde_el)]
+            
+            error_msg = (
+                f"ERROR: Después de firmar, el rDE NO tiene <ds:Signature> como hijo directo.\n"
+                f"Root tag: {root_local} (ns: {root_ns})\n"
+                f"rDE hijos directos: {', '.join(rde_children) if rde_children else '(ninguno)'}"
+            )
+            print(f"❌ {error_msg}", file=sys.stderr)
+            raise RuntimeError(error_msg)
+        
+        print("✓ rDE firmado tiene Signature como hijo directo (validado)")
+        
+        # Guardar rDE después de firma (debug)
+        if debug_enabled and artifacts_dir:
+            rde_after_bytes = etree.tostring(rde_el, xml_declaration=False, encoding="utf-8")
+            (artifacts_dir / "rde_after_sign.xml").write_bytes(rde_after_bytes)
+            print(f"💾 Guardado: {artifacts_dir / 'rde_after_sign.xml'}")
+        
+        # Usar el XML firmado completo como base
+        xml_bytes = signed_full
+    else:
+        # Ya tiene Signature, pero verificar orden
+        rde_el = rde_el  # No cambiar referencia
+        print("✓ rDE ya tiene Signature, verificando orden...")
+    
+    # Reordenar hijos de rDE: dVerFor, DE, Signature, gCamFuFD (determinístico)
+    # Obtener referencias usando find() con namespaces
+    dverfor = rde_el.find(f"./{{{SIFEN_NS}}}dVerFor")
+    de = rde_el.find(f"./{{{SIFEN_NS}}}DE")
+    gcamfufd = rde_el.find(f"./{{{SIFEN_NS}}}gCamFuFD")
+    
+    # Buscar Signature: primer hijo directo cuyo localname == 'Signature' y ns == DSIG_NS
+    signature = None
+    for child in list(rde_el):
+        if local_tag(child.tag) == "Signature" and child.tag == f"{{{DSIG_NS}}}Signature":
+            signature = child
+            break
+    
+    # Verificar si hay otros hijos que no sean los esperados
+    expected_children = {dverfor, de, signature, gcamfufd}
+    others = [child for child in list(rde_el) if child not in expected_children]
+    
+    # Construir orden: dVerFor, DE, Signature, gCamFuFD, otros
+    ordered_children = []
+    if dverfor is not None:
+        ordered_children.append(dverfor)
+    if de is not None:
+        ordered_children.append(de)
+    if signature is not None:
+        ordered_children.append(signature)
+    if gcamfufd is not None:
+        ordered_children.append(gcamfufd)
+    ordered_children.extend(others)
+    
+    # Verificar si el orden actual es diferente
+    current_children = list(rde_el)
+    needs_reorder = False
+    if len(ordered_children) != len(current_children):
+        needs_reorder = True
+    else:
+        for i, expected in enumerate(ordered_children):
+            if current_children[i] != expected:
+                needs_reorder = True
+                break
+    
+    # Si el orden cambió, reordenar
+    if needs_reorder:
+        print("🔄 Reordenando hijos de rDE...")
+        # Remover todos los hijos
+        for child in list(rde_el):
+            rde_el.remove(child)
+        # Agregar en orden
+        for child in ordered_children:
+            rde_el.append(child)
+        
+        if debug_enabled:
+            children_after = [local_tag(c.tag) for c in list(rde_el)]
+            print(f"🔍 [sign_and_normalize_rde_inside_xml] rDE hijos después: {', '.join(children_after)}")
+    
+    # (Opcional) Limpiar namespaces si hace falta (sin forzar xmlns:ds)
+    # etree.cleanup_namespaces() puede ayudar, pero no es crítico
+    
+    # Serializar XML completo
+    result_bytes = etree.tostring(root, xml_declaration=True, encoding="utf-8")
+    
+    # Si se firmó, el xml_after_sign_normalize.xml ya se guardó arriba
+    # Solo guardar el resultado final si se reordenó (para ver el orden final)
+    if debug_enabled and artifacts_dir:
+        artifacts_dir.mkdir(exist_ok=True)
+        # Solo guardar si se reordenó (para no duplicar)
+        if needs_reorder:
+            (artifacts_dir / "xml_after_sign_normalize_final.xml").write_bytes(result_bytes)
+            print(f"💾 Guardado: {artifacts_dir / 'xml_after_sign_normalize_final.xml'}")
+    
+    return result_bytes
+
+
 def ensure_rde_default_namespace(xml_bytes: bytes) -> bytes:
     """
     Asegura que el elemento rDE tenga namespace default SIFEN_NS en su tag de apertura.
@@ -461,27 +794,70 @@ def ensure_rde_default_namespace(xml_bytes: bytes) -> bytes:
     return result
 
 
+def extract_rde_fragment(xml_bytes: bytes) -> bytes:
+    """
+    Extrae el elemento rDE (con o sin namespace / con o sin prefijo) usando lxml,
+    para evitar fallas de búsqueda por bytes luego del firmado (ej: </ns0:rDE>).
+    """
+    parser = etree.XMLParser(remove_blank_text=True, recover=True)
+    root = etree.fromstring(xml_bytes, parser)
+
+    # Caso: root ya es rDE (con o sin namespace)
+    try:
+        if etree.QName(root).localname == "rDE":
+            rde = root
+        else:
+            rde = None
+    except Exception:
+        rde = None
+
+    # Caso: buscar rDE con namespace SIFEN
+    if rde is None:
+        rde = root.find(".//s:rDE", namespaces=NS)
+
+    # Caso: buscar rDE por local-name() (sin namespace / con prefijo raro)
+    if rde is None:
+        hits = root.xpath("//*[local-name()='rDE']")
+        rde = hits[0] if hits else None
+
+    if rde is None:
+        raise RuntimeError("No se encontró rDE en el XML de entrada (no se puede construir lote).")
+
+    # Importante: NO agregamos xml_declaration para mantener el fragmento "puro"
+    return etree.tostring(rde, encoding="UTF-8", pretty_print=True)
+
+
 def _extract_rde_fragment_bytes(xml_signed_bytes: bytes) -> bytes:
     """
-    Extrae el fragmento <rDE ...>...</rDE> desde los bytes originales
-    para NO alterar firma / namespaces / whitespace.
+    Extrae <rDE>...</rDE> desde BYTES sin re-serializar (preserva firma),
+    soportando prefijos: <ns0:rDE> ... </ns0:rDE>.
     """
-    import re
-    
-    # 1) Caso sin prefijo: <rDE ...>...</rDE>
-    m = re.search(br"<rDE\b[^>]*>.*?</rDE>", xml_signed_bytes, flags=re.DOTALL)
-    if m:
-        return m.group(0)
-    
-    # 2) Caso con prefijo: <ns:rDE ...>...</ns:rDE>
-    m = re.search(br"<([A-Za-z_][\w.-]*):rDE\b[^>]*>.*?</\1:rDE>", xml_signed_bytes, flags=re.DOTALL)
-    if m:
-        return m.group(0)
-    
-    raise ValueError("No pude extraer <rDE>...</rDE> en bytes desde el XML firmado")
+    # 1) Encontrar el tag de apertura con prefijo opcional
+    m_open = re.search(rb'<(?P<prefix>[A-Za-z_][\w\-.]*:)?rDE\b[^>]*>', xml_signed_bytes)
+    if not m_open:
+        raise RuntimeError("No pude encontrar tag de apertura <rDE ...> en bytes.")
+
+    prefix = m_open.group("prefix") or b""  # ej: b"ns0:" o b""
+    start = m_open.start()
+
+    # 2) Encontrar el cierre correspondiente con el mismo prefijo
+    close_pat = rb'</' + prefix + rb'rDE\s*>'
+    m_close = re.search(close_pat, xml_signed_bytes[m_open.end():])
+    if not m_close:
+        # diagnóstico útil: intentamos también cierre sin prefijo por si hubiera inconsistencia
+        m_close2 = re.search(rb'</rDE\s*>', xml_signed_bytes[m_open.end():])
+        if m_close2:
+            end = m_open.end() + m_close2.end()
+            return xml_signed_bytes[start:end]
+        raise RuntimeError(
+            "No pude encontrar el tag de cierre </rDE> (con o sin prefijo) en bytes."
+        )
+
+    end = m_open.end() + m_close.end()
+    return xml_signed_bytes[start:end]
 
 
-def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = False) -> str | tuple[str, bytes, bytes]:
+def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = False) -> Union[str, Tuple[str, bytes, bytes]]:
     """
     Crea un ZIP con el rDE firmado envuelto en rLoteDE.
     
@@ -526,30 +902,146 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
             for child in list(el)
         )
     
+    # Función para verificar si un rDE tiene Signature en cualquier profundidad (incluyendo dentro de DE)
+    def has_signature_anywhere(el) -> bool:
+        """Verifica si el rDE o su contenido (incluyendo DE) tiene Signature en cualquier profundidad."""
+        for sig_candidate in el.iter():
+            if local_tag(sig_candidate.tag) == "Signature":
+                # Verificar que sea del namespace correcto
+                if "}" in sig_candidate.tag:
+                    ns = sig_candidate.tag.split("}", 1)[0][1:]
+                    if ns == DSIG_NS:
+                        return True
+                elif sig_candidate.tag == "Signature":
+                    # Sin namespace, asumir que es DSIG_NS
+                    return True
+        return False
+    
+    # DIAGNÓSTICO: Log información del XML de entrada (SIEMPRE, no solo en debug)
+    try:
+        xml_str_preview = xml_bytes[:500].decode('utf-8', errors='replace') if len(xml_bytes) > 500 else xml_bytes.decode('utf-8', errors='replace')
+        print(f"🔍 DIAGNÓSTICO [build_lote_base64] XML entrada: {len(xml_bytes)} bytes")
+        print(f"🔍 DIAGNÓSTICO [build_lote_base64] Primeros 200 chars: {xml_str_preview[:200]}")
+    except Exception as e:
+        print(f"⚠️  DIAGNÓSTICO [build_lote_base64] Error al leer preview XML: {e}")
+    
     # Parsear xml_bytes
     try:
         xml_root = etree.fromstring(xml_bytes)
+        root_localname = local_tag(xml_root.tag)
+        root_ns = xml_root.tag.split("}", 1)[0][1:] if "}" in xml_root.tag else "VACÍO"
+        print(f"🔍 DIAGNÓSTICO [build_lote_base64] Root localname: {root_localname}")
+        print(f"🔍 DIAGNÓSTICO [build_lote_base64] Root namespace: {root_ns}")
     except Exception as e:
-        raise ValueError(f"Error al parsear XML: {e}")
+        error_msg = f"Error al parsear XML: {e}"
+        print(f"❌ ERROR en build_lote_base64_from_single_xml: {error_msg}", file=sys.stderr)
+        import traceback
+        traceback.print_exc(file=sys.stderr)
+        raise ValueError(error_msg)
+    
+    # Helper para asegurar namespace SIFEN en elementos sin xmlns
+    def ensure_sifen_ns(el):
+        """
+        Recorre recursivamente el árbol y asegura que los elementos tengan namespace SIFEN_NS.
+        Si el tag no empieza con "{", lo reemplaza por f"{{{SIFEN_NS}}}{localname}".
+        Conserva atributos y children.
+        """
+        if el is None:
+            return
+        
+        # Si el tag no tiene namespace, agregarlo
+        if not el.tag.startswith("{"):
+            localname = el.tag
+            el.tag = f"{{{SIFEN_NS}}}{localname}"
+        
+        # Recursivamente procesar hijos
+        for child in list(el):
+            ensure_sifen_ns(child)
     
     # Construir lista de candidatos rDE
     candidates_rde = []
+    rde_constructed_from_de = False  # Flag para saber si rDE fue construido desde DE
     
     # Caso a) si local-name(root) == "rDE"
     if local_tag(xml_root.tag) == "rDE":
         candidates_rde = [xml_root]
+        print(f"🔍 DIAGNÓSTICO [build_lote_base64] Root ES rDE directamente")
     else:
         # Caso b) buscar todos los rDE con namespace SIFEN
         candidates_rde = xml_root.findall(f".//{{{SIFEN_NS}}}rDE")
-        # Caso c) si sigue vacío, buscar sin namespace
+        print(f"🔍 DIAGNÓSTICO [build_lote_base64] Buscando rDE con namespace SIFEN: {len(candidates_rde)} encontrados")
+        # Caso c) si sigue vacío, buscar sin namespace usando XPath
         if not candidates_rde:
             candidates_rde = xml_root.xpath(".//*[local-name()='rDE']")
+            print(f"🔍 DIAGNÓSTICO [build_lote_base64] Buscando rDE sin namespace (XPath): {len(candidates_rde)} encontrados")
     
-    # Si no se encontró ningún rDE
+    # Si no se encontró ningún rDE, intentar construir uno desde DE
     if not candidates_rde:
-        raise ValueError(
-            "No se encontró rDE en el XML de entrada (no se puede construir lote)."
-        )
+        print(f"🔍 DIAGNÓSTICO [build_lote_base64] No se encontró rDE, buscando DE para construir rDE...")
+        
+        # Buscar DE (con o sin namespace)
+        de_candidates = []
+        
+        # Buscar DE con namespace SIFEN
+        de_candidates = xml_root.findall(f".//{{{SIFEN_NS}}}DE")
+        if not de_candidates:
+            # Buscar DE sin namespace usando XPath
+            de_candidates = xml_root.xpath(".//*[local-name()='DE']")
+        
+        # Si el root mismo es DE
+        if local_tag(xml_root.tag) == "DE":
+            de_candidates = [xml_root] if not de_candidates else de_candidates
+        
+        if de_candidates:
+            de_el = de_candidates[0]
+            print(f"🔍 DIAGNÓSTICO [build_lote_base64] Encontrado DE, construyendo rDE mínimo...")
+            
+            # Asegurar que DE tenga namespace SIFEN_NS
+            ensure_sifen_ns(de_el)
+            
+            # Crear rDE mínimo con namespace SIFEN_NS
+            rde_el = etree.Element(f"{{{SIFEN_NS}}}rDE", nsmap={None: SIFEN_NS})
+            
+            # Agregar dVerFor si no existe en DE
+            # (verificar si ya existe en el DE o en algún hijo)
+            has_dverfor = False
+            for child in de_el.iter():
+                if local_tag(child.tag) == "dVerFor":
+                    has_dverfor = True
+                    break
+            
+            if not has_dverfor:
+                dverfor = etree.SubElement(rde_el, f"{{{SIFEN_NS}}}dVerFor")
+                dverfor.text = "150"
+                print(f"🔍 DIAGNÓSTICO [build_lote_base64] Agregado dVerFor='150' al rDE construido")
+            
+            # Agregar el DE dentro del rDE
+            rde_el.append(de_el)
+            
+            # Agregar a candidatos
+            candidates_rde = [rde_el]
+            print(f"🔍 DIAGNÓSTICO [build_lote_base64] rDE construido exitosamente envolviendo DE")
+            
+            # Marcar que este rDE fue construido desde DE (puede tener Signature dentro del DE, no como hijo directo)
+            rde_constructed_from_de = True
+        else:
+            # No se encontró ni rDE ni DE
+            xml_preview = xml_bytes[:200].decode('utf-8', errors='replace') if len(xml_bytes) > 200 else xml_bytes.decode('utf-8', errors='replace')
+            de_found = len(xml_root.xpath(".//*[local-name()='DE']")) > 0
+            rde_found = len(xml_root.xpath(".//*[local-name()='rDE']")) > 0
+            
+            error_msg = (
+                f"No se encontró rDE en el XML de entrada (no se puede construir lote).\n"
+                f"Root local-name: {root_localname}\n"
+                f"Root namespace: {root_ns}\n"
+                f"Primeros 200 chars del XML: {xml_preview}\n"
+                f"DE encontrado por local-name: {de_found}\n"
+                f"rDE encontrado por local-name: {rde_found}"
+            )
+            print(f"❌ ERROR en build_lote_base64_from_single_xml: {error_msg}", file=sys.stderr)
+            raise ValueError(error_msg)
+    
+    print(f"🔍 DIAGNÓSTICO [build_lote_base64] Total candidates_rDE: {len(candidates_rde)}")
     
     # Seleccionar el candidato correcto: el que tiene Signature como hijo directo
     signed = [el for el in candidates_rde if is_signed_rde(el)]
@@ -557,24 +1049,107 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
     if len(signed) >= 1:
         rde_el = signed[0]
     else:
-        # Opcional: buscar por gCamFuFD como fallback (pero igualmente validar Signature)
+        # Si no hay rDE con Signature como hijo directo, buscar por gCamFuFD como fallback
         gcam = [
             el for el in candidates_rde
             if any(local_tag(child.tag) == "gCamFuFD" for child in list(el))
         ]
         if gcam:
             rde_el = gcam[0]
-            # Validar que tenga Signature (si no, abortar)
-            if not is_signed_rde(rde_el):
-                raise ValueError(
+            # Validar que tenga Signature
+            # Si rDE fue construido desde DE, permitir Signature en cualquier profundidad
+            # Si no, requerir Signature como hijo directo
+            if rde_constructed_from_de:
+                if not has_signature_anywhere(rde_el):
+                    # Si fue construido desde DE y no tiene Signature, es un error
+                    error_msg = (
+                        "Se construyó rDE desde DE pero el DE no contiene Signature. "
+                        "El DE debe estar firmado antes de construir el lote."
+                    )
+                    print(f"❌ ERROR en build_lote_base64_from_single_xml: {error_msg}", file=sys.stderr)
+                    raise ValueError(error_msg)
+            elif not is_signed_rde(rde_el):
+                # DIAGNÓSTICO ADICIONAL antes de levantar ValueError
+                children_list = []
+                for child in list(rde_el):
+                    child_local = local_tag(child.tag)
+                    child_ns = child.tag.split("}", 1)[0][1:] if "}" in child.tag else "VACÍO"
+                    children_list.append(f"{child_local} (ns: {child_ns})")
+                
+                # Buscar Signature en cualquier profundidad
+                signature_paths = []
+                for sig_candidate in rde_el.iter():
+                    if local_tag(sig_candidate.tag) == "Signature":
+                        # Construir path simple
+                        path_parts = []
+                        current = sig_candidate
+                        while current is not None and current != rde_el:
+                            path_parts.insert(0, local_tag(current.tag))
+                            current = current.getparent()
+                        signature_paths.append(" -> ".join(path_parts))
+                
+                error_msg = (
+                    "Se encontró rDE pero NO contiene <ds:Signature> como hijo directo. "
+                    "Probablemente se pasó XML no firmado o se eligió el rDE equivocado.\n"
+                    f"Hijos directos de rDE: {', '.join(children_list) if children_list else '(ninguno)'}\n"
+                )
+                if signature_paths:
+                    error_msg += f"Signature encontrada en profundidad: {', '.join(signature_paths)}\n"
+                else:
+                    error_msg += "Signature NO encontrada en ninguna profundidad dentro de rDE.\n"
+                
+                print(f"❌ ERROR en build_lote_base64_from_single_xml:", file=sys.stderr)
+                print(error_msg, file=sys.stderr)
+                raise ValueError(error_msg)
+        else:
+            # Si rDE fue construido desde DE, permitir Signature en cualquier profundidad
+            if rde_constructed_from_de:
+                if has_signature_anywhere(candidates_rde[0]):
+                    rde_el = candidates_rde[0]
+                else:
+                    error_msg = (
+                        "Se construyó rDE desde DE pero el DE no contiene Signature. "
+                        "El DE debe estar firmado antes de construir el lote."
+                    )
+                    print(f"❌ ERROR en build_lote_base64_from_single_xml: {error_msg}", file=sys.stderr)
+                    raise ValueError(error_msg)
+            else:
+                # DIAGNÓSTICO ADICIONAL antes de levantar ValueError
+                error_msg_parts = [
                     "Se encontró rDE pero NO contiene <ds:Signature> como hijo directo. "
                     "Probablemente se pasó XML no firmado o se eligió el rDE equivocado."
-                )
-        else:
-            raise ValueError(
-                "Se encontró rDE pero NO contiene <ds:Signature> como hijo directo. "
-                "Probablemente se pasó XML no firmado o se eligió el rDE equivocado."
-            )
+                ]
+                
+                if candidates_rde:
+                    for idx, candidate in enumerate(candidates_rde):
+                        children_list = []
+                        for child in list(candidate):
+                            child_local = local_tag(child.tag)
+                            child_ns = child.tag.split("}", 1)[0][1:] if "}" in child.tag else "VACÍO"
+                            children_list.append(f"{child_local} (ns: {child_ns})")
+                        
+                        error_msg_parts.append(f"\nCandidato rDE #{idx + 1} hijos directos: {', '.join(children_list) if children_list else '(ninguno)'}")
+                        
+                        # Buscar Signature en cualquier profundidad
+                        signature_paths = []
+                        for sig_candidate in candidate.iter():
+                            if local_tag(sig_candidate.tag) == "Signature":
+                                path_parts = []
+                                current = sig_candidate
+                                while current is not None and current != candidate:
+                                    path_parts.insert(0, local_tag(current.tag))
+                                    current = current.getparent()
+                                signature_paths.append(" -> ".join(path_parts))
+                        
+                        if signature_paths:
+                            error_msg_parts.append(f"  Signature encontrada en profundidad: {', '.join(signature_paths)}")
+                        else:
+                            error_msg_parts.append(f"  Signature NO encontrada en ninguna profundidad")
+                
+                error_msg = "\n".join(error_msg_parts)
+                print(f"❌ ERROR en build_lote_base64_from_single_xml:", file=sys.stderr)
+                print(error_msg, file=sys.stderr)
+                raise ValueError(error_msg)
     
     # Debug: mostrar información de selección
     debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
@@ -584,15 +1159,78 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
         selected_children = [local_tag(c.tag) for c in list(rde_el)]
         print(f"🧪 DEBUG [build_lote_base64] selected_rDE_children: {', '.join(selected_children)}")
     
+    # Guardar artifact de debug del rDE fragment final (si artifacts_dir existe)
+    try:
+        artifacts_dir = Path("artifacts")
+        if artifacts_dir.exists():
+            rde_fragment_xml = etree.tostring(rde_el, xml_declaration=True, encoding="utf-8", pretty_print=True)
+            debug_rde_file = artifacts_dir / "debug_rde_fragment.xml"
+            debug_rde_file.write_bytes(rde_fragment_xml)
+            print(f"💾 Guardado artifact debug: {debug_rde_file}")
+    except Exception as e:
+        # Silencioso: no fallar si no se puede guardar el artifact
+        pass
+    
     # IMPORTANTE: NO "reconstruyas" rDE ni cambies hijos; solo lo vas a envolver.
     # Según ejemplos oficiales SIFEN:
     # - rLoteDE NO debe tener namespace (root sin xmlns)
     # - El namespace debe estar declarado en rDE (no en rLoteDE)
     # Esto evita que lxml "hoistee" el xmlns al wrapper y rompa la firma
     
-    # Extraer el fragmento rDE desde los bytes originales (NO re-serializar con lxml)
-    # Esto preserva exactamente la firma, namespaces y whitespace del rDE firmado
-    rde_fragment = _extract_rde_fragment_bytes(xml_bytes)
+    # Detectar root para decidir estrategia de extracción
+    root_local, root_ns = _root_info(xml_bytes)
+    
+    # DE suelto -> wrapper rDE byte-preserving (sin re-serializar para preservar firma)
+    if root_local == "DE":
+        print(f"🔍 DIAGNÓSTICO [build_lote_base64] Root es DE, construyendo wrapper rDE byte-preserving...")
+        # Remover XML declaration si existe (no debe haber declaración dentro del wrapper)
+        de_bytes = _strip_xml_decl(xml_bytes).lstrip()
+        # Construir rDE fragment envolviendo DE bytes tal cual (preserva firma)
+        rde_fragment = (
+            f'<rDE xmlns="{SIFEN_NS}"><dVerFor>150</dVerFor>'.encode("utf-8")
+            + de_bytes
+            + b"</rDE>"
+        )
+        print(f"🔍 DIAGNÓSTICO [build_lote_base64] rDE fragment construido desde DE: {len(rde_fragment)} bytes")
+        
+        # Guardar artifact de debug del rDE fragment construido
+        try:
+            artifacts_dir = Path("artifacts")
+            if artifacts_dir.exists():
+                debug_rde_file = artifacts_dir / "debug_rde_fragment.xml"
+                debug_rde_file.write_bytes(rde_fragment)
+                print(f"💾 Guardado artifact debug: {debug_rde_file}")
+        except Exception:
+            # Silencioso: no fallar si no se puede guardar el artifact
+            pass
+    else:
+        # Caso normal: extraer rDE existente desde bytes (preserva firma)
+        try:
+            rde_fragment = _extract_rde_fragment_bytes(xml_bytes)
+            print(f"🔍 DIAGNÓSTICO [build_lote_base64] rDE fragment extraído: {len(rde_fragment)} bytes")
+        except Exception as e:
+            # Debugging robusto cuando falla la extracción
+            artifacts_dir = Path("artifacts")
+            if artifacts_dir.exists():
+                try:
+                    (artifacts_dir / "debug_input_before_rde_extract.xml").write_bytes(xml_bytes)
+                    print(f"💾 DEBUG: guardado debug_input_before_rde_extract.xml ({len(xml_bytes)} bytes)")
+                except Exception:
+                    pass
+
+            try:
+                parser = etree.XMLParser(recover=True, remove_blank_text=True)
+                root = etree.fromstring(xml_bytes, parser)
+                qn = etree.QName(root)
+                has_rde = bool(root.xpath("//*[local-name()='rDE']"))
+                has_de = bool(root.xpath("//*[local-name()='DE']"))
+                print("🔍 DEBUG extract rDE: root=", qn.localname, "ns=", qn.namespace)
+                print("🔍 DEBUG extract rDE: has_rDE=", has_rde, "has_DE=", has_de)
+            except Exception as pe:
+                print("🔍 DEBUG parse failed:", repr(pe))
+
+            print("🔍 DEBUG first_250:", xml_bytes[:250].decode("utf-8", errors="ignore"))
+            raise RuntimeError(f"Error al extraer fragmento rDE desde bytes: {e}")
     
     # IMPORTANTE: si el rDE no trae xmlns default, NO lo inventes acá (eso puede romper firma).
     # Solo envolvemos EXACTO.
@@ -620,10 +1258,18 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
         Path("/tmp/lote_xml_payload.xml").write_bytes(lote_xml_bytes)
     
     # ZIP con lote.xml
-    mem = BytesIO()
-    with zipfile.ZipFile(mem, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
-        zf.writestr("lote.xml", lote_xml_bytes)
-    zip_bytes = mem.getvalue()
+    try:
+        mem = BytesIO()
+        with zipfile.ZipFile(mem, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("lote.xml", lote_xml_bytes)
+        zip_bytes = mem.getvalue()
+        print(f"🔍 DIAGNÓSTICO [build_lote_base64] ZIP creado: {len(zip_bytes)} bytes")
+    except Exception as e:
+        error_msg = f"Error al crear ZIP: {e}"
+        print(f"❌ ERROR en build_lote_base64_from_single_xml: {error_msg}", file=sys.stderr)
+        import traceback
+        traceback.print_exc(file=sys.stderr)
+        raise RuntimeError(error_msg)
     
     # Guardar ZIP también para debug
     if debug_enabled:
@@ -751,6 +1397,174 @@ def build_r_envio_lote_xml(did: int, xml_bytes: bytes, zip_base64: Optional[str]
     return etree.tostring(rEnvioLote, xml_declaration=True, encoding="utf-8").decode("utf-8")
 
 
+def apply_timbrado_override(xml_bytes: bytes, artifacts_dir: Optional[Path] = None) -> bytes:
+    """
+    Aplica override de timbrado y fecha de inicio si están definidos en env vars.
+    
+    Si SIFEN_TIMBRADO_OVERRIDE está definido:
+    - Parchea <dNumTim> en gTimb
+    - Regenera CDC (DE@Id) y dDVId
+    
+    Si SIFEN_FEINI_OVERRIDE está definido:
+    - Parchea <dFeIniT> en gTimb
+    
+    Args:
+        xml_bytes: XML original (bytes)
+        artifacts_dir: Directorio para guardar artifact de salida (opcional)
+        
+    Returns:
+        XML modificado (bytes) o xml_bytes sin cambios si no hay override
+    """
+    import re
+    
+    # Leer env vars
+    timbrado = os.getenv("SIFEN_TIMBRADO_OVERRIDE", "").strip()
+    feini = os.getenv("SIFEN_FEINI_OVERRIDE", "").strip()
+    
+    # Si ambas vacías, devolver sin cambios
+    if not timbrado and not feini:
+        return xml_bytes
+    
+    # Parsear XML
+    parser = etree.XMLParser(remove_blank_text=True)
+    try:
+        root = etree.fromstring(xml_bytes, parser)
+    except Exception as e:
+        raise ValueError(f"Error al parsear XML para timbrado override: {e}")
+    
+    # Namespace
+    NS = {"s": SIFEN_NS}
+    
+    # Buscar gTimb
+    gtimb = root.find(".//s:gTimb", namespaces=NS)
+    if gtimb is None:
+        raise RuntimeError("No se encontró <gTimb> en el XML. No se puede aplicar override de timbrado.")
+    
+    # Aplicar override de timbrado
+    if timbrado:
+        dnumtim = gtimb.find("s:dNumTim", namespaces=NS)
+        if dnumtim is None:
+            raise RuntimeError("No se encontró <dNumTim> en <gTimb>. No se puede aplicar override de timbrado.")
+        dnumtim.text = timbrado
+        print(f"🔧 TIMBRADO OVERRIDE: dNumTim = {timbrado}")
+    
+    # Aplicar override de fecha inicio
+    if feini:
+        dfeinit = gtimb.find("s:dFeIniT", namespaces=NS)
+        if dfeinit is None:
+            raise RuntimeError("No se encontró <dFeIniT> en <gTimb>. No se puede aplicar override de fecha inicio.")
+        dfeinit.text = feini
+        print(f"🔧 TIMBRADO OVERRIDE: dFeIniT = {feini}")
+    
+    # Si se cambió el timbrado, regenerar CDC
+    if timbrado:
+        print("🔄 Regenerando CDC con nuevo timbrado...")
+        
+        # Extraer datos del XML
+        gemis = root.find(".//s:gEmis", namespaces=NS)
+        if gemis is None:
+            raise RuntimeError("No se encontró <gEmis> en el XML. No se puede regenerar CDC.")
+        
+        drucem = gemis.find("s:dRucEm", namespaces=NS)
+        if drucem is None or not drucem.text:
+            raise RuntimeError("No se encontró <dRucEm> en <gEmis>. No se puede regenerar CDC.")
+        ruc = drucem.text.strip()
+        
+        dest = gtimb.find("s:dEst", namespaces=NS)
+        if dest is None or not dest.text:
+            raise RuntimeError("No se encontró <dEst> en <gTimb>. No se puede regenerar CDC.")
+        est = dest.text.strip()
+        
+        dpunexp = gtimb.find("s:dPunExp", namespaces=NS)
+        if dpunexp is None or not dpunexp.text:
+            raise RuntimeError("No se encontró <dPunExp> en <gTimb>. No se puede regenerar CDC.")
+        pnt = dpunexp.text.strip()
+        
+        dnumdoc = gtimb.find("s:dNumDoc", namespaces=NS)
+        if dnumdoc is None or not dnumdoc.text:
+            raise RuntimeError("No se encontró <dNumDoc> en <gTimb>. No se puede regenerar CDC.")
+        num = dnumdoc.text.strip()
+        
+        # Tipo documento
+        itide = gtimb.find("s:iTiDE", namespaces=NS)
+        if itide is None or not itide.text:
+            raise RuntimeError("No se encontró <iTiDE> en <gTimb>. No se puede regenerar CDC.")
+        tipo_doc = itide.text.strip()
+        
+        # Fecha emisión
+        gdatgral = root.find(".//s:gDatGralOpe", namespaces=NS)
+        if gdatgral is None:
+            raise RuntimeError("No se encontró <gDatGralOpe> en el XML. No se puede regenerar CDC.")
+        
+        dfemi = gdatgral.find("s:dFeEmiDE", namespaces=NS)
+        if dfemi is None or not dfemi.text:
+            raise RuntimeError("No se encontró <dFeEmiDE> en <gDatGralOpe>. No se puede regenerar CDC.")
+        fecha_emi = dfemi.text.strip()
+        
+        # Convertir fecha de YYYY-MM-DD a YYYYMMDD
+        fecha_ymd = re.sub(r"\D", "", fecha_emi)[:8]
+        if len(fecha_ymd) != 8:
+            raise RuntimeError(f"Fecha de emisión inválida para CDC: {fecha_emi!r}")
+        
+        # Monto total
+        gtot = root.find(".//s:gTotSub", namespaces=NS)
+        if gtot is None:
+            raise RuntimeError("No se encontró <gTotSub> en el XML. No se puede regenerar CDC.")
+        
+        dtot = gtot.find("s:dTotalGs", namespaces=NS)
+        if dtot is None or not dtot.text:
+            # Fallback: usar 0 si no hay monto
+            monto = "0"
+        else:
+            monto = dtot.text.strip()
+        
+        # Generar nuevo CDC
+        try:
+            from app.sifen_client.xml_generator_v150 import generate_cdc
+            cdc = generate_cdc(
+                ruc=ruc,
+                timbrado=timbrado,
+                establecimiento=est,
+                punto_expedicion=pnt,
+                numero_documento=num,
+                tipo_documento=tipo_doc,
+                fecha=fecha_ymd,
+                monto=monto
+            )
+            print(f"✓ CDC regenerado: {cdc}")
+        except Exception as e:
+            raise RuntimeError(f"Error al generar CDC: {e}")
+        
+        # Actualizar DE@Id
+        de = root.find(".//s:DE", namespaces=NS)
+        if de is None:
+            raise RuntimeError("No se encontró <DE> en el XML. No se puede actualizar CDC.")
+        de.set("Id", cdc)
+        
+        # Actualizar dDVId (último dígito del CDC)
+        ddvid = root.find(".//s:dDVId", namespaces=NS)
+        if ddvid is None:
+            raise RuntimeError("No se encontró <dDVId> en el XML. No se puede actualizar DV.")
+        ddvid.text = cdc[-1]
+        print(f"✓ dDVId actualizado: {cdc[-1]}")
+    
+    # Serializar de vuelta
+    out = etree.tostring(root, xml_declaration=True, encoding="UTF-8", pretty_print=True)
+    
+    # Guardar artifact si artifacts_dir está definido
+    if artifacts_dir is not None:
+        try:
+            artifacts_dir.mkdir(exist_ok=True)
+            artifact_path = artifacts_dir / "xml_after_timbrado_override.xml"
+            artifact_path.write_bytes(out)
+            print(f"💾 Guardado: {artifact_path}")
+        except Exception as e:
+            # Silencioso: no romper el flujo si falla guardar artifact
+            print(f"⚠️  No se pudo guardar artifact de timbrado override: {e}")
+    
+    return out
+
+
 def resolve_xml_path(xml_arg: str, artifacts_dir: Path) -> Path:
     """
     Resuelve el path al XML (puede ser 'latest' o un path específico)
@@ -803,6 +1617,9 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
             "error": f"Error al leer archivo XML: {str(e)}",
             "error_type": type(e).__name__
         }
+    
+    # Aplicar override de timbrado/fecha inicio si están definidos (ANTES de normalizar/firmar)
+    xml_bytes = apply_timbrado_override(xml_bytes, artifacts_dir=artifacts_dir)
     
     # Normalizar rDE antes de firmar (dDesPaisRec -> dDesPaisRe, mover gCamFuFD)
     xml_bytes = normalize_rde_before_sign(xml_bytes)
@@ -944,6 +1761,37 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
     # Construir XML de lote (rEnvioLote) desde el XML original
     try:
         print("📦 Construyendo lote desde XML individual...")
+        
+        # GARANTIZAR que el rDE esté firmado antes de construir el lote
+        # Leer certificado de firma (fallback a mTLS si no hay específico de firma)
+        sign_cert_path = os.getenv("SIFEN_SIGN_P12_PATH") or os.getenv("SIFEN_MTLS_P12_PATH")
+        sign_cert_password = os.getenv("SIFEN_SIGN_P12_PASSWORD") or os.getenv("SIFEN_MTLS_P12_PASSWORD")
+        
+        if sign_cert_path and sign_cert_password:
+            print("🔐 Verificando y normalizando rDE (firma y orden)...")
+            try:
+                xml_bytes = sign_and_normalize_rde_inside_xml(
+                    xml_bytes=xml_bytes,
+                    cert_path=sign_cert_path,
+                    cert_password=sign_cert_password,
+                    artifacts_dir=artifacts_dir
+                )
+                print("✓ rDE verificado/normalizado exitosamente\n")
+            except Exception as e:
+                error_msg = f"Error al verificar/normalizar rDE: {str(e)}"
+                print(f"❌ {error_msg}", file=sys.stderr)
+                import traceback
+                traceback.print_exc(file=sys.stderr)
+                return {
+                    "success": False,
+                    "error": error_msg,
+                    "error_type": type(e).__name__,
+                    "traceback": traceback.format_exc()
+                }
+        else:
+            print("⚠️  No se encontró certificado de firma (SIFEN_SIGN_P12_PATH o SIFEN_MTLS_P12_PATH)")
+            print("   Continuando sin verificar firma del rDE...")
+        
         # Obtener dId del XML original si está disponible, sino usar 1
         try:
             xml_root = etree.fromstring(xml_bytes)
@@ -1044,6 +1892,20 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
                     if validation_result["lote_errors"]:
                         error_msg += f"\nErrores lote: {len(validation_result['lote_errors'])}"
                     
+                    # Guardar artifacts si debug está activo (incluso si PRECHECK falló)
+                    if debug_soap and artifacts_dir:
+                        try:
+                            _save_precheck_artifacts(
+                                artifacts_dir=artifacts_dir,
+                                payload_xml=payload_xml,
+                                zip_bytes=zip_bytes,
+                                zip_base64=zip_base64,
+                                wsdl_url=wsdl_url,
+                                lote_xml_bytes=lote_xml_bytes
+                            )
+                        except Exception as e:
+                            print(f"⚠️  Error al guardar artifacts de PRECHECK: {e}")
+                    
                     return {
                         "success": False,
                         "error": error_msg,
@@ -1053,10 +1915,20 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
                 
                 print()  # Línea en blanco después de validación
     except Exception as e:
+        # SIEMPRE imprimir traceback completo cuando falla build_lote
+        error_msg = f"Error al construir lote: {str(e)}"
+        error_type = type(e).__name__
+        print(f"\n❌ ERROR en construcción de lote:", file=sys.stderr)
+        print(f"   Tipo: {error_type}", file=sys.stderr)
+        print(f"   Mensaje: {error_msg}", file=sys.stderr)
+        import traceback
+        print(f"\n📋 TRACEBACK COMPLETO:", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
         return {
             "success": False,
-            "error": f"Error al construir lote: {str(e)}",
-            "error_type": type(e).__name__
+            "error": error_msg,
+            "error_type": error_type,
+            "traceback": traceback.format_exc()
         }
     
     # Enviar usando SoapClient
@@ -1271,6 +2143,22 @@ Configuración requerida (variables de entorno):
     # Retornar código de salida (0 solo si success es True explícitamente)
     success = result.get("success") is True
     exit_code = 0 if success else 1
+    
+    # SIEMPRE imprimir bloque final con resultado (incluso cuando SIFEN_DEBUG_SOAP=0)
+    print("\n" + "="*60)
+    print("=== RESULT ===")
+    print(f"success: {success}")
+    if result.get("error"):
+        print(f"error: {result.get('error')}")
+    if result.get("error_type"):
+        print(f"error_type: {result.get('error_type')}")
+    if result.get("traceback"):
+        print(f"\ntraceback:\n{result.get('traceback')}")
+    if result.get("response"):
+        print(f"response: {result.get('response')}")
+    if result.get("response_file"):
+        print(f"response_file: {result.get('response_file')}")
+    print("="*60)
     
     # Debug output
     debug_soap = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")

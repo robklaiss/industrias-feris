@@ -80,7 +80,7 @@ class SifenConfig:
             "recibe": "https://sifen-test.set.gov.py/de/ws/sync/recibe.wsdl",
             "recibe_lote": "https://sifen-test.set.gov.py/de/ws/async/recibe-lote.wsdl?wsdl",
             "evento": "https://sifen-test.set.gov.py/de/ws/eventos/evento.wsdl",
-            "consulta_lote": "https://sifen-test.set.gov.py/de/ws/consultas/consulta-lote.wsdl?wsdl",
+            "consulta_lote": "https://sifen-test.set.gov.py/de/ws/consultas-lote/consulta-lote.wsdl",
             "consulta_ruc": "https://sifen-test.set.gov.py/de/ws/consultas/consulta-ruc.wsdl",
             "consulta": "https://sifen-test.set.gov.py/de/ws/consultas/consulta.wsdl",
         },
@@ -88,7 +88,7 @@ class SifenConfig:
             "recibe": "https://sifen.set.gov.py/de/ws/sync/recibe.wsdl",
             "recibe_lote": "https://sifen.set.gov.py/de/ws/async/recibe-lote.wsdl",
             "evento": "https://sifen.set.gov.py/de/ws/eventos/evento.wsdl",
-            "consulta_lote": "https://sifen.set.gov.py/de/ws/consultas/consulta-lote.wsdl?wsdl",
+            "consulta_lote": "https://sifen.set.gov.py/de/ws/consultas-lote/consulta-lote.wsdl",
             "consulta_ruc": "https://sifen.set.gov.py/de/ws/consultas/consulta-ruc.wsdl",
             "consulta": "https://sifen.set.gov.py/de/ws/consultas/consulta.wsdl",
         }
@@ -176,10 +176,19 @@ class SifenConfig:
             
         Returns:
             URL del WSDL del servicio
+            
+        Nota:
+            Para consulta_lote, se permite override mediante env var SIFEN_WSDL_CONSULTA_LOTE
         """
         valid_keys = ["recibe", "recibe_lote", "evento", "consulta_lote", "consulta_ruc", "consulta"]
         if service_key not in valid_keys:
             raise ValueError(f"Servicio SOAP inválido: {service_key}. Válidos: {valid_keys}")
+        
+        # Permitir override por env var para consulta_lote
+        if service_key == "consulta_lote":
+            override_url = os.getenv("SIFEN_WSDL_CONSULTA_LOTE")
+            if override_url:
+                return override_url
         
         return self.SOAP_SERVICES[self.env][service_key]
     

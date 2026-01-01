@@ -15,7 +15,8 @@ Notas importantes:
 
 import os
 import logging
-from typing import Dict, Any, Optional, TYPE_CHECKING
+import time
+from typing import Dict, Any, Optional, List, TYPE_CHECKING
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse
 
@@ -53,6 +54,12 @@ from .exceptions import (
     SifenSizeLimitError,
 )
 from .pkcs12_utils import p12_to_temp_pem_files, cleanup_pem_files, PKCS12Error
+
+try:
+    from .wsdl_introspect import inspect_wsdl, save_wsdl_inspection
+except ImportError:
+    inspect_wsdl = None  # type: ignore
+    save_wsdl_inspection = None  # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -351,6 +358,103 @@ class SoapClient:
     # ---------------------------------------------------------------------
     # Zeep client (solo para WSDL/address)
     # ---------------------------------------------------------------------
+    def _validate_wsdl_access(self, wsdl_url: str) -> None:
+        """
+        Valida que el WSDL sea accesible con mTLS antes de intentar usarlo.
+        
+        Detecta errores comunes:
+        - Redirects a /vdesk/hangup.php3 (indica falta/fracaso de certificado mTLS)
+        - Body vacío
+        - Respuestas que no son XML
+        
+        Args:
+            wsdl_url: URL del WSDL a validar
+            
+        Raises:
+            RuntimeError: Si el WSDL no es accesible o hay problemas con mTLS
+        """
+        debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+        
+        try:
+            session = self.transport.session if hasattr(self, "transport") else Session()
+            resp = session.get(
+                wsdl_url,
+                timeout=(self.connect_timeout, self.read_timeout),
+                allow_redirects=False  # No seguir redirects automáticamente para detectarlos
+            )
+            
+            # Verificar redirects
+            if resp.status_code in (301, 302, 303, 307, 308):
+                location = resp.headers.get("Location", "")
+                if "/vdesk/" in location or "/vdesk/" in resp.url:
+                    error_msg = (
+                        f"No se pudo acceder al WSDL de consulta-lote. "
+                        f"Probable falta/fracaso de certificado mTLS (redirect a /vdesk/hangup.php3). "
+                        f"URL: {wsdl_url}, Status: {resp.status_code}, Location: {location}"
+                    )
+                    if debug_enabled:
+                        logger.error(f"WSDL validation failed: {error_msg}")
+                        logger.error(f"Response headers: {dict(resp.headers)}")
+                    raise RuntimeError(error_msg)
+                else:
+                    # Redirect legítimo, seguir
+                    resp = session.get(
+                        resp.headers.get("Location", wsdl_url),
+                        timeout=(self.connect_timeout, self.read_timeout)
+                    )
+            
+            # Verificar status code
+            if resp.status_code != 200:
+                error_msg = (
+                    f"WSDL no accesible: HTTP {resp.status_code}. "
+                    f"URL: {wsdl_url}"
+                )
+                if debug_enabled:
+                    logger.error(f"WSDL validation failed: {error_msg}")
+                    logger.error(f"Response body (first 200 chars): {resp.text[:200]}")
+                raise RuntimeError(error_msg)
+            
+            # Verificar que el body no esté vacío
+            content = resp.content or b""
+            if len(content) == 0:
+                error_msg = (
+                    f"WSDL vacío (body length=0). "
+                    f"Probable falta/fracaso de certificado mTLS. "
+                    f"URL: {wsdl_url}"
+                )
+                if debug_enabled:
+                    logger.error(f"WSDL validation failed: {error_msg}")
+                raise RuntimeError(error_msg)
+            
+            # Verificar que parezca XML (debe empezar con <?xml o <definitions)
+            content_str = content.decode("utf-8", errors="ignore").strip()
+            if not (content_str.startswith("<?xml") or content_str.startswith("<definitions")):
+                error_msg = (
+                    f"WSDL no parece ser XML válido. "
+                    f"URL: {wsdl_url}, "
+                    f"Primeros 200 chars: {content_str[:200]}"
+                )
+                if debug_enabled:
+                    logger.error(f"WSDL validation failed: {error_msg}")
+                raise RuntimeError(error_msg)
+            
+            if debug_enabled:
+                logger.info(f"WSDL validation OK: {wsdl_url}, status={resp.status_code}, len={len(content)}")
+                
+        except RuntimeError:
+            # Re-lanzar RuntimeError tal cual
+            raise
+        except Exception as e:
+            # Otros errores (timeout, conexión, etc.)
+            error_msg = (
+                f"Error al validar acceso al WSDL: {e}. "
+                f"URL: {wsdl_url}. "
+                f"Verifique certificado mTLS y conectividad."
+            )
+            if debug_enabled:
+                logger.error(f"WSDL validation exception: {error_msg}")
+            raise RuntimeError(error_msg) from e
+
     def _get_client(self, service_key: str) -> Any:  # Client de Zeep
         if service_key in self.clients:
             return self.clients[service_key]
@@ -359,6 +463,12 @@ class SoapClient:
         wsdl_url_final = self._normalize_wsdl_url(wsdl_url)
 
         logger.info(f"Cargando WSDL para servicio '{service_key}': {wsdl_url_final}")
+
+        # Validar acceso al WSDL antes de intentar cargarlo con zeep
+        try:
+            self._validate_wsdl_access(wsdl_url_final)
+        except RuntimeError as e:
+            raise SifenClientError(f"Error al validar WSDL: {e}") from e
 
         try:
             plugins = []
@@ -834,6 +944,19 @@ class SoapClient:
         response_root: Optional[str] = None,
         body_has_wrapper_sireceplotede: Optional[bool] = None,
         body_has_renviolote: Optional[bool] = None,
+        body_root_localname: Optional[str] = None,
+        body_root_ns: Optional[str] = None,
+        body_wrapper_localname: Optional[str] = None,
+        body_wrapper_ns: Optional[str] = None,
+        body_preview: Optional[str] = None,
+        wsdl_info: Optional[Dict[str, Any]] = None,
+        body_root_qname_sent: Optional[str] = None,
+        body_children_sent: Optional[list] = None,
+        xde_base64_len: Optional[int] = None,
+        xde_base64_has_whitespace: Optional[bool] = None,
+        suffix: str = "",
+        exception_class: Optional[str] = None,
+        exception_message: Optional[str] = None,
     ):
         """
         Guarda debug completo de un intento HTTP/SOAP.
@@ -845,22 +968,74 @@ class SoapClient:
             return  # Solo guardar en error si no está habilitado
         
         try:
-            debug_file = Path("artifacts") / "soap_last_http_debug.txt"
+            debug_file = Path("artifacts") / f"soap_last_http_debug{suffix}.txt"
             debug_file.parent.mkdir(exist_ok=True)
             
             soap_sha256 = hashlib.sha256(soap_bytes).hexdigest()
             soap_str = soap_bytes.decode("utf-8", errors="replace")
             
             with open(debug_file, "w", encoding="utf-8") as f:
-                # Nuevos campos de debug (opcionales)
+                # Try label si está presente (para attempt matrix)
+                if suffix and suffix.startswith("_try"):
+                    try_label = suffix.replace("_", "")
+                    f.write(f"TRY_LABEL={try_label}\n")
+                
+                # Información de excepción si existe
+                if exception_class:
+                    f.write(f"EXCEPTION_CLASS={exception_class}\n")
+                if exception_message:
+                    # Truncar mensaje largo
+                    exc_msg = exception_message[:500] if len(exception_message) > 500 else exception_message
+                    f.write(f"EXCEPTION_MESSAGE={exc_msg}\n")
+                
+                # Campos WSDL-driven
+                if wsdl_info:
+                    f.write(f"WSDL_TARGET_NAMESPACE={wsdl_info.get('target_namespace', '')}\n")
+                    f.write(f"WSDL_OPERATION_NAME={wsdl_info.get('operation_name', '')}\n")
+                    f.write(f"WSDL_INPUT_ELEMENT={wsdl_info.get('body_root_qname', {}).get('namespace', '')}:{wsdl_info.get('body_root_qname', {}).get('localname', '')}\n")
+                    f.write(f"WSDL_SOAP_ACTION={wsdl_info.get('soap_action', '')}\n")
+                    f.write(f"WSDL_ACTION_REQUIRED={wsdl_info.get('action_required', False)}\n")
+                    f.write(f"WSDL_IS_WRAPPED={wsdl_info.get('is_wrapped', False)}\n")
+                    f.write(f"WSDL_STYLE={wsdl_info.get('style', '')}\n")
+                    f.write(f"WSDL_USE={wsdl_info.get('use', '')}\n")
                 if wsdl_url:
                     f.write(f"WSDL_URL={wsdl_url}\n")
                 if soap_address:
-                    f.write(f"SOAP_ADDRESS={soap_address}\n")
-                f.write(f"POST_URL={post_url}\n")
+                    f.write(f"WSDL_SOAP_ADDRESS={soap_address}\n")
+                f.write(f"POST_URL_USED={post_url}\n")
+                f.write(f"SOAP_VERSION_USED={version}\n")
                 f.write(f"ORIGINAL_URL={original_url}\n")
-                f.write(f"VERSION={version}\n")
-                f.write(f"ACTION={action}\n")
+                f.write(f"ACTION_HEADER_USED={action}\n")
+                
+                # Headers FINALES (usar el dict headers tal cual se envió)
+                content_type = headers.get("Content-Type", "")
+                soap_action_header = headers.get("SOAPAction", "")
+                f.write(f"CONTENT_TYPE_USED={content_type}\n")
+                f.write(f"SOAP_ACTION_HEADER_USED={soap_action_header}\n")
+                
+                # Volcar headers finales completos (ordenados por key)
+                f.write("\n---- REQUEST_HEADERS_FINAL ----\n")
+                for key in sorted(headers.keys()):
+                    f.write(f"{key}: {headers[key]}\n")
+                f.write("---- END REQUEST_HEADERS_FINAL ----\n")
+                
+                # Body structure
+                if body_root_qname_sent:
+                    f.write(f"BODY_ROOT_QNAME_SENT={body_root_qname_sent}\n")
+                if body_children_sent:
+                    f.write(f"BODY_CHILDREN_SENT={','.join(body_children_sent)}\n")
+                # Consulta lote: orden XSD y orden enviado
+                consulta_xsd_order = getattr(self, '_consulta_xsd_order_debug', None)
+                if consulta_xsd_order is not None:
+                    f.write(f"CONSULTA_XSD_ORDER={','.join(consulta_xsd_order) if consulta_xsd_order else '(none)'}\n")
+                consulta_body_order = getattr(self, '_consulta_body_order_debug', None)
+                if consulta_body_order is not None:
+                    f.write(f"BODY_CHILDREN_ORDER_SENT={','.join(consulta_body_order) if consulta_body_order else '(none)'}\n")
+                if xde_base64_len is not None:
+                    f.write(f"XDE_BASE64_LEN={xde_base64_len}\n")
+                if xde_base64_has_whitespace is not None:
+                    f.write(f"XDE_BASE64_HAS_WHITESPACE={'yes' if xde_base64_has_whitespace else 'no'}\n")
+                
                 f.write(f"HEADERS={headers}\n")
                 if mtls_cert_path:
                     f.write(f"MTLS_CERT={mtls_cert_path}\n")
@@ -873,11 +1048,29 @@ class SoapClient:
                 f.write("\n---- SOAP END ----\n")
                 
                 if response_status is not None:
-                    f.write(f"RESPONSE_STATUS={response_status}\n")
+                    f.write(f"HTTP_STATUS={response_status}\n")
+                    f.write(f"RESPONSE_STATUS={response_status}\n")  # Mantener compatibilidad
+                elif exception_class:
+                    f.write(f"HTTP_STATUS=(exception)\n")
                 if response_headers:
                     f.write(f"RESPONSE_HEADERS={response_headers}\n")
                 if response_root:
                     f.write(f"RESPONSE_ROOT={response_root}\n")
+                if response_body:
+                    resp_body_str = response_body.decode("utf-8", errors="replace")
+                    f.write(f"RESPONSE_FIRST_200={resp_body_str[:200]}\n")
+                    # Extraer primeros 300 chars del body para análisis
+                    try:
+                        import lxml.etree as etree
+                        soap_body = etree.fromstring(response_body)
+                        body_str = etree.tostring(soap_body, encoding="unicode", method="xml")
+                        f.write(f"FIRST_300_CHARS_OF_BODY={body_str[:300]}\n")
+                    except Exception:
+                        f.write(f"FIRST_300_CHARS_OF_BODY={resp_body_str[:300]}\n")
+                elif not response_body and soap_bytes:
+                    # Si no hay response_body pero hay request, mostrar primeros 300 chars del request
+                    soap_str_preview = soap_bytes.decode("utf-8", errors="replace")[:300]
+                    f.write(f"FIRST_300_CHARS_OF_BODY={soap_str_preview}\n")
                 if body_has_wrapper_sireceplotede is not None:
                     f.write(f"BODY_HAS_WRAPPER_SIRECEPLOTEDE={body_has_wrapper_sireceplotede}\n")
                 if body_has_renviolote is not None:
@@ -891,20 +1084,80 @@ class SoapClient:
                 if body_wrapper_ns:
                     f.write(f"BODY_WRAPPER_NS={body_wrapper_ns}\n")
                 if body_preview:
-                    f.write(f"FIRST_300_CHARS_OF_BODY={body_preview}\n")
-                # Content-Type y action
-                content_type = headers.get("Content-Type", "")
-                f.write(f"CONTENT_TYPE_USED={content_type}\n")
-                if "action=" in content_type:
-                    action_val = content_type.split("action=", 1)[1].split(";", 1)[0].strip('"\'')
-                    f.write(f"ACTION_HEADER_USED={action_val}\n")
-                else:
-                    f.write(f"ACTION_HEADER_USED=(none)\n")
+                    # Redactar xDE si contiene base64 muy largo
+                    preview = body_preview
+                    if "<xDE>" in preview:
+                        import re
+                        preview = re.sub(r'(<xDE>)[^<]*(</xDE>)', r'\1__BASE64_REDACTED__\2', preview, flags=re.DOTALL)
+                    f.write(f"FIRST_300_CHARS_OF_BODY={preview}\n")
                 if response_body:
                     body_str = response_body.decode("utf-8", errors="replace")
                     f.write(f"RESPONSE_BODY_FIRST_2000={body_str[:2000]}\n")
             
             logger.debug(f"HTTP debug guardado en: {debug_file}")
+            
+            # Guardar headers finales en archivo separado
+            try:
+                headers_file = Path("artifacts") / f"soap_last_request_headers{suffix}.txt"
+                with open(headers_file, "w", encoding="utf-8") as hf:
+                    for key in sorted(headers.keys()):
+                        hf.write(f"{key}: {headers[key]}\n")
+                logger.debug(f"Headers guardados en: {headers_file}")
+            except Exception as e2:
+                logger.warning(f"Error al guardar headers: {e2}")
+            
+            # Guardar también los archivos XML (request y response)
+            try:
+                # Request XML (redactar xDE si es muy largo, incluyendo longitud)
+                request_xml = soap_bytes.decode("utf-8", errors="replace")
+                if "<xDE>" in request_xml or "<xsd:xDE>" in request_xml:
+                    import re
+                    # Buscar contenido de xDE y reemplazar con placeholder incluyendo longitud
+                    def replace_xde(match):
+                        prefix = match.group(1)
+                        content = match.group(2)
+                        suffix = match.group(3)
+                        content_len = len(content.strip())
+                        return f'{prefix}__BASE64_REDACTED_LEN_{content_len}__{suffix}'
+                    
+                    request_xml = re.sub(
+                        r'(<xDE[^>]*>)([^<]+)(</xDE>)',
+                        replace_xde,
+                        request_xml,
+                        flags=re.DOTALL
+                    )
+                    request_xml = re.sub(
+                        r'(<xsd:xDE[^>]*>)([^<]+)(</xsd:xDE>)',
+                        replace_xde,
+                        request_xml,
+                        flags=re.DOTALL
+                    )
+                
+                request_file = Path("artifacts") / f"soap_last_request{suffix}.xml"
+                request_file.write_text(request_xml, encoding="utf-8")
+                logger.debug(f"SOAP request guardado en: {request_file}")
+                
+                # Response XML (si existe, o crear placeholder si hay excepción)
+                response_file = Path("artifacts") / f"soap_last_response{suffix}.xml"
+                if response_body:
+                    response_file.write_bytes(response_body)
+                    logger.debug(f"SOAP response guardado en: {response_file}")
+                elif exception_class:
+                    # Crear placeholder XML para excepciones
+                    import xml.etree.ElementTree as ET
+                    error_root = ET.Element("error")
+                    ET.SubElement(error_root, "exception_class").text = exception_class
+                    if exception_message:
+                        ET.SubElement(error_root, "exception_message").text = exception_message[:500]
+                    error_xml = ET.tostring(error_root, encoding="unicode")
+                    response_file.write_text(
+                        f'<?xml version="1.0" encoding="UTF-8"?>\n{error_xml}',
+                        encoding="utf-8"
+                    )
+                    logger.debug(f"SOAP response placeholder (exception) guardado en: {response_file}")
+            except Exception as e2:
+                logger.warning(f"Error al guardar archivos XML de debug: {e2}")
+                
         except Exception as e:
             logger.warning(f"Error al guardar HTTP debug: {e}")
 
@@ -1036,8 +1289,9 @@ class SoapClient:
             # Parsear el SOAP
             root = etree.fromstring(soap_bytes)
 
-            # Namespaces esperados
-            expected_ns = {SOAP_NS, SIFEN_NS, DS_NS}
+            # Namespaces esperados (SOAP 1.1 y 1.2, SIFEN, XMLDSig)
+            SOAP_NS_11 = "http://schemas.xmlsoap.org/soap/envelope/"
+            expected_ns = {SOAP_NS, SOAP_NS_11, SIFEN_NS, DS_NS}
 
             # Recopilar elementos con namespaces raros
             rare_elements = []
@@ -1222,71 +1476,191 @@ class SoapClient:
             method="xml",
         )
 
-        # Obtener WSDL URL y extraer SOAP address usando mTLS
+        # Validaciones locales ANTES de enviar (falla rápido)
+        # 1. Extraer xDE (Base64 ZIP) y validar
+        xde_elem = xml_root.find(f".//{{{SIFEN_NS}}}xDE")
+        if xde_elem is None:
+            xde_elem = xml_root.find(".//xDE")
+        
+        if xde_elem is not None and xde_elem.text:
+            import base64
+            import zipfile
+            import hashlib
+            from io import BytesIO
+            
+            xde_base64 = xde_elem.text.strip()
+            
+            # Validar que el Base64 no tenga espacios/whitespace extra
+            if xde_base64 != xde_elem.text:
+                logger.warning("xDE Base64 contiene whitespace extra (será eliminado al decodificar)")
+            
+            try:
+                # Decodificar Base64
+                zip_bytes = base64.b64decode(xde_base64)
+                zip_sha256 = hashlib.sha256(zip_bytes).hexdigest()
+                logger.debug(f"ZIP SHA256: {zip_sha256}")
+                print(f"📦 ZIP SHA256: {zip_sha256}")  # Para reproducibilidad
+                
+                # Descomprimir y verificar que lote.xml existe
+                with zipfile.ZipFile(BytesIO(zip_bytes), mode='r') as zf:
+                    namelist = zf.namelist()
+                    if "lote.xml" not in namelist:
+                        raise SifenClientError(f"ZIP no contiene 'lote.xml'. Archivos encontrados: {namelist}")
+                    
+                    # Leer y parsear lote.xml para verificar que es well-formed
+                    lote_xml_bytes = zf.read("lote.xml")
+                    try:
+                        lote_root = etree.fromstring(lote_xml_bytes)
+                        logger.debug(f"lote.xml es well-formed, root: {etree.QName(lote_root).localname}")
+                    except etree.XMLSyntaxError as e:
+                        raise SifenClientError(f"lote.xml dentro del ZIP no es well-formed XML: {e}")
+                
+            except zipfile.BadZipFile as e:
+                raise SifenClientError(f"xDE no es un ZIP válido: {e}")
+            except ValueError as e:
+                # base64.b64decode puede lanzar binascii.Error (que es ValueError)
+                if "base64" in str(type(e)).lower() or "Invalid base64" in str(e) or "incorrect padding" in str(e).lower():
+                    raise SifenClientError(f"xDE no es Base64 válido: {e}")
+                raise SifenClientError(f"Error al validar xDE/ZIP: {e}")
+            except SifenClientError:
+                raise  # Re-raise SifenClientError tal cual
+            except Exception as e:
+                raise SifenClientError(f"Error al validar xDE/ZIP: {e}")
+
+        # WSDL-driven: inspeccionar WSDL para construir request exacto
         service_key = "recibe_lote"
         wsdl_url = self._normalize_wsdl_url(
             self.config.get_soap_service_url(service_key)
         )
         
-        # Extraer SOAP address del WSDL usando el transporte mTLS
-        if service_key not in self._soap_address:
-            soap_address = self._extract_soap_address_from_wsdl(wsdl_url)
-            if soap_address:
-                self._soap_address[service_key] = soap_address
-            else:
-                raise SifenClientError(
-                    f"No se pudo extraer SOAP address del WSDL: {wsdl_url}"
-                )
+        # Inspeccionar WSDL (con cache opcional)
+        wsdl_info = None
+        wsdl_cache_path = Path("/tmp/recibe-lote.wsdl")
+        wsdl_inspected_path = Path("artifacts/wsdl_inspected.json")
         
-        post_url = self._soap_address[service_key]
+        if inspect_wsdl is None:
+            raise SifenClientError("wsdl_introspect no disponible. Instalar dependencias.")
         
-        # Construir SOAP 1.2 envelope con Header vacío y Body con rEnvioLote directo (SIN prefijo, namespace default)
-        # Según WSDL document/literal: el elemento debe estar en namespace default, no con prefijo
+        # Intentar usar WSDL cacheado local si existe
+        wsdl_source = wsdl_url
+        if wsdl_cache_path.exists():
+            try:
+                wsdl_info = inspect_wsdl(str(wsdl_cache_path))
+                logger.debug(f"Usando WSDL cacheado: {wsdl_cache_path}")
+            except Exception as e:
+                logger.debug(f"No se pudo usar WSDL cacheado: {e}, usando URL")
+        
+        # Si no hay cache o falló, intentar desde URL con mTLS
+        if wsdl_info is None:
+            try:
+                # Para descargar WSDL con mTLS, usar el transport session
+                session = self.transport.session
+                resp_wsdl = session.get(wsdl_url, timeout=(self.connect_timeout, self.read_timeout))
+                resp_wsdl.raise_for_status()
+                wsdl_content = resp_wsdl.content
+                
+                # Guardar en cache
+                wsdl_cache_path.parent.mkdir(parents=True, exist_ok=True)
+                wsdl_cache_path.write_bytes(wsdl_content)
+                
+                wsdl_info = inspect_wsdl(str(wsdl_cache_path))
+            except Exception as e:
+                raise SifenClientError(f"Error al inspeccionar WSDL: {e}")
+        
+        # Guardar información del WSDL inspeccionado
+        if save_wsdl_inspection is not None:
+            try:
+                save_wsdl_inspection(wsdl_info, wsdl_inspected_path)
+            except Exception:
+                pass  # No crítico si falla guardar
+        
+        # Usar información del WSDL para construir request
+        # POST URL: usar el WSDL URL pero sin ?wsdl (según evidencia externa)
+        wsdl_url_clean = wsdl_url.split("?")[0]  # Quitar query string (?wsdl)
+        post_url = wsdl_url_clean  # POST a la URL del WSDL sin query
+        body_root_qname = wsdl_info["body_root_qname"]
+        is_wrapped = wsdl_info["is_wrapped"]
+        soap_action = wsdl_info["soap_action"]
+        action_required = wsdl_info["action_required"]
+        soap_version = wsdl_info["soap_version"]
+        target_ns = wsdl_info["target_namespace"]
+        
+        # Construir envelope SOAP según versión del WSDL
+        if soap_version == "1.2":
+            soap_env_ns = "http://www.w3.org/2003/05/soap-envelope"
+        else:
+            soap_env_ns = "http://schemas.xmlsoap.org/soap/envelope/"
+        
         envelope = etree.Element(
-            f"{{{SOAP_NS}}}Envelope",
-            nsmap={"soap-env": SOAP_NS}
+            f"{{{soap_env_ns}}}Envelope",
+            nsmap={"soap": soap_env_ns, "xsd": SIFEN_NS}
         )
         
-        # Header vacío (NO HeaderMsg)
-        header = etree.SubElement(envelope, f"{{{SOAP_NS}}}Header")
+        # Header vacío
+        header = etree.SubElement(envelope, f"{{{soap_env_ns}}}Header")
         
-        # Body con rEnvioLote directo (SIN wrapper siRecepLoteDE, SIN prefijo xsd)
-        body = etree.SubElement(envelope, f"{{{SOAP_NS}}}Body")
+        # Body según estilo (wrapped o bare)
+        body = etree.SubElement(envelope, f"{{{soap_env_ns}}}Body")
         
-        # Parsear rEnvioLote y reconstruirlo en namespace default (sin prefijo)
+        # Parsear rEnvioLote y reconstruirlo según el WSDL
         r_envio_lote_elem = etree.fromstring(r_envio_lote_content)
         
-        # Crear nuevo rEnvioLote en namespace default (sin prefijo)
-        # Esto es crítico: según WSDL document/literal, el elemento debe estar en namespace default
-        r_envio_lote_default = etree.Element(
-            etree.QName(SIFEN_NS, "rEnvioLote"),
-            nsmap={None: SIFEN_NS}  # Namespace default, sin prefijo
-        )
-        
-        # Copiar hijos (dId y xDE) en namespace default
-        for child in r_envio_lote_elem:
-            child_local = etree.QName(child).localname
-            new_child = etree.SubElement(
-                r_envio_lote_default,
-                etree.QName(SIFEN_NS, child_local)  # En namespace SIFEN, sin prefijo
+        if is_wrapped:
+            # Wrapped: crear wrapper con nombre de operación, y dentro rEnvioLote
+            wrapper = etree.SubElement(
+                body,
+                etree.QName(target_ns, wsdl_info["operation_name"]),
+                nsmap={"tns": target_ns}
             )
-            new_child.text = child.text
-            new_child.tail = child.tail
-            # Copiar atributos si los hay
-            for attr_name, attr_value in child.attrib.items():
-                new_child.set(attr_name, attr_value)
-        
-        body.append(r_envio_lote_default)
+            
+            # Crear rEnvioLote con prefijo xsd: dentro del wrapper
+            r_envio_lote_prefixed = etree.Element(
+                etree.QName(SIFEN_NS, "rEnvioLote"),
+                nsmap={"xsd": SIFEN_NS}
+            )
+            
+            # Copiar hijos
+            for child in r_envio_lote_elem:
+                child_local = etree.QName(child).localname
+                new_child = etree.SubElement(
+                    r_envio_lote_prefixed,
+                    etree.QName(SIFEN_NS, child_local)
+                )
+                new_child.text = child.text
+                new_child.tail = child.tail
+                for attr_name, attr_value in child.attrib.items():
+                    new_child.set(attr_name, attr_value)
+            
+            wrapper.append(r_envio_lote_prefixed)
+        else:
+            # Bare: rEnvioLote va directamente en el Body
+            r_envio_lote_prefixed = etree.Element(
+                etree.QName(body_root_qname["namespace"], body_root_qname["localname"]),
+                nsmap={"xsd": body_root_qname["namespace"]}
+            )
+            
+            # Copiar hijos
+            for child in r_envio_lote_elem:
+                child_local = etree.QName(child).localname
+                new_child = etree.SubElement(
+                    r_envio_lote_prefixed,
+                    etree.QName(SIFEN_NS, child_local)
+                )
+                new_child.text = child.text
+                new_child.tail = child.tail
+                for attr_name, attr_value in child.attrib.items():
+                    new_child.set(attr_name, attr_value)
+            
+            body.append(r_envio_lote_prefixed)
         
         soap_bytes = etree.tostring(
             envelope, xml_declaration=True, encoding="UTF-8", pretty_print=False
         )
         
-        # Headers SOAP 1.2
-        # Según WSDL: soapAction="" y soapActionRequired="false"
-        # NO incluir action= en Content-Type (SOAP 1.2 sin action requerido)
-        headers = {
-            "Content-Type": "application/soap+xml; charset=utf-8",
+        # Headers FINALES (según evidencia externa: application/xml sin action)
+        # IMPORTANTE: Construir UNA sola vez y usar para POST y debug
+        headers_final = {
+            "Content-Type": "application/xml; charset=utf-8",
             "Accept": "application/soap+xml, text/xml, */*",
         }
         
@@ -1308,7 +1682,7 @@ class SoapClient:
             resp = session.post(
                 post_url,
                 data=soap_bytes,
-                headers=headers,
+                headers=headers_final,  # Usar headers_final único
                 timeout=(self.connect_timeout, self.read_timeout),
             )
             
@@ -1321,18 +1695,43 @@ class SoapClient:
             except Exception:
                 pass
             
-            # Verificar estructura del SOAP para debug
-            soap_str = soap_bytes.decode("utf-8", errors="replace")
-            body_has_wrapper = "<siRecepLoteDE" in soap_str
-            body_has_renviolote = "<xsd:rEnvioLote" in soap_str or ("<rEnvioLote" in soap_str and 'xmlns:xsd="http://ekuatia.set.gov.py/sifen/xsd"' in soap_str)
+            # Extraer información del body para debug (WSDL-driven)
+            body_root_qname_sent = f"{body_root_qname['namespace']}:{body_root_qname['localname']}"
+            body_children_sent = []
+            xde_base64_len = None
+            xde_base64_has_whitespace = False
             
-            # Guardar debug
+            try:
+                soap_root = etree.fromstring(soap_bytes)
+                body_elem = soap_root.find(f".//{{{soap_env_ns}}}Body")
+                if body_elem is not None and len(body_elem) > 0:
+                    first_child = body_elem[0]
+                    body_root_localname = etree.QName(first_child).localname
+                    if "}" in first_child.tag:
+                        body_root_ns = first_child.tag.split("}", 1)[0][1:]
+                    else:
+                        body_root_ns = first_child.nsmap.get(None) or target_ns
+                    
+                    # Obtener hijos
+                    for child in first_child:
+                        child_qname = f"{etree.QName(child).namespace}:{etree.QName(child).localname}"
+                        body_children_sent.append(child_qname)
+                        
+                        # Buscar xDE y analizar Base64
+                        if etree.QName(child).localname == "xDE" and child.text:
+                            xde_base64 = child.text.strip()
+                            xde_base64_len = len(xde_base64)
+                            xde_base64_has_whitespace = xde_base64 != child.text
+            except Exception:
+                pass
+            
+            # Guardar debug con información WSDL-driven (usar headers_final único)
             self._save_http_debug(
                 post_url=post_url,
                 original_url=wsdl_url,
-                version="1.2",
-                action="siRecepLoteDE",
-                headers=headers,
+                version=soap_version,
+                action="",  # No action según evidencia externa
+                headers=headers_final,  # Usar headers_final único
                 soap_bytes=soap_bytes,
                 response_status=resp.status_code,
                 response_headers=dict(resp.headers),
@@ -1342,9 +1741,28 @@ class SoapClient:
                 wsdl_url=wsdl_url,
                 soap_address=post_url,
                 response_root=resp_root_localname,
-                body_has_wrapper_sireceplotede=body_has_wrapper,
-                body_has_renviolote=body_has_renviolote,
+                wsdl_info=wsdl_info,
+                body_root_qname_sent=body_root_qname_sent,
+                body_children_sent=body_children_sent,
+                xde_base64_len=xde_base64_len,
+                xde_base64_has_whitespace=xde_base64_has_whitespace,
             )
+            
+            # Verificar que la respuesta sea rResEnviLoteDe (no rRetEnviDe)
+            # Si viene rRetEnviDe, significa que el servidor enrutó a recepción individual (routing incorrecto)
+            resp_body_str = resp.content.decode("utf-8", errors="replace")
+            has_r_res_envi_lote_de = "<rResEnviLoteDe" in resp_body_str or "<rResEnviLoteDe" in resp_body_str
+            has_r_ret_envi_de = "<rRetEnviDe" in resp_body_str or "<rRetEnviDe" in resp_body_str
+            
+            if has_r_ret_envi_de and not has_r_res_envi_lote_de:
+                # El servidor respondió con rRetEnviDe, lo que indica routing incorrecto
+                error_msg = (
+                    "Servidor respondió rRetEnviDe; esto indica que NO se enrutó a recibe-lote. "
+                    "Revisar action/headers/endpoint. "
+                    f"Response preview: {resp_body_str[:500]}"
+                )
+                self._save_raw_soap_debug(soap_bytes, resp.content, suffix="_lote")
+                raise SifenClientError(error_msg)
             
             # Verificar éxito
             is_success = False
@@ -1353,8 +1771,7 @@ class SoapClient:
             else:
                 # Verificar si hay respuesta XML válida aunque HTTP != 200
                 try:
-                    resp_body_str = resp.content.decode("utf-8", errors="replace")
-                    if "<rResEnviLoteDe" in resp_body_str or "<rRetEnviDe" in resp_body_str or "<dCodRes>" in resp_body_str:
+                    if has_r_res_envi_lote_de or has_r_ret_envi_de or "<dCodRes>" in resp_body_str:
                         is_success = True
                 except Exception:
                     pass
@@ -1379,16 +1796,69 @@ class SoapClient:
         except Exception as e:
             # Verificar estructura del SOAP para debug
             soap_str = soap_bytes.decode("utf-8", errors="replace")
-            body_has_wrapper = "<siRecepLoteDE" in soap_str
+            body_has_wrapper = "<siRecepLoteDE" in soap_str or "<tns:siRecepLoteDE" in soap_str
             body_has_renviolote = "<xsd:rEnvioLote" in soap_str or ("<rEnvioLote" in soap_str and 'xmlns:xsd="http://ekuatia.set.gov.py/sifen/xsd"' in soap_str)
             
-            # Guardar debug incluso en error
+            # Extraer información del body para debug
+            body_root_localname = None
+            body_root_ns = None
+            body_wrapper_localname = None
+            body_wrapper_ns = None
+            body_preview = None
+            try:
+                soap_root = etree.fromstring(soap_bytes)
+                body_elem = soap_root.find(f".//{{{SOAP_NS}}}Body")
+                if body_elem is not None and len(body_elem) > 0:
+                    first_child = body_elem[0]
+                    body_root_localname = etree.QName(first_child).localname
+                    # Detectar namespace: puede estar en el tag {ns}local o en nsmap
+                    # El root del Body ahora es siRecepLoteDE (TARGET_NS)
+                    if "}" in first_child.tag:
+                        body_root_ns = first_child.tag.split("}", 1)[0][1:]
+                    else:
+                        # Buscar en nsmap (puede estar como None o como prefijo)
+                        body_root_ns = first_child.nsmap.get(None)
+                        if not body_root_ns:
+                            # Buscar por valor del namespace en nsmap
+                            for prefix, ns in first_child.nsmap.items():
+                                if ns == SIFEN_NS:
+                                    body_root_ns = ns
+                                    break
+                        body_root_ns = body_root_ns or None
+                    # Verificar si hay wrapper (rEnvioLote dentro de siRecepLoteDE)
+                    if len(first_child) > 0:
+                        wrapper_child = first_child[0]
+                        body_wrapper_localname = etree.QName(wrapper_child).localname
+                        if "}" in wrapper_child.tag:
+                            body_wrapper_ns = wrapper_child.tag.split("}", 1)[0][1:]
+                        else:
+                            body_wrapper_ns = wrapper_child.nsmap.get(None)
+                            if not body_wrapper_ns:
+                                # Buscar por valor del namespace en nsmap (SIFEN_NS para rEnvioLote)
+                                for prefix, ns in wrapper_child.nsmap.items():
+                                    if ns == SIFEN_NS:
+                                        body_wrapper_ns = ns
+                                        break
+                            body_wrapper_ns = body_wrapper_ns or None
+                    # Preview de los primeros 300 caracteres del body
+                    body_xml = etree.tostring(body_elem, encoding="unicode", pretty_print=False)
+                    body_preview = body_xml[:300]
+            except Exception:
+                pass  # Si falla, dejar valores None
+            
+            # Guardar debug incluso en error (usar headers_final si existe, sino construir mínimo)
+            if 'headers_final' not in locals():
+                headers_final = {
+                    "Content-Type": 'application/soap+xml; charset=utf-8; action="rEnvioLote"',
+                    "SOAPAction": '"rEnvioLote"',
+                    "Accept": "application/soap+xml, text/xml, */*",
+                }
             self._save_http_debug(
                 post_url=post_url,
                 original_url=wsdl_url,
                 version="1.2",
-                action="siRecepLoteDE",
-                headers=headers,
+                action="",  # No action según evidencia externa
+                headers=headers_final,
                 soap_bytes=soap_bytes,
                 response_status=None,
                 response_headers=None,
@@ -1400,77 +1870,515 @@ class SoapClient:
                 response_root=None,
                 body_has_wrapper_sireceplotede=body_has_wrapper,
                 body_has_renviolote=body_has_renviolote,
+                body_root_localname=body_root_localname,
+                body_root_ns=body_root_ns,
+                body_wrapper_localname=body_wrapper_localname,
+                body_wrapper_ns=body_wrapper_ns,
+                body_preview=body_preview,
             )
             self._save_raw_soap_debug(soap_bytes, None, suffix="_lote")
             raise SifenClientError(f"Error al enviar SOAP a SIFEN: {e}") from e
 
-    def consulta_lote(self, xml_renvi_cons_lote_de: str, timeout: int = 60) -> Dict[str, Any]:
-        """Envía un rEnviConsLoteDe (siConsLoteDE) a SIFEN vía SOAP 1.2 (RAW).
+    def _detect_xsd_dir(self) -> Optional[Path]:
+        """
+        Detecta automáticamente el directorio XSD.
+        
+        Prioridad:
+        1. SIFEN_XSD_DIR env var
+        2. rshk-jsifenlib/docs/set/ekuatia.set.gov.py/sifen/xsd (relativo desde repo root)
+        3. None (no encontrado)
+        """
+        xsd_dir_env = os.getenv("SIFEN_XSD_DIR")
+        if xsd_dir_env:
+            xsd_path = Path(xsd_dir_env)
+            if xsd_path.exists():
+                return xsd_path.resolve()
+        
+        # Buscar rshk-jsifenlib desde repo root (asumiendo que estamos en tesaka-cv/)
+        # Intentar múltiples paths posibles
+        possible_roots = [
+            Path(__file__).parent.parent.parent,  # tesaka-cv/ desde app/sifen_client/
+            Path(__file__).parent.parent.parent.parent,  # repo root desde tesaka-cv/
+        ]
+        
+        for repo_root in possible_roots:
+            xsd_path = repo_root / "rshk-jsifenlib" / "docs" / "set" / "ekuatia.set.gov.py" / "sifen" / "xsd"
+            if xsd_path.exists():
+                return xsd_path.resolve()
+        
+        return None
+    
+    def _find_consulta_lote_request_root_from_xsd(self, xsd_dir: Path) -> Optional[str]:
+        """
+        Busca el elemento root del request de consulta lote en los XSD locales.
+        
+        Busca un xs:element global cuyo complexType/sequence contenga un xs:element
+        con name="dProtConsLote".
         
         Args:
-            xml_renvi_cons_lote_de: XML del rEnviConsLoteDe (string o bytes)
-            timeout: Timeout en segundos (se usa en _post_raw_soap)
+            xsd_dir: Directorio donde buscar XSDs
             
         Returns:
-            Dict con response_xml, cod_res_lot, msg_res_lot, etc.
+            Nombre del elemento root (ej: "rEnviConsLoteDe") o None si no se encuentra
         """
-        service_key = "consulta_lote"
-        service_action = "siConsLoteDE"
+        import lxml.etree as etree
         
-        if isinstance(xml_renvi_cons_lote_de, bytes):
-            xml_renvi_cons_lote_de = xml_renvi_cons_lote_de.decode("utf-8")
+        NS_XSD = "http://www.w3.org/2001/XMLSchema"
+        SIFEN_NS = "http://ekuatia.set.gov.py/sifen/xsd"
         
-        self._validate_size(service_action, xml_renvi_cons_lote_de)
+        # Buscar XSDs que contengan "ConsLote" (pero NO "Cons" solo, para evitar consultas individuales)
+        xsd_files = list(xsd_dir.glob("*ConsLote*.xsd"))
         
-        # Validación mínima: verificar que el root sea rEnviConsLoteDe
-        import lxml.etree as etree  # noqa: F401
+        if not xsd_files:
+            # Fallback: buscar cualquier XSD que contenga "Cons" y "Lote"
+            xsd_files = [
+                f for f in xsd_dir.glob("*.xsd")
+                if "Cons" in f.name and "Lote" in f.name and "ConsLote" in f.name
+            ]
         
-        try:
-            xml_root = etree.fromstring(xml_renvi_cons_lote_de.encode("utf-8"))
-        except Exception as e:
-            raise SifenClientError(f"Error al parsear XML rEnviConsLoteDe: {e}")
-        
-        # Verificar root (con o sin namespace)
-        expected_tag = f"{{{SIFEN_NS}}}rEnviConsLoteDe"
-        if xml_root.tag != expected_tag and xml_root.tag != "rEnviConsLoteDe":
+        for xsd_file in xsd_files:
             try:
-                if etree.QName(xml_root).localname != "rEnviConsLoteDe":
-                    raise SifenClientError(
-                        f"XML root debe ser 'rEnviConsLoteDe', encontrado: {xml_root.tag}"
-                    )
-            except Exception:
-                raise SifenClientError(
-                    f"XML root debe ser 'rEnviConsLoteDe', encontrado: {xml_root.tag}"
-                )
+                tree = etree.parse(str(xsd_file))
+                root = tree.getroot()
+                
+                # Buscar todos los xs:element globales
+                elements = root.findall(f".//{{{NS_XSD}}}element[@name]", namespaces={"xs": NS_XSD})
+                
+                for elem in elements:
+                    elem_name = elem.get("name")
+                    if not elem_name:
+                        continue
+                    
+                    # Buscar dentro del complexType/sequence si contiene dProtConsLote
+                    complex_type = elem.find(f"{{{NS_XSD}}}complexType", namespaces={"xs": NS_XSD})
+                    if complex_type is not None:
+                        sequence = complex_type.find(f"{{{NS_XSD}}}sequence", namespaces={"xs": NS_XSD})
+                        if sequence is not None:
+                            # Buscar elemento con name="dProtConsLote"
+                            for child in sequence.findall(f"{{{NS_XSD}}}element", namespaces={"xs": NS_XSD}):
+                                if child.get("name") == "dProtConsLote":
+                                    logger.debug(f"Encontrado request root '{elem_name}' en {xsd_file.name}")
+                                    return elem_name
+            except Exception as e:
+                logger.debug(f"Error al parsear {xsd_file.name}: {e}")
+                continue
         
-        # Re-serializar el XML para el envelope
-        r_envi_cons_lote_de_content = etree.tostring(
-            xml_root,
-            xml_declaration=False,
-            encoding="UTF-8",
-            pretty_print=False,
-            method="xml",
-        )
+        return None
+    
+    def _xsd_order_for_request_root(self, xsd_dir: Path, root_element_name: str) -> list[str]:
+        """
+        Devuelve lista de nombres de elementos hijos EN ORDEN (xs:sequence) del root global `root_element_name`.
+        Busca en todos los .xsd del directorio.
         
-        # Construir envelope SOAP 1.2 con el rEnviConsLoteDe embebido
-        soap_bytes = self._build_raw_envelope_with_original_content(
-            r_envi_cons_lote_de_content, action=service_action
-        )
+        Args:
+            xsd_dir: Directorio donde buscar XSDs
+            root_element_name: Nombre del elemento root (ej: "rEnviConsLoteDe")
+            
+        Returns:
+            Lista de nombres de elementos hijos en orden, o lista vacía si no se encuentra
+        """
+        import lxml.etree as etree
         
-        response_bytes = None
+        NS_XSD = "http://www.w3.org/2001/XMLSchema"
+        
+        # Buscar XSDs que contengan "ConsLote" para consulta lote
+        xsd_files = list(xsd_dir.glob("*ConsLote*.xsd"))
+        
+        if not xsd_files:
+            # Fallback: buscar cualquier XSD que contenga "Cons" y "Lote"
+            xsd_files = [
+                f for f in xsd_dir.glob("*.xsd")
+                if "Cons" in f.name and "Lote" in f.name and "ConsLote" in f.name
+            ]
+        
+        for xsd_file in xsd_files:
+            try:
+                tree = etree.parse(str(xsd_file))
+                root = tree.getroot()
+                
+                # Buscar el elemento global con el nombre especificado
+                # Soporta prefijos xs: y xsd:
+                namespaces = {
+                    "xs": NS_XSD,
+                    "xsd": NS_XSD,
+                }
+                
+                element = root.find(f".//xs:element[@name='{root_element_name}']", namespaces)
+                if element is None:
+                    # Intentar con otro namespace prefix
+                    element = root.find(f".//{{{NS_XSD}}}element[@name='{root_element_name}']")
+                
+                if element is None:
+                    continue
+                
+                # Buscar complexType (inline o por referencia type="...")
+                complex_type = element.find(f"xs:complexType", namespaces)
+                if complex_type is None:
+                    complex_type = element.find(f"{{{NS_XSD}}}complexType")
+                
+                if complex_type is None:
+                    # Si tiene type="...", necesitaríamos resolverlo (por ahora solo inline)
+                    continue
+                
+                # Buscar sequence dentro del complexType
+                sequence = complex_type.find(f"xs:sequence", namespaces)
+                if sequence is None:
+                    sequence = complex_type.find(f"{{{NS_XSD}}}sequence")
+                
+                if sequence is None:
+                    continue
+                
+                # Extraer nombres de elementos hijos en orden
+                children_order = []
+                for child_elem in sequence.findall(f"xs:element", namespaces):
+                    child_name = child_elem.get("name")
+                    if child_name:
+                        children_order.append(child_name)
+                
+                # También intentar con namespace completo si no se encontró nada
+                if not children_order:
+                    for child_elem in sequence.findall(f"{{{NS_XSD}}}element"):
+                        child_name = child_elem.get("name")
+                        if child_name:
+                            children_order.append(child_name)
+                
+                if children_order:
+                    logger.debug(f"Orden XSD para {root_element_name}: {children_order} (desde {xsd_file.name})")
+                    return children_order
+                    
+            except Exception as e:
+                logger.debug(f"Error al parsear {xsd_file.name} para orden: {e}")
+                continue
+        
+        return []
+    
+    def consulta_lote_de(self, dprot_cons_lote: str, did: int = 1) -> Dict[str, Any]:
+        """Consulta estado de lote (siConsLoteDE) a SIFEN usando zeep Client (WSDL-driven).
+        
+        Usa zeep Client para construir el SOAP envelope correctamente según el WSDL.
+        Incluye retries solo para errores de conexión (ConnectionReset, timeouts).
+        Si HTTP=400 y dCodRes=0160, NO reintenta: devuelve error inmediato.
+        
+        Args:
+            dprot_cons_lote: dProtConsLote (número de lote devuelto por siRecepLoteDE)
+            did: dId (default: 1)
+            
+        Returns:
+            Dict con ok, codigo_respuesta, mensaje, parsed_fields, response_xml, etc.
+        """
+        import lxml.etree as etree
+        from pathlib import Path
+        
+        service_key = "consulta_lote"
+        operation_name = "siConsLoteDE"
+        
+        # Obtener cliente zeep para consulta_lote
         try:
-            response_bytes = self._post_raw_soap(service_key, soap_bytes)
-            self._save_raw_soap_debug(soap_bytes, response_bytes, suffix="_consulta")
-        except Exception:
-            self._save_raw_soap_debug(soap_bytes, None, suffix="_consulta")
-            raise
-        
-        try:
-            resp_root = etree.fromstring(response_bytes)
+            client = self._get_client(service_key)
         except Exception as e:
-            raise SifenClientError(f"Error al parsear respuesta XML de SIFEN: {e}")
+            raise SifenClientError(f"Error al obtener cliente zeep para {service_key}: {e}")
         
-        return self._parse_consulta_lote_response_from_xml(resp_root)
+        # Obtener history plugin si está disponible (para debug)
+        history = None
+        debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+        if debug_enabled and hasattr(self, "_history_plugins") and service_key in self._history_plugins:
+            history = self._history_plugins[service_key]
+        
+        # Construir parámetros para la operación
+        # Según el WSDL, la operación siConsLoteDE espera rEnviConsLoteDe con dId y dProtConsLote
+        try:
+            # Intentar llamar a la operación usando zeep
+            # zeep puede requerir diferentes formas según el binding del WSDL
+            # Primero intentar con el formato más común (dict con estructura del tipo)
+            request_data = {
+                "dId": str(did),
+                "dProtConsLote": str(dprot_cons_lote)
+            }
+            
+            # Llamar a la operación
+            # zeep puede requerir el wrapper o no, dependiendo del WSDL
+            # Intentar primero sin wrapper (bare style)
+            try:
+                result = client.service.siConsLoteDE(**request_data)
+            except (Fault, TransportError, AttributeError) as e:
+                # Si falla, intentar con wrapper explícito
+                try:
+                    result = client.service.siConsLoteDE(rEnviConsLoteDe=request_data)
+                except (Fault, TransportError, AttributeError) as e2:
+                    # Si sigue fallando, intentar con estructura anidada
+                    try:
+                        result = client.service.siConsLoteDE(
+                            rEnviConsLoteDe={
+                                "dId": str(did),
+                                "dProtConsLote": str(dprot_cons_lote)
+                            }
+                        )
+                    except Exception as e3:
+                        # Si todos fallan, intentar obtener el mensaje desde el binding
+                        # y construir manualmente solo si es necesario
+                        raise SifenClientError(
+                            f"Error al llamar a {operation_name} con zeep. "
+                            f"Intentos fallaron: {e}, {e2}, {e3}. "
+                            f"Verificar estructura del WSDL."
+                        )
+            
+            # Guardar artifacts de debug si está habilitado
+            if debug_enabled and history:
+                try:
+                    artifacts_dir = Path("artifacts")
+                    artifacts_dir.mkdir(exist_ok=True)
+                    
+                    # Guardar request
+                    if hasattr(history, "last_sent") and history.last_sent:
+                        request_envelope = history.last_sent.get("envelope", "")
+                        if request_envelope:
+                            request_file = artifacts_dir / "consulta_last_request.xml"
+                            request_file.write_text(
+                                request_envelope.decode("utf-8", errors="ignore") if isinstance(request_envelope, bytes) else request_envelope,
+                                encoding="utf-8"
+                            )
+                    
+                    # Guardar response
+                    if hasattr(history, "last_received") and history.last_received:
+                        response_envelope = history.last_received.get("envelope", "")
+                        if response_envelope:
+                            response_file = artifacts_dir / "consulta_last_response.xml"
+                            response_file.write_text(
+                                response_envelope.decode("utf-8", errors="ignore") if isinstance(response_envelope, bytes) else response_envelope,
+                                encoding="utf-8"
+                            )
+                except Exception as debug_err:
+                    logger.warning(f"Error al guardar artifacts de consulta lote: {debug_err}")
+            
+            # Parsear respuesta XML desde history si está disponible
+            response_xml = ""
+            if history and hasattr(history, "last_received") and history.last_received:
+                response_envelope = history.last_received.get("envelope", "")
+                if response_envelope:
+                    response_xml = response_envelope.decode("utf-8", errors="ignore") if isinstance(response_envelope, bytes) else response_envelope
+            
+            # Construir respuesta en formato esperado
+            parsed_result = {
+                "ok": False,
+                "codigo_respuesta": None,
+                "mensaje": None,
+                "parsed_fields": {},
+                "response_xml": response_xml,
+            }
+            
+            # Extraer código y mensaje desde response_xml (más confiable)
+            if response_xml:
+                try:
+                    resp_root = etree.fromstring(response_xml.encode("utf-8") if isinstance(response_xml, str) else response_xml)
+                    
+                    # Extraer dCodResLot/dCodRes y dMsgResLot/dMsgRes
+                    cod_res = resp_root.xpath('//*[local-name()="dCodResLot"] | //*[local-name()="dCodRes"]')
+                    msg_res = resp_root.xpath('//*[local-name()="dMsgResLot"] | //*[local-name()="dMsgRes"]')
+                    if cod_res and cod_res[0].text:
+                        parsed_result["codigo_respuesta"] = cod_res[0].text.strip()
+                    if msg_res and msg_res[0].text:
+                        parsed_result["mensaje"] = msg_res[0].text.strip()
+                    
+                    # Extraer gResProcLote (lista de resultados por DE)
+                    g_res_proc_lote = resp_root.xpath('//*[local-name()="gResProcLote"]')
+                    if g_res_proc_lote:
+                        de_results = []
+                        for de_elem in g_res_proc_lote[0].xpath('.//*[local-name()="dResProc"]'):
+                            de_result = {}
+                            # Extraer campos comunes de dResProc
+                            for child in de_elem:
+                                local_name = etree.QName(child.tag).localname
+                                if child.text:
+                                    de_result[local_name] = child.text.strip()
+                            if de_result:
+                                de_results.append(de_result)
+                        if de_results:
+                            parsed_result["parsed_fields"]["gResProcLote"] = de_results
+                except Exception as parse_err:
+                    logger.debug(f"Error al parsear response_xml: {parse_err}")
+                    pass
+            
+            # También intentar extraer desde result (zeep puede devolver objetos complejos)
+            try:
+                # Convertir resultado de zeep a dict si es posible
+                if serialize_object:
+                    result_dict = serialize_object(result)
+                    if isinstance(result_dict, dict):
+                        parsed_result["parsed_fields"] = result_dict
+                        if not parsed_result["codigo_respuesta"]:
+                            parsed_result["codigo_respuesta"] = result_dict.get("dCodResLot") or result_dict.get("dCodRes")
+                        if not parsed_result["mensaje"]:
+                            parsed_result["mensaje"] = result_dict.get("dMsgResLot") or result_dict.get("dMsgRes")
+                elif hasattr(result, "__dict__"):
+                    parsed_result["parsed_fields"] = result.__dict__
+                elif isinstance(result, dict):
+                    parsed_result["parsed_fields"] = result
+                    if not parsed_result["codigo_respuesta"]:
+                        parsed_result["codigo_respuesta"] = result.get("dCodResLot") or result.get("dCodRes")
+                    if not parsed_result["mensaje"]:
+                        parsed_result["mensaje"] = result.get("dMsgResLot") or result.get("dMsgRes")
+                else:
+                    # Fallback: convertir a string
+                    parsed_result["parsed_fields"] = {"result": str(result)}
+            except Exception:
+                # Si falla la conversión, continuar con parsed_fields vacío
+                pass
+            
+            # Determinar éxito
+            codigo = parsed_result["codigo_respuesta"]
+            if codigo in ("0361", "0362"):
+                parsed_result["ok"] = True
+            elif codigo == "0160":
+                # XML Mal Formado: no reintentar, devolver error inmediato
+                error_msg = f"Error 0160 (XML Mal Formado) en consulta lote. Mensaje: {parsed_result.get('mensaje', 'N/A')}"
+                if debug_enabled:
+                    error_msg += f"\nResponse guardado en artifacts/consulta_last_response.xml"
+                raise SifenClientError(error_msg)
+            
+            return parsed_result
+            
+        except SifenClientError:
+            raise  # Re-raise SifenClientError tal cual
+        except ConnectionResetError as e:
+            # Reintentar solo para ConnectionResetError (máximo 2 veces)
+            delays = [0.4, 0.8]
+            last_exception = e
+            for attempt in range(2):
+                try:
+                    time.sleep(delays[attempt] if attempt < len(delays) else delays[-1])
+                    logger.debug(f"ConnectionResetError en consulta lote, reintentando {attempt + 1}/2...")
+                    # Reintentar la llamada
+                    result = client.service.siConsLoteDE(
+                        rEnviConsLoteDe={
+                            "dId": str(did),
+                            "dProtConsLote": str(dprot_cons_lote)
+                        }
+                    )
+                    # Si llegamos aquí, el reintento funcionó
+                    # Parsear respuesta (mismo código de arriba)
+                    response_xml = ""
+                    if history and hasattr(history, "last_received") and history.last_received:
+                        response_envelope = history.last_received.get("envelope", "")
+                        if response_envelope:
+                            response_xml = response_envelope.decode("utf-8", errors="ignore") if isinstance(response_envelope, bytes) else response_envelope
+                    
+                    parsed_result = {
+                        "ok": False,
+                        "codigo_respuesta": None,
+                        "mensaje": None,
+                        "parsed_fields": {},
+                        "response_xml": response_xml,
+                    }
+                    
+                    if response_xml:
+                        try:
+                            resp_root = etree.fromstring(response_xml.encode("utf-8") if isinstance(response_xml, str) else response_xml)
+                            
+                            # Extraer dCodResLot/dCodRes y dMsgResLot/dMsgRes
+                            cod_res = resp_root.xpath('//*[local-name()="dCodResLot"] | //*[local-name()="dCodRes"]')
+                            msg_res = resp_root.xpath('//*[local-name()="dMsgResLot"] | //*[local-name()="dMsgRes"]')
+                            if cod_res and cod_res[0].text:
+                                parsed_result["codigo_respuesta"] = cod_res[0].text.strip()
+                            if msg_res and msg_res[0].text:
+                                parsed_result["mensaje"] = msg_res[0].text.strip()
+                            
+                            # Extraer gResProcLote (lista de resultados por DE)
+                            g_res_proc_lote = resp_root.xpath('//*[local-name()="gResProcLote"]')
+                            if g_res_proc_lote:
+                                de_results = []
+                                for de_elem in g_res_proc_lote[0].xpath('.//*[local-name()="dResProc"]'):
+                                    de_result = {}
+                                    for child in de_elem:
+                                        local_name = etree.QName(child.tag).localname
+                                        if child.text:
+                                            de_result[local_name] = child.text.strip()
+                                    if de_result:
+                                        de_results.append(de_result)
+                                if de_results:
+                                    parsed_result["parsed_fields"]["gResProcLote"] = de_results
+                        except Exception:
+                            pass
+                    
+                    # También intentar desde result
+                    try:
+                        if serialize_object:
+                            result_dict = serialize_object(result)
+                            if isinstance(result_dict, dict):
+                                parsed_result["parsed_fields"] = result_dict
+                                if not parsed_result["codigo_respuesta"]:
+                                    parsed_result["codigo_respuesta"] = result_dict.get("dCodResLot") or result_dict.get("dCodRes")
+                                if not parsed_result["mensaje"]:
+                                    parsed_result["mensaje"] = result_dict.get("dMsgResLot") or result_dict.get("dMsgRes")
+                        elif isinstance(result, dict):
+                            parsed_result["parsed_fields"] = result
+                            if not parsed_result["codigo_respuesta"]:
+                                parsed_result["codigo_respuesta"] = result.get("dCodResLot") or result.get("dCodRes")
+                            if not parsed_result["mensaje"]:
+                                parsed_result["mensaje"] = result.get("dMsgResLot") or result.get("dMsgRes")
+                    except Exception:
+                        pass
+                    
+                    codigo = parsed_result["codigo_respuesta"]
+                    if codigo in ("0361", "0362"):
+                        parsed_result["ok"] = True
+                    elif codigo == "0160":
+                        error_msg = f"Error 0160 (XML Mal Formado) en consulta lote. Mensaje: {parsed_result.get('mensaje', 'N/A')}"
+                        if debug_enabled:
+                            error_msg += f"\nResponse guardado en artifacts/consulta_last_response.xml"
+                        raise SifenClientError(error_msg)
+                    
+                    return parsed_result
+                except ConnectionResetError:
+                    last_exception = e
+                    continue
+                except Exception as retry_e:
+                    # Otro tipo de error en el reintento: lanzar el error original
+                    raise last_exception from retry_e
+            
+            # Si llegamos aquí, todos los reintentos fallaron
+            raise SifenClientError(f"ConnectionResetError después de 2 reintentos: {last_exception}") from last_exception
+        except Fault as e:
+            # Fault de SOAP: extraer información y lanzar SifenClientError
+            fault_code = getattr(e, "code", None)
+            fault_message = getattr(e, "message", str(e))
+            
+            # Guardar artifacts si está habilitado
+            if debug_enabled and history:
+                try:
+                    artifacts_dir = Path("artifacts")
+                    artifacts_dir.mkdir(exist_ok=True)
+                    if hasattr(history, "last_sent") and history.last_sent:
+                        request_envelope = history.last_sent.get("envelope", "")
+                        if request_envelope:
+                            request_file = artifacts_dir / "consulta_last_request.xml"
+                            request_file.write_text(
+                                request_envelope.decode("utf-8", errors="ignore") if isinstance(request_envelope, bytes) else request_envelope,
+                                encoding="utf-8"
+                            )
+                    if hasattr(history, "last_received") and history.last_received:
+                        response_envelope = history.last_received.get("envelope", "")
+                        if response_envelope:
+                            response_file = artifacts_dir / "consulta_last_response.xml"
+                            response_file.write_text(
+                                response_envelope.decode("utf-8", errors="ignore") if isinstance(response_envelope, bytes) else response_envelope,
+                                encoding="utf-8"
+                            )
+                except Exception:
+                    pass
+            
+            raise SifenClientError(f"SOAP Fault en consulta lote: {fault_message} (code: {fault_code})")
+        except TransportError as e:
+            # Error de transporte: puede ser timeout, conexión, etc.
+            error_msg = f"Error de transporte en consulta lote: {e}"
+            if debug_enabled and history:
+                error_msg += "\nArtifacts guardados en artifacts/consulta_last_*.xml"
+            raise SifenClientError(error_msg) from e
+        except Exception as e:
+            # Error inesperado
+            error_msg = f"Error inesperado en consulta lote: {e}"
+            if debug_enabled and history:
+                error_msg += "\nArtifacts guardados en artifacts/consulta_last_*.xml"
+            raise SifenClientError(error_msg) from e
 
     def _parse_consulta_lote_response_from_xml(self, xml_root: Any) -> Dict[str, Any]:
         """Parsea la respuesta de consulta de lote desde XML."""
@@ -1478,9 +2386,10 @@ class SoapClient:
         
         result: Dict[str, Any] = {
             "ok": False,
+            "codigo_respuesta": None,
+            "mensaje": None,
+            "parsed_fields": {},
             "response_xml": etree.tostring(xml_root, encoding="unicode"),
-            "cod_res_lot": None,
-            "msg_res_lot": None,
         }
         
         def find_text(xpath_expr: str) -> Optional[str]:
@@ -1494,11 +2403,27 @@ class SoapClient:
             return None
         
         # Buscar campos de respuesta de consulta lote
-        result["cod_res_lot"] = find_text('//*[local-name()="dCodResLot"]')
-        result["msg_res_lot"] = find_text('//*[local-name()="dMsgResLot"]')
+        # Pueden estar en diferentes ubicaciones según la estructura de respuesta
+        cod_res_lot = find_text('//*[local-name()="dCodResLot"]')
+        msg_res_lot = find_text('//*[local-name()="dMsgResLot"]')
+        
+        # También buscar dCodRes y dMsgRes (formato genérico)
+        if not cod_res_lot:
+            cod_res_lot = find_text('//*[local-name()="dCodRes"]')
+        if not msg_res_lot:
+            msg_res_lot = find_text('//*[local-name()="dMsgRes"]')
+        
+        result["codigo_respuesta"] = cod_res_lot
+        result["mensaje"] = msg_res_lot
+        result["parsed_fields"]["dCodResLot"] = cod_res_lot
+        result["parsed_fields"]["dMsgResLot"] = msg_res_lot
+        
+        # Buscar otros campos opcionales
+        d_prot_cons_lote = find_text('//*[local-name()="dProtConsLote"]')
+        if d_prot_cons_lote:
+            result["parsed_fields"]["dProtConsLote"] = d_prot_cons_lote
         
         # Determinar éxito basado en código
-        cod_res_lot = result.get("cod_res_lot", "")
         if cod_res_lot in ("0361", "0362"):
             result["ok"] = True
         elif cod_res_lot == "0364":
