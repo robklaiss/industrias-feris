@@ -3,6 +3,7 @@ Utilidades para manejo y limpieza de XML para SIFEN
 
 Según "Guía de Mejores Prácticas para la Gestión del Envío de DE" (Octubre 2024)
 """
+from lxml import etree
 import re
 from typing import Optional
 import xml.etree.ElementTree as ET

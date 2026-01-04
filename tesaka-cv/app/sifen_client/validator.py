@@ -2,6 +2,7 @@
 Validación de XML para SIFEN
 """
 import xml.etree.ElementTree as ET
+from lxml import etree
 from typing import Dict, Any, List, Optional
 from pathlib import Path
 import httpx

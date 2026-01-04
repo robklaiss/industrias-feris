@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DE xmlns="http://ekuatia.set.gov.py/sifen/xsd" Id="011234567A1747642286537210927750174764228653">
-    <dDVId>3</dDVId>
-    <dFecFirma>2025-12-29T20:44:54</dFecFirma>
+<DE xmlns="http://ekuatia.set.gov.py/sifen/xsd" Id="01045547378001001000000112026010111234567891">
+    <dDVId>1</dDVId>
+    <dFecFirma>2026-01-01T21:35:04</dFecFirma>
     <dSisFact>1</dSisFact>
     <gOpeDE>
         <iTipEmi>1</iTipEmi>
@@ -15,15 +15,15 @@
         <dEst>001</dEst>
         <dPunExp>001</dPunExp>
         <dNumDoc>0000001</dNumDoc>
-        <dFeIniT>2025-12-29</dFeIniT>
+        <dFeIniT>2026-01-01</dFeIniT>
     </gTimb>
     <gDatGralOpe>
-        <dFeEmiDE>2025-12-29T20:44:54</dFeEmiDE>
+        <dFeEmiDE>2026-01-01T21:35:04</dFeEmiDE>
         <gEmis>
             <dRucEm>4554737</dRucEm>
             <dDVEmi>8</dDVEmi>
             <iTipCont>1</iTipCont>
-            <dNomEmi>Contribuyente de Prueba S.A.</dNomEmi>
+            <dNomEmi>DE generado en ambiente de prueba - sin valor comercial ni fiscal</dNomEmi>
             <dDirEmi>Asunción</dDirEmi>
             <dNumCas>1234</dNumCas>
             <cDepEmi>1</cDepEmi>
@@ -41,7 +41,7 @@
             <iNatRec>1</iNatRec>
             <iTiOpe>1</iTiOpe>
             <cPaisRec>PRY</cPaisRec>
-            <dDesPaisRe>Paraguay</dDesPaisRe>
+            <dDesPaisRec>Paraguay</dDesPaisRec>
             <dRucRec>80012345</dRucRec>
             <dDVRec>7</dDVRec>
             <dNomRec>Cliente de Prueba</dNomRec>

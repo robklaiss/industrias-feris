@@ -4,6 +4,7 @@ Generador de XML para documentos electrónicos SIFEN
 Este módulo genera XML válido según el esquema SIFEN.
 TODO: Actualizar cuando se tenga el esquema XSD oficial completo.
 """
+from lxml import etree
 from typing import Dict, Any, Optional
 from datetime import datetime
 import xml.etree.ElementTree as ET
