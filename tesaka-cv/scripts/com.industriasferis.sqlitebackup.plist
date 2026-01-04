@@ -21,10 +21,10 @@
     </dict>
     
     <key>StandardOutPath</key>
-    <string>/Users/robinklaiss/backups/app/backup.log</string>
+    <string>/Users/TU_USUARIO/backups/app/backup.log</string>
     
     <key>StandardErrorPath</key>
-    <string>/Users/robinklaiss/backups/app/backup.err</string>
+    <string>/Users/TU_USUARIO/backups/app/backup.err</string>
     
     <key>RunAtLoad</key>
     <false/>
