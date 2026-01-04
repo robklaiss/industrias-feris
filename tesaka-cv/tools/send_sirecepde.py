@@ -21,11 +21,12 @@ import copy
 from lxml import etree
 import time
 from pathlib import Path
-from typing import Optional, Union, Tuple
+from typing import Optional, Union, Tuple, Dict, Any
 from datetime import datetime
 from io import BytesIO
 import base64
 import zipfile
+import json
 
 # Agregar el directorio padre al path para imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -4285,6 +4286,108 @@ def resolve_xml_path(xml_arg: str, artifacts_dir: Path) -> Path:
     return xml_path
 
 
+def _extract_ruc_from_cert(p12_path: str, p12_password: str) -> Optional[Dict[str, str]]:
+    """
+    Extrae el RUC del certificado P12/PFX.
+    
+    Busca el RUC en:
+    1. Subject DN: SERIALNUMBER o CN (formato "RUCxxxxxxx-y" o "xxxxxxx-y")
+    2. Subject Alternative Names (SAN): DirectoryName con SERIALNUMBER
+    
+    Args:
+        p12_path: Ruta al certificado P12/PFX
+        p12_password: Contraseña del certificado
+        
+    Returns:
+        Dict con:
+            - "ruc": número de RUC sin DV (ej: "4554737")
+            - "ruc_with_dv": RUC completo con DV si se encuentra (ej: "4554737-8")
+        None si no se puede extraer o si cryptography no está disponible
+    """
+    try:
+        from cryptography.hazmat.primitives.serialization import pkcs12
+        from cryptography.hazmat.backends import default_backend
+        from cryptography import x509
+    except ImportError:
+        return None
+    
+    try:
+        with open(p12_path, "rb") as f:
+            p12_bytes = f.read()
+        password_bytes = p12_password.encode("utf-8") if p12_password else None
+        
+        key_obj, cert_obj, _ = pkcs12.load_key_and_certificates(
+            p12_bytes, password_bytes, backend=default_backend()
+        )
+        
+        if cert_obj is None:
+            return None
+        
+        # Buscar RUC en Subject DN
+        subject = cert_obj.subject
+        ruc_with_dv = None
+        
+        # Buscar en SERIALNUMBER
+        for attr in subject:
+            if attr.oid == x509.NameOID.SERIAL_NUMBER:
+                serial = attr.value.strip()
+                # Puede ser "RUC4554737-8" o "4554737-8"
+                if serial.upper().startswith("RUC"):
+                    serial = serial[3:].strip()
+                if "-" in serial:
+                    ruc_with_dv = serial
+                    break
+        
+        # Si no se encontró en SERIALNUMBER, buscar en CN
+        if ruc_with_dv is None:
+            for attr in subject:
+                if attr.oid == x509.NameOID.COMMON_NAME:
+                    cn = attr.value.strip()
+                    # Puede ser "RUC4554737-8" o "4554737-8"
+                    if cn.upper().startswith("RUC"):
+                        cn = cn[3:].strip()
+                    # Validar que es un RUC (solo números y un guion)
+                    if "-" in cn and all(c.isdigit() or c == "-" for c in cn):
+                        ruc_with_dv = cn
+                        break
+        
+        # Buscar en Subject Alternative Names (SAN)
+        if ruc_with_dv is None:
+            try:
+                san_ext = cert_obj.extensions.get_extension_for_oid(
+                    x509.ExtensionOID.SUBJECT_ALTERNATIVE_NAME
+                )
+                for name in san_ext.value:
+                    if isinstance(name, x509.DirectoryName):
+                        dir_name = name.value
+                        for attr in dir_name:
+                            if attr.oid == x509.NameOID.SERIAL_NUMBER:
+                                serial = attr.value.strip()
+                                if serial.upper().startswith("RUC"):
+                                    serial = serial[3:].strip()
+                                if "-" in serial:
+                                    ruc_with_dv = serial
+                                    break
+                        if ruc_with_dv:
+                            break
+            except x509.ExtensionNotFound:
+                pass
+        
+        if ruc_with_dv:
+            # Separar RUC y DV
+            parts = ruc_with_dv.split("-", 1)
+            ruc = parts[0].strip()
+            return {
+                "ruc": ruc,
+                "ruc_with_dv": ruc_with_dv
+            }
+        
+        return None
+    except Exception:
+        # Silenciosamente fallar si no se puede extraer
+        return None
+
+
 def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Path] = None, dump_http: bool = False) -> dict:
     """
     Envía un XML siRecepDE al servicio SOAP de Recepción de SIFEN
@@ -4686,7 +4789,9 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
             # --- GATE: verificar habilitación FE del RUC antes de enviar ---
             try:
                 # Extraer RUC emisor del lote.xml
-                ruc_emisor = None
+                ruc_de = None
+                ruc_de_with_dv = None
+                ruc_dv = None
                 if lote_xml_bytes:
                     try:
                         lote_root = etree.fromstring(lote_xml_bytes)
@@ -4698,48 +4803,139 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
                                 break
                         
                         if de_elem is not None:
-                            # Buscar dRucEm dentro de gEmis
+                            # Buscar dRucEm y dDVEmi dentro de gEmis
                             g_emis = de_elem.find(f".//{{{SIFEN_NS_URI}}}gEmis")
                             if g_emis is not None:
                                 d_ruc_elem = g_emis.find(f"{{{SIFEN_NS_URI}}}dRucEm")
                                 if d_ruc_elem is not None and d_ruc_elem.text:
-                                    ruc_emisor = d_ruc_elem.text.strip()
+                                    ruc_de = d_ruc_elem.text.strip()
+                                
+                                d_dv_elem = g_emis.find(f"{{{SIFEN_NS_URI}}}dDVEmi")
+                                if d_dv_elem is not None and d_dv_elem.text:
+                                    ruc_dv = d_dv_elem.text.strip()
+                                
+                                # Construir RUC-DE completo si hay DV
+                                if ruc_de and ruc_dv:
+                                    ruc_de_with_dv = f"{ruc_de}-{ruc_dv}"
+                                elif ruc_de:
+                                    ruc_de_with_dv = ruc_de
                     except Exception as e:
                         print(f"⚠️  No se pudo extraer RUC del lote.xml para gate: {e}")
                 
-                if ruc_emisor:
-                    # ruc_emisor debe ser SOLO el número (sin DV)
-                    # si vos ya lo extraés del DE, debería ser algo como "4554737"
-                    ruc_emisor = str(ruc_emisor).strip().split("-", 1)[0].strip()
+                # Extraer RUC del certificado P12
+                ruc_cert = None
+                ruc_cert_with_dv = None
+                try:
+                    sign_cert_path = os.getenv("SIFEN_SIGN_P12_PATH") or os.getenv("SIFEN_MTLS_P12_PATH")
+                    sign_cert_password = os.getenv("SIFEN_SIGN_P12_PASSWORD") or os.getenv("SIFEN_MTLS_P12_PASSWORD")
+                    if sign_cert_path and sign_cert_password:
+                        cert_info = _extract_ruc_from_cert(sign_cert_path, sign_cert_password)
+                        if cert_info:
+                            ruc_cert = cert_info.get("ruc")
+                            ruc_cert_with_dv = cert_info.get("ruc_with_dv")
+                except Exception:
+                    pass  # Silenciosamente fallar si no se puede extraer
+                
+                # --- SANITY CHECK: Comparar RUCs ---
+                ruc_gate = None
+                if ruc_de:
+                    # ruc_gate debe ser SOLO el número (sin DV)
+                    ruc_gate = str(ruc_de).strip().split("-", 1)[0].strip()
+                
+                # Imprimir sanity check
+                print("\n" + "="*60)
+                print("=== SIFEN SANITY CHECK ===")
+                print(f"RUC-DE:     {ruc_de_with_dv or ruc_de or '(no encontrado)'}")
+                print(f"RUC-GATE:   {ruc_gate or '(no encontrado)'}")
+                print(f"RUC-CERT:   {ruc_cert_with_dv or ruc_cert or '(no disponible)'}")
+                
+                # Comparaciones booleanas
+                match_de_gate = (ruc_de and ruc_gate and ruc_de.split("-", 1)[0].strip() == ruc_gate)
+                match_cert_gate = (ruc_cert and ruc_gate and ruc_cert == ruc_gate)
+                
+                print(f"match(DE.ruc == GATE.ruc):   {match_de_gate}")
+                if ruc_cert:
+                    print(f"match(CERT.ruc == GATE.ruc): {match_cert_gate}")
+                
+                # Warnings si hay mismatch (pero no bloquear todavía)
+                if ruc_de and ruc_gate and not match_de_gate:
+                    print(f"⚠️  WARNING: RUC del DE ({ruc_de.split('-', 1)[0]}) no coincide con RUC-GATE ({ruc_gate})")
+                if ruc_cert and ruc_gate and not match_cert_gate:
+                    print(f"⚠️  WARNING: RUC del certificado ({ruc_cert}) no coincide con RUC-GATE ({ruc_gate})")
+                
+                print("="*60 + "\n")
+                
+                # Guardar artifact JSON si dump_http=True
+                if dump_http and artifacts_dir:
+                    try:
+                        from datetime import datetime
+                        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                        sanity_data = {
+                            "timestamp": datetime.now().isoformat(),
+                            "ruc_de": ruc_de_with_dv or ruc_de,
+                            "ruc_gate": ruc_gate,
+                            "ruc_cert": ruc_cert_with_dv or ruc_cert,
+                            "matches": {
+                                "de_gate": match_de_gate,
+                                "cert_gate": match_cert_gate if ruc_cert else None
+                            }
+                        }
+                        sanity_file = artifacts_dir / f"sanity_check_{timestamp}.json"
+                        sanity_file.write_text(json.dumps(sanity_data, indent=2, ensure_ascii=False), encoding="utf-8")
+                    except Exception:
+                        pass  # Silenciosamente fallar si no se puede guardar
+                
+                # Hard-fail si falta dRucEm o es inválido
+                if not ruc_de or not ruc_gate:
+                    raise RuntimeError(
+                        f"No se pudo extraer RUC válido del DE. "
+                        f"dRucEm={ruc_de!r} RUC-GATE={ruc_gate!r}"
+                    )
+                
+                ruc_emisor = ruc_gate
                     
-                    print(f"🔍 Verificando habilitación FE del RUC: {ruc_emisor}")
-                    ruc_check = client.consulta_ruc_raw(ruc=ruc_emisor, dump_http=dump_http)
-                    cod = (ruc_check.get("dCodRes") or "").strip()
-                    msg = (ruc_check.get("dMsgRes") or "").strip()
-                    
-                    # Extraer dRUCFactElec de xContRUC
-                    x_cont_ruc = ruc_check.get("xContRUC", {})
-                    d_fact = x_cont_ruc.get("dRUCFactElec") if isinstance(x_cont_ruc, dict) else None
-                    d_fact = (str(d_fact).strip().upper() if d_fact is not None else "")
-                    
-                    habilitado = d_fact in ("1", "S", "SI", "Y", "YES", "TRUE")
-                    
-                    if cod != "0502":
-                        raise RuntimeError(f"SIFEN siConsRUC no confirmó el RUC. dCodRes={cod} dMsgRes={msg}")
-                    
-                    if not habilitado:
-                        razon = x_cont_ruc.get("dRazCons", "") if isinstance(x_cont_ruc, dict) else ""
-                        est = x_cont_ruc.get("dDesEstCons", "") if isinstance(x_cont_ruc, dict) else ""
-                        env_str = config.env if hasattr(config, 'env') else env
-                        raise RuntimeError(
-                            f"RUC NO habilitado para Facturación Electrónica en SIFEN ({env_str}). "
-                            f"RUC={ruc_emisor} RazónSocial='{razon}' Estado='{est}' dRUCFactElec='{d_fact}'. "
-                            "Debés gestionar la habilitación FE del RUC en SIFEN/SET."
-                        )
-                    
-                    print(f"✅ RUC {ruc_emisor} habilitado para FE (dRUCFactElec={d_fact})")
-                else:
-                    print("⚠️  No se pudo extraer RUC del lote.xml, saltando gate de habilitación FE")
+                print(f"🔍 Verificando habilitación FE del RUC: {ruc_emisor}")
+                ruc_check = client.consulta_ruc_raw(ruc=ruc_emisor, dump_http=dump_http)
+                cod = (ruc_check.get("dCodRes") or "").strip()
+                msg = (ruc_check.get("dMsgRes") or "").strip()
+                
+                # Extraer dRUCFactElec de xContRUC
+                x_cont_ruc = ruc_check.get("xContRUC", {})
+                d_fact_raw = x_cont_ruc.get("dRUCFactElec") if isinstance(x_cont_ruc, dict) else None
+                # Normalizar: convertir a string, trim, uppercase
+                d_fact_normalized = (str(d_fact_raw).strip().upper() if d_fact_raw is not None else "")
+                
+                # Valores que indican HABILITADO: "1", "S", "SI"
+                # Valores que indican NO HABILITADO: "0", "N", "NO", "" (vacío)
+                # 
+                # Test manual de normalización (ejemplos):
+                #   Input: "1"  -> Normalizado: "1"  -> Resultado: OK (habilitado)
+                #   Input: "S"  -> Normalizado: "S"  -> Resultado: OK (habilitado)
+                #   Input: "SI" -> Normalizado: "SI" -> Resultado: OK (habilitado)
+                #   Input: "0"  -> Normalizado: "0"  -> Resultado: FAIL (no habilitado)
+                #   Input: "N"  -> Normalizado: "N"  -> Resultado: FAIL (no habilitado)
+                #   Input: "NO" -> Normalizado: "NO" -> Resultado: FAIL (no habilitado)
+                #   Input: ""   -> Normalizado: ""   -> Resultado: FAIL (no habilitado)
+                #   Input: None -> Normalizado: ""   -> Resultado: FAIL (no habilitado)
+                habilitado = d_fact_normalized in ("1", "S", "SI")
+                
+                if cod != "0502":
+                    raise RuntimeError(f"SIFEN siConsRUC no confirmó el RUC. dCodRes={cod} dMsgRes={msg}")
+                
+                if not habilitado:
+                    razon = x_cont_ruc.get("dRazCons", "") if isinstance(x_cont_ruc, dict) else ""
+                    est = x_cont_ruc.get("dDesEstCons", "") if isinstance(x_cont_ruc, dict) else ""
+                    env_str = config.env if hasattr(config, 'env') else env
+                    # Mostrar valor original y normalizado para diagnóstico
+                    d_fact_display = repr(d_fact_raw) if d_fact_raw is not None else "None"
+                    raise RuntimeError(
+                        f"RUC NO habilitado para Facturación Electrónica en SIFEN ({env_str}). "
+                        f"RUC={ruc_emisor} RazónSocial='{razon}' Estado='{est}' "
+                        f"dRUCFactElec={d_fact_display} (normalizado='{d_fact_normalized}'). "
+                        "Debés gestionar la habilitación FE del RUC en SIFEN/SET."
+                    )
+                
+                print(f"✅ RUC {ruc_emisor} habilitado para FE (dRUCFactElec={d_fact_raw!r} -> '{d_fact_normalized}')")
             except Exception as e:
                 # hard-fail: no enviar lote si no está habilitado
                 print(f"❌ GATE FALLÓ: {e}")
