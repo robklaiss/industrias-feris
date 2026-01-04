@@ -9,7 +9,7 @@
     <array>
         <string>/bin/zsh</string>
         <string>-lc</string>
-        <string>DB_PATH="/Users/robinklaiss/Dev/industrias-feris-facturacion-electronica-simplificado/tesaka-cv/tesaka.db" OUT_DIR="$HOME/backups/app" PASSPHRASE_FILE="$HOME/secrets/backup_passphrase.txt" "$HOME/backup_sqlite.sh"</string>
+        <string>DB_PATH="/Users/TU_USUARIO/Dev/industrias-feris-facturacion-electronica-simplificado/tesaka-cv/tesaka.db" OUT_DIR="$HOME/backups/app" PASSPHRASE_FILE="$HOME/secrets/backup_passphrase.txt" "$HOME/backup_sqlite.sh"</string>
     </array>
     
     <key>StartCalendarInterval</key>
