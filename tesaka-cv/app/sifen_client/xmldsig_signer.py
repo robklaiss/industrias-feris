@@ -205,20 +205,15 @@ def sign_de_xml(xml_str: str, p12_path: str, p12_password: str) -> str:
         # Esto es necesario para que la referencia URI funcione
         # signxml usa el atributo Id automáticamente si está presente
 
-        # Crear signer con configuración SIFEN
-        # Usar strings para algoritmos (no constantes)
-        # NOTA: SIFEN normalmente requiere RSA-SHA256 y SHA-256,
-        # pero algunos certificados pueden requerir RSA-SHA1 y SHA-1.
-        # Ajustar según el certificado disponible.
+        # Crear signer con configuración SIFEN v150
+        # IMPORTANTE: SIFEN v150 requiere RSA-SHA256 y SHA-256 (NO rsa-sha1/sha1)
         if signxml is None or signxml.methods is None:
             raise XMLDSigError("signxml no está disponible correctamente")
         signer = XMLSigner(  # type: ignore
             method=signxml.methods.enveloped,  # Enveloped signature
-            signature_algorithm="rsa-sha1",  # RSA-SHA1
-            digest_algorithm="sha1",  # SHA-1
-            c14n_algorithm=(
-                "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
-            ),  # c14n (no exc-c14n)
+            signature_algorithm="rsa-sha256",  # RSA-SHA256 (SIFEN v150)
+            digest_algorithm="sha256",  # SHA-256 (SIFEN v150)
+            c14n_algorithm="http://www.w3.org/2001/10/xml-exc-c14n#",  # exc-c14n (SIFEN v150)
         )
 
         # Firmar el elemento DE

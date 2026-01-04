@@ -4,6 +4,7 @@ Rutas para integración SIFEN
 import json
 import os
 from typing import Optional
+from pathlib import Path as FSPath
 from fastapi import Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from jinja2 import Environment
@@ -32,7 +33,6 @@ def register_sifen_routes(app, jinja_env: Environment):
         
         try:
             import base64
-            from pathlib import Path
             from datetime import datetime
             
             # Obtener configuración
@@ -54,7 +54,7 @@ def register_sifen_routes(app, jinja_env: Environment):
             test_timbrado = str(test_timbrado).strip() if test_timbrado else '12345678'
             
             # Crear directorio artifacts si no existe
-            artifacts_dir = Path(__file__).parent.parent.parent / "artifacts"
+            artifacts_dir = FSPath(__file__).parent.parent.parent / "artifacts"
             artifacts_dir.mkdir(exist_ok=True)
             
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -91,8 +91,8 @@ def register_sifen_routes(app, jinja_env: Environment):
                 "steps_failed": [],
                 "details": {},
                 "artifacts": {
-                    "de_crudo": str(de_path.relative_to(Path(__file__).parent.parent.parent)),
-                    "sirecepde": str(sirecepde_path.relative_to(Path(__file__).parent.parent.parent))
+                    "de_crudo": str(de_path.relative_to(FSPath(__file__).parent.parent.parent)),
+                    "sirecepde": str(sirecepde_path.relative_to(FSPath(__file__).parent.parent.parent))
                 }
             }
             
@@ -118,7 +118,7 @@ def register_sifen_routes(app, jinja_env: Environment):
                 results["steps_failed"].append("validate_de_structure")
             
             # Validar DE contra XSD DE_v150.xsd
-            xsd_dir = Path(__file__).parent.parent.parent / "schemas_sifen"
+            xsd_dir = FSPath(__file__).parent.parent.parent / "schemas_sifen"
             de_xsd_valid, de_xsd_errors = validate_against_xsd(de_path, "de", xsd_dir)
             results["details"]["de_crudo"]["xsd_validation"] = {
                 "valid": de_xsd_valid,

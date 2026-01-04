@@ -50,11 +50,11 @@ def validate_lote_xml(lote_xml_path: Path, xsd_dir: Path) -> dict:
         
         structural_errors = []
         
-        # 1. Root debe ser rLoteDE sin namespace
+        # 1. Root debe ser rLoteDE con namespace SIFEN
         if root_local != "rLoteDE":
             structural_errors.append(f"Root debe ser 'rLoteDE', encontrado: {root_local}")
-        if root_ns:
-            structural_errors.append(f"rLoteDE NO debe tener namespace, encontrado: {root_ns}")
+        if root_ns != SIFEN_NS:
+            structural_errors.append(f"rLoteDE debe tener namespace {SIFEN_NS}, encontrado: {root_ns or '(vacío)'}")
         
         # 2. Debe contener exactamente 1 rDE
         rde_candidates = []

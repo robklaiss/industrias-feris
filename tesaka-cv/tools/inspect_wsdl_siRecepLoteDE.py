@@ -3,6 +3,7 @@
 Script para inspeccionar el WSDL de siRecepLoteDE (recibe-lote) y mostrar
 el formato exacto esperado del SOAP request.
 """
+from lxml import etree
 import sys
 from pathlib import Path
 import xml.etree.ElementTree as ET
@@ -44,6 +45,10 @@ def inspect_wsdl_local(wsdl_path: Path):
             'soap11': 'http://schemas.xmlsoap.org/wsdl/soap/',
         }
         
+        # Target namespace
+        target_ns = root.get('targetNamespace', '')
+        print(f"\n🌐 targetNamespace: {target_ns}")
+        
         # Buscar operación rEnvioLote
         operations = root.findall('.//wsdl:operation', ns)
         print(f"\n🔍 Operaciones encontradas: {len(operations)}")
@@ -51,6 +56,29 @@ def inspect_wsdl_local(wsdl_path: Path):
         for op in operations:
             op_name = op.get('name')
             print(f"\n  📌 Operación: {op_name}")
+            
+            # Buscar message del input
+            input_elem = op.find('wsdl:input', ns)
+            input_name = input_elem.get('name') if input_elem is not None else None
+            if input_name:
+                message = root.find(f'.//wsdl:message[@name="{input_name}"]', ns)
+                if message is not None:
+                    part = message.find('wsdl:part', ns)
+                    if part is not None:
+                        element = part.get('element', '')
+                        # Extraer namespace y localname del element
+                        if ':' in element:
+                            prefix, localname = element.split(':', 1)
+                            # Buscar namespace del prefix
+                            ns_uri = root.get(f'xmlns:{prefix}', '')
+                            if not ns_uri:
+                                ns_uri = target_ns  # Fallback
+                        else:
+                            localname = element
+                            ns_uri = target_ns
+                        print(f"    Message part element: {element}")
+                        print(f"      → localname: {localname}")
+                        print(f"      → namespace: {ns_uri}")
             
             # Buscar binding para esta operación
             bindings = root.findall(f'.//wsdl:binding/wsdl:operation[@name="{op_name}"]', ns)
@@ -61,10 +89,12 @@ def inspect_wsdl_local(wsdl_path: Path):
                     soap_action = soap12_op.get('soapAction', '')
                     soap_action_required = soap12_op.get('soapActionRequired', 'false')
                     style = soap12_op.get('style', 'document')
-                    print(f"    SOAP 1.2:")
-                    print(f"      soapAction: '{soap_action}'")
+                    print(f"    SOAP 1.2 Binding:")
+                    print(f"      soapAction: '{soap_action}' {'(VACÍO)' if soap_action == '' else ''}")
                     print(f"      soapActionRequired: {soap_action_required}")
                     print(f"      style: {style}")
+                    if soap_action_required == 'false':
+                        print(f"      ⚠️  IMPORTANTE: NO incluir action= en Content-Type")
                 
                 # Input
                 input_elem = binding_op.find('wsdl:input', ns)
@@ -73,16 +103,9 @@ def inspect_wsdl_local(wsdl_path: Path):
                     if soap12_body is not None:
                         use = soap12_body.get('use', 'literal')
                         print(f"      input body use: {use}")
-                
-                # Buscar message
-                input_name = input_elem.get('name') if input_elem is not None else None
-                if input_name:
-                    message = root.find(f'.//wsdl:message[@name="{input_name}"]', ns)
-                    if message is not None:
-                        part = message.find('wsdl:part', ns)
-                        if part is not None:
-                            element = part.get('element', '')
-                            print(f"      message part element: {element}")
+                        if use == 'literal':
+                            print(f"      → Body contiene DIRECTAMENTE el elemento del schema (document/literal)")
+                            print(f"      → NO hay wrapper de operación")
         
         # Buscar service y port
         services = root.findall('.//wsdl:service', ns)
@@ -99,10 +122,10 @@ def inspect_wsdl_local(wsdl_path: Path):
                 if soap12_address is not None:
                     location = soap12_address.get('location', '')
                     print(f"    location: {location}")
-        
-        # Target namespace
-        target_ns = root.get('targetNamespace', '')
-        print(f"\n🌐 targetNamespace: {target_ns}")
+                    # Normalizar endpoint (quitar .wsdl si está)
+                    if location.endswith('.wsdl'):
+                        endpoint = location[:-5]  # Quitar .wsdl
+                        print(f"    → POST endpoint (sin .wsdl): {endpoint}")
         
     except Exception as e:
         print(f"❌ Error al parsear WSDL: {e}")
@@ -133,7 +156,19 @@ def inspect_wsdl_remote(wsdl_url: str):
                         print(f"    input: {operation.input.signature()}")
                         print(f"    output: {operation.output.signature()}")
         
-        print(f"\n🌐 targetNamespace: {client.wsdl.target_namespace}")
+        # Target namespace desde el documento WSDL
+        try:
+            # Intentar obtener targetNamespace de diferentes formas
+            target_ns = None
+            if hasattr(client.wsdl, 'target_namespace'):
+                target_ns = client.wsdl.target_namespace  # type: ignore
+            elif hasattr(client.wsdl, 'types') and hasattr(client.wsdl.types, 'doc'):
+                doc = client.wsdl.types.doc  # type: ignore
+                if hasattr(doc, 'targetNamespace'):
+                    target_ns = doc.targetNamespace  # type: ignore
+            print(f"\n🌐 targetNamespace: {target_ns or '(no encontrado)'}")
+        except Exception:
+            print(f"\n🌐 targetNamespace: (no disponible)")
         
     except Exception as e:
         print(f"❌ Error al cargar WSDL remoto: {e}")

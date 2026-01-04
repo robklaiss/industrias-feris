@@ -12,6 +12,7 @@ Implementa firma digital XMLDSig Enveloped según especificación SIFEN v150:
 """
 
 import logging
+import os
 from pathlib import Path
 from typing import Optional, Any
 
@@ -725,13 +726,72 @@ def sign_de_with_p12(xml_bytes: bytes, p12_path: str, p12_password: str) -> byte
     # 3) Post-check estructural con lxml
     # tree/root ya existen en tu función
     root2 = tree.getroot()
+    
+    # Helpers para extraer localname y namespace
+    def _localname(tag: str) -> str:
+        """Extrae el localname de un tag (sin namespace)"""
+        return tag.split("}", 1)[1] if isinstance(tag, str) and tag.startswith("{") else tag
+    
+    def _ns(tag: str) -> Optional[str]:
+        """Extrae el namespace URI de un tag, o None si no tiene namespace"""
+        if not isinstance(tag, str) or not tag.startswith("{"):
+            return None
+        return tag[1:].split("}", 1)[0]
 
-    # 3.1) Ubicar rDE y DE
-    rde_check = root2.find(f".//{{{SIFEN_NS_URI}}}rDE")
+    # 3.1) Ubicar rDE: primero verificar si el root es rDE
+    rde_check = None
+    if isinstance(root2.tag, str) and _localname(root2.tag) == "rDE":
+        rde_check = root2
+    else:
+        # Buscar rDE en el árbol (namespace-aware primero, luego fallback)
+        rde_check = root2.find(f".//{{{SIFEN_NS}}}rDE")
+        if rde_check is None:
+            # Fallback: buscar por local-name (ignora namespace)
+            nodes = root2.xpath("//*[local-name()='rDE']")
+            rde_check = nodes[0] if nodes else None
+    
     if rde_check is None:
-        raise XMLSecError("Post-check falló: no se encontró <rDE> (SIFEN_NS_URI)")
+        # Obtener información de debug
+        root_tag = root2.tag if hasattr(root2, 'tag') else str(root2)
+        root_nsmap = root2.nsmap if hasattr(root2, 'nsmap') else {}
+        
+        # Obtener primeros 10 tags hijos del root para diagnóstico
+        child_tags = []
+        for i, child in enumerate(list(root2)[:10]):
+            child_localname = _localname(child.tag)
+            child_tags.append(f"  [{i}] {child.tag} (local: {child_localname})")
+        child_tags_str = "\n".join(child_tags) if child_tags else "  (sin hijos)"
+        
+        error_msg = (
+            f"Post-check falló: no se encontró <rDE> (SIFEN_NS).\n"
+            f"  root.tag: {root_tag}\n"
+            f"  root.nsmap: {root_nsmap}\n"
+            f"  root localname: {_localname(root_tag)}\n"
+            f"  Primeros 10 hijos del root:\n{child_tags_str}"
+        )
+        
+        # Guardar artifacts si está habilitado debug
+        debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+        if debug_enabled:
+            try:
+                artifacts_dir = Path("artifacts")
+                artifacts_dir.mkdir(parents=True, exist_ok=True)
+                artifacts_dir.joinpath("xmlsec_signed_output.xml").write_bytes(out)
+            except Exception:
+                pass
+        
+        raise XMLSecError(error_msg)
+    
+    # Validar namespace del rDE encontrado
+    rde_ns = _ns(rde_check.tag)
+    if rde_ns is not None and rde_ns != SIFEN_NS:
+        raise XMLSecError(
+            f"Post-check falló: rDE tiene namespace incorrecto. "
+            f"Tag actual: {rde_check.tag!r}, namespace actual: {rde_ns!r}, "
+            f"esperado: {SIFEN_NS!r}"
+        )
 
-    de2 = rde_check.find(f"./{{{SIFEN_NS_URI}}}DE")
+    de2 = rde_check.find(f"./{{{SIFEN_NS}}}DE")
     if de2 is None:
         # por si DE vino sin namespace:
         de2 = rde_check.find("./DE")

@@ -130,64 +130,129 @@ def main():
         default=Path("/tmp/lote_extracted.xml"),
         help="Path donde guardar lote.xml extraído (default: /tmp/lote_extracted.xml)"
     )
+    parser.add_argument(
+        "--zip-file",
+        type=Path,
+        help="Path directo al archivo ZIP (en vez de extraer desde debug-file)"
+    )
+    parser.add_argument(
+        "--payload-file",
+        type=Path,
+        help="Path directo al archivo XML payload (xml_file.xml o lote.xml)"
+    )
+    parser.add_argument(
+        "--prefer-tmp",
+        action="store_true",
+        help="Si existe /tmp/lote_payload.zip, usar ese en vez de debug-file"
+    )
     
     args = parser.parse_args()
     
     try:
-        print("🔍 Extrayendo BASE64 de xDE del SOAP debug...")
-        xde_base64 = extract_xde_base64_from_soap_debug(args.debug_file)
-        print(f"✓ BASE64 extraído: {len(xde_base64)} caracteres\n")
+        # Determinar fuente del ZIP
+        zip_bytes = None
+        lote_xml_bytes = None
         
-        print("📦 Decodificando BASE64...")
-        zip_bytes = base64.b64decode(xde_base64)
-        print(f"✓ ZIP decodificado: {len(zip_bytes)} bytes\n")
-        
-        print("📂 Descomprimiendo ZIP...")
-        with zipfile.ZipFile(BytesIO(zip_bytes), "r") as zf:
-            zip_files = zf.namelist()
-            print(f"✓ Archivos en ZIP: {zip_files}\n")
-            
-            if "lote.xml" not in zip_files:
-                print(f"❌ ERROR: 'lote.xml' no encontrado en ZIP")
-                print(f"   Archivos encontrados: {zip_files}")
+        # Prioridad 1: --payload-file (XML directo)
+        if args.payload_file:
+            if not args.payload_file.exists():
+                print(f"❌ ERROR: Archivo no encontrado: {args.payload_file}")
                 return 1
+            print(f"📄 Leyendo XML payload directo: {args.payload_file}")
+            lote_xml_bytes = args.payload_file.read_bytes()
+            print(f"✓ XML leído: {len(lote_xml_bytes)} bytes\n")
+        
+        # Prioridad 2: --zip-file (ZIP directo)
+        elif args.zip_file:
+            if not args.zip_file.exists():
+                print(f"❌ ERROR: Archivo ZIP no encontrado: {args.zip_file}")
+                return 1
+            print(f"📦 Leyendo ZIP directo: {args.zip_file}")
+            zip_bytes = args.zip_file.read_bytes()
+            print(f"✓ ZIP leído: {len(zip_bytes)} bytes\n")
+        
+        # Prioridad 3: --prefer-tmp (buscar /tmp/lote_payload.zip)
+        elif args.prefer_tmp:
+            tmp_zip = Path("/tmp/lote_payload.zip")
+            if tmp_zip.exists():
+                print(f"📦 Usando ZIP desde /tmp: {tmp_zip}")
+                zip_bytes = tmp_zip.read_bytes()
+                print(f"✓ ZIP leído: {len(zip_bytes)} bytes\n")
+            else:
+                print(f"⚠️  WARNING: /tmp/lote_payload.zip no encontrado, usando debug-file")
+                # Caer a debug-file
+                zip_bytes = None
+        
+        # Prioridad 4: Extraer desde debug-file (comportamiento original)
+        if zip_bytes is None and lote_xml_bytes is None:
+            print("🔍 Extrayendo BASE64 de xDE del SOAP debug...")
+            xde_base64 = extract_xde_base64_from_soap_debug(args.debug_file)
+            print(f"✓ BASE64 extraído: {len(xde_base64)} caracteres\n")
             
-            print("📄 Extrayendo lote.xml...")
-            lote_xml_bytes = zf.read("lote.xml")
-            print(f"✓ lote.xml extraído: {len(lote_xml_bytes)} bytes\n")
-            
-            print("🔬 Analizando lote.xml...")
-            analysis = analyze_lote_xml(lote_xml_bytes, args.output)
-            
-            print("=" * 60)
-            print("ANÁLISIS DE lote.xml")
-            print("=" * 60)
-            print(f"Tamaño: {analysis['size']} bytes")
-            print(f"Tiene BOM: {analysis['has_bom']}")
-            print(f"Encoding: {analysis['encoding'] or 'NO DETECTADO'}")
-            if analysis.get("xml_declaration"):
-                print(f"XML Declaration: {analysis['xml_declaration']}")
-            print(f"Root tag: {analysis['root_tag']}")
-            print(f"Root namespace: {analysis['root_namespace']}")
-            if analysis.get("parse_error"):
-                print(f"❌ Error al parsear: {analysis['parse_error']}")
-            print(f"\nPrimeros 200 bytes:")
-            print("-" * 60)
-            print(analysis['first_200_bytes'])
-            print("-" * 60)
-            
-            if analysis.get("saved_to"):
-                print(f"\n💾 lote.xml guardado en: {analysis['saved_to']}")
-            
-            # Verificar estructura básica
-            if analysis.get("root_tag"):
-                root_local = analysis['root_tag'].split("}", 1)[-1] if "}" in analysis['root_tag'] else analysis['root_tag']
-                if root_local != "rLoteDE":
-                    print(f"\n⚠️  WARNING: Root esperado 'rLoteDE', encontrado '{root_local}'")
-                else:
-                    print(f"\n✅ Root correcto: rLoteDE")
-            
-            return 0
+            print("📦 Decodificando BASE64...")
+            zip_bytes = base64.b64decode(xde_base64)
+            print(f"✓ ZIP decodificado: {len(zip_bytes)} bytes\n")
+        
+        # Si tenemos ZIP, extraer lote_xml_bytes
+        if zip_bytes is not None:
+            print("📂 Descomprimiendo ZIP...")
+            with zipfile.ZipFile(BytesIO(zip_bytes), "r") as zf:
+                zip_files = zf.namelist()
+                print(f"✓ Archivos en ZIP: {zip_files}\n")
+                
+                # Soportar tanto xml_file.xml como lote.xml (compatibilidad)
+                xml_file_name = None
+                if "xml_file.xml" in zip_files:
+                    xml_file_name = "xml_file.xml"
+                elif "lote.xml" in zip_files:
+                    xml_file_name = "lote.xml"
+                
+                if not xml_file_name:
+                    print(f"❌ ERROR: 'xml_file.xml' o 'lote.xml' no encontrado en ZIP")
+                    print(f"   Archivos encontrados: {zip_files}")
+                    return 1
+                
+                print(f"📄 Extrayendo {xml_file_name}...")
+                lote_xml_bytes = zf.read(xml_file_name)
+                print(f"✓ {xml_file_name} extraído: {len(lote_xml_bytes)} bytes\n")
+        
+        # Si no tenemos lote_xml_bytes, error
+        if lote_xml_bytes is None:
+            print("❌ ERROR: No se pudo obtener lote_xml_bytes")
+            return 1
+        
+        print("🔬 Analizando lote.xml...")
+        analysis = analyze_lote_xml(lote_xml_bytes, args.output)
+        
+        print("=" * 60)
+        print("ANÁLISIS DE lote.xml")
+        print("=" * 60)
+        print(f"Tamaño: {analysis['size']} bytes")
+        print(f"Tiene BOM: {analysis['has_bom']}")
+        print(f"Encoding: {analysis['encoding'] or 'NO DETECTADO'}")
+        if analysis.get("xml_declaration"):
+            print(f"XML Declaration: {analysis['xml_declaration']}")
+        print(f"Root tag: {analysis['root_tag']}")
+        print(f"Root namespace: {analysis['root_namespace']}")
+        if analysis.get("parse_error"):
+            print(f"❌ Error al parsear: {analysis['parse_error']}")
+        print(f"\nPrimeros 200 bytes:")
+        print("-" * 60)
+        print(analysis['first_200_bytes'])
+        print("-" * 60)
+        
+        if analysis.get("saved_to"):
+            print(f"\n💾 lote.xml guardado en: {analysis['saved_to']}")
+        
+        # Verificar estructura básica
+        if analysis.get("root_tag"):
+            root_local = analysis['root_tag'].split("}", 1)[-1] if "}" in analysis['root_tag'] else analysis['root_tag']
+            if root_local != "rLoteDE":
+                print(f"\n⚠️  WARNING: Root esperado 'rLoteDE', encontrado '{root_local}'")
+            else:
+                print(f"\n✅ Root correcto: rLoteDE")
+        
+        return 0
             
     except Exception as e:
         print(f"❌ Error: {e}")

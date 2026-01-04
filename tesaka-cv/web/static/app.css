@@ -109,9 +109,16 @@ footer {
 }
 
 .status-pending,
-.status-processing {
+.status-processing,
+.status-pending-sifen {
     background-color: #fff3cd;
     color: #856404;
+}
+
+.status-signed-local,
+.status-sent-to-sifen {
+    background-color: #d1ecf1;
+    color: #0c5460;
 }
 
 .status-unknown {

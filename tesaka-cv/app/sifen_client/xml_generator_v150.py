@@ -100,15 +100,25 @@ def generate_cdc(ruc: str, timbrado: str, establecimiento: str, punto_expedicion
     return base43 + dv_id
 
 
-def calculate_digit_verifier(cdc: str) -> str:
+def calculate_digit_verifier(base43: str) -> str:
     """
-    Calcula el dígito verificador del CDC
+    DV del CDC (módulo 11) sobre los 43 dígitos.
+
+    Regla SIFEN:
+      - pesos cíclicos 2..9 desde derecha a izquierda
+      - dv = 11 - (suma % 11)
+      - si dv == 11 => 0
+      - si dv == 10 => 1
+    """
+    # Importar función reutilizable
+    from app.sifen_client.cdc_utils import calc_dv_mod11
     
-    NOTA: Algoritmo simplificado para pruebas
-    """
-    # Algoritmo simplificado - NO usar en producción
-    suma = sum(ord(c) for c in cdc)
-    return str(suma % 10)
+    s = "".join(c for c in str(base43) if c.isdigit())
+    if len(s) != 43:
+        raise ValueError(f"Base CDC inválida para DV (len={len(s)}): {s}")
+
+    dv = calc_dv_mod11(s)
+    return str(dv)
 
 
 def create_rde_xml_v150(
@@ -155,11 +165,42 @@ def create_rde_xml_v150(
     cdc = generate_cdc(ruc, timbrado, establecimiento, punto_expedicion, 
                       numero_documento, tipo_documento, fecha.replace("-", ""), monto)
     
+    # Validación defensiva: asegurar que el CDC sea válido antes de usarlo
+    from app.sifen_client.cdc_utils import validate_cdc, fix_cdc
+    
+    # Convertir a string si no lo es
+    cdc = str(cdc).strip()
+    
+    # Validar longitud y formato
+    if len(cdc) != 44:
+        raise ValueError(
+            f"CDC generado tiene longitud inválida: {len(cdc)} (esperado: 44). "
+            f"CDC recibido: {cdc!r}"
+        )
+    
+    # Validar que sea solo dígitos
+    if not cdc.isdigit():
+        raise ValueError(
+            f"CDC generado contiene caracteres no numéricos: {cdc!r}. "
+            f"El CDC debe ser exactamente 44 dígitos (0-9)."
+        )
+    
+    # Validar DV
+    es_valido, dv_orig, dv_calc = validate_cdc(cdc)
+    if not es_valido:
+        # Corregir automáticamente si el DV es incorrecto
+        cdc = fix_cdc(cdc)
+        # Re-validar después de corregir
+        es_valido, _, _ = validate_cdc(cdc)
+        if not es_valido:
+            raise ValueError(
+                f"CDC generado tiene DV inválido y no pudo corregirse. "
+                f"CDC: {cdc!r}"
+            )
+    
     # Calcular dígito verificador (dv del CDC)
-    # El dDVId debe ser un dígito numérico [0-9], no la letra hexadecimal
-    # Para pruebas: usar el último dígito numérico del CDC
-    digits_in_cdc = ''.join(c for c in cdc if c.isdigit())
-    dv_id = digits_in_cdc[-1] if digits_in_cdc else "0"
+    # El dDVId es el último dígito del CDC (que ya está validado)
+    dv_id = cdc[-1]
     
     # Código de seguridad (CSC) - debe ser entero de 9 dígitos según tiCodSe
     # Para pruebas: generar número de 9 dígitos

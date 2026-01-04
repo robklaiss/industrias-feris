@@ -14,7 +14,7 @@ except ImportError:
     pass
 
 
-def get_cert_path_and_password() -> Tuple[Optional[str], Optional[str]]:
+def get_cert_path_and_password() -> Tuple[str, str]:
     """
     Helper unificado para obtener certificado P12 y contraseña desde variables de entorno.
     
@@ -23,14 +23,27 @@ def get_cert_path_and_password() -> Tuple[Optional[str], Optional[str]]:
     2. SIFEN_SIGN_P12_PATH / SIFEN_SIGN_P12_PASSWORD (alias, compatibilidad)
     
     Returns:
-        Tupla (cert_path, cert_password) o (None, None) si no están configuradas
+        Tupla (cert_path, cert_password)
+        
+    Raises:
+        RuntimeError: Si faltan las variables de entorno o el archivo no existe
     """
-    cert_path = os.getenv("SIFEN_CERT_PATH") or os.getenv("SIFEN_SIGN_P12_PATH")
-    cert_password = os.getenv("SIFEN_CERT_PASSWORD") or os.getenv("SIFEN_SIGN_P12_PASSWORD")
+    cert_path = os.environ.get("SIFEN_CERT_PATH") or os.environ.get("SIFEN_SIGN_P12_PATH")
+    if not cert_path:
+        raise RuntimeError("Falta SIFEN_CERT_PATH (o SIFEN_SIGN_P12_PATH) en el entorno")
+    
+    cert_password = os.environ.get("SIFEN_CERT_PASSWORD") or os.environ.get("SIFEN_SIGN_P12_PASSWORD")
+    if not cert_password:
+        raise RuntimeError("Falta SIFEN_CERT_PASSWORD (o SIFEN_SIGN_P12_PASSWORD) en el entorno")
+    
+    # Validar que el archivo existe
+    if not os.path.exists(cert_path):
+        raise RuntimeError(f"Certificado no encontrado: {cert_path}")
+    
     return cert_path, cert_password
 
 
-def get_mtls_cert_path_and_password() -> Tuple[Optional[str], Optional[str]]:
+def get_mtls_cert_path_and_password() -> Tuple[str, str]:
     """
     Helper para obtener certificado P12 y contraseña para mTLS desde variables de entorno.
     
@@ -40,18 +53,31 @@ def get_mtls_cert_path_and_password() -> Tuple[Optional[str], Optional[str]]:
     3. SIFEN_SIGN_P12_PATH / SIFEN_SIGN_P12_PASSWORD (fallback)
     
     Returns:
-        Tupla (cert_path, cert_password) o (None, None) si no están configuradas
+        Tupla (cert_path, cert_password)
+        
+    Raises:
+        RuntimeError: Si faltan las variables de entorno o el archivo no existe
     """
     cert_path = (
-        os.getenv("SIFEN_MTLS_P12_PATH") or
-        os.getenv("SIFEN_CERT_PATH") or
-        os.getenv("SIFEN_SIGN_P12_PATH")
+        os.environ.get("SIFEN_MTLS_P12_PATH") or
+        os.environ.get("SIFEN_CERT_PATH") or
+        os.environ.get("SIFEN_SIGN_P12_PATH")
     )
+    if not cert_path:
+        raise RuntimeError("Falta SIFEN_MTLS_P12_PATH, SIFEN_CERT_PATH o SIFEN_SIGN_P12_PATH en el entorno")
+    
     cert_password = (
-        os.getenv("SIFEN_MTLS_P12_PASSWORD") or
-        os.getenv("SIFEN_CERT_PASSWORD") or
-        os.getenv("SIFEN_SIGN_P12_PASSWORD")
+        os.environ.get("SIFEN_MTLS_P12_PASSWORD") or
+        os.environ.get("SIFEN_CERT_PASSWORD") or
+        os.environ.get("SIFEN_SIGN_P12_PASSWORD")
     )
+    if not cert_password:
+        raise RuntimeError("Falta SIFEN_MTLS_P12_PASSWORD, SIFEN_CERT_PASSWORD o SIFEN_SIGN_P12_PASSWORD en el entorno")
+    
+    # Validar que el archivo existe
+    if not os.path.exists(cert_path):
+        raise RuntimeError(f"Certificado no encontrado: {cert_path}")
+    
     return cert_path, cert_password
 
 
@@ -130,20 +156,19 @@ class SifenConfig:
         
         if self.use_mtls:
             # Configuración mTLS (mutual TLS) - usar helper unificado
-            cert_path, cert_password = get_cert_path_and_password()
-            ca_bundle_path = os.getenv("SIFEN_CA_BUNDLE_PATH")
-            
-            if cert_path:
+            # El helper ya valida existencia y lanza RuntimeError si faltan env vars
+            try:
+                cert_path, cert_password = get_cert_path_and_password()
                 self.cert_path = cert_path
-            if cert_password:
                 self.cert_password = cert_password
+            except RuntimeError:
+                # Si falla, dejar como None (puede ser que use_mtls=False más adelante)
+                # o que se configure desde otro lugar
+                pass
             
+            ca_bundle_path = os.getenv("SIFEN_CA_BUNDLE_PATH")
             # ca_bundle_path se mantiene como Path para compatibilidad
             self.ca_bundle_path = Path(ca_bundle_path) if ca_bundle_path else None
-            
-            # Validar que el certificado existe si se proporcionó
-            if self.cert_path and not Path(self.cert_path).exists():
-                raise FileNotFoundError(f"Certificado no encontrado: {self.cert_path}")
         else:
             # Otro tipo de autenticación (API Key, OAuth, etc.)
             self.api_key = os.getenv("SIFEN_API_KEY")
@@ -233,10 +258,15 @@ def get_sifen_config(env: Optional[str] = None) -> SifenConfig:
     # Cargar certificado desde variables de entorno si no están ya asignados
     # (esto permite que funcionen incluso si use_mtls=False en el __init__)
     # Usar helper unificado para mantener compatibilidad con ambos nombres
+    # El helper valida y lanza RuntimeError si faltan env vars
     if not cfg.cert_path or not cfg.cert_password:
-        env_cert_path, env_cert_password = get_cert_path_and_password()
-        cfg.cert_path = cfg.cert_path or env_cert_path
-        cfg.cert_password = cfg.cert_password or env_cert_password
+        try:
+            env_cert_path, env_cert_password = get_cert_path_and_password()
+            cfg.cert_path = cfg.cert_path or env_cert_path
+            cfg.cert_password = cfg.cert_password or env_cert_password
+        except RuntimeError:
+            # Si falla, dejar como None (puede ser configuración opcional en algunos casos)
+            pass
     
     # Cargar rutas PEM directas (prioridad sobre PKCS12)
     if not cfg.cert_pem_path:

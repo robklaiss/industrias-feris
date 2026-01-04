@@ -3,6 +3,7 @@ Módulo para consultar estado de lotes SIFEN
 """
 import os
 import logging
+import time
 from typing import Dict, Any, Optional
 from pathlib import Path
 import sys
@@ -11,14 +12,22 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from requests import Session
+from lxml import etree
 
 logger = logging.getLogger(__name__)
 
-# Importar función de consulta desde tools
+# Importar función de consulta desde tools y helper PKCS12
 try:
-    from tools.consulta_lote_de import call_consulta_lote_raw, p12_to_pem_files
+    from tools.consulta_lote_de import call_consulta_lote_raw
 except ImportError:
     logger.error("No se pudo importar call_consulta_lote_raw desde tools.consulta_lote_de")
+    raise
+
+# Importar helper PKCS12 desde módulo correcto
+try:
+    from app.sifen_client.pkcs12_utils import p12_to_temp_pem_files
+except ImportError:
+    logger.error("No se pudo importar p12_to_temp_pem_files desde app.sifen_client.pkcs12_utils")
     raise
 
 
@@ -57,8 +66,6 @@ def parse_lote_response(xml_response: str) -> Dict[str, Any]:
     }
 
     try:
-        from lxml import etree
-
         root = etree.fromstring(xml_response.encode("utf-8"))
 
         def find_text(xpath_expr: str) -> Optional[str]:
@@ -120,32 +127,99 @@ def check_lote_status(
 
     # Resolver certificado desde env vars si no se proporciona - usar helper unificado
     if not p12_path or not p12_password:
-        from app.sifen_client.config import get_cert_path_and_password
-        env_cert_path, env_cert_password = get_cert_path_and_password()
-        p12_path = p12_path or env_cert_path
-        p12_password = p12_password or env_cert_password
+        try:
+            from app.sifen_client.config import get_cert_path_and_password
+            env_cert_path, env_cert_password = get_cert_path_and_password()
+            p12_path = p12_path or env_cert_path
+            p12_password = p12_password or env_cert_password
+        except RuntimeError as e:
+            # El helper ya valida y lanza RuntimeError con mensaje claro
+            return {
+                "success": False,
+                "error": str(e),
+            }
 
-    if not p12_path or not p12_password:
-        return {
-            "success": False,
-            "error": "Faltan certificado P12 o contraseña. Configure SIFEN_CERT_PATH y SIFEN_CERT_PASSWORD",
-        }
-
-    # Convertir P12 a PEM temporales
-    cert_pair = None
+    # Convertir P12 a PEM temporales (una sola vez, no por cada reintento)
+    cert_path = None
+    key_path = None
     try:
-        cert_pair = p12_to_pem_files(p12_path, p12_password)
+        cert_path, key_path = p12_to_temp_pem_files(p12_path, p12_password)
+        
+        # Debug: verificar que los archivos PEM existen
+        print(f"[SIFEN DEBUG] cert_path={os.path.basename(cert_path)} exists={os.path.exists(cert_path)}")
+        print(f"[SIFEN DEBUG] key_path={os.path.basename(key_path)} exists={os.path.exists(key_path)}")
 
-        # Crear sesión con mTLS
-        session = Session()
-        session.cert = (cert_pair.cert_path, cert_pair.key_path)
-        session.verify = True
-
-        # Consultar lote
+        # Consultar lote con retry/backoff para errores transitorios de red
+        # NOTA: NO recrear session en cada reintento - el transport dentro de call_consulta_lote_raw
+        # ya tiene retries configurados y reutiliza la misma session con cookies
         logger.info(f"Consultando lote {prot} en ambiente {env}")
-        xml_response = call_consulta_lote_raw(
-            session=session, env=env, prot=prot, timeout=timeout
-        )
+        print(f"[SIFEN DEBUG] check_lote_status: prot={prot} env={env} timeout={timeout}")
+        
+        # Backoff: 0.5s, 1.5s, 3s
+        backoff_times = [0.5, 1.5, 3.0]
+        last_error = None
+        
+        for attempt in range(3):
+            try:
+                # NO recrear session - reusar la misma para mantener cookies
+                # El transport dentro de call_consulta_lote_raw ya tiene retries configurados
+                if attempt > 0:
+                    print(f"[SIFEN DEBUG] check_lote_status: retry {attempt+1}/3")
+                
+                xml_response = call_consulta_lote_raw(
+                    session=None, env=env, prot=prot, timeout=timeout
+                )
+                
+                # Guardar respuesta cruda de SIFEN para diagnóstico
+                try:
+                    from datetime import datetime
+                    artifacts_dir = Path("artifacts")
+                    artifacts_dir.mkdir(parents=True, exist_ok=True)
+                    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    out = artifacts_dir / f"consulta_lote_{prot}_{ts}.xml"
+                    out.write_text(xml_response, encoding="utf-8")
+                    print(f"[SIFEN DEBUG] consulta_lote XML guardado: {out}")
+                except Exception as e:
+                    print(f"[SIFEN DEBUG] no se pudo guardar XML de consulta_lote: {e}")
+                
+                # Éxito, salir del loop
+                print(f"[SIFEN DEBUG] check_lote_status: consulta exitosa, xml_response length={len(xml_response) if xml_response else 0}")
+                break
+            except Exception as e:
+                # Capturar errores de conexión transitorios
+                error_str = str(e).lower()
+                error_type = type(e).__name__
+                
+                # Detectar errores de conexión transitorios
+                is_connection_error = (
+                    isinstance(e, (ConnectionError, OSError)) or
+                    "connection reset" in error_str or
+                    "connection aborted" in error_str or
+                    "connection refused" in error_str or
+                    "reset by peer" in error_str or
+                    error_type in ("ConnectionError", "ConnectionResetError", "OSError")
+                )
+                
+                if is_connection_error:
+                    last_error = e
+                    if attempt < 2:  # No es el último intento
+                        wait_time = backoff_times[attempt]
+                        logger.warning(
+                            f"Error de conexión transitorio al consultar lote {prot} "
+                            f"(intento {attempt + 1}/3): {e}. Reintentando en {wait_time}s..."
+                        )
+                        print(f"[SIFEN DEBUG] check_lote_status: error de conexión (intento {attempt + 1}/3): {type(e).__name__}: {str(e)[:200]}")
+                        time.sleep(wait_time)
+                        continue
+                    else:
+                        # Último intento falló, lanzar error
+                        logger.error(f"Error de conexión tras 3 intentos al consultar lote {prot}: {e}")
+                        print(f"[SIFEN DEBUG] check_lote_status: error de conexión tras 3 intentos: {type(e).__name__}: {str(e)[:200]}")
+                        raise
+                else:
+                    # Otro tipo de error, no reintentar
+                    print(f"[SIFEN DEBUG] check_lote_status: EXC {type(e).__name__}: {str(e)[:200]}")
+                    raise
 
         # Parsear respuesta
         parsed = parse_lote_response(xml_response)
@@ -160,18 +234,39 @@ def check_lote_status(
         return result
 
     except Exception as e:
-        logger.error(f"Error al consultar lote {prot}: {e}")
+        # Error de conexión transitorio (tras 3 intentos) u otro error
+        error_str = str(e).lower()
+        error_type = type(e).__name__
+        
+        print(f"[SIFEN DEBUG] check_lote_status: EXC final {error_type}: {str(e)[:200]}")
+        
+        # Detectar errores de conexión transitorios
+        is_connection_error = (
+            isinstance(e, (ConnectionError, OSError)) or
+            "connection reset" in error_str or
+            "connection aborted" in error_str or
+            "reset by peer" in error_str or
+            error_type in ("ConnectionError", "ConnectionResetError", "OSError")
+        )
+        
+        if is_connection_error:
+            error_msg = "SIFEN no respondió (reset by peer). Reintentar."
+            logger.error(f"Error de conexión al consultar lote {prot} tras 3 intentos: {e}")
+        else:
+            error_msg = str(e)
+            logger.error(f"Error al consultar lote {prot}: {e}")
+        
         return {
             "success": False,
-            "error": str(e),
+            "error": error_msg,
             "response_xml": None,
         }
     finally:
         # Limpiar archivos PEM temporales
-        if cert_pair:
+        if cert_path and key_path:
             try:
-                os.unlink(cert_pair.cert_path)
-                os.unlink(cert_pair.key_path)
+                os.unlink(cert_path)
+                os.unlink(key_path)
             except Exception as e:
                 logger.warning(f"Error al limpiar archivos PEM temporales: {e}")
 

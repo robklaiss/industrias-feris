@@ -23,7 +23,7 @@ OPCIÓN 2 (Manual):
 NOTA: Asegúrate de que el venv esté activado (deberías ver (.venv) en el prompt).
 """
 import os
-from pathlib import Path
+from pathlib import Path as FSPath
 from typing import Optional
 from fastapi import FastAPI, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -34,7 +34,7 @@ from fastapi.templating import Jinja2Templates
 try:
     from dotenv import load_dotenv
     # Buscar .env en el directorio raíz del proyecto (tesaka-cv/)
-    project_root = Path(__file__).parent.parent
+    project_root = FSPath(__file__).parent.parent
     env_file = project_root / ".env"
     if env_file.exists():
         load_dotenv(env_file)
@@ -53,7 +53,7 @@ from . import lotes_db
 app = FastAPI(title="TESAKA-SIFEN", version="1.0.0")
 
 # Obtener ruta base del proyecto (directorio padre de web/)
-WEB_DIR = Path(__file__).parent
+WEB_DIR = FSPath(__file__).parent
 
 # Montar archivos estáticos
 app.mount("/static", StaticFiles(directory=str(WEB_DIR / "static")), name="static")
@@ -198,7 +198,7 @@ def _build_de_xml_with_items(
     
     # Importar xml_generator_v150 directamente sin pasar por __init__.py
     # para evitar cargar dependencias pesadas (cryptography, etc.)
-    xml_gen_path = Path(__file__).parent.parent / "app" / "sifen_client" / "xml_generator_v150.py"
+    xml_gen_path = FSPath(__file__).parent.parent / "app" / "sifen_client" / "xml_generator_v150.py"
     spec = importlib.util.spec_from_file_location("xml_generator_v150", xml_gen_path)
     xml_gen = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(xml_gen)
@@ -278,8 +278,20 @@ def _build_de_xml_with_items(
     # Generar CDC
     cdc = generate_cdc(ruc_for_cdc, timbrado, establecimiento, punto_expedicion, 
                       numero_documento, tipo_documento, fecha.replace("-", ""), monto_cdc)
-    digits_in_cdc = ''.join(c for c in cdc if c.isdigit())
-    dv_id = calculate_digit_verifier(digits_in_cdc)
+    
+    # Extraer solo dígitos del CDC
+    cdc_base = ''.join(c for c in cdc if c.isdigit())
+    cdc_base = cdc_base.strip()
+    
+    # Si viene con 44 dígitos, es porque ya trae el DV pegado; sacarlo
+    if len(cdc_base) == 44:
+        cdc_base = cdc_base[:-1]
+    
+    if len(cdc_base) != 43:
+        raise ValueError(f"Base CDC inválida para DV (len={len(cdc_base)}): {cdc_base}")
+    
+    dv_id = calculate_digit_verifier(cdc_base)
+    cdc = cdc_base + str(dv_id)
     
     cod_seg = "123456789"
     
@@ -425,6 +437,41 @@ async def de_new_submit(
     if len(timbrado) != 8:
         raise HTTPException(status_code=400, detail="El timbrado debe tener exactamente 8 dígitos")
     
+    # Obtener ambiente (test/prod) desde env var o default a test
+    env = os.getenv("SIFEN_ENV", "test")
+    
+    # Parsear número solicitado por el usuario
+    requested_raw = numero_documento.strip()
+    requested = None
+    if requested_raw and requested_raw.isdigit():
+        requested = int(requested_raw)
+    
+    # Obtener contador secuencial ANTES de generar CDC/DE
+    from . import counters
+    from .db import get_conn, ensure_tables
+    
+    conn = get_conn()
+    ensure_tables(conn)
+    
+    try:
+        # Tipo de documento: 1 = Factura electrónica
+        tipo_documento = "1"
+        
+        next_num = counters.next_dnumdoc(
+            conn,
+            env=env,
+            timbrado=timbrado,
+            est=establecimiento,
+            punexp=punto_expedicion,
+            tipode=tipo_documento,
+            requested=requested,
+        )
+        
+        # Formatear a 7 dígitos con cero a la izquierda
+        numero_documento = f"{next_num:07d}"
+    finally:
+        conn.close()
+    
     # Extraer items del formulario
     form_data = await request.form()
     items = []
@@ -473,7 +520,7 @@ async def de_new_submit(
     # Generar DE XML con items
     try:
         import sys
-        sys.path.insert(0, str(Path(__file__).parent.parent))
+        sys.path.insert(0, str(FSPath(__file__).parent.parent))
         
         de_xml = _build_de_xml_with_items(
             ruc=emisor_ruc,
@@ -578,13 +625,14 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
         if not document:
             raise HTTPException(status_code=404, detail=f"Documento {doc_id} no encontrado")
         
-        # Actualizar estado a "sending"
-        db.update_document_status(doc_id, status="sending")
+        # Importar constantes de estado
+        from .document_status import STATUS_ERROR
+        from .sifen_status_mapper import map_recepcion_response_to_status
         
         # Importar cliente SIFEN (lazy import)
         import sys
         import re
-        sys.path.insert(0, str(Path(__file__).parent.parent))
+        sys.path.insert(0, str(FSPath(__file__).parent.parent))
         
         try:
             from app.sifen_client.soap_client import SoapClient
@@ -614,39 +662,172 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
             
             if mode == "lote":
                 # Flujo por lote (siRecepLoteDE)
-                from tools.send_sirecepde import build_r_envio_lote_xml, build_lote_base64_from_single_xml
+                from tools.send_sirecepde import build_r_envio_lote_xml, build_and_sign_lote_from_xml
+                from app.sifen_client.config import get_mtls_cert_path_and_password
                 
                 de_xml_bytes = de_xml.encode("utf-8")
-                zip_base64 = build_lote_base64_from_single_xml(de_xml_bytes)
+                
+                # Obtener certificado de firma (usar mTLS si no hay específico de firma)
+                sign_cert_path, sign_cert_password = get_mtls_cert_path_and_password()
+                
+                # GUARD-RAIL: Verificar dependencias críticas ANTES de construir/firmar
+                try:
+                    from tools.send_sirecepde import _check_signing_dependencies
+                    _check_signing_dependencies()
+                except RuntimeError as e:
+                    error_msg = f"BLOQUEADO: {str(e)}. Ver artifacts/sign_blocked_reason.txt"
+                    db.update_document_status(doc_id, status="error", message=error_msg)
+                    return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
+                
+                # Construir y firmar lote usando el pipeline correcto
+                try:
+                    zip_base64, lote_xml_bytes, zip_bytes, _ = build_and_sign_lote_from_xml(
+                        xml_bytes=de_xml_bytes,
+                        cert_path=sign_cert_path,
+                        cert_password=sign_cert_password,
+                        return_debug=True
+                    )
+                except Exception as e:
+                    error_msg = f"BLOQUEADO: Error al construir/firmar lote: {str(e)}"
+                    db.update_document_status(doc_id, status="error", message=error_msg)
+                    return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
+                
                 payload_xml = build_r_envio_lote_xml(did=1, xml_bytes=de_xml_bytes, zip_base64=zip_base64)
                 
-                # Enviar lote a SIFEN
+                # PREFLIGHT: Validar antes de enviar
+                from tools.send_sirecepde import preflight_soap_request
+                preflight_success, preflight_error = preflight_soap_request(
+                    payload_xml=payload_xml,
+                    zip_bytes=zip_bytes,
+                    lote_xml_bytes=lote_xml_bytes,
+                    artifacts_dir=FSPath("artifacts")
+                )
+                
+                if not preflight_success:
+                    error_msg = f"BLOQUEADO: Preflight falló - {preflight_error}. Ver artifacts/preflight_*.xml y artifacts/preflight_zip.zip"
+                    db.update_document_status(doc_id, status="error", message=error_msg)
+                    return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
+                
+                # Enviar lote a SIFEN (solo si preflight pasó)
                 response = client.recepcion_lote(payload_xml)
                 
-                # Extraer dProtConsLote de la respuesta
+                # Extraer campos de la respuesta (SIEMPRE parsear aunque dProtConsLote sea 0)
                 d_prot_cons_lote = response.get('d_prot_cons_lote')
+                d_cod_res = response.get('codigo_respuesta')
+                d_msg_res = response.get('mensaje')
+                d_tpo_proces = response.get('d_tpo_proces')
                 
-                # Actualizar estado del documento según respuesta
-                if response.get('ok'):
-                    status = "approved"
-                    code = response.get('codigo_respuesta', '0200')
-                    message = response.get('mensaje', 'Lote aceptado')
-                else:
-                    status = "rejected"
-                    code = response.get('codigo_respuesta', '0100')
-                    message = response.get('mensaje', 'Lote rechazado')
+                # Guardar artifact de debug si está habilitado
+                debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+                if debug_enabled:
+                    try:
+                        artifacts_dir = FSPath("artifacts")
+                        artifacts_dir.mkdir(parents=True, exist_ok=True)
+                        import json
+                        parsed_response = {
+                            "dCodRes": d_cod_res,
+                            "dMsgRes": d_msg_res,
+                            "dProtConsLote": d_prot_cons_lote,
+                            "dTpoProces": d_tpo_proces
+                        }
+                        artifacts_dir.joinpath("last_lote_response_parsed.json").write_text(
+                            json.dumps(parsed_response, indent=2, ensure_ascii=False),
+                            encoding="utf-8"
+                        )
+                    except Exception:
+                        pass
                 
-                # Guardar respuesta del documento
+                # Mapear respuesta de recepción a estado (NO es aprobación, solo recepción)
+                status, code, message = map_recepcion_response_to_status(response)
+                
+                # Guardar paquete de diagnóstico automáticamente si dCodRes=0301 con dProtConsLote=0
+                if d_cod_res == "0301" and (d_prot_cons_lote is None or d_prot_cons_lote == 0 or str(d_prot_cons_lote) == "0"):
+                    try:
+                        artifacts_dir = FSPath("artifacts")
+                        artifacts_dir.mkdir(parents=True, exist_ok=True)
+                        
+                        # Importar función de diagnóstico
+                        sys.path.insert(0, str(FSPath(__file__).parent.parent))
+                        from tools.send_sirecepde import _save_0301_diagnostic_package
+                        
+                        # Extraer dId del payload
+                        from lxml import etree
+                        SIFEN_NS = "http://ekuatia.set.gov.py/sifen/xsd"
+                        payload_root = etree.fromstring(payload_xml.encode("utf-8"))
+                        did = "1"  # Default
+                        d_id_elem = payload_root.find(f".//{{{SIFEN_NS}}}dId")
+                        if d_id_elem is None:
+                            d_id_elem = payload_root.find(".//dId")
+                        if d_id_elem is not None and d_id_elem.text:
+                            did = d_id_elem.text.strip()
+                        
+                        # Llamar función de diagnóstico (zip_bytes y lote_xml_bytes ya están disponibles)
+                        # Nota: zip_bytes y lote_xml_bytes están disponibles desde build_and_sign_lote_from_xml
+                        if lote_xml_bytes:
+                            _save_0301_diagnostic_package(
+                                artifacts_dir=artifacts_dir,
+                                response=response,
+                                payload_xml=payload_xml,
+                                zip_bytes=zip_bytes,
+                                lote_xml_bytes=lote_xml_bytes,
+                                env=env,
+                                did=did
+                            )
+                        else:
+                            # Si no se pudo extraer, al menos guardar un resumen básico
+                            import json
+                            from datetime import datetime
+                            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                            basic_summary = {
+                                "diagnostic_package": {
+                                    "trigger": "dCodRes=0301 with dProtConsLote=0",
+                                    "timestamp": timestamp,
+                                    "env": env,
+                                    "note": "No se pudo extraer lote_xml_bytes (no disponible en contexto)"
+                                },
+                                "response": {
+                                    "dCodRes": d_cod_res,
+                                    "dMsgRes": d_msg_res,
+                                    "dProtConsLote": d_prot_cons_lote,
+                                },
+                                "request": {
+                                    "dId": did,
+                                    "soap_request_redacted": payload_xml[:1000] + "... [truncado]"
+                                }
+                            }
+                            summary_file = artifacts_dir / f"diagnostic_0301_summary_basic_{timestamp}.json"
+                            summary_file.write_text(
+                                json.dumps(basic_summary, indent=2, ensure_ascii=False, default=str),
+                                encoding="utf-8"
+                            )
+                    except Exception as e:
+                        # No bloquear el flujo si falla el diagnóstico
+                        import logging
+                        logger = logging.getLogger(__name__)
+                        logger.warning(f"Error al guardar paquete de diagnóstico 0301: {e}")
+                
+                # Guardar respuesta del documento con d_prot_cons_lote si existe
                 db.update_document_status(
                     doc_id=doc_id,
                     status=status,
                     code=code,
                     message=message,
-                    sirecepde_xml=payload_xml
+                    sirecepde_xml=payload_xml,
+                    d_prot_cons_lote=d_prot_cons_lote
                 )
                 
-                # Si se recibió dProtConsLote, guardar lote y consultar automáticamente
+                # Si se recibió dProtConsLote > 0, guardar lote y consultar automáticamente
+                # NO consultar si dProtConsLote es 0 o None (no hay protocolo)
+                d_prot_int = None
                 if d_prot_cons_lote:
+                    try:
+                        d_prot_str = str(d_prot_cons_lote).strip()
+                        if d_prot_str and d_prot_str != "0":
+                            d_prot_int = int(d_prot_str)
+                    except (ValueError, AttributeError):
+                        pass
+                
+                if d_prot_int and d_prot_int > 0:
                     # Validar que sea solo dígitos
                     if not re.match(r'^\d+$', d_prot_cons_lote.strip()):
                         # Log warning pero continuar
@@ -699,22 +880,17 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
                 
                 # Parsear respuesta (recepcion_de retorna dict con ok, codigo_respuesta, mensaje, etc.)
+                # IMPORTANTE: En modo directo, siRecepDE puede devolver aprobación inmediata,
+                # pero según documentación SIFEN, esto es raro. Mapear correctamente.
                 if isinstance(response, dict):
-                    # Respuesta parseada correctamente
-                    if response.get('ok'):
-                        status = "approved"
-                        code = response.get('codigo_respuesta', '0200')
-                        message = response.get('mensaje', 'DE aceptado')
-                    else:
-                        status = "rejected"
-                        code = response.get('codigo_respuesta', '0100')
-                        message = response.get('mensaje', 'DE rechazado')
+                    # Mapear respuesta de recepción a estado
+                    status, code, message = map_recepcion_response_to_status(response)
                     
                     # Guardar respuesta XML parseada si está disponible
                     response_xml = response.get('parsed_fields', {}).get('xml')
                 else:
-                    # Respuesta inesperada (no dict), guardar como sent
-                    status = "sent"
+                    # Respuesta inesperada (no dict), guardar como error
+                    status = STATUS_ERROR
                     code = None
                     message = "Respuesta recibida pero no parseada correctamente"
                     response_xml = str(response) if response else None
@@ -748,7 +924,7 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
 
 async def _check_lote_status_async(lote_id: int, env: str, prot: str):
     """
-    Helper async para consultar el estado de un lote.
+    Helper async para consultar el estado de un lote y actualizar DEs asociados.
     Se ejecuta en background después de recibir dProtConsLote.
     """
     import asyncio
@@ -756,6 +932,7 @@ async def _check_lote_status_async(lote_id: int, env: str, prot: str):
         check_lote_status,
         determine_status_from_cod_res_lot,
     )
+    from .sifen_status_mapper import map_lote_consulta_to_de_status
     
     # Ejecutar en thread pool para no bloquear
     loop = asyncio.get_event_loop()
@@ -774,17 +951,56 @@ async def _check_lote_status_async(lote_id: int, env: str, prot: str):
         msg_res_lot = result.get("msg_res_lot")
         response_xml = result.get("response_xml")
         
-        # Determinar estado
-        status = determine_status_from_cod_res_lot(cod_res_lot)
+        # Determinar estado del lote
+        lote_status = determine_status_from_cod_res_lot(cod_res_lot)
         
         # Actualizar lote
         lotes_db.update_lote_status(
             lote_id=lote_id,
-            status=status,
+            status=lote_status,
             cod_res_lot=cod_res_lot,
             msg_res_lot=msg_res_lot,
             response_xml=response_xml,
         )
+        
+        # Actualizar estado de los DEs asociados al lote
+        # Buscar DEs asociados a este lote
+        try:
+            lote = lotes_db.get_lote(lote_id)
+            if lote and lote.get('de_document_id'):
+                doc_id = lote['de_document_id']
+                document = db.get_document(doc_id)
+                if document:
+                    cdc = document.get('cdc')
+                    if cdc:
+                        # Mapear respuesta de consulta al estado del DE
+                        de_status, de_code, de_message, approved_at = map_lote_consulta_to_de_status(
+                            cod_res_lot=cod_res_lot,
+                            xml_response=response_xml,
+                            cdc=cdc
+                        )
+                        
+                        # Actualizar estado del DE
+                        db.update_document_status(
+                            doc_id=doc_id,
+                            status=de_status,
+                            code=de_code,
+                            message=de_message,
+                            approved_at=approved_at
+                        )
+                        
+                        # Log de transición de estado
+                        import logging
+                        logger = logging.getLogger(__name__)
+                        logger.info(
+                            f"DE {doc_id} (CDC: {cdc}) actualizado a estado {de_status} "
+                            f"después de consultar lote {prot}"
+                        )
+        except Exception as e:
+            # Error al actualizar DE, pero no fallar la consulta del lote
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Error al actualizar estado de DE después de consultar lote: {e}")
     else:
         # Error al consultar
         error_msg = result.get("error", "Error desconocido")
@@ -854,3 +1070,117 @@ async def admin_lote_check(request: Request, lote_id: int):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al consultar lote: {str(e)}")
+
+
+@app.get("/de/{doc_id}/status", response_class=HTMLResponse)
+async def de_check_status(request: Request, doc_id: int):
+    """
+    Consulta el estado de un DE en SIFEN y actualiza la base de datos.
+    
+    Si el DE tiene d_prot_cons_lote, consulta el lote.
+    Si no, intenta consulta directa por CDC (siConsDE).
+    
+    Query params:
+    - force: Si es "1", fuerza la consulta incluso si el estado es final (APPROVED/REJECTED)
+    """
+    try:
+        # Leer query param force
+        force = request.query_params.get("force", "0")
+        force_consult = force == "1"
+        
+        document = db.get_document(doc_id)
+        if not document:
+            raise HTTPException(status_code=404, detail=f"Documento {doc_id} no encontrado")
+        
+        cdc = document.get('cdc')
+        d_prot_cons_lote = document.get('d_prot_cons_lote')
+        current_status = document.get('last_status')
+        
+        # Importar constantes y mappers
+        from .document_status import STATUS_PENDING_SIFEN, STATUS_SENT_TO_SIFEN, STATUS_ERROR, is_final_status
+        from .sifen_status_mapper import map_lote_consulta_to_de_status
+        
+        # Determinar si se puede consultar
+        is_final = is_final_status(current_status) if current_status else False
+        
+        # Permitir consulta si:
+        # - Está en estado que puede cambiar (SENT_TO_SIFEN, PENDING_SIFEN, ERROR)
+        # - O si force=1 (incluso si es final, pero solo si tiene protocolo)
+        can_consult = (
+            current_status in [STATUS_SENT_TO_SIFEN, STATUS_PENDING_SIFEN, STATUS_ERROR]
+            or (force_consult and d_prot_cons_lote)  # Solo force si tiene protocolo
+        )
+        
+        if can_consult:
+            env = os.getenv("SIFEN_ENV", "test")
+            
+            if d_prot_cons_lote:
+                # Consultar por lote
+                from app.sifen_client.lote_checker import check_lote_status
+                
+                try:
+                    result = check_lote_status(
+                        env=env,
+                        prot=d_prot_cons_lote,
+                        timeout=30
+                    )
+                    
+                    if result.get("success"):
+                        cod_res_lot = result.get("cod_res_lot")
+                        response_xml = result.get("response_xml")
+                        
+                        # Mapear al estado del DE
+                        de_status, de_code, de_message, approved_at = map_lote_consulta_to_de_status(
+                            cod_res_lot=cod_res_lot,
+                            xml_response=response_xml,
+                            cdc=cdc
+                        )
+                        
+                        # Actualizar estado del DE
+                        db.update_document_status(
+                            doc_id=doc_id,
+                            status=de_status,
+                            code=de_code,
+                            message=de_message,
+                            approved_at=approved_at
+                        )
+                        
+                        return RedirectResponse(url=f"/de/{doc_id}?checked=1", status_code=303)
+                    else:
+                        # Error en la consulta - SOBRESCRIBIR con el nuevo error
+                        error_msg = result.get("error", "Error desconocido")
+                        # Si es error de conexión transitorio, mantener mensaje claro pero no bloquear reintentos
+                        if "reset by peer" in error_msg.lower() or "no respondió" in error_msg.lower():
+                            error_msg = "SIFEN no respondió (reset by peer). Reintentar."
+                        db.update_document_status(
+                            doc_id=doc_id,
+                            status=STATUS_ERROR,
+                            code=None,  # Limpiar código anterior
+                            message=error_msg  # Sobrescribir mensaje anterior
+                        )
+                        return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
+                except Exception as e:
+                    # Error al consultar - SOBRESCRIBIR con el nuevo error
+                    error_msg = f"Error al consultar lote: {str(e)}"
+                    db.update_document_status(
+                        doc_id=doc_id,
+                        status=STATUS_ERROR,
+                        code=None,  # Limpiar código anterior
+                        message=error_msg  # Sobrescribir mensaje anterior
+                    )
+                    return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
+            else:
+                # TODO: Implementar consulta directa por CDC (siConsDE)
+                # Por ahora, solo redirigir
+                return RedirectResponse(url=f"/de/{doc_id}?note=Consulta por CDC no implementada aún", status_code=303)
+        else:
+            # No se puede consultar (estado final sin force, o sin protocolo)
+            if is_final and not force_consult:
+                return RedirectResponse(url=f"/de/{doc_id}?note=Estado final. Use ?force=1 para forzar consulta", status_code=303)
+            else:
+                return RedirectResponse(url=f"/de/{doc_id}?note=No se puede consultar (falta d_prot_cons_lote)", status_code=303)
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")

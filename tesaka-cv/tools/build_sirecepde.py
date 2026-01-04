@@ -11,6 +11,7 @@ Uso:
     python -m tools.build_sirecepde --de de_test.xml --output sirecepde_test.xml
     python -m tools.build_sirecepde --de de_test.xml --did 1 --output sirecepde_test.xml
 """
+from lxml import etree
 import sys
 import argparse
 import xml.etree.ElementTree as ET

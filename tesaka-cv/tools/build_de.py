@@ -86,21 +86,62 @@ def build_de_xml(
         except:
             dv_ruc = "0"
     
-    # Limpiar RUC: solo dígitos, sin zero-padding (mantener longitud original)
+    # Limpiar RUC: solo dígitos, normalizar a 8 dígitos con zero-fill a la izquierda
     ruc_clean = ''.join(c for c in ruc_num if c.isdigit())
     if not ruc_clean:
         raise ValueError(f"RUC debe contener al menos un dígito. Valor recibido: '{ruc_num}'")
+    # Normalizar a 8 dígitos para CDC (zero-fill a la izquierda)
+    ruc_clean = ruc_clean.zfill(8)[-8:]  # Tomar últimos 8 dígitos si es más largo
     
     # Monto para CDC (simplificado)
     monto = "100000"
     
-    # Generar CDC (usar solo el número del RUC, sin DV)
-    cdc = generate_cdc(ruc_clean, timbrado, establecimiento, punto_expedicion, 
-                      numero_documento, tipo_documento, fecha.replace("-", ""), monto)
+    # Normalizar campos para CDC antes de generar
+    establecimiento_cdc = str(establecimiento).zfill(3)[-3:]
+    punto_expedicion_cdc = str(punto_expedicion).zfill(3)[-3:]
+    numero_documento_cdc = str(numero_documento).zfill(7)[-7:]
+    tipo_documento_cdc = str(tipo_documento).zfill(2)[-2:]
     
-    # Calcular dígito verificador
-    digits_in_cdc = ''.join(c for c in cdc if c.isdigit())
-    dv_id = digits_in_cdc[-1] if digits_in_cdc else "0"
+    # Generar CDC (usar campos normalizados)
+    cdc = generate_cdc(ruc_clean, timbrado, establecimiento_cdc, punto_expedicion_cdc, 
+                      numero_documento_cdc, tipo_documento_cdc, fecha.replace("-", ""), monto)
+    
+    # Validación defensiva: asegurar que el CDC sea válido antes de usarlo
+    from app.sifen_client.cdc_utils import validate_cdc, fix_cdc
+    
+    # Convertir a string si no lo es
+    cdc = str(cdc).strip()
+    
+    # Validar longitud y formato
+    if len(cdc) != 44:
+        raise ValueError(
+            f"CDC generado tiene longitud inválida: {len(cdc)} (esperado: 44). "
+            f"CDC recibido: {cdc!r}"
+        )
+    
+    # Validar que sea solo dígitos
+    if not cdc.isdigit():
+        raise ValueError(
+            f"CDC generado contiene caracteres no numéricos: {cdc!r}. "
+            f"El CDC debe ser exactamente 44 dígitos (0-9)."
+        )
+    
+    # Validar DV
+    es_valido, dv_orig, dv_calc = validate_cdc(cdc)
+    if not es_valido:
+        # Corregir automáticamente si el DV es incorrecto
+        cdc = fix_cdc(cdc)
+        # Re-validar después de corregir
+        es_valido, _, _ = validate_cdc(cdc)
+        if not es_valido:
+            raise ValueError(
+                f"CDC generado tiene DV inválido y no pudo corregirse. "
+                f"CDC: {cdc!r}"
+            )
+    
+    # Calcular dígito verificador (dv del CDC)
+    # El dDVId es el último dígito del CDC (que ya está validado)
+    dv_id = cdc[-1]
     
     # Código de seguridad (CSC)
     if csc:
@@ -123,6 +164,12 @@ def build_de_xml(
         if not d_nom_emi:
             d_nom_emi = "Emisor"
     
+    # Normalizar campos numéricos para CDC
+    establecimiento_norm = str(establecimiento).zfill(3)[-3:]  # 3 dígitos
+    punto_expedicion_norm = str(punto_expedicion).zfill(3)[-3:]  # 3 dígitos
+    numero_documento_norm = str(numero_documento).zfill(7)[-7:]  # 7 dígitos
+    tipo_documento_norm = str(tipo_documento).zfill(2)[-2:]  # 2 dígitos para CDC
+    
     # Generar XML DE crudo (solo el elemento DE, sin wrapper rDE)
     # Este XML valida contra DE_v150.xsd (tipo tDE)
     xml = f"""<DE xmlns="http://ekuatia.set.gov.py/sifen/xsd" Id="{cdc}">
@@ -135,12 +182,12 @@ def build_de_xml(
         <dCodSeg>{cod_seg}</dCodSeg>
     </gOpeDE>
     <gTimb>
-        <iTiDE>{tipo_documento}</iTiDE>
+        <iTiDE>{tipo_documento_norm}</iTiDE>
         <dDesTiDE>Factura electrónica</dDesTiDE>
         <dNumTim>{timbrado_clean}</dNumTim>
-        <dEst>{establecimiento}</dEst>
-        <dPunExp>{punto_expedicion}</dPunExp>
-        <dNumDoc>{numero_documento}</dNumDoc>
+        <dEst>{establecimiento_norm}</dEst>
+        <dPunExp>{punto_expedicion_norm}</dPunExp>
+        <dNumDoc>{numero_documento_norm}</dNumDoc>
         <dFeIniT>{fecha}</dFeIniT>
     </gTimb>
     <gDatGralOpe>
@@ -378,6 +425,18 @@ def main():
     # Escribir archivo
     output_path = Path(args.output)
     output_path.write_text(xml_with_prolog, encoding="utf-8")
+    
+    # Recalcular CDC desde XML y setear DE@Id para asegurar consistencia
+    try:
+        from tools.cdc_fix import fix_de_id_in_file
+        cdc_final = fix_de_id_in_file(str(output_path))
+        print(f"🔒 CDC final seteado en DE@Id: {cdc_final}")
+    except SystemExit as e:
+        print(f"❌ Error al corregir DE@Id: {e}")
+        return 1
+    except Exception as e:
+        print(f"❌ Error inesperado al corregir DE@Id: {e}")
+        return 1
     
     print(f"✅ DE crudo generado: {output_path}")
     print(f"   RUC: {ruc}")

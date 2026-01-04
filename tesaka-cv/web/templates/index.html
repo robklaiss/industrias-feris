@@ -27,8 +27,20 @@
             <td>{{ doc.timbrado or 'N/A' }}</td>
             <td>{{ doc.created_at if doc.created_at else 'N/A' }}</td>
             <td>
-                <span class="status-badge status-{{ doc.last_status|lower|replace(' ', '-') if doc.last_status else 'unknown' }}">
-                    {{ doc.last_status or 'N/A' }}
+                <span class="status-badge status-{{ doc.last_status|lower|replace('_', '-') if doc.last_status else 'unknown' }}">
+                    {% if doc.last_status == 'signed_local' %}
+                        Firmado Local
+                    {% elif doc.last_status == 'sent_to_sifen' or doc.last_status == 'pending_sifen' %}
+                        Enviado a SIFEN
+                    {% elif doc.last_status == 'approved' %}
+                        Aprobado
+                    {% elif doc.last_status == 'rejected' %}
+                        Rechazado
+                    {% elif doc.last_status == 'error' %}
+                        Error
+                    {% else %}
+                        {{ doc.last_status or 'N/A' }}
+                    {% endif %}
                 </span>
             </td>
         </tr>

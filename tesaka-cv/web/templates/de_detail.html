@@ -7,10 +7,17 @@
     <div class="doc-header">
         <h2>Documento #{{ doc.id }}</h2>
         <div class="header-actions">
-            {% if doc.last_status == 'pending' or doc.last_status == 'error' %}
+            {% if doc.last_status == 'signed_local' or doc.last_status == 'error' %}
             <form method="POST" action="/de/{{ doc.id }}/send" style="display: inline;">
                 <button type="submit" class="btn-primary" onclick="return confirm('¿Enviar este documento a SIFEN?');">
                     📤 Enviar a SIFEN
+                </button>
+            </form>
+            {% endif %}
+            {% if doc.last_status == 'sent_to_sifen' or doc.last_status == 'pending_sifen' or doc.last_status == 'error' %}
+            <form method="GET" action="/de/{{ doc.id }}/status{% if doc.last_status == 'error' %}?force=1{% endif %}" style="display: inline;">
+                <button type="submit" class="btn-secondary">
+                    🔍 Consultar Estado en SIFEN
                 </button>
             </form>
             {% endif %}
@@ -44,11 +51,37 @@
             <tr>
                 <th>Estado:</th>
                 <td>
-                    <span class="status-badge status-{{ doc.last_status|lower|replace(' ', '-') if doc.last_status else 'unknown' }}">
-                        {{ doc.last_status or 'N/A' }}
+                    <span class="status-badge status-{{ doc.last_status|lower|replace('_', '-') if doc.last_status else 'unknown' }}">
+                        {% if doc.last_status == 'signed_local' %}
+                            FIRMADO LOCALMENTE: pendiente de envío a SIFEN.
+                        {% elif doc.last_status == 'sent_to_sifen' %}
+                            ENVIADO A SIFEN: recibido, en espera de validación/aprobación.
+                        {% elif doc.last_status == 'pending_sifen' %}
+                            ENVIADO A SIFEN: en espera de validación/aprobación.
+                        {% elif doc.last_status == 'approved' %}
+                            APROBADO POR SIFEN: DE emitido y autorizado{% if doc.approved_at %} (Aprobado el {{ doc.approved_at }}){% endif %}.
+                        {% elif doc.last_status == 'rejected' %}
+                            RECHAZADO POR SIFEN{% if doc.last_code or doc.last_message %}: {% if doc.last_code %}{{ doc.last_code }}{% endif %}{% if doc.last_code and doc.last_message %} - {% endif %}{% if doc.last_message %}{{ doc.last_message }}{% endif %}{% endif %}.
+                        {% elif doc.last_status == 'error' %}
+                            ERROR: problema en el proceso{% if doc.last_message %}: {{ doc.last_message }}{% endif %}.
+                        {% else %}
+                            {{ doc.last_status or 'N/A' }}
+                        {% endif %}
                     </span>
                 </td>
             </tr>
+            {% if doc.d_prot_cons_lote %}
+            <tr>
+                <th>Protocolo de Lote:</th>
+                <td><code>{{ doc.d_prot_cons_lote }}</code></td>
+            </tr>
+            {% endif %}
+            {% if doc.approved_at %}
+            <tr>
+                <th>Fecha de Aprobación:</th>
+                <td>{{ doc.approved_at }}</td>
+            </tr>
+            {% endif %}
             <tr>
                 <th>Código:</th>
                 <td><code>{{ doc.last_code or 'N/A' }}</code></td>
