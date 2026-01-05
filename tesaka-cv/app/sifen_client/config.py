@@ -89,9 +89,13 @@ class SifenConfig:
     
     # URLs base según "Guía de Mejores Prácticas para la Gestión del Envío de DE" (Oct 2024)
     # Fuente: https://ekuatia.set.gov.py
+    # Modo MOCK: Si SIFEN_MOCK=1, usar servidor local
+    _MOCK_BASE_URL = os.getenv("SIFEN_MOCK_BASE_URL", "https://127.0.0.1:9443")
+    _USE_MOCK = os.getenv("SIFEN_MOCK", "0").lower() in ("1", "true", "yes")
+    
     BASE_URLS = {
-        "test": os.getenv("SIFEN_TEST_BASE_URL", "https://sifen-test.set.gov.py"),
-        "prod": os.getenv("SIFEN_PROD_BASE_URL", "https://sifen.set.gov.py"),
+        "test": _MOCK_BASE_URL if _USE_MOCK else os.getenv("SIFEN_TEST_BASE_URL", "https://sifen-test.set.gov.py"),
+        "prod": _MOCK_BASE_URL if _USE_MOCK else os.getenv("SIFEN_PROD_BASE_URL", "https://sifen.set.gov.py"),
     }
     
     # Prevalidador (público - herramienta de desarrollo)
@@ -101,22 +105,24 @@ class SifenConfig:
     # Servicios Web SOAP según Manual Técnico SIFEN V150
     # SOAP 1.2 Document/Literal
     # Fuente: Manual Técnico SIFEN V150
+    # Modo MOCK: Si SIFEN_MOCK=1, usar endpoints locales
+    _MOCK_BASE = _MOCK_BASE_URL.rstrip('/')
     SOAP_SERVICES = {
         "test": {
-            "recibe": "https://sifen-test.set.gov.py/de/ws/sync/recibe.wsdl",
-            "recibe_lote": "https://sifen-test.set.gov.py/de/ws/async/recibe-lote.wsdl?wsdl",
-            "evento": "https://sifen-test.set.gov.py/de/ws/eventos/evento.wsdl",
-            "consulta_lote": "https://sifen-test.set.gov.py/de/ws/consultas-lote/consulta-lote.wsdl",
-            "consulta_ruc": "https://sifen-test.set.gov.py/de/ws/consultas/consulta-ruc.wsdl",
-            "consulta": "https://sifen-test.set.gov.py/de/ws/consultas/consulta.wsdl",
+            "recibe": _MOCK_BASE + "/de/ws/sync/recibe.wsdl" if _USE_MOCK else "https://sifen-test.set.gov.py/de/ws/sync/recibe.wsdl",
+            "recibe_lote": _MOCK_BASE + "/de/ws/async/recibe-lote.wsdl?wsdl" if _USE_MOCK else "https://sifen-test.set.gov.py/de/ws/async/recibe-lote.wsdl?wsdl",
+            "evento": _MOCK_BASE + "/de/ws/eventos/evento.wsdl" if _USE_MOCK else "https://sifen-test.set.gov.py/de/ws/eventos/evento.wsdl",
+            "consulta_lote": _MOCK_BASE + "/de/ws/consultas-lote/consulta-lote.wsdl" if _USE_MOCK else "https://sifen-test.set.gov.py/de/ws/consultas-lote/consulta-lote.wsdl",
+            "consulta_ruc": _MOCK_BASE + "/de/ws/consultas/consulta-ruc.wsdl" if _USE_MOCK else "https://sifen-test.set.gov.py/de/ws/consultas/consulta-ruc.wsdl",
+            "consulta": _MOCK_BASE + "/de/ws/consultas/consulta.wsdl" if _USE_MOCK else "https://sifen-test.set.gov.py/de/ws/consultas/consulta.wsdl",
         },
         "prod": {
-            "recibe": "https://sifen.set.gov.py/de/ws/sync/recibe.wsdl",
-            "recibe_lote": "https://sifen.set.gov.py/de/ws/async/recibe-lote.wsdl",
-            "evento": "https://sifen.set.gov.py/de/ws/eventos/evento.wsdl",
-            "consulta_lote": "https://sifen.set.gov.py/de/ws/consultas-lote/consulta-lote.wsdl",
-            "consulta_ruc": "https://sifen.set.gov.py/de/ws/consultas/consulta-ruc.wsdl",
-            "consulta": "https://sifen.set.gov.py/de/ws/consultas/consulta.wsdl",
+            "recibe": _MOCK_BASE + "/de/ws/sync/recibe.wsdl" if _USE_MOCK else "https://sifen.set.gov.py/de/ws/sync/recibe.wsdl",
+            "recibe_lote": _MOCK_BASE + "/de/ws/async/recibe-lote.wsdl" if _USE_MOCK else "https://sifen.set.gov.py/de/ws/async/recibe-lote.wsdl",
+            "evento": _MOCK_BASE + "/de/ws/eventos/evento.wsdl" if _USE_MOCK else "https://sifen.set.gov.py/de/ws/eventos/evento.wsdl",
+            "consulta_lote": _MOCK_BASE + "/de/ws/consultas-lote/consulta-lote.wsdl" if _USE_MOCK else "https://sifen.set.gov.py/de/ws/consultas-lote/consulta-lote.wsdl",
+            "consulta_ruc": _MOCK_BASE + "/de/ws/consultas/consulta-ruc.wsdl" if _USE_MOCK else "https://sifen.set.gov.py/de/ws/consultas/consulta-ruc.wsdl",
+            "consulta": _MOCK_BASE + "/de/ws/consultas/consulta.wsdl" if _USE_MOCK else "https://sifen.set.gov.py/de/ws/consultas/consulta.wsdl",
         }
     }
     

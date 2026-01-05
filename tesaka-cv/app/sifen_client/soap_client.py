@@ -16,6 +16,7 @@ Notas importantes:
 import os
 import logging
 import time
+import ssl
 from typing import Dict, Any, Optional, List, TYPE_CHECKING
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse
@@ -346,7 +347,56 @@ class SoapClient:
         if ca_bundle_path:
             session.verify = ca_bundle_path
 
-        session.mount("https://", HTTPAdapter())
+        # Forzar TLS 1.2 mínimo (y permitir TLS 1.3)
+        # Crear SSLContext con versión mínima TLS 1.2
+        ssl_context = ssl.create_default_context()
+        # Python 3.7+ soporta minimum_version
+        if hasattr(ssl, 'TLSVersion'):
+            ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
+            ssl_context.maximum_version = ssl.TLSVersion.MAXIMUM_SUPPORTED
+        # Deshabilitar TLS 1.0 y 1.1 explícitamente (compatible con Python 3.6+)
+        ssl_context.options |= ssl.OP_NO_TLSv1
+        ssl_context.options |= ssl.OP_NO_TLSv1_1
+        
+        # Crear HTTPAdapter con SSLContext personalizado
+        # HTTPAdapter.init_poolmanager acepta ssl_context en urllib3 1.26+
+        adapter = HTTPAdapter()
+        try:
+            # Configurar el SSLContext en el adapter
+            adapter.init_poolmanager(
+                connections=10,
+                maxsize=10,
+                block=False,
+                ssl_context=ssl_context,
+            )
+        except TypeError:
+            # urllib3 < 1.26 no acepta ssl_context directamente
+            # Intentar método alternativo
+            try:
+                import urllib3.poolmanager
+                # Crear poolmanager con ssl_context
+                adapter.poolmanager = urllib3.poolmanager.PoolManager(
+                    ssl_context=ssl_context,
+                )
+            except Exception as e:
+                logger.warning(
+                    f"No se pudo configurar SSLContext personalizado: {e}. "
+                    f"Usando configuración por defecto (puede no forzar TLS 1.2 mínimo)."
+                )
+        except Exception as e:
+            logger.warning(
+                f"No se pudo configurar SSLContext personalizado: {e}. "
+                f"Usando configuración por defecto (puede no forzar TLS 1.2 mínimo)."
+            )
+        
+        session.mount("https://", adapter)
+        
+        # Log de configuración TLS (sin secretos)
+        if hasattr(ssl, 'TLSVersion') and hasattr(ssl_context, 'minimum_version'):
+            tls_min_version = ssl_context.minimum_version.name if hasattr(ssl_context.minimum_version, 'name') else str(ssl_context.minimum_version)
+        else:
+            tls_min_version = "TLSv1.2 (via OP_NO_TLSv1/OP_NO_TLSv1_1)"
+        logger.info(f"TLS configurado: mínimo={tls_min_version}, máximo=MAXIMUM_SUPPORTED")
 
         # Transport está disponible porque ZEEP_AVAILABLE es True (verificado en __init__)
         # timeout puede ser int o tuple (connect, read) según requests/zeep

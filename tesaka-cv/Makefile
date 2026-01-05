@@ -1,4 +1,4 @@
-.PHONY: help env-check send-de consulta-lote extract-lote
+.PHONY: help env-check send-de consulta-lote extract-lote mtls-mock-test mtls-mock-server mtls-mock-certs mtls-mock-test mtls-mock-server mtls-mock-certs
 
 # Default target
 help:
@@ -8,6 +8,10 @@ help:
 	@echo "  make send-de XML=... ENV=test     - Envía DE a SIFEN"
 	@echo "  make consulta-lote PROT=... ENV=test - Consulta estado de lote"
 	@echo "  make extract-lote IN=... OUT=...  - Extrae ZIP del SOAP y guarda XML"
+	@echo ""
+	@echo "  make mtls-mock-certs              - Genera certificados DEV para mock server"
+	@echo "  make mtls-mock-server             - Levanta el mock server mTLS"
+	@echo "  make mtls-mock-test               - Test automático completo (levanta server, prueba, baja)"
 	@echo ""
 	@echo "Ejemplos:"
 	@echo "  make env-check"
@@ -110,4 +114,21 @@ extract-lote:
 	@export PYTHONUNBUFFERED=1; \
 	echo "📦 Extrayendo lote de $(IN) a $(OUT)..."; \
 	python scripts/extract_lote_from_soap.py "$(IN)" "$(OUT)"
+
+# Mock Server mTLS (dev-only)
+mtls-mock-certs:
+	@echo "🔐 Generando certificados DEV para mock server..."
+	@tools/mtls_mock/generate_dev_certs.sh
+
+mtls-mock-server:
+	@echo "🚀 Levantando mock server mTLS..."
+	@echo "   Servidor escuchará en https://127.0.0.1:9443"
+	@echo "   Presione Ctrl+C para detener"
+	@export PYTHONUNBUFFERED=1; \
+	python tools/mtls_mock/mock_server.py
+
+mtls-mock-test:
+	@echo "🧪 Ejecutando test automático del mock server..."
+	@export PYTHONUNBUFFERED=1; \
+	python tools/mtls_mock/test_mtls_mock.py
 

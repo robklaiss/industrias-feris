@@ -1,0 +1,16 @@
+# Certificados DEV (NO commitear)
+certs/*.key
+certs/*.p12
+certs/*.pfx
+certs/*.csr
+certs/*.ext
+certs/*.srl
+
+# Artifacts (pueden ser grandes)
+artifacts/*.xml
+artifacts/*.txt
+
+# Mantener estructura de directorios
+!certs/.gitkeep
+!artifacts/.gitkeep
+
