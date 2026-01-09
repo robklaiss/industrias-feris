@@ -51,6 +51,7 @@ from requests.adapters import HTTPAdapter
 import requests
 
 from .config import SifenConfig, get_mtls_cert_path_and_password
+from .ruc_format import normalize_sifen_truc, RucFormatError
 from .exceptions import (
     SifenClientError,
     SifenSizeLimitError,
@@ -3609,11 +3610,18 @@ class SoapClient:
         import random
         import time
         
-        # Parsear RUC: puede venir como "RUC-DV" (ej: "4554737-8") o solo "RUC" (ej: "4554737")
-        # Para siConsRUC, se debe enviar SOLO el número sin DV (no concatenar)
-        ruc_clean = ruc.strip()
-        # Extraer solo la parte antes del guión (si existe)
-        ruc_final = ruc_clean.split("-", 1)[0].strip()  # 4554737-8 -> 4554737
+        # Normalizar RUC según especificación SIFEN consultaRUC:
+        # - Longitud: 7-8 dígitos totales (incluyendo DV)
+        # - Solo dígitos: El RUC paraguayo NUNCA tiene letras
+        # - Sin guión (el guión es solo para visualización)
+        # - Si viene "BASE-DV": BASE debe ser 6-7 dígitos, DV 1 dígito → BASE+DV (7-8 total)
+        # - Si viene sin guión: debe ser 7-8 dígitos
+        try:
+            ruc_final = normalize_sifen_truc(ruc)
+        except RucFormatError as e:
+            result["ok"] = False
+            result["error"] = f"{type(e).__name__}: {e}"
+            raise SifenClientError(f"Formato de RUC inválido para consultaRUC: {e}", result=result) from e
         
         # Generar dId de 15 dígitos si no se proporciona (formato: YYYYMMDDHHMMSS + 1 dígito aleatorio)
         # Igual que en siRecepLoteDE y consulta_de_por_cdc_raw
