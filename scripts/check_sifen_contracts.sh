@@ -271,8 +271,10 @@ else
     fi
     if [ ! -f "$WSDL_SNAPSHOT" ]; then
         echo "   - WSDL snapshot no encontrado: ${WSDL_SNAPSHOT}"
+        echo "   - Para actualizar: bash scripts/update_wsdl_snapshot_consulta_ruc_test.sh"
     elif [ ! -s "$WSDL_SNAPSHOT" ]; then
         echo "   - WSDL snapshot está vacío: ${WSDL_SNAPSHOT}"
+        echo "   - Para actualizar: bash scripts/update_wsdl_snapshot_consulta_ruc_test.sh"
     fi
     echo ""
 fi

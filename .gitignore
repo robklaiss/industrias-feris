@@ -76,8 +76,15 @@ htmlcov/
 # SIFEN specific
 *.p12
 *.pfx
+*.pem
+*.key
 *.jks
 *certificates*
+
+# Archivos PEM temporales generados por scripts (si alguien los genera dentro del repo)
+**/tmp/sifen_*.pem
+tesaka-cv/tmp/sifen_*.pem
+**/*.pem.local
 
 # Maven
 target/
