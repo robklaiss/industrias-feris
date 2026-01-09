@@ -1,7 +1,7 @@
 """
 Excepciones personalizadas para el cliente SIFEN
 """
-from typing import Optional
+from typing import Optional, Dict, Any
 
 
 class SifenException(Exception):
@@ -14,7 +14,19 @@ class SifenException(Exception):
 
 class SifenClientError(SifenException):
     """Error del cliente SIFEN"""
-    pass
+    def __init__(self, message: str, code: Optional[str] = None, result: Optional[Dict[str, Any]] = None, **kwargs):
+        """
+        Args:
+            message: Mensaje de error
+            code: Código de error (opcional)
+            result: Diccionario con resultado parcial (opcional, para debug/tests)
+            **kwargs: Campos adicionales opcionales (se ignoran por compatibilidad)
+        """
+        self.result = result
+        # Guardar kwargs adicionales si existen (para compatibilidad futura)
+        if kwargs:
+            self.meta = kwargs
+        super().__init__(message, code)
 
 
 class SifenValidationError(SifenException):

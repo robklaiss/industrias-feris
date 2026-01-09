@@ -274,72 +274,166 @@ class SoapClient:
             )
 
         else:
-            # Modo 2: PKCS12 (fallback) - usar helper para mTLS
-            resolved_cert_path, resolved_cert_password = get_mtls_cert_path_and_password()
-            
-            # Fallback a config si no hay env vars
-            if not resolved_cert_path:
-                resolved_cert_path = getattr(self.config, "cert_path", None)
-            if not resolved_cert_password:
-                resolved_cert_password = getattr(self.config, "cert_password", None)
-
-            missing = []
-            if not resolved_cert_path:
-                missing.append("SIFEN_MTLS_P12_PATH o SIFEN_CERT_PATH")
-            if not resolved_cert_password:
-                missing.append("SIFEN_MTLS_P12_PASSWORD o SIFEN_CERT_PASSWORD")
-
-            if missing:
-                raise SifenClientError(
-                    "mTLS es requerido para SIFEN. Falta: "
-                    + ", ".join(missing)
-                    + ". Opciones: 1) export SIFEN_CERT_PEM_PATH=... "
-                    "y SIFEN_KEY_PEM_PATH=... "
-                    "2) export SIFEN_MTLS_P12_PATH=/ruta/al/certificado.p12 "
-                    "y SIFEN_MTLS_P12_PASSWORD=..."
-                )
-
-            # resolved_cert_path está garantizado como no-None
-            # por la validación anterior
-            assert resolved_cert_path is not None
-            cert_path = Path(resolved_cert_path)
-            if not cert_path.exists():
-                raise SifenClientError(f"Certificado no encontrado: {cert_path}")
-
-            ext = cert_path.suffix.lower()
-            is_p12 = ext in (".p12", ".pfx")
-
-            if is_p12:
-                try:
-                    cert_pem_path, key_pem_path = p12_to_temp_pem_files(
-                        str(cert_path), resolved_cert_password or ""
+            # Modo 2: PKCS12 (fallback)
+            # Prioridad: 1) config.cert_path + config.cert_password, 2) env vars via helper
+            try:
+                # Intentar primero leer del config
+                config_cert_path = getattr(self.config, "cert_path", None)
+                config_cert_password = getattr(self.config, "cert_password", None)
+                
+                # Si ambos existen y no están vacíos, usar esos
+                if config_cert_path and config_cert_password:
+                    resolved_cert_path = config_cert_path
+                    resolved_cert_password = config_cert_password
+                else:
+                    # Si falta alguno, usar helper para obtener desde env vars
+                    resolved_cert_path, resolved_cert_password = get_mtls_cert_path_and_password()
+                
+                # Validar que tenemos ambos
+                if not resolved_cert_path:
+                    raise SifenClientError(
+                        "mTLS es requerido para SIFEN. Falta cert_path. "
+                        "Opciones: 1) config.cert_path, 2) SIFEN_MTLS_P12_PATH, "
+                        "3) SIFEN_CERT_PATH, 4) SIFEN_SIGN_P12_PATH",
+                        result={
+                            "ok": False,
+                            "error": "Missing cert_path for mTLS",
+                            "endpoint": None,
+                            "http_status": None,
+                            "raw_xml": None,
+                            "dCodRes": None,
+                            "dMsgRes": None,
+                        }
                     )
-                    self._temp_pem_files = (cert_pem_path, key_pem_path)
-                    session.cert = (cert_pem_path, key_pem_path)
-                    
-                    # Debug: guardar paths si está habilitado
-                    debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
-                    if debug_enabled:
-                        logger.info(
-                            f"mTLS: Certificado P12 convertido a PEM temporales: "
-                            f"cert={cert_pem_path}, key={key_pem_path}"
-                        )
-                    else:
-                        logger.info(
-                            f"Certificado P12 convertido a PEM temporales para mTLS: "
-                            f"{Path(cert_pem_path).name}, {Path(key_pem_path).name}"
-                        )
-                except PKCS12Error as e:
+                
+                if not resolved_cert_password:
                     raise SifenClientError(
-                        f"Error al convertir certificado P12 a PEM: {e}"
-                    ) from e
-                except Exception as e:
+                        "mTLS es requerido para SIFEN. Falta cert_password. "
+                        "Opciones: 1) config.cert_password, 2) SIFEN_MTLS_P12_PASSWORD, "
+                        "3) SIFEN_CERT_PASSWORD, 4) SIFEN_SIGN_P12_PASSWORD",
+                        result={
+                            "ok": False,
+                            "error": "Missing cert_password for mTLS",
+                            "endpoint": None,
+                            "http_status": None,
+                            "raw_xml": None,
+                            "dCodRes": None,
+                            "dMsgRes": None,
+                        }
+                    )
+                
+                # Validar que el archivo existe
+                cert_path = Path(resolved_cert_path)
+                if not cert_path.exists():
                     raise SifenClientError(
-                        f"Error inesperado al procesar certificado: {e}"
-                    ) from e
-            else:
-                session.cert = str(cert_path)
-                logger.info(f"Usando certificado en formato: {ext}")
+                        f"Certificado no encontrado: {cert_path}",
+                        result={
+                            "ok": False,
+                            "error": f"Cert file not found: {cert_path}",
+                            "endpoint": None,
+                            "http_status": None,
+                            "raw_xml": None,
+                            "dCodRes": None,
+                            "dMsgRes": None,
+                        }
+                    )
+
+                ext = cert_path.suffix.lower()
+                is_p12 = ext in (".p12", ".pfx")
+
+                if is_p12:
+                    try:
+                        cert_pem_path, key_pem_path = p12_to_temp_pem_files(
+                            str(cert_path), resolved_cert_password
+                        )
+                        self._temp_pem_files = (cert_pem_path, key_pem_path)
+                        session.cert = (cert_pem_path, key_pem_path)
+                        
+                        # Debug: guardar paths si está habilitado
+                        debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+                        if debug_enabled:
+                            logger.info(
+                                f"mTLS: Certificado P12 convertido a PEM temporales: "
+                                f"cert={cert_pem_path}, key={key_pem_path}"
+                            )
+                        else:
+                            logger.info(
+                                f"Certificado P12 convertido a PEM temporales para mTLS: "
+                                f"{Path(cert_pem_path).name}, {Path(key_pem_path).name}"
+                            )
+                    except PKCS12Error as e:
+                        raise SifenClientError(
+                            f"mTLS cert error: {e}",
+                            result={
+                                "ok": False,
+                                "error": str(e),
+                                "endpoint": None,
+                                "http_status": None,
+                                "raw_xml": None,
+                                "dCodRes": None,
+                                "dMsgRes": None,
+                            }
+                        ) from e
+                    except Exception as e:
+                        raise SifenClientError(
+                            f"mTLS cert error: {e}",
+                            result={
+                                "ok": False,
+                                "error": f"{type(e).__name__}: {e}",
+                                "endpoint": None,
+                                "http_status": None,
+                                "raw_xml": None,
+                                "dCodRes": None,
+                                "dMsgRes": None,
+                            }
+                        ) from e
+                else:
+                    # Certificado no es P12/PFX, usar directamente
+                    session.cert = str(cert_path)
+                    self._temp_pem_files = None
+                    logger.info(f"Usando certificado mTLS: {cert_path.name}")
+            except RuntimeError as e:
+                # Envolver RuntimeError del helper en SifenClientError
+                raise SifenClientError(
+                    f"mTLS cert error: {e}",
+                    result={
+                        "ok": False,
+                        "error": str(e),
+                        "endpoint": None,
+                        "http_status": None,
+                        "raw_xml": None,
+                        "dCodRes": None,
+                        "dMsgRes": None,
+                    }
+                ) from e
+            except PKCS12Error as e:
+                # Envolver PKCS12Error en SifenClientError
+                raise SifenClientError(
+                    f"mTLS cert error: {e}",
+                    result={
+                        "ok": False,
+                        "error": str(e),
+                        "endpoint": None,
+                        "http_status": None,
+                        "raw_xml": None,
+                        "dCodRes": None,
+                        "dMsgRes": None,
+                    }
+                ) from e
+            except Exception as e:
+                # Envolver cualquier otra excepción en SifenClientError
+                raise SifenClientError(
+                    f"mTLS cert error: {e}",
+                    result={
+                        "ok": False,
+                        "error": f"{type(e).__name__}: {e}",
+                        "endpoint": None,
+                        "http_status": None,
+                        "raw_xml": None,
+                        "dCodRes": None,
+                        "dMsgRes": None,
+                    }
+                ) from e
 
         # SSL verify
         session.verify = True

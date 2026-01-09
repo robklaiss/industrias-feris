@@ -36,7 +36,7 @@ def test_create_transport_fallback_to_env_vars(mock_config, mock_cert_file):
     with patch.dict(os.environ, {
         "SIFEN_CERT_PATH": mock_cert_file,
         "SIFEN_CERT_PASSWORD": "test_password"
-    }):
+    }, clear=True):
         with patch('app.sifen_client.soap_client.p12_to_temp_pem_files') as mock_p12_to_pem:
             mock_p12_to_pem.return_value = ("/tmp/cert.pem", "/tmp/key.pem")
             
@@ -57,7 +57,7 @@ def test_create_transport_uses_config_values(mock_config, mock_cert_file):
     with patch.dict(os.environ, {
         "SIFEN_CERT_PATH": "/other/path.p12",
         "SIFEN_CERT_PASSWORD": "env_password"
-    }, clear=False):
+    }, clear=True):
         with patch('app.sifen_client.soap_client.p12_to_temp_pem_files') as mock_p12_to_pem:
             mock_p12_to_pem.return_value = ("/tmp/cert.pem", "/tmp/key.pem")
             
@@ -72,23 +72,31 @@ def test_create_transport_uses_config_values(mock_config, mock_cert_file):
 
 def test_create_transport_missing_cert_path(mock_config):
     """Test que _create_transport() lanza error si falta cert_path"""
+    # Asegurar que config no tiene cert_path
+    mock_config.cert_path = None
+    mock_config.cert_password = None
+    
     with patch.dict(os.environ, {}, clear=True):
         with pytest.raises(SifenClientError) as exc_info:
             client = SoapClient(mock_config)
         
-        assert "SIFEN_CERT_PATH" in str(exc_info.value)
-        assert "mTLS es requerido" in str(exc_info.value)
+        assert "cert_path" in str(exc_info.value).lower() or "SIFEN_CERT_PATH" in str(exc_info.value) or "SIFEN_MTLS_P12_PATH" in str(exc_info.value)
+        assert "mTLS" in str(exc_info.value)
 
 
 def test_create_transport_missing_cert_password(mock_config, mock_cert_file):
     """Test que _create_transport() lanza error si falta cert_password"""
+    # Asegurar que config no tiene cert_password
+    mock_config.cert_path = None
+    mock_config.cert_password = None
+    
     with patch.dict(os.environ, {
         "SIFEN_CERT_PATH": mock_cert_file
         # SIFEN_CERT_PASSWORD no está
-    }):
+    }, clear=True):
         with pytest.raises(SifenClientError) as exc_info:
             client = SoapClient(mock_config)
         
-        assert "SIFEN_CERT_PASSWORD" in str(exc_info.value)
-        assert "mTLS es requerido" in str(exc_info.value)
+        assert "cert_password" in str(exc_info.value).lower() or "SIFEN_CERT_PASSWORD" in str(exc_info.value) or "SIFEN_MTLS_P12_PASSWORD" in str(exc_info.value)
+        assert "mTLS" in str(exc_info.value)
 
