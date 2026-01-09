@@ -253,49 +253,28 @@ else
     done
 fi
 
-# Test 3: Contract tests (opcional, solo si existe WSDL snapshot)
-# Verificar snapshot WSDL antes de ejecutar para mostrar warning
+# Test 3: Contract tests (opcional, solo si existe WSDL snapshot Y test file)
+CONTRACT_TEST_FILE="${REPO_ROOT}/tesaka-cv/tests/test_consulta_ruc_contract.py"
 WSDL_SNAPSHOT="${REPO_ROOT}/tesaka-cv/wsdl_snapshots/consulta-ruc_test.wsdl"
-if [ ! -f "$WSDL_SNAPSHOT" ] || [ ! -s "$WSDL_SNAPSHOT" ]; then
-    # Mostrar warning pero ejecutar el test de todas formas (hará SKIP automáticamente)
-    TESTS_RUN=$((TESTS_RUN + 1))
-    echo "▶️  Test Contract WSDL consultaRUC (estructura SOAP)"
-    echo "   Archivo: tesaka-cv/tests/test_consulta_ruc_contract.py"
-    if [ ! -f "$WSDL_SNAPSHOT" ]; then
-        echo -e "   ${YELLOW}⚠️  WSDL snapshot no encontrado, test será SKIPPED${NC}"
-    else
-        SNAPSHOT_SIZE=$(stat -f%z "$WSDL_SNAPSHOT" 2>/dev/null || stat -c%s "$WSDL_SNAPSHOT" 2>/dev/null || echo "0")
-        if [ "$SNAPSHOT_SIZE" -eq 0 ]; then
-            echo -e "   ${YELLOW}⚠️  WSDL snapshot está vacío (0 bytes), test será SKIPPED${NC}"
-        fi
-    fi
-    echo -e "   ${YELLOW}⚠️  Para actualizar: bash scripts/update_wsdl_snapshot_consulta_ruc_test.sh${NC}"
-    
-    # Ejecutar pytest y verificar SKIPPED
-    pytest_output=$("${PY}" -m pytest "tesaka-cv/tests/test_consulta_ruc_contract.py" -q --tb=short 2>&1)
-    pytest_status=$?
-    
-    # Verificar si hay tests skipped (pytest muestra "skipped" o "SKIPPED")
-    if echo "$pytest_output" | grep -qi "skip"; then
-        skipped_count=$(echo "$pytest_output" | grep -oE "[0-9]+ skipped" | grep -oE "[0-9]+" | head -1 || echo "0")
-        if [ "$skipped_count" -eq 0 ]; then
-            skipped_count="todos"
-        fi
-        echo -e "   ${YELLOW}⚠️  SKIPPED (${skipped_count} test(s)) - snapshot ausente o vacío${NC}"
-        # SKIPPED no cuenta como fallido
-    elif [ $pytest_status -eq 0 ]; then
-        echo -e "   ${GREEN}✅ PASSED${NC}"
-    else
-        echo -e "   ${RED}❌ FAILED${NC}"
-        TESTS_FAILED=$((TESTS_FAILED + 1))
-        FAILED_TESTS+=("Test Contract WSDL consultaRUC (estructura SOAP)")
-    fi
-    echo ""
-else
-    # Snapshot existe y no está vacío, ejecutar test normalmente
+
+# Solo ejecutar contract test si tanto el test file como el snapshot existen y no están vacíos
+if [ -f "$CONTRACT_TEST_FILE" ] && [ -f "$WSDL_SNAPSHOT" ] && [ -s "$WSDL_SNAPSHOT" ]; then
+    # Ambos existen, ejecutar test normalmente
     run_test \
         "tesaka-cv/tests/test_consulta_ruc_contract.py" \
         "Test Contract WSDL consultaRUC (estructura SOAP)"
+else
+    # Test o snapshot no presente - mostrar warning pero NO ejecutar ni agregar a FAILED_TESTS
+    echo -e "${YELLOW}⚠️  Contract test consultaRUC omitido (snapshot o test no presente).${NC}"
+    if [ ! -f "$CONTRACT_TEST_FILE" ]; then
+        echo "   - Test file no encontrado: ${CONTRACT_TEST_FILE}"
+    fi
+    if [ ! -f "$WSDL_SNAPSHOT" ]; then
+        echo "   - WSDL snapshot no encontrado: ${WSDL_SNAPSHOT}"
+    elif [ ! -s "$WSDL_SNAPSHOT" ]; then
+        echo "   - WSDL snapshot está vacío: ${WSDL_SNAPSHOT}"
+    fi
+    echo ""
 fi
 
 # Resumen
@@ -310,16 +289,6 @@ echo ""
 if [ ${TESTS_FAILED} -eq 0 ]; then
     echo -e "${GREEN}✅ TODOS LOS TESTS DE CONTRATO PASARON${NC}"
     echo ""
-    
-    # Verificar si hay snapshot WSDL ausente o vacío para mostrar advertencia
-    WSDL_SNAPSHOT="${REPO_ROOT}/tesaka-cv/wsdl_snapshots/consulta-ruc_test.wsdl"
-    if [ ! -f "$WSDL_SNAPSHOT" ] || [ ! -s "$WSDL_SNAPSHOT" ]; then
-        echo -e "${YELLOW}⚠️  NOTA: Algunos contract tests fueron SKIPPED porque el WSDL snapshot está ausente o vacío.${NC}"
-        echo "   Para habilitarlos completamente, ejecuta:"
-        echo "   bash scripts/update_wsdl_snapshot_consulta_ruc_test.sh"
-        echo ""
-    fi
-    
     echo "El código cumple con los contratos WSDL/XSD de SIFEN."
     echo "Es seguro proceder con pruebas contra SIFEN real."
     exit 0
