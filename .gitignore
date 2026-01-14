@@ -7,6 +7,10 @@ env/
 .env
 .env.local
 .env.*.local
+.env.sifen
+.env.test
+.env.prod
+.env.*.prod
 
 # IDE files
 .vscode/
@@ -73,18 +77,29 @@ htmlcov/
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# SIFEN specific
+# SIFEN specific - Certificates and Keys
 *.p12
 *.pfx
 *.pem
 *.key
 *.jks
 *certificates*
+*.crt
+*.cer
+*.der
+
+# Secrets directory
+secrets/
+**/secrets/
 
 # Archivos PEM temporales generados por scripts (si alguien los genera dentro del repo)
 **/tmp/sifen_*.pem
 tesaka-cv/tmp/sifen_*.pem
 **/*.pem.local
+
+# Evidencia SIFEN (puede contener datos sensibles, no commitear)
+evidence/
+tesaka-cv/evidence/
 
 # Maven
 target/
