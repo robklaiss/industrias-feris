@@ -2,6 +2,11 @@
 Tests unitarios para verificar fallback a variables de entorno en mTLS
 """
 import pytest
+
+# Skip si faltan dependencias opcionales (este test no las necesita directamente,
+# pero el import de app.sifen_client puede fallar si __init__.py importa signxml)
+pytest.importorskip("signxml", reason="signxml requerido para importar sifen_client")
+
 import os
 from unittest.mock import patch, MagicMock
 from pathlib import Path

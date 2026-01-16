@@ -2,6 +2,11 @@
 Tests unitarios para validación de tamaños según límites SIFEN
 """
 import pytest
+
+# Skip si faltan dependencias opcionales (este test no las necesita directamente,
+# pero el import de app.sifen_client puede fallar si __init__.py importa signxml)
+pytest.importorskip("signxml", reason="signxml requerido para importar sifen_client")
+
 from app.sifen_client.soap_client import SIZE_LIMITS, SifenSizeLimitError
 from app.sifen_client.exceptions import SifenSizeLimitError as SizeLimitError
 

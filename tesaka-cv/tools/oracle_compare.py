@@ -157,7 +157,7 @@ def map_input_to_xmlgen_format(input_data: Dict[str, Any]) -> Tuple[Dict[str, An
     # Mapear a formato xmlgen
     # params: datos estáticos del emisor
     # CRÍTICO: params.ruc debe tener formato RUC-DV (ej: "80012345-7")
-    ruc_emisor = buyer.get('ruc', '80012345')
+    ruc_emisor = buyer.get('ruc', '4554737')
     if '-' not in ruc_emisor:
         # Si no tiene DV, agregar uno por defecto (no ideal, pero funciona para pruebas)
         ruc_emisor_with_dv = f"{ruc_emisor}-7"
@@ -178,12 +178,17 @@ def map_input_to_xmlgen_format(input_data: Dict[str, Any]) -> Tuple[Dict[str, An
     # CRÍTICO: params.establecimientos es requerido por xmlgen
     # Debe ser un array con objetos que tienen: codigo, denominacion, ciudad, distrito, departamento
     # Basado en la validación de jsonDeMainValidate.service.js línea ~416-448
+    # IMPORTANTE: Los códigos deben coincidir con las constantes de SIFEN
+    # Usando Departamento 1 (CONCEPCIÓN) con códigos simples que xmlgen acepta
+    # Departamento 1 = CONCEPCIÓN
+    # Distrito 1 = CONCEPCIÓN (pertenece al departamento 1)
+    # Ciudad 1 = CONCEPCIÓN (pertenece al distrito 1)
     params['establecimientos'] = [{
         'codigo': codigo_establecimiento,
         'denominacion': buyer.get('nombre', 'Empresa Ejemplo S.A.'),
-        'ciudad': '1',  # 1 = Asunción (código numérico según SIFEN)
-        'distrito': '1',  # 1 = Asunción (código numérico según SIFEN)
-        'departamento': '1',  # 1 = Asunción (código numérico según SIFEN)
+        'ciudad': 1,  # 1 = CONCEPCIÓN - debe ser número, no string
+        'distrito': 1,  # 1 = CONCEPCIÓN - debe ser número, no string
+        'departamento': 1,  # 1 = CONCEPCIÓN - debe ser número, no string
         'telefono': buyer.get('telefono', '')[:15] if buyer.get('telefono') else None,  # Opcional, max 15 chars
     }]
     
@@ -321,7 +326,7 @@ def map_input_to_xmlgen_format(input_data: Dict[str, Any]) -> Tuple[Dict[str, An
         }
     else:
         # Usar buyer como receptor si no hay receptor separado
-        receptor_ruc = buyer.get('ruc', '80012345')
+        receptor_ruc = buyer.get('ruc', '4554737')
         receptor_nombre = buyer.get('nombre', 'Empresa Ejemplo S.A.')
         data['receptor'] = {
             'ruc': receptor_ruc,

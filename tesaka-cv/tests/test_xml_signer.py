@@ -2,6 +2,11 @@
 Tests unitarios para xml_signer
 """
 import pytest
+
+# Skip si faltan dependencias opcionales
+pytest.importorskip("signxml", reason="signxml requerido para tests de firma XML")
+pytest.importorskip("lxml", reason="lxml requerido para tests de XML")
+
 import tempfile
 from pathlib import Path
 from cryptography import x509

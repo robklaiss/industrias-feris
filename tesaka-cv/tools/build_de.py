@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.sifen_client.xml_generator_v150 import generate_cdc, calculate_digit_verifier
 from app.sifen_client.config import get_sifen_config
+from app.sifen_client.qr_generator import QRGenerator
 
 
 def build_de_xml(
@@ -63,7 +64,7 @@ def build_de_xml(
     # Parsear RUC: puede venir como "RUC-DV" (ej: "4554737-8") o solo "RUC" (ej: "80012345")
     ruc_str = str(ruc or "").strip()
     if not ruc_str:
-        ruc_str = os.getenv("SIFEN_EMISOR_RUC") or os.getenv("SIFEN_TEST_RUC") or "80012345"
+        ruc_str = os.getenv("SIFEN_EMISOR_RUC") or os.getenv("SIFEN_TEST_RUC") or "4554737"
     
     # Separar RUC y DV si viene en formato RUC-DV
     if "-" in ruc_str:
@@ -86,12 +87,16 @@ def build_de_xml(
         except:
             dv_ruc = "0"
     
-    # Limpiar RUC: solo dígitos, normalizar a 8 dígitos con zero-fill a la izquierda
-    ruc_clean = ''.join(c for c in ruc_num if c.isdigit())
-    if not ruc_clean:
+    # Limpiar RUC: solo dígitos
+    # IMPORTANTE:
+    # - Para el CDC, SIFEN requiere RUC base de 8 dígitos (zero-left)
+    # - Para el XML (dRucEm), se debe emitir el RUC numérico real, sin padding
+    ruc_digits = ''.join(c for c in ruc_num if c.isdigit())
+    if not ruc_digits:
         raise ValueError(f"RUC debe contener al menos un dígito. Valor recibido: '{ruc_num}'")
-    # Normalizar a 8 dígitos para CDC (zero-fill a la izquierda)
-    ruc_clean = ruc_clean.zfill(8)[-8:]  # Tomar últimos 8 dígitos si es más largo
+
+    ruc_xml = ruc_digits.lstrip("0") or "0"
+    ruc_cdc = ruc_digits.zfill(8)[-8:]  # 8 dígitos para CDC
     
     # Monto para CDC (simplificado)
     monto = "100000"
@@ -103,7 +108,7 @@ def build_de_xml(
     tipo_documento_cdc = str(tipo_documento).zfill(2)[-2:]
     
     # Generar CDC (usar campos normalizados)
-    cdc = generate_cdc(ruc_clean, timbrado, establecimiento_cdc, punto_expedicion_cdc, 
+    cdc = generate_cdc(ruc_cdc, timbrado, establecimiento_cdc, punto_expedicion_cdc, 
                       numero_documento_cdc, tipo_documento_cdc, fecha.replace("-", ""), monto)
     
     # Validación defensiva: asegurar que el CDC sea válido antes de usarlo
@@ -144,11 +149,13 @@ def build_de_xml(
     dv_id = cdc[-1]
     
     # Código de seguridad (CSC)
+    # IMPORTANTE: Debe coincidir con SIFEN_CODSEG usado en generate_cdc()
     if csc:
         cod_seg_digits = ''.join(c for c in str(csc) if c.isdigit())
-        cod_seg = cod_seg_digits[:9].zfill(9) if cod_seg_digits else "123456789"
+        cod_seg = cod_seg_digits[:9].zfill(9) if cod_seg_digits else os.getenv("SIFEN_CODSEG", "000000001").strip()
     else:
-        cod_seg = "123456789"
+        # Usar el mismo valor que generate_cdc() para consistencia
+        cod_seg = os.getenv("SIFEN_CODSEG", "000000001").strip()
     
     # Timbrado debe tener al menos 7 dígitos
     timbrado_str = str(timbrado or "")
@@ -170,6 +177,27 @@ def build_de_xml(
     numero_documento_norm = str(numero_documento).zfill(7)[-7:]  # 7 dígitos
     tipo_documento_norm = str(tipo_documento).zfill(2)[-2:]  # 2 dígitos para CDC
     
+    # Generar QR code
+    try:
+        qr_csc = csc or os.getenv("SIFEN_CSC") or "ABCD0000000000000000000000000000"
+        qr_gen = QRGenerator(csc=qr_csc, csc_id="0001", environment="TEST")
+        qr_result = qr_gen.generate(
+            d_id=cdc,
+            d_fe_emi=fecha.replace("-", ""),
+            d_ruc_em=ruc_xml,
+            d_est=establecimiento_norm,
+            d_pun_exp=punto_expedicion_norm,
+            d_num_doc=numero_documento_norm,
+            d_tipo_doc=tipo_documento_norm,
+            d_tipo_cont="1",
+            d_tipo_emi="1",
+            d_dv_emi=dv_ruc
+        )
+        qr_url = qr_result['url_xml']
+    except Exception as e:
+        # Fallback: generar QR básico sin CSC
+        qr_url = f"https://ekuatia.set.gov.py/consultas-test/qr?nVersion=150&amp;Id={cdc}"
+    
     # Generar XML DE crudo (solo el elemento DE, sin wrapper rDE)
     # Este XML valida contra DE_v150.xsd (tipo tDE)
     xml = f"""<DE xmlns="http://ekuatia.set.gov.py/sifen/xsd" Id="{cdc}">
@@ -182,7 +210,7 @@ def build_de_xml(
         <dCodSeg>{cod_seg}</dCodSeg>
     </gOpeDE>
     <gTimb>
-        <iTiDE>{tipo_documento_norm}</iTiDE>
+        <iTiDE>{tipo_documento}</iTiDE>
         <dDesTiDE>Factura electrónica</dDesTiDE>
         <dNumTim>{timbrado_clean}</dNumTim>
         <dEst>{establecimiento_norm}</dEst>
@@ -192,8 +220,16 @@ def build_de_xml(
     </gTimb>
     <gDatGralOpe>
         <dFeEmiDE>{fecha_emision}</dFeEmiDE>
+        <gOpeCom>
+            <iTipTra>1</iTipTra>
+            <dDesTipTra>Venta de mercadería</dDesTipTra>
+            <iTImp>1</iTImp>
+            <dDesTImp>IVA</dDesTImp>
+            <cMoneOpe>PYG</cMoneOpe>
+            <dDesMoneOpe>Guarani</dDesMoneOpe>
+        </gOpeCom>
         <gEmis>
-            <dRucEm>{ruc_clean}</dRucEm>
+            <dRucEm>{ruc_xml}</dRucEm>
             <dDVEmi>{dv_ruc}</dDVEmi>
             <iTipCont>1</iTipCont>
             <dNomEmi>{d_nom_emi}</dNomEmi>
@@ -202,31 +238,47 @@ def build_de_xml(
             <cDepEmi>1</cDepEmi>
             <dDesDepEmi>CAPITAL</dDesDepEmi>
             <cCiuEmi>1</cCiuEmi>
-            <dDesCiuEmi>Asunción</dDesCiuEmi>
+            <dDesCiuEmi>ASUNCION (DISTRITO)</dDesCiuEmi>
             <dTelEmi>021123456</dTelEmi>
             <dEmailE>test@example.com</dEmailE>
             <gActEco>
-                <cActEco>471100</cActEco>
-                <dDesActEco>Venta al por menor en comercios no especializados</dDesActEco>
+                <cActEco>64990</cActEco>
+                <dDesActEco>OTRAS ACTIVIDADES DE SERVICIOS FINANCIEROS, EXCEPTO LA FINANCIACIÓN DE PLANES DE SEGUROS Y DE PENSIONES</dDesActEco>
             </gActEco>
         </gEmis>
         <gDatRec>
             <iNatRec>1</iNatRec>
             <iTiOpe>1</iTiOpe>
             <cPaisRec>PRY</cPaisRec>
-            <dDesPaisRec>Paraguay</dDesPaisRec>
+            <dDesPaisRe>Paraguay</dDesPaisRe>
+            <iTiContRec>2</iTiContRec>
             <dRucRec>80012345</dRucRec>
-            <dDVRec>7</dDVRec>
+            <dDVRec>0</dDVRec>
             <dNomRec>Cliente de Prueba</dNomRec>
             <dDirRec>Asunción</dDirRec>
             <dNumCasRec>5678</dNumCasRec>
             <cDepRec>1</cDepRec>
             <dDesDepRec>CAPITAL</dDesDepRec>
             <cCiuRec>1</cCiuRec>
-            <dDesCiuRec>Asunción</dDesCiuRec>
+            <dDesCiuRec>ASUNCION (DISTRITO)</dDesCiuRec>
         </gDatRec>
     </gDatGralOpe>
     <gDtipDE>
+        <gCamFE>
+            <iIndPres>1</iIndPres>
+            <dDesIndPres>Operación presencial</dDesIndPres>
+        </gCamFE>
+        <gCamCond>
+            <iCondOpe>1</iCondOpe>
+            <dDCondOpe>Contado</dDCondOpe>
+            <gPaConEIni>
+                <iTiPago>1</iTiPago>
+                <dDesTiPag>Efectivo</dDesTiPag>
+                <dMonTiPag>100000</dMonTiPag>
+                <cMoneTiPag>PYG</cMoneTiPag>
+                <dDMoneTiPag>Guarani</dDMoneTiPag>
+            </gPaConEIni>
+        </gCamCond>
         <gCamItem>
             <dCodInt>001</dCodInt>
             <dDesProSer>Producto de Prueba</dDesProSer>
@@ -240,13 +292,22 @@ def build_de_xml(
                     <dTotOpeItem>100000</dTotOpeItem>
                 </gValorRestaItem>
             </gValorItem>
+            <gCamIVA>
+                <iAfecIVA>1</iAfecIVA>
+                <dDesAfecIVA>Gravado IVA</dDesAfecIVA>
+                <dPropIVA>100</dPropIVA>
+                <dTasaIVA>10</dTasaIVA>
+                <dBasGravIVA>90909</dBasGravIVA>
+                <dLiqIVAItem>9091</dLiqIVAItem>
+                <dBasExe>0</dBasExe>
+            </gCamIVA>
         </gCamItem>
     </gDtipDE>
     <gTotSub>
         <dSubExe>0</dSubExe>
         <dSubExo>0</dSubExo>
         <dSub5>0</dSub5>
-        <dSub10>0</dSub10>
+        <dSub10>100000</dSub10>
         <dTotOpe>100000</dTotOpe>
         <dTotDesc>0</dTotDesc>
         <dTotDescGlotem>0</dTotDescGlotem>
@@ -258,15 +319,11 @@ def build_de_xml(
         <dRedon>0</dRedon>
         <dTotGralOpe>100000</dTotGralOpe>
         <dIVA5>0</dIVA5>
-        <dIVA10>0</dIVA10>
-        <dLiqTotIVA5>0</dLiqTotIVA5>
-        <dLiqTotIVA10>0</dLiqTotIVA10>
-        <dIVAComi>0</dIVAComi>
-        <dTotIVA>0</dTotIVA>
+        <dIVA10>9091</dIVA10>
+        <dTotIVA>9091</dTotIVA>
         <dBaseGrav5>0</dBaseGrav5>
-        <dBaseGrav10>0</dBaseGrav10>
-        <dTBasGraIVA>0</dTBasGraIVA>
-        <dTotalGs>100000</dTotalGs>
+        <dBaseGrav10>90909</dBaseGrav10>
+        <dTBasGraIVA>90909</dTBasGraIVA>
     </gTotSub>
     <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
         <ds:SignedInfo>
@@ -287,9 +344,6 @@ def build_de_xml(
             </ds:X509Data>
         </ds:KeyInfo>
     </ds:Signature>
-    <gCamFuFD>
-        <dCarQR>TESTQRCODE12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890</dCarQR>
-    </gCamFuFD>
 </DE>"""
     
     return xml

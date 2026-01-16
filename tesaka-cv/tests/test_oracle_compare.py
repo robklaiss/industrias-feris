@@ -4,6 +4,11 @@ Tests para el sistema de comparación oráculo (oracle_compare)
 Valida que la comparación entre nuestra implementación y xmlgen funcione correctamente.
 """
 import pytest
+
+# Skip si faltan dependencias opcionales
+pytest.importorskip("signxml", reason="signxml requerido para tests de XML")
+pytest.importorskip("lxml", reason="lxml requerido para tests de XML")
+
 import json
 from pathlib import Path
 import sys

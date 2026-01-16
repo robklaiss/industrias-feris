@@ -1,8 +1,12 @@
 """
 Tests para el adaptador de facturas "crudas" al formato estándar
 """
-import json
 import pytest
+
+# Skip si falta jsonschema (debe estar ANTES de importar src.*)
+pytest.importorskip("jsonschema", reason="jsonschema requerido para tests de validación")
+
+import json
 from pathlib import Path
 
 # Importar el adaptador y convertidor

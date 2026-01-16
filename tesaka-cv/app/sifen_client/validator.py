@@ -234,24 +234,75 @@ class SifenValidator:
                 "note": "lxml no está instalado. Instala con: pip install lxml"
             }
     
-    def prevalidate_with_service(self, xml_content: str) -> Dict[str, Any]:
+    def prevalidate_with_service(
+        self,
+        xml_content: str,
+        modo: Optional[int] = None,
+        captcha: Optional[str] = None,
+        cookie: Optional[str] = None
+    ) -> Dict[str, Any]:
         """
         Prevalida usando el servicio Prevalidador SIFEN
         
-        Este método intenta múltiples estrategias para comunicarse con el Prevalidador:
-        1. Descubrir endpoints API REST usando AngularBridge (si disponible)
-        2. Intentar endpoints API REST comunes (detrás de la aplicación Angular)
-        3. Intentar POST directo al endpoint web
-        4. Intentar multipart/form-data (simular formulario)
+        Este método realiza POST directo al endpoint oficial de SIFEN:
+        https://ekuatia.set.gov.py/validar/validar?modo={0|1}
         
         Args:
             xml_content: Contenido XML del DE
+            modo: Modo del validador (0=Prod, 1=Test). Si None, usa SIFEN_ENV.
+            captcha: Valor del header 'captcha' (requerido por SIFEN)
+            cookie: Cookie header opcional para sesión
             
         Returns:
             Resultado de prevalidación
         """
+        # Auto-detectar modo desde SIFEN_ENV si no se especificó
+        if modo is None:
+            try:
+                from .env_validator import get_current_env, env_to_modo
+                current_env = get_current_env()
+                modo = env_to_modo(current_env)
+            except ImportError:
+                return {
+                    "valid": False,
+                    "error": "Parámetro 'modo' es requerido (0=PROD, 1=TEST) o configurar SIFEN_ENV"
+                }
+        
+        if captcha is None:
+            return {
+                "valid": False,
+                "error": "Falta captcha (copiar del navegador: DevTools > Network > validar > Request Headers > captcha)",
+                "suggestion": "Abrir https://ekuatia.set.gov.py/prevalidador/validacion, resolver captcha, copiar valor del header 'captcha' en DevTools"
+            }
+        
         # Limpiar XML antes de enviarlo (remover BOM, espacios iniciales)
         xml_content_clean = clean_xml(xml_content)
+        
+        # Verificar coherencia QR vs modo
+        try:
+            from .qr_inspector import extract_dcar_qr, detect_qr_env
+            
+            qr_url = extract_dcar_qr(xml_content_clean)
+            if qr_url:
+                qr_env = detect_qr_env(qr_url)
+                
+                # Detectar mismatch
+                mismatch = None
+                if modo == 0 and qr_env == "TEST":
+                    mismatch = "QR TEST detectado con modo=0 (prod). Esto causará error 2502."
+                elif modo == 1 and qr_env == "PROD":
+                    mismatch = "QR PROD detectado con modo=1 (test). Esto causará error 2502."
+                
+                if mismatch:
+                    return {
+                        "valid": False,
+                        "error": mismatch,
+                        "qr_env": qr_env,
+                        "modo": modo,
+                        "suggestion": f"Regenerar el XML con SIFEN_ENV={'prod' if modo == 0 else 'test'} para que el QR coincida con el modo de validación."
+                    }
+        except ImportError:
+            pass  # qr_inspector no disponible, continuar sin verificación
         
         # Validar prolog antes de enviar
         prolog_valid, prolog_error = validate_xml_prolog(xml_content_clean)
@@ -265,206 +316,95 @@ class SifenValidator:
         # Convertir a bytes UTF-8 sin BOM
         xml_bytes = ensure_utf8_encoding(xml_content_clean)
         
-        # Estrategia 0: Intentar comunicarse directamente con app Angular del Prevalidador
-        try:
-            from .angular_prevalidador import AngularPrevalidadorClient
-            
-            angular_client = AngularPrevalidadorClient()
-            result = angular_client.prevalidate_xml(xml_content_clean)
-            angular_client.close()
-            
-            if result.get("valid") is not None or result.get("response"):
-                return result
-        except ImportError:
-            pass
-        except Exception as e:
-            # Continuar con otros métodos si falla
-            pass
+        # POST directo al endpoint oficial SIFEN
+        sifen_url = "https://ekuatia.set.gov.py/validar/validar"
         
-        # Estrategia 0.5: Intentar descubrir API usando AngularBridge
-        if self.angular_bridge:
-            try:
-                discovered_endpoint = self.angular_bridge.discover_api_endpoint(xml_content_clean)
-                if discovered_endpoint:
-                    try:
-                        response = httpx.post(
-                            discovered_endpoint,
-                            content=xml_bytes,
-                            headers={"Content-Type": "application/xml; charset=UTF-8", "Accept": "application/json"},
-                            timeout=15
-                        )
-                        if response.status_code in [200, 201, 400] and not response.text.strip().startswith("<!DOCTYPE"):
-                            try:
-                                return {
-                                    "valid": response.json().get("valido", response.json().get("valid", None)),
-                                    "response": response.json(),
-                                    "status_code": response.status_code,
-                                    "api_endpoint": discovered_endpoint,
-                                    "format": "json",
-                                    "discovered": True
-                                }
-                            except:
-                                return {
-                                    "valid": None,
-                                    "response": response.text[:1000],
-                                    "status_code": response.status_code,
-                                    "api_endpoint": discovered_endpoint,
-                                    "format": "text",
-                                    "discovered": True
-                                }
-                    except:
-                        pass
-                
-                # Intentar servicio Angular típico
-                angular_result = self.angular_bridge.try_angular_service_call(xml_content, "validacion")
-                if angular_result:
-                    return {
-                        "valid": angular_result.get("valido", angular_result.get("valid", None)),
-                        "response": angular_result,
-                        "format": "json",
-                        "method": "angular_service"
-                    }
-            except:
-                pass
+        headers = {
+            "accept": "application/json, text/plain, */*",
+            "content-type": "application/xml;charset=UTF-8",
+            "origin": "https://ekuatia.set.gov.py",
+            "referer": "https://ekuatia.set.gov.py/prevalidador/validacion",
+            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+            "captcha": captcha,
+        }
         
-        # Estrategia 1: Intentar endpoints API REST (comúnmente las apps Angular tienen APIs)
-        for api_url in self.prevalidador_api_urls:
-            try:
-                response = httpx.post(
-                    api_url,
-                    content=xml_bytes,
-                    headers={
-                        "Content-Type": "application/xml; charset=UTF-8",
-                        "Accept": "application/json"
-                    },
-                    timeout=15,
-                    follow_redirects=False
-                )
-                
-                # Si encontramos un endpoint que no es HTML, usarlo
-                if response.status_code in [200, 201, 400] and not response.text.strip().startswith("<!DOCTYPE"):
-                    try:
-                        # Intentar parsear como JSON
-                        json_response = response.json()
-                        return {
-                            "valid": json_response.get("valido", json_response.get("valid", None)),
-                            "response": json_response,
-                            "status_code": response.status_code,
-                            "api_endpoint": api_url,
-                            "format": "json"
-                        }
-                    except:
-                        # Si no es JSON, retornar texto
-                        return {
-                            "valid": None,
-                            "response": response.text[:1000],
-                            "status_code": response.status_code,
-                            "api_endpoint": api_url,
-                            "format": "text",
-                            "note": "Respuesta recibida (formato a verificar)"
-                        }
-            except (httpx.TimeoutException, httpx.RequestError, httpx.HTTPStatusError):
-                continue  # Intentar siguiente URL
+        if cookie:
+            headers["cookie"] = cookie
         
-        # Estrategia 2: POST directo al endpoint web
         try:
             response = httpx.post(
-                self.prevalidador_url,
+                sifen_url,
+                params={"modo": str(modo)},
+                headers=headers,
                 content=xml_bytes,
-                headers={"Content-Type": "application/xml; charset=UTF-8"},
-                timeout=30
+                timeout=60,
+                follow_redirects=False
             )
             
-            if response.status_code == 200:
-                response_text = response.text
-                
-                # Si la respuesta es HTML (aplicación web Angular)
-                if response_text.strip().startswith("<!DOCTYPE html>") or "<html" in response_text[:200].lower():
-                    # Estrategia 3: Intentar con multipart/form-data (simular formulario Angular)
-                    try:
-                        files = {'file': ('documento.xml', xml_bytes, 'application/xml; charset=UTF-8')}
-                        response2 = httpx.post(
-                            self.prevalidador_url,
-                            files=files,
-                            headers={"Accept": "application/json"},
-                            timeout=30
-                        )
-                        if response2.status_code == 200 and not response2.text.strip().startswith("<!DOCTYPE"):
-                            try:
-                                json_resp = response2.json()
-                                return {
-                                    "valid": json_resp.get("valido", json_resp.get("valid", None)),
-                                    "response": json_resp,
-                                    "status_code": response2.status_code,
-                                    "method": "multipart/form-data",
-                                    "format": "json"
-                                }
-                            except:
-                                return {
-                                    "valid": None,
-                                    "response": response2.text[:500],
-                                    "status_code": response2.status_code,
-                                    "method": "multipart/form-data",
-                                    "format": "text",
-                                    "note": "Respuesta recibida (formato a verificar)"
-                                }
-                    except:
-                        pass
+            ct = (response.headers.get("content-type") or "").lower()
+            
+            # Parsear respuesta JSON
+            if "application/json" in ct:
+                try:
+                    json_data = response.json()
                     
-                    # Si sigue siendo HTML después de todos los intentos
+                    # Mapear respuesta SIFEN a formato estándar
+                    valid = None
+                    if isinstance(json_data, dict):
+                        # Intentar detectar si es válido
+                        if "valido" in json_data:
+                            valid = json_data["valido"]
+                        elif "valid" in json_data:
+                            valid = json_data["valid"]
+                        elif "errores" in json_data:
+                            valid = len(json_data.get("errores", [])) == 0
+                        elif "estado" in json_data:
+                            valid = json_data["estado"] in ["APROBADO", "OK", "VALIDO"]
+                    
+                    return {
+                        "valid": valid,
+                        "status_code": response.status_code,
+                        "response": json_data,
+                        "errores": json_data.get("errores", []),
+                        "format": "json",
+                        "endpoint": sifen_url,
+                        "modo": modo
+                    }
+                except Exception as e:
                     return {
                         "valid": None,
-                        "error": "El Prevalidador devuelve HTML (aplicación web Angular). No se encontró API REST programática.",
-                        "response_type": "html",
-                        "response_preview": response_text[:500],
-                        "status_code": response.status_code,
-                        "note": "Usar https://ekuatia.set.gov.py/prevalidador/validacion manualmente o verificar documentación para API programática",
-                        "suggestions": [
-                            "Revisar documentación técnica para encontrar endpoint API",
-                            "Inspeccionar requests de la aplicación Angular (DevTools Network)",
-                            "Contactar soporte DNIT/SET para API programática"
-                        ]
+                        "error": f"Error parseando JSON: {str(e)}",
+                        "response_text": response.text[:500],
+                        "status_code": response.status_code
                     }
-                
-                # Si no es HTML, intentar parsear
-                try:
-                    json_resp = response.json()
-                    return {
-                        "valid": json_resp.get("valido", json_resp.get("valid", None)),
-                        "response": json_resp,
-                        "status_code": response.status_code,
-                        "format": "json"
-                    }
-                except:
-                    # Parsear texto
-                    is_valid = None
-                    if "error" in response_text.lower() or "invalido" in response_text.lower() or "rechazado" in response_text.lower():
-                        is_valid = False
-                    elif "valido" in response_text.lower() or "exitoso" in response_text.lower() or "aceptado" in response_text.lower():
-                        is_valid = True
-                    
-                    return {
-                        "valid": is_valid,
-                        "response": response_text[:1000],
-                        "status_code": response.status_code,
-                        "format": "text"
-                    }
+            
+            # Respuesta HTML (captcha inválido, cookies faltantes, etc.)
             else:
+                text = response.text or ""
                 return {
-                    "valid": False,
-                    "error": f"Error HTTP {response.status_code}: {response.text[:200]}",
+                    "valid": None,
+                    "error": "Respuesta HTML recibida (no JSON)",
                     "status_code": response.status_code,
+                    "snippet": text[:600],
+                    "suggestion": "Posibles causas: captcha inválido/expirado, cookies faltantes, endpoint cambió, o modo incorrecto para el QR"
                 }
-                
+        
         except httpx.TimeoutException:
             return {
-                "valid": False,
-                "error": "Timeout al contactar Prevalidador",
+                "valid": None,
+                "error": "Timeout al conectar con SIFEN (60s)",
+                "suggestion": "Verificar conectividad o intentar más tarde"
             }
         except httpx.RequestError as e:
             return {
-                "valid": False,
+                "valid": None,
                 "error": f"Error de conexión: {str(e)}",
+                "suggestion": "Verificar conectividad a https://ekuatia.set.gov.py"
+            }
+        except Exception as e:
+            return {
+                "valid": None,
+                "error": f"Error inesperado: {str(e)}",
             }
     
     def validate(self, xml_content: str, use_prevalidador: bool = True) -> Dict[str, Any]:

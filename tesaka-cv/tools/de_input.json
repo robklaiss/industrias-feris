@@ -1,0 +1,26 @@
+{
+  "dVerFor": 150,
+  "dId": "SMOKE-TEST-001",
+  "env": "test",
+  "buyer": {
+    "ruc": "4554737-8",
+    "nombre": "Marcio Ruben Feris Aguilera",
+    "domicilio": "Asunción, Paraguay",
+    "telefono": "021123456"
+  },
+  "transaction": {
+    "tipoComprobante": 1,
+    "numeroComprobanteVenta": "001-001-0000001",
+    "numeroTimbrado": "12345678",
+    "fecha": "2026-01-12",
+    "condicionCompra": "CONTADO"
+  },
+  "items": [
+    {
+      "descripcion": "Producto de Prueba",
+      "cantidad": 1,
+      "precioUnitario": 100000,
+      "tasaAplica": 10
+    }
+  ]
+}

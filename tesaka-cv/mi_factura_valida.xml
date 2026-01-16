@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rDE xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd" xmlns="http://ekuatia.set.gov.py/sifen/xsd">
+    <dVerFor>150</dVerFor>
+    <DE Id="01045547378001001000000212026011310000000019">
+        <dDVId>3</dDVId>
+        <dFecFirma>2026-01-13T11:30:00</dFecFirma>
+        <dSisFact>1</dSisFact>
+        <gDatGralOpe>
+            <dFeEmiDE>2026-01-13T11:30:00</dFeEmiDE>
+            <dCodSeg>123456789</dCodSeg>
+            <gOpeCom>
+                <iTipTra>1</iTipTra>
+                <dDestCom>1</dDestCom>
+                <cPaisDest>PRY</cPaisDest>
+                <dPaisDest>PARAGUAY</dPaisDest>
+            </gOpeCom>
+            <gDatRec>
+                <iNatRec>1</iNatRec>
+                <dRucRec>80012345</dRucRec>
+                <dDVRec>7</dDVRec>
+                <dNomRec>CLIENTE DE PRUEBA</dNomRec>
+            </gDatRec>
+            <gEmis>
+                <iTipCont>1</iTipCont>
+                <dRucEm>4554737</dRucEm>
+                <dDVEmi>8</dDVEmi>
+                <dNomEmi>EMPRESA DE PRUEBA S.A.</dNomEmi>
+                <dNomFanEmi>EMPRESA DE PRUEBA</dNomFanEmi>
+                <dDirEmi>DIRECCION DE PRUEBA 123</dDirEmi>
+                <dNumCas>123</dNumCas>
+                <dCompDir1>ENTRE CALLE A Y B</dCompDir1>
+                <dCompDir2>ESQUINA NORTE</dCompDir2>
+                <cDepEmi>12</cDepEmi>
+                <dDesDepEmi>CENTRAL</dDesDepEmi>
+                <cDisEmi>169</cDisEmi>
+                <dDesDisEmi>LAMBARE</dDesDisEmi>
+                <cCiuEmi>6106</cCiuEmi>
+                <dDesCiuEmi>LAMBARE</dDesCiuEmi>
+                <dTelEmi>0971 123456</dTelEmi>
+                <dEmailE>info@empresa.com.py</dEmailE>
+                <dDenSuc>MATRIZ</dDenSuc>
+            </gEmis>
+            <gTimb>
+                <iTiDE>1</iTiDE>
+                <dNumTim>12345678</dNumTim>
+                <dEst>001</dEst>
+                <dPunExp>001</dPunExp>
+                <dNumDoc>0000002</dNumDoc>
+                <dFeIniT>2023-07-17</dFeIniT>
+            </gTimb>
+            <gDatConc>
+                <cTipoConc>1</cTipoConc>
+                <dDesConc>VENTA DE MERCADERIAS</dDesConc>
+            </gDatConc>
+            <gCamCond>
+                <cCondOpe>1</cCondOpe>
+                <dDCondOpe>CONTADO</dDCondOpe>
+            </gCamCond>
+            <gVenDoc>
+                <dCTipDoc>1</dCTipDoc>
+                <dDTipDoc>FACTURA ELECTRONICA</dDTipDoc>
+            </gVenDoc>
+            <gPagCred>
+                <dCuotas>1</dCuotas>
+                <dMonCuo>1000000.00000000</dMonCuo>
+                <dFechVenCuota>2026-01-13</dFechVenCuota>
+            </gPagCred>
+            <gCamFEC>
+                <iIndPres>1</iIndPres>
+            </gCamFEC>
+        </gDatGralOpe>
+        <gCamItem>
+            <dCodInt>PROD001</dCodInt>
+            <cCodInt>GS03</cCodInt>
+            <dDesProSer>PRODUCTO DE PRUEBA</dDesProSer>
+            <cUniMed>77</cUniMed>
+            <dCantProSer>1.0000</dCantProSer>
+            <gCamItem>
+                <dCodInt>PROD001</dCodInt>
+                <dDesProSer>PRODUCTO DE PRUEBA</dDesProSer>
+                <cUniMed>77</cUniMed>
+                <dCantProSer>1.0000</dCantProSer>
+                <dPUniProSer>909091.00000000</dPUniProSer>
+                <gValItem>
+                    <dPUniProSer>909091.00000000</dPUniProSer>
+                    <dTotOpeItem>909091.00000000</dTotOpeItem>
+                    <gCamIVA>
+                        <cTasaIVA>10</cTasaIVA>
+                        <dBaseGravIVA>826446.37000000</dBaseGravIVA>
+                        <dLiqIVAItem>82644.63000000</dLiqIVAItem>
+                    </gCamIVA>
+                </gValItem>
+            </gCamItem>
+        </gCamItem>
+        <gCamItem>
+            <dCodInt>SERV001</dCodInt>
+            <cCodInt>GS03</cCodInt>
+            <dDesProSer>SERVICIO DE PRUEBA</dDesProSer>
+            <cUniMed>77</cUniMed>
+            <dCantProSer>1.0000</dCantProSer>
+            <gCamItem>
+                <dCodInt>SERV001</dCodInt>
+                <dDesProSer>SERVICIO DE PRUEBA</dDesProSer>
+                <cUniMed>77</cUniMed>
+                <dCantProSer>1.0000</dCantProSer>
+                <dPUniProSer>90909.00000000</dPUniProSer>
+                <gValItem>
+                    <dPUniProSer>90909.00000000</dPUniProSer>
+                    <dTotOpeItem>90909.00000000</dTotOpeItem>
+                    <gCamIVA>
+                        <cTasaIVA>10</cTasaIVA>
+                        <dBaseGravIVA>82644.63000000</dBaseGravIVA>
+                        <dLiqIVAItem>8264.37000000</dLiqIVAItem>
+                    </gCamIVA>
+                </gValItem>
+            </gCamItem>
+        </gCamItem>
+        <gTotSub>
+            <dSubExe>0.00000000</dSubExe>
+            <dSub5>0.00000000</dSub5>
+            <dSub10>1000000.00000000</dSub10>
+            <dTotOpe>1000000.00000000</dTotOpe>
+            <dTotDesc>0.00000000</dTotDesc>
+            <dTotDescGlotem>0.00000000</dTotDescGlotem>
+            <dTotAntItem>0.00000000</dTotAntItem>
+            <dTotAnt>0.00000000</dTotAnt>
+            <dPorcDescTotal>0.00000000</dPorcDescTotal>
+            <dDescTotal>0.00000000</dDescTotal>
+            <dAnticipo>0.00000000</dAnticipo>
+            <dRedon>0.0000</dRedon>
+            <dTotGralOpe>1000000.00000000</dTotGralOpe>
+            <dIVA5>0.00000000</dIVA5>
+            <dTotIVA10>90909.00000000</dTotIVA10>
+            <dTotIVA>90909.00000000</dTotIVA>
+            <dBaseGrav5>0.00000000</dBaseGrav5>
+            <dBaseGrav10>909091.00000000</dBaseGrav10>
+            <dTBasGraIVA>909091.00000000</dTBasGraIVA>
+        </gTotSub>
+    </DE>
+  
+    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <SignedInfo>
+            <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+            <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+            <Reference URI="#01045547378029010018945612026011310000000010">
+                <Transforms>
+                    <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                </Transforms>
+                <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+                <DigestValue>6f516f4f54496b6243714d63435867654c42713130745933706c634d707a66374676346555377657476e493d</DigestValue>
+            </Reference>
+        </SignedInfo>
+        <SignatureValue>
+            LA FIRMA IRÁ AQUÍ DESPUÉS DE FIRMAR
+        </SignatureValue>
+        <KeyInfo>
+            <X509Data>
+                <X509Certificate>
+                    EL CERTIFICADO IRÁ AQUÍ
+                </X509Certificate>
+            </X509Data>
+        </KeyInfo>
+    </Signature>
+    
+    <gCamFuFD>
+        <dCarQR>https://ekuatia.set.gov.py/consultas/qr?nVersion=150&amp;Id=01045547378029010018945612026011310000000010&amp;dFeEmiDE=20260113T113000&amp;dRucRec=80012345&amp;dTotGralOpe=1000000.00000000&amp;dTotIVA=90909.00000000&amp;cItems=2&amp;DigestValue=6f516f4f54496b6243714d63435867654c42713130745933706c634d707a66374676346555377657476e493d&amp;IdCSC=0001&amp;cHashQR=02af18bc538048d7567f1183ea9e9895cc05401c71334ac4be90bff57c27acf0</dCarQR>
+    </gCamFuFD>
+</rDE>

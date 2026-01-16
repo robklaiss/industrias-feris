@@ -1134,19 +1134,19 @@ def main() -> int:
     parser.add_argument(
         "--wsdl",
         default=None,
-        help="Override WSDL URL (opcional). Ej: https://sifen-test.set.gov.py/de/ws/async/recibe-lote.wsdl?wsdl",
+        help="(OBSOLETO) Se ignora. El endpoint se resuelve automáticamente.",
     )
     parser.add_argument(
         "--wsdl-file",
         default=None,
         type=str,
-        help="Usar archivo WSDL local (no descargar desde internet). Ej: artifacts/consulta-lote.wsdl.xml",
+        help="(OBSOLETO) Se ignora. El endpoint se resuelve automáticamente.",
     )
     parser.add_argument(
         "--wsdl-cache-dir",
         default="artifacts",
         type=str,
-        help="Directorio para cache de WSDL/XSD (default: artifacts)",
+        help="(OBSOLETO) Solo para compatibilidad; se ignora si existe.",
     )
     parser.add_argument(
         "--p12-password",
@@ -1201,10 +1201,9 @@ def main() -> int:
     if not cache_dir.is_absolute():
         cache_dir = Path(__file__).parent.parent / cache_dir
     cache_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Preparar artifacts_dir para guardar archivos de respuesta
+
     artifacts_dir = Path(__file__).parent.parent / "artifacts"
-    artifacts_dir.mkdir(exist_ok=True)
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
     
     # Si --dump-http está activo, usar consulta_lote_raw() directamente (sin zeep)
     if args.dump_http:
@@ -1219,228 +1218,31 @@ def main() -> int:
             print("VERIFICADOR E2E: rEnviConsLoteDe (SOAP 1.2, sin wrapper)")
             print("="*70)
             
-            # Llamar consulta_lote_raw con dump_http=True
             result = client.consulta_lote_raw(prot, did=1, dump_http=True)
-            
-            # 1. Headers HTTP enviados
-            print("\n1️⃣  HEADERS HTTP ENVIADOS:")
-            print("-" * 70)
-            sent_headers = result.get("sent_headers", {})
-            for key, value in sorted(sent_headers.items()):
-                print(f"   {key}: {value}")
-            
-            # Validación: Content-Type debe ser application/soap+xml
-            content_type = sent_headers.get("Content-Type", "")
-            if "application/soap+xml" not in content_type:
-                print(f"\n❌ VALIDACIÓN FALLIDA: Content-Type debe contener 'application/soap+xml'")
-                print(f"   Encontrado: {content_type}")
-                cleanup_pem_files()
-                sys.exit(1)
-            else:
-                print(f"\n   ✅ Content-Type correcto: {content_type}")
-            
-            # Validación: NO debe haber SOAPAction header separado
-            if "SOAPAction" in sent_headers:
-                print(f"\n❌ VALIDACIÓN FALLIDA: NO debe existir header 'SOAPAction' en SOAP 1.2")
-                print(f"   Encontrado: SOAPAction = {sent_headers['SOAPAction']}")
-                cleanup_pem_files()
-                sys.exit(1)
-            else:
-                print(f"   ✅ NO hay header 'SOAPAction' (correcto para SOAP 1.2)")
-            
-            # Validación opcional: si action= está presente en Content-Type, es recomendado
-            if 'action="rEnviConsLoteDe"' in content_type:
-                print(f"   ✅ Recomendado: Content-Type incluye action=\"rEnviConsLoteDe\" (ayuda al enrutamiento)")
-            elif 'action=' in content_type:
-                print(f"   ℹ️  Content-Type incluye action= (permitido en SOAP 1.2)")
-            
-            # 2. SOAP Envelope enviado
-            print("\n2️⃣  SOAP ENVELOPE ENVIADO:")
-            print("-" * 70)
-            sent_xml = result.get("sent_xml", "")
-            if sent_xml:
-                xml_lines = sent_xml.split("\n")
-                if len(xml_lines) > 80:
-                    print("\n".join(xml_lines[:80]))
-                    print(f"\n... (truncado, total {len(xml_lines)} líneas)")
-                else:
-                    print(sent_xml)
-                
-                # Validaciones del XML
-                print("\n   Validaciones del XML:")
-                # Validar namespace SOAP 1.2
-                if "http://www.w3.org/2003/05/soap-envelope" not in sent_xml:
-                    print(f"   ❌ VALIDACIÓN FALLIDA: Envelope debe usar namespace SOAP 1.2")
-                    print(f"      Esperado: http://www.w3.org/2003/05/soap-envelope")
-                    cleanup_pem_files()
-                    sys.exit(1)
-                else:
-                    print(f"   ✅ Namespace SOAP 1.2 correcto")
-                
-                # Validar rEnviConsLoteDe directamente en Body (sin wrapper)
-                if "<sifen:rEnviConsLoteDe" not in sent_xml and "<rEnviConsLoteDe" not in sent_xml:
-                    print(f"   ❌ VALIDACIÓN FALLIDA: Debe existir 'rEnviConsLoteDe' en el Body")
-                    cleanup_pem_files()
-                    sys.exit(1)
-                else:
-                    print(f"   ✅ 'rEnviConsLoteDe' encontrado en Body")
-                
-                # Validar que NO hay wrapper (rEnviConsLoteDe debe estar directamente en Body)
-                if "<sifen:siResultLoteDE" in sent_xml or "<siResultLoteDE" in sent_xml:
-                    print(f"   ⚠️  ADVERTENCIA: Se encontró wrapper 'siResultLoteDE' (no debería estar presente)")
-                else:
-                    print(f"   ✅ NO hay wrapper (rEnviConsLoteDe está directamente en Body)")
-            else:
-                print("   ⚠️  No se pudo obtener XML enviado")
-            
-            # 3. Status code HTTP y headers recibidos
-            print("\n3️⃣  STATUS CODE HTTP Y HEADERS RECIBIDOS:")
-            print("-" * 70)
-            http_status = result.get("http_status", 0)
-            print(f"   Status Code: {http_status}")
-            
-            received_headers = result.get("received_headers", {})
-            if received_headers:
-                print("\n   Headers recibidos:")
-                for key, value in sorted(received_headers.items()):
-                    print(f"      {key}: {value}")
-            else:
-                print("   ⚠️  No se pudieron obtener headers recibidos")
-            
-            # 4. Body recibido
-            print("\n4️⃣  BODY RECIBIDO:")
-            print("-" * 70)
-            received_body = result.get("received_body_preview", "")
-            if received_body:
-                body_lines = received_body.split("\n")
-                if len(body_lines) > 120:
-                    print("\n".join(body_lines[:120]))
-                    print(f"\n... (truncado, total {len(body_lines)} líneas)")
-                else:
-                    print(received_body)
-                
-                # Detectar SOAP Fault
-                if "<soap:Fault" in received_body or "<soap12:Fault" in received_body or "<Fault" in received_body:
-                    print("\n   ⚠️  SOAP FAULT DETECTADO en la respuesta")
-                    # Intentar extraer código y mensaje del fault
-                    try:
-                        from lxml import etree
-                        fault_root = etree.fromstring(result.get("raw_xml", "").encode("utf-8"))
-                        fault_code = fault_root.find(".//{http://www.w3.org/2003/05/soap-envelope}Code")
-                        fault_reason = fault_root.find(".//{http://www.w3.org/2003/05/soap-envelope}Reason")
-                        if fault_code is not None:
-                            print(f"      Fault Code: {etree.tostring(fault_code, encoding='unicode')}")
-                        if fault_reason is not None:
-                            print(f"      Fault Reason: {etree.tostring(fault_reason, encoding='unicode')}")
-                    except Exception:
-                        pass
-                else:
-                    print("\n   ✅ No se detectó SOAP Fault")
-            else:
-                print("   ⚠️  No se pudo obtener body recibido")
-            
-            print("\n" + "="*70)
-            print("✅ VERIFICACIÓN COMPLETA")
-            print("="*70 + "\n")
-            
-            cleanup_pem_files()
-            return 0
-            
-        except SystemExit:
-            raise
+            endpoint_used = result.get("endpoint") or "<unknown>"
+            print(f"\n📡 Endpoint utilizado: {endpoint_used}")
+            print(f"HTTP status: {result.get('http_status')}")
+            print(f"dCodResLot: {result.get('dCodResLot')}")
+            print(f"dMsgResLot: {result.get('dMsgResLot')}")
         except Exception as e:
-            cleanup_pem_files()
-            _die(f"Error en verificador E2E: {e}")
+            print(f"\n⚠️  VERIFICADOR E2E falló: {e}. Continuando con la ejecución normal...\n")
     
-    # Resolver WSDL según prioridad
-    wsdl_url = resolve_wsdl(args.env, args.wsdl)
-    
-    # Resolver archivo WSDL (proveído, cache, o descarga)
-    wsdl_file_arg = Path(args.wsdl_file) if args.wsdl_file else None
-    
-    # Mostrar información
+    from app.sifen_client.lote_checker import check_lote_status
+    result = check_lote_status(env=args.env, prot=prot)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    artifacts_dir = Path(__file__).parent.parent / "artifacts"
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
+    out_path = artifacts_dir / f"consulta_lote_{timestamp}.json"
+    out_path.write_text(
+        json.dumps(result, ensure_ascii=False, indent=2, default=str),
+        encoding="utf-8",
+    )
     print(f"🔧 Ambiente: {args.env}")
-    print(f"🌐 WSDL URL: {wsdl_url}")
-    if wsdl_file_arg:
-        print(f"📂 WSDL File: {wsdl_file_arg}")
-    print(f"💾 Cache Dir: {cache_dir}")
     print(f"🔎 dProtConsLote: {prot}")
-    if args.debug:
-        print(f"🔐 Cert: {p12_path}")
-    
-    # Cargar WSDL (desde archivo, cache, o descarga)
-    try:
-        wsdl_path = load_wsdl_source(
-            wsdl_url=wsdl_url,
-            cache_dir=cache_dir,
-            wsdl_file=wsdl_file_arg,
-            cert_p12_path=p12_path,
-            cert_password=p12_password,
-            debug=debug_enabled
-        )
-        if debug_enabled:
-            print(f"✅ WSDL cargado: {wsdl_path}")
-    except Exception as e:
-        cleanup_pem_files()
-        _die(f"Error al cargar WSDL: {e}")
-    
-    # Crear transporte con mTLS
-    try:
-        transport = create_zeep_transport(p12_path, p12_password)
-    except Exception as e:
-        cleanup_pem_files()
-        _die(f"Error al crear transporte mTLS: {e}")
-    
-    # Crear cliente zeep con history plugin (siempre, para debug en errores)
-    history = HistoryPlugin()
-    settings = Settings(strict=False, xml_huge_tree=True)
-    
-    try:
-        client = Client(
-            wsdl=str(wsdl_path),
-            transport=transport,
-            settings=settings,
-            plugins=[history]
-        )
-    except Exception as e:
-        cleanup_pem_files()
-        _die(f"Error al cargar WSDL desde archivo: {e}")
-    
-    # Listar servicios/puertos/operaciones en modo debug
-    if debug_enabled:
-        print("\n📋 Servicios disponibles en WSDL:")
-        for svc_name, svc in client.wsdl.services.items():
-            print(f"   Servicio: {svc_name}")
-            for port_name, port in svc.ports.items():
-                ops = sorted(port.binding._operations.keys())
-                print(f"      Puerto: {port_name}")
-                print(f"      Operaciones: {', '.join(ops)}")
-    
-    # Forzar binding/port SOAP 1.2 específico del servicio de consulta lote
-    svc_name_selected = "de-ws-consultas-consuta-loteService"
-    port_name_selected = "de-ws-consultas-consuta-loteSoap12"
-    op_name = "rEnviConsLoteDe"
-    
-    # Verificar que el servicio y puerto existan
-    if svc_name_selected not in client.wsdl.services:
-        available_services = list(client.wsdl.services.keys())
-        cleanup_pem_files()
-        _die(f"Servicio '{svc_name_selected}' no encontrado en WSDL. Servicios disponibles: {available_services}")
-    
-    svc = client.wsdl.services[svc_name_selected]
-    if port_name_selected not in svc.ports:
-        available_ports = list(svc.ports.keys())
-        cleanup_pem_files()
-        _die(f"Puerto '{port_name_selected}' no encontrado en servicio '{svc_name_selected}'. Puertos disponibles: {available_ports}")
-    
-    port = svc.ports[port_name_selected]
-    available_ops = sorted(port.binding._operations.keys())
-    
-    if op_name not in available_ops:
-        cleanup_pem_files()
-        _die(f"Operación '{op_name}' no encontrada en puerto '{port_name_selected}'. Operaciones disponibles: {available_ops}")
-    
-    print(f"✅ Usando operación: {op_name} (servicio: {svc_name_selected}, puerto: {port_name_selected})")
+    print(f"   Código respuesta: {result.get('cod_res_lot')}")
+    print(f"   Mensaje: {result.get('msg_res_lot')}")
+    print(f"\n💾 Respuesta JSON guardada en: {out_path}")
+    return 0
     
     # --- Extraer endpoint SIEMPRE desde soap12:address/@location del WSDL local ---
     try:

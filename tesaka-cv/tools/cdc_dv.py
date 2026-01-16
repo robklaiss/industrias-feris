@@ -12,7 +12,7 @@ def calc_cdc_dv(base_43: str) -> int:
     """
     Calcula el dígito verificador (DV) del CDC usando módulo 11.
     
-    Esta es la implementación oficial que debe coincidir con SIFEN.
+    Esta es la implementación oficial que debe coincidir con SIFEN (Roshka reference).
     
     Args:
         base_43: String con exactamente 43 dígitos (base del CDC sin el DV)
@@ -23,14 +23,12 @@ def calc_cdc_dv(base_43: str) -> int:
     Raises:
         ValueError: Si base_43 no tiene 43 dígitos o no es numérico
         
-    Algoritmo SIFEN:
+    Algoritmo SIFEN (Roshka):
         - Recorrer los 43 dígitos desde la DERECHA hacia la IZQUIERDA
-        - Multiplicar cada dígito por un peso cíclico [2, 3, 4, 5, 6, 7, 8, 9]
+        - Multiplicar cada dígito por un peso que va de 2 a 11 (y se reinicia a 2)
         - Sumar todos los productos
-        - r = suma % 11
-        - dv = 11 - r
-        - Si dv == 11 -> 0
-        - Si dv == 10 -> 1
+        - Si (total % 11) > 1: dv = 11 - (total % 11)
+        - Si no: dv = 0
     """
     if not base_43 or not isinstance(base_43, str):
         raise ValueError(f"base_43 debe ser un string: {base_43!r}")
@@ -40,24 +38,24 @@ def calc_cdc_dv(base_43: str) -> int:
     if len(digits) != 43:
         raise ValueError(f"base_43 debe tener exactamente 43 dígitos. Recibido: {len(digits)} dígitos en {base_43!r}")
     
-    # Pesos cíclicos [2, 3, 4, 5, 6, 7, 8, 9]
-    weights = [2, 3, 4, 5, 6, 7, 8, 9]
+    # Algoritmo Roshka: pesos de 2 a 11, luego se reinicia a 2
+    base_max = 11
+    k = 2
+    total = 0
     
     # Recorrer desde la derecha (último dígito primero)
-    total = 0
-    for i, digit in enumerate(reversed(digits)):
-        weight = weights[i % len(weights)]
-        total += int(digit) * weight
+    for digit in reversed(digits):
+        if k > base_max:
+            k = 2
+        total += int(digit) * k
+        k += 1
     
-    # Calcular DV
-    r = total % 11
-    dv = 11 - r
-    
-    # Ajustes especiales
-    if dv == 11:
+    # Calcular DV (algoritmo Roshka)
+    remainder = total % 11
+    if remainder > 1:
+        dv = 11 - remainder
+    else:
         dv = 0
-    elif dv == 10:
-        dv = 1
     
     return dv
 

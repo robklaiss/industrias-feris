@@ -22,8 +22,18 @@ from html import unescape
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
-# Import safe configuration
-from tools.safe_config import require_config, SifenConfigError
+# Bootstrap sys.path para imports locales
+# Permite ejecutar como script o módulo
+try:
+    from tools.safe_config import require_config, SifenConfigError
+except ModuleNotFoundError:
+    # Agregar parent al path si se ejecuta como script
+    script_dir = Path(__file__).parent
+    parent_dir = script_dir.parent
+    if str(parent_dir) not in sys.path:
+        sys.path.insert(0, str(parent_dir))
+    # Reintentar import
+    from tools.safe_config import require_config, SifenConfigError
 
 NS = {
     "s": "http://ekuatia.set.gov.py/sifen/xsd",

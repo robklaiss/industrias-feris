@@ -11,7 +11,14 @@ import sys
 import os
 import argparse
 import base64
+import logging
 from pathlib import Path
+
+# Configurar logging para ver los mensajes de debug
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 
 # Agregar el directorio padre al path para imports
 sys.path.insert(0, str(Path(__file__).parent.parent))

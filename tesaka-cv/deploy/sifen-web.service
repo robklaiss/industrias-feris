@@ -1,0 +1,57 @@
+[Unit]
+Description=SIFEN Web Service
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=sifen
+Group=sifen
+WorkingDirectory=/home/sifen/app/tesaka-cv
+
+# Environment file con secretos
+EnvironmentFile=/etc/sifen/sifen.env
+
+# Python environment
+Environment=PATH=/home/sifen/.venv/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/home/sifen/app/tesaka-cv
+Environment=PYTHONUNBUFFERED=1
+
+# Directorios importantes
+Environment=SIFEN_ARTIFACTS_DIR=/home/sifen/artifacts
+Environment=SIFEN_LOG_DIR=/var/log/sifen
+
+# Comando de ejecución
+ExecStart=/home/sifen/.venv/bin/python -m uvicorn web.main:app \
+    --host 127.0.0.1 \
+    --port 8000 \
+    --workers 2 \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --access-log \
+    --log-level info
+
+# Restart configuration
+Restart=always
+RestartSec=5
+StartLimitInterval=60
+StartLimitBurst=3
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/sifen/app/tesaka-cv /var/log/sifen /home/sifen/artifacts
+ReadOnlyPaths=/home/sifen/.venv
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=sifen-web
+
+[Install]
+WantedBy=multi-user.target

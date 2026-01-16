@@ -7,11 +7,22 @@ import sys
 from pathlib import Path
 from typing import Dict, Any
 
+# Lazy import de jsonschema para evitar SystemExit durante collection
 try:
     from jsonschema import Draft202012Validator, ValidationError
+    _HAS_JSONSCHEMA = True
 except ImportError:
-    print("Error: jsonschema no está instalado. Instálalo con: pip install jsonschema", file=sys.stderr)
-    sys.exit(1)
+    Draft202012Validator = None  # type: ignore
+    ValidationError = Exception  # type: ignore
+    _HAS_JSONSCHEMA = False
+
+
+def _require_jsonschema():
+    """Verifica que jsonschema esté disponible, lanza RuntimeError si no"""
+    if not _HAS_JSONSCHEMA:
+        raise RuntimeError(
+            "Missing dependency: jsonschema. Install with: pip install jsonschema"
+        )
 
 
 def load_schema() -> Dict[str, Any]:
@@ -41,17 +52,26 @@ def load_invoice(file_path: str) -> Dict[str, Any]:
         sys.exit(1)
 
 
-def format_validation_error(error: ValidationError) -> str:
+def format_validation_error(error: "ValidationError") -> str:
     """Formatea un error de validación de manera legible"""
-    path = " -> ".join(str(p) for p in error.path)
-    absolute_path = " -> ".join(str(p) for p in error.absolute_path)
+    _require_jsonschema()
+    
+    # Si llegamos aquí, ValidationError es el tipo correcto de jsonschema
+    # y tiene los atributos path, absolute_path y message
+    try:
+        path = " -> ".join(str(p) for p in error.path)
+        absolute_path = " -> ".join(str(p) for p in error.absolute_path)
+        message = error.message
+    except AttributeError:
+        # Fallback si el error no tiene la estructura esperada
+        return f"Error de validación: {error}"
     
     if path:
         location = f"Campo: {path} (ruta absoluta: {absolute_path})"
     else:
         location = f"Raíz del documento (ruta absoluta: {absolute_path})"
     
-    return f"{location}\n  Error: {error.message}"
+    return f"{location}\n  Error: {message}"
 
 
 def convert_to_tesaka(invoice: Dict[str, Any]) -> list:
@@ -107,6 +127,11 @@ def validate_tesaka(tesaka_data: list, schema: Dict[str, Any]) -> list:
     Returns:
         Lista de errores formateados (vacía si no hay errores)
     """
+    _require_jsonschema()
+    
+    if Draft202012Validator is None:
+        raise RuntimeError("jsonschema no está disponible")
+    
     validator = Draft202012Validator(schema)
     errors = list(validator.iter_errors(tesaka_data))
     

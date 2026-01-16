@@ -1,0 +1,69 @@
+{
+  "emisor": {
+    "ruc": "80012345",
+    "dv": "7",
+    "razon_social": "MARCIO RUBEN FERIS AGUILERA",
+    "direccion": "ASUNCION",
+    "numero_casa": "1234",
+    "departamento": "1",
+    "ciudad": "1",
+    "telefono": "021123456",
+    "email": "test@example.com",
+    "actividad_economica": {
+      "codigo": "471100",
+      "descripcion": "Venta al por menor en comercios no especializados"
+    }
+  },
+  "timbrado": {
+    "numero": "12345678",
+    "establecimiento": "001",
+    "punto_expedicion": "001",
+    "tipo_documento": "1",
+    "numero_documento": "0000010"
+  },
+  "receptor": {
+    "tipo_naturaleza": "1",
+    "tipo_operacion": "1",
+    "pais": "PRY",
+    "pais_descripcion": "Paraguay",
+    "ruc": "1234567",
+    "dv": "9",
+    "nombre": "CLIENTE CONTRIBUYENTE SA",
+    "direccion": "CIUDAD DEL ESTE",
+    "numero_casa": "5678",
+    "departamento": "1",
+    "departamento_descripcion": "CAPITAL",
+    "ciudad": "1",
+    "ciudad_descripcion": "Asunción"
+  },
+  "condicion_operacion": {
+    "codigo": "1",
+    "descripcion": "Contado"
+  },
+  "tipo_contado": {
+    "codigo": "1",
+    "descripcion": "Efectivo"
+  },
+  "items": [
+    {
+      "codigo": "001",
+      "descripcion": "PRODUCTO DE VENTA AL POR MENOR",
+      "unidad_medida": "77",
+      "unidad_medida_descripcion": "UNI",
+      "cantidad": 10.0,
+      "precio_unitario": 50000,
+      "tasa_iva": 10
+    },
+    {
+      "codigo": "002",
+      "descripcion": "SERVICIO DE INSTALACION",
+      "unidad_medida": "77",
+      "unidad_medida_descripcion": "UNI",
+      "cantidad": 2.0,
+      "precio_unitario": 150000,
+      "tasa_iva": 10
+    }
+  ],
+  "fecha_emision": "2025-01-14",
+  "hora_emision": "14:30:00"
+}

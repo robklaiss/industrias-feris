@@ -7,38 +7,78 @@ Requisitos:
 - Algoritmo RSA 2048 bits
 - Hash SHA-256
 - Validación de cadena de confianza (CRL/LCR)
+
+IMPORTANTE: Este módulo usa lazy imports para signxml y lxml.
+Se importan solo cuando se usan las funciones, no al importar el módulo.
 """
 import os
 import logging
 from typing import Optional
 from pathlib import Path
 from datetime import datetime, timezone
+
+# Imports estándar (siempre disponibles)
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
-from lxml import etree
-from signxml import XMLSigner, XMLVerifier
-from signxml.util import ensure_str
 
-# signxml cambia APIs entre versiones: algunas no tienen XMLSigner.methods y
-# otras requieren Enum SignatureConstructionMethod para el parámetro `method`.
-try:
-    from signxml.algorithms import SignatureConstructionMethod  # type: ignore
-except Exception:
-    try:
-        from signxml.signer import SignatureConstructionMethod  # type: ignore
-    except Exception:
-        SignatureConstructionMethod = None  # type: ignore
+# Lazy imports para signxml y lxml (solo cuando se necesitan)
+_lxml_etree = None
+_XMLSigner = None
+_XMLVerifier = None
+_ensure_str = None
+_SignatureConstructionMethod = None
+_SignatureConfiguration = None
 
-# Import robusto de SignatureConfiguration para require_x509=False
-try:
-    from signxml.verifier import SignatureConfiguration  # type: ignore
-except Exception:
-    try:
-        from signxml import SignatureConfiguration  # type: ignore
-    except Exception:
-        SignatureConfiguration = None  # type: ignore
+def _ensure_signxml_imports():
+    """Importa signxml y lxml solo cuando se necesitan"""
+    global _lxml_etree, _XMLSigner, _XMLVerifier, _ensure_str, _SignatureConstructionMethod, _SignatureConfiguration
+    
+    if _lxml_etree is None:
+        try:
+            from lxml import etree as _lxml_etree_module
+            _lxml_etree = _lxml_etree_module
+        except ImportError as e:
+            raise ImportError(
+                "lxml no está instalado. Instale con: pip install lxml"
+            ) from e
+    
+    if _XMLSigner is None:
+        try:
+            from signxml import XMLSigner as _XMLSigner_module, XMLVerifier as _XMLVerifier_module
+            from signxml.util import ensure_str as _ensure_str_module
+            _XMLSigner = _XMLSigner_module
+            _XMLVerifier = _XMLVerifier_module
+            _ensure_str = _ensure_str_module
+        except ImportError as e:
+            raise ImportError(
+                "signxml no está instalado. Instale con: pip install signxml"
+            ) from e
+        
+        # signxml cambia APIs entre versiones
+        try:
+            from signxml.algorithms import SignatureConstructionMethod as _SCM  # type: ignore
+            _SignatureConstructionMethod = _SCM
+        except Exception:
+            try:
+                from signxml.signer import SignatureConstructionMethod as _SCM  # type: ignore
+                _SignatureConstructionMethod = _SCM
+            except Exception:
+                _SignatureConstructionMethod = None  # type: ignore
+        
+        # Import robusto de SignatureConfiguration
+        try:
+            from signxml.verifier import SignatureConfiguration as _SC  # type: ignore
+            _SignatureConfiguration = _SC
+        except Exception:
+            try:
+                from signxml import SignatureConfiguration as _SC  # type: ignore
+                _SignatureConfiguration = _SC
+            except Exception:
+                _SignatureConfiguration = None  # type: ignore
+    
+    return _lxml_etree, _XMLSigner, _XMLVerifier, _ensure_str, _SignatureConstructionMethod, _SignatureConfiguration
 
 logger = logging.getLogger(__name__)
 
@@ -211,6 +251,9 @@ class XmlSigner:
         Returns:
             XML firmado como string
         """
+        # Lazy import de signxml y lxml
+        etree, XMLSigner, _, _, SignatureConstructionMethod, _ = _ensure_signxml_imports()
+        
         try:
             # Parsear XML
             root = etree.fromstring(xml_content.encode('utf-8'))
@@ -228,12 +271,13 @@ class XmlSigner:
             else:
                 cert_for_signxml = [self.certificate]
             
-            # Configurar firmador
+            # Configurar firmador según NT16/MT v150
             signer = XMLSigner(
                 method=method,
                 signature_algorithm='rsa-sha256',
                 digest_algorithm='sha256',
-                c14n_algorithm='http://www.w3.org/2001/10/xml-exc-c14n#'
+                c14n_algorithm='http://www.w3.org/2001/10/xml-exc-c14n#',
+                exclude_c14n_transform_element=True  # Solo enveloped-signature en Transforms
             )
             
             # Firmar
@@ -268,6 +312,9 @@ class XmlSigner:
         Returns:
             True si la firma es válida, False en caso contrario
         """
+        # Lazy import de signxml y lxml
+        etree, _, XMLVerifier, _, _, SignatureConfiguration = _ensure_signxml_imports()
+        
         try:
             root = etree.fromstring(signed_xml.encode('utf-8'))
             

@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='utf-8' standalone='no'?>
+<rDE xmlns="http://ekuatia.set.gov.py/sifen/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd">
+    <dVerFor>150</dVerFor>
+    <DE Id="01800140664029010018945612026010915677380320">
+        <dDVId>0</dDVId>
+        <dFecFirma>2026-01-10T00:00:23</dFecFirma>
+        <dSisFact>1</dSisFact>
+        <gOpeDE>
+            <iTipEmi>1</iTipEmi>
+            <dDesTipEmi>Normal</dDesTipEmi>
+            <dCodSeg>567738032</dCodSeg>
+        </gOpeDE>
+        <gTimb>
+            <iTiDE>1</iTiDE>
+            <dDesTiDE>Factura electrónica</dDesTiDE>
+            <dNumTim>12345678</dNumTim>
+            <dEst>029</dEst>
+            <dPunExp>010</dPunExp>
+            <dNumDoc>0000004</dNumDoc>
+            <dFeIniT>2023-03-16</dFeIniT>
+        </gTimb>
+        <gDatGralOpe>
+            <dFeEmiDE>2026-01-13T14:44:26</dFeEmiDE>
+            <gOpeCom>
+                <iTipTra>1</iTipTra>
+                <dDesTipTra>Venta de mercadería</dDesTipTra>
+                <iTImp>1</iTImp>
+                <dDesTImp>IVA</dDesTImp>
+                <cMoneOpe>PYG</cMoneOpe>
+                <dDesMoneOpe>Guarani</dDesMoneOpe>
+            </gOpeCom>
+            <gEmis>
+                <dRucEm>4554737</dRucEm>
+                <dDVEmi>8</dDVEmi>
+                <iTipCont>1</iTipCont>
+                <cTipReg>2</cTipReg>
+                <dNomEmi>EMPRESA DE PRUEBA S.A.</dNomEmi>
+                <dNomFanEmi>EMPRESA DE PRUEBA</dNomFanEmi>
+                <dDirEmi>AVDA. ESPAÑA 123</dDirEmi>
+                <dNumCas>0</dNumCas>
+                <dCompDir1>N/A</dCompDir1>
+                <dCompDir2>N/A</dCompDir2>
+                <cDepEmi>12</cDepEmi>
+                <dDesDepEmi>CENTRAL</dDesDepEmi>
+                <cDisEmi>169</cDisEmi>
+                <dDesDisEmi>LAMBARE</dDesDisEmi>
+                <cCiuEmi>6106</cCiuEmi>
+                <dDesCiuEmi>LAMBARE</dDesCiuEmi>
+                <dTelEmi>0971 123456</dTelEmi>
+                <dEmailE>info@empresa.com.py</dEmailE>
+                <dDenSuc>LAMBARE</dDenSuc>
+                <gActEco>
+                    <cActEco>56101</cActEco>
+                    <dDesActEco>RESTAURANTES Y PARRILLADAS</dDesActEco>
+                </gActEco>
+            </gEmis>
+            <gDatRec>
+                <iNatRec>1</iNatRec>
+                <iTiOpe>2</iTiOpe>
+                <cPaisRec>PRY</cPaisRec>
+                <dDesPaisRe>Paraguay</dDesPaisRe>
+                <iTiContRec>1</iTiContRec>
+                <dRucRec>7524653</dRucRec>
+                <dDVRec>8</dDVRec>
+                <dNomRec>CONSUMIDOR FINAL</dNomRec>
+                <dEmailRec>ROBIN@VINCULO.COM.PY</dEmailRec>
+            </gDatRec>
+        </gDatGralOpe>
+        <gDtipDE>
+            <gCamFE>
+                <iIndPres>1</iIndPres>
+                <dDesIndPres>Operación presencial</dDesIndPres>
+            </gCamFE>
+            <gCamCond>
+                <iCondOpe>1</iCondOpe>
+                <dDCondOpe>Contado</dDCondOpe>
+                <gPaConEIni>
+                    <iTiPago>99</iTiPago>
+                    <dDesTiPag>Otro</dDesTiPag>
+                    <dMonTiPag>114500.0000</dMonTiPag>
+                    <cMoneTiPag>PYG</cMoneTiPag>
+                    <dDMoneTiPag>Guarani</dDMoneTiPag>
+                </gPaConEIni>
+            </gCamCond>
+            <gCamItem>
+                <dCodInt>50022</dCodInt>
+                <dDesProSer>ComBigMacMd</dDesProSer>
+                <cUniMed>77</cUniMed>
+                <dDesUniMed>UNI</dDesUniMed>
+                <dCantProSer>2.0000</dCantProSer>
+                <gValorItem>
+                    <dPUniProSer>38500.00000000</dPUniProSer>
+                    <dTotBruOpeItem>77000.00000000</dTotBruOpeItem>
+                    <gValorRestaItem>
+                        <dTotOpeItem>77000.00000000</dTotOpeItem>
+                    </gValorRestaItem>
+                </gValorItem>
+                <gCamIVA>
+                    <iAfecIVA>1</iAfecIVA>
+                    <dDesAfecIVA>Gravado IVA</dDesAfecIVA>
+                    <dPropIVA>100.00000000</dPropIVA>
+                    <dTasaIVA>10</dTasaIVA>
+                    <dBasGravIVA>70000.00000000</dBasGravIVA>
+                    <dLiqIVAItem>7000.00000000</dLiqIVAItem>
+                    <dBasExe>0.00000000</dBasExe>
+                </gCamIVA>
+            </gCamItem>
+            <gCamItem>
+                <dCodInt>50035</dCodInt>
+                <dDesProSer>CboPoMcChiMd</dDesProSer>
+                <cUniMed>77</cUniMed>
+                <dDesUniMed>UNI</dDesUniMed>
+                <dCantProSer>1.0000</dCantProSer>
+                <gValorItem>
+                    <dPUniProSer>37500.00000000</dPUniProSer>
+                    <dTotBruOpeItem>37500.00000000</dTotBruOpeItem>
+                    <gValorRestaItem>
+                        <dTotOpeItem>37500.00000000</dTotOpeItem>
+                    </gValorRestaItem>
+                </gValorItem>
+                <gCamIVA>
+                    <iAfecIVA>1</iAfecIVA>
+                    <dDesAfecIVA>Gravado IVA</dDesAfecIVA>
+                    <dPropIVA>100.00000000</dPropIVA>
+                    <dTasaIVA>10</dTasaIVA>
+                    <dBasGravIVA>34090.91000000</dBasGravIVA>
+                    <dLiqIVAItem>3409.09100000</dLiqIVAItem>
+                    <dBasExe>0.00000000</dBasExe>
+                </gCamIVA>
+            </gCamItem>
+        </gDtipDE>
+        <gTotSub>
+            <dSubExe>0.00000000</dSubExe>
+            <dSub5>0.00000000</dSub5>
+            <dSub10>114500.00000000</dSub10>
+            <dTotOpe>114500.00000000</dTotOpe>
+            <dTotDesc>0.00000000</dTotDesc>
+            <dTotDescGlotem>0.00000000</dTotDescGlotem>
+            <dTotAntItem>0.00000000</dTotAntItem>
+            <dTotAnt>0.00000000</dTotAnt>
+            <dPorcDescTotal>0.00000000</dPorcDescTotal>
+            <dDescTotal>0.00000000</dDescTotal>
+            <dAnticipo>0.00000000</dAnticipo>
+            <dRedon>0.0000</dRedon>
+            <dTotGralOpe>114500.00000000</dTotGralOpe>
+            <dIVA5>0.00000000</dIVA5>
+            <dIVA10>10409.00000000</dIVA10>
+            <dTotIVA>10409.00000000</dTotIVA>
+            <dBaseGrav5>0.00000000</dBaseGrav5>
+            <dBaseGrav10>104091.00000000</dBaseGrav10>
+            <dTBasGraIVA>104091.00000000</dTBasGraIVA>
+        </gTotSub>
+    </DE>
+
+	</rDE>

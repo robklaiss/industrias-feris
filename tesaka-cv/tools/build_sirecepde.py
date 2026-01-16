@@ -87,81 +87,47 @@ def build_sirecepde_xml(
     de_without_declaration = strip_xml_declaration(de_xml_content)
     
     # Namespace: http://ekuatia.set.gov.py/sifen/xsd
-    ns = "http://ekuatia.set.gov.py/sifen/xsd"
-    ds_ns = "http://www.w3.org/2000/09/xmldsig#"
+    SIFEN_NS = "http://ekuatia.set.gov.py/sifen/xsd"
+    XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
     
-    # Registrar namespaces para que ET.tostring() los incluya con prefijos
-    # register_namespace('', ns) hace que ET.tostring() agregue xmlns automáticamente
-    ET.register_namespace('', ns)  # Namespace por defecto
-    ET.register_namespace('ds', ds_ns)  # Namespace para ds:Signature
+    # REGLA CRÍTICA SIFEN:
+    # - El root (rEnviDe) NO debe tener xmlns:ds
+    # - ds:Signature dentro del DE debe tener su propio default namespace
+    # - Usar lxml para control completo del nsmap
     
-    # Crear elemento raíz rEnviDe usando ET
-    # NO establecer xmlns manualmente ya que register_namespace('', ns) lo maneja
-    # Solo establecer xmlns:ds que no se maneja automáticamente
-    root = ET.Element(f"{{{ns}}}rEnviDe")
-    root.set("xmlns:ds", ds_ns)  # Declarar namespace para ds:Signature que puede estar en el DE
+    # Crear elemento raíz rEnviDe con lxml (nsmap sin ds)
+    nsmap = {None: SIFEN_NS, "xsi": XSI_NS}
+    root = etree.Element(f"{{{SIFEN_NS}}}rEnviDe", nsmap=nsmap)
     
     # dId: Identificador de control de envío
-    d_id_elem = ET.SubElement(root, f"{{{ns}}}dId")
+    d_id_elem = etree.SubElement(root, f"{{{SIFEN_NS}}}dId")
     d_id_elem.text = str(d_id)
     
     # xDE: XML del DE transmitido
-    # Según el XSD, xDE contiene <xs:any namespace="..." processContents="skip"/>
-    # Esto significa que puede contener cualquier elemento del namespace correcto
-    x_de_elem = ET.SubElement(root, f"{{{ns}}}xDE")
+    x_de_elem = etree.SubElement(root, f"{{{SIFEN_NS}}}xDE")
     
-    # Parsear el DE sin declaración y agregarlo como hijo de xDE
+    # Parsear el DE y agregarlo como hijo de xDE
     try:
-        # El DE debe tener el namespace correcto
-        # Parsear el DE sin declaración XML
-        de_root = ET.fromstring(de_without_declaration)
+        # Parsear DE con lxml (preserva namespaces correctamente)
+        # Agregar declaración XML temporalmente para parseo correcto
+        de_with_decl = f'<?xml version="1.0" encoding="UTF-8"?>\n{de_without_declaration}'
         
-        # Si el DE tiene namespace, preservarlo; si no, agregar el namespace correcto
-        if de_root.tag.startswith('{') and '}' in de_root.tag:
-            # Ya tiene namespace, usar directamente
-            x_de_elem.append(de_root)
-        else:
-            # No tiene namespace explícito, asumir que es DE y agregar namespace
-            # Crear nuevo elemento DE con namespace correcto
-            de_with_ns = ET.Element(f"{{{ns}}}DE")
-            # Copiar atributos
-            for attr, value in de_root.attrib.items():
-                de_with_ns.set(attr, value)
-            # Copiar hijos recursivamente
-            for child in de_root:
-                _copy_element_with_ns(child, de_with_ns, ns)
-            de_with_ns.text = de_root.text
-            de_with_ns.tail = de_root.tail
-            x_de_elem.append(de_with_ns)
+        # Usar XMLParser con recover=True para manejar XMLs problemáticos
+        parser = etree.XMLParser(recover=True, remove_blank_text=False, resolve_entities=False)
+        de_root = etree.fromstring(de_with_decl.encode('utf-8'), parser=parser)
+        
+        # Agregar el DE completo como hijo de xDE
+        # NO tocar la firma - debe mantener su default namespace
+        x_de_elem.append(de_root)
             
-    except ET.ParseError as e:
-        # Si falla el parseo, intentar como texto XML (último recurso)
-        # Esto puede ocurrir si el DE tiene estructura compleja
-        x_de_elem.text = de_without_declaration
+    except etree.ParseError as e:
+        raise ValueError(f"Error parseando DE: {e}")
     
-    # Serializar a XML string
-    # Usar ET.tostring con encoding='unicode' y agregar prolog manualmente
-    xml_body = ET.tostring(root, encoding='unicode', xml_declaration=False)
-    
-    # Limpiar atributos duplicados que pueden ocurrir cuando se copian elementos
-    # ET.tostring() puede duplicar xmlns:ds si el DE también lo declara
-    # Buscar y remover duplicados de xmlns:ds
-    import re
-    # Patrón para encontrar xmlns:ds duplicado en el mismo elemento
-    # Buscar: xmlns:ds="..." xmlns:ds="..." (duplicado consecutivo)
-    xml_body = re.sub(
-        r'xmlns:ds="[^"]*"\s+xmlns:ds="[^"]*"',
-        'xmlns:ds="' + ds_ns + '"',
-        xml_body
-    )
-    
-    # También limpiar si está al inicio del tag (después de otros atributos)
-    # Buscar: ... xmlns:ds="..." xmlns:ds="..."
-    xml_body = re.sub(
-        r'(\S+)\s+xmlns:ds="[^"]*"\s+xmlns:ds="[^"]*"',
-        r'\1 xmlns:ds="' + ds_ns + '"',
-        xml_body
-    )
+    # Serializar a XML string con lxml (NO pretty_print para preservar firma)
+    # IMPORTANTE: NO remover xmlns:ds del root porque rompe los prefijos ds: en Signature
+    # El namespace ds DEBE estar declarado en algún ancestro de los elementos ds:*
+    # SIFEN acepta xmlns:ds en el root, el problema era la DUPLICACIÓN
+    xml_body = etree.tostring(root, encoding='unicode', xml_declaration=False, pretty_print=False)
     
     # Asegurar que comienza EXACTAMENTE con <?xml (sin espacios/BOM)
     result = f'<?xml version="1.0" encoding="UTF-8"?>\n{xml_body}'

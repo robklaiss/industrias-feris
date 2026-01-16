@@ -9,6 +9,12 @@ Ejecutar:
 
 import sys
 from pathlib import Path
+import pytest
+
+# Skip si faltan dependencias opcionales
+pytest.importorskip("lxml", reason="lxml requerido para tests de XML")
+pytest.importorskip("signxml", reason="signxml requerido para tests de XML")
+
 from lxml import etree
 
 # Agregar el directorio padre al path para imports
@@ -30,6 +36,7 @@ spec2 = importlib.util.spec_from_file_location("xml_generator_v150", xml_gen_pat
 xml_gen = importlib.util.module_from_spec(spec2)
 spec2.loader.exec_module(xml_gen)
 create_rde_xml_v150 = xml_gen.create_rde_xml_v150
+generate_cdc = xml_gen.generate_cdc
 
 # Importar build_de
 build_de_path = Path(__file__).parent.parent / "tools" / "build_de.py"
@@ -37,6 +44,13 @@ spec3 = importlib.util.spec_from_file_location("build_de", build_de_path)
 build_de_mod = importlib.util.module_from_spec(spec3)
 spec3.loader.exec_module(build_de_mod)
 build_de_xml = build_de_mod.build_de_xml
+
+# Importar normalize_cdc_in_rde desde send_sirecepde
+send_sirecepde_path = Path(__file__).parent.parent / "tools" / "send_sirecepde.py"
+spec4 = importlib.util.spec_from_file_location("send_sirecepde", send_sirecepde_path)
+send_sirecepde_mod = importlib.util.module_from_spec(spec4)
+spec4.loader.exec_module(send_sirecepde_mod)
+normalize_cdc_in_rde = send_sirecepde_mod.normalize_cdc_in_rde
 
 
 def test_create_rde_xml_v150_cdc_valido():
@@ -53,6 +67,9 @@ def test_create_rde_xml_v150_cdc_valido():
         fecha="2025-01-01",
         hora="12:00:00"
     )
+
+    assert "dDesPaisRe" in xml_str
+    assert "dDesPaisRec" not in xml_str
     
     # Parsear XML
     root = etree.fromstring(xml_str.encode("utf-8"))
@@ -98,6 +115,9 @@ def test_build_de_xml_cdc_valido():
         hora="12:00:00",
         env="test"
     )
+
+    assert "dDesPaisRe" in xml_str
+    assert "dDesPaisRec" not in xml_str
     
     # Parsear XML
     root = etree.fromstring(xml_str.encode("utf-8"))
@@ -170,6 +190,82 @@ def test_check_cdc_detecta_cdc_alfanumerico():
     finally:
         if temp_path.exists():
             temp_path.unlink()
+
+
+def test_normalize_cdc_in_rde_rewrites_id_and_dv():
+    """Verifica que normalize_cdc_in_rde regenere CDC/dDVId cuando dNumDoc cambia."""
+    print("\n=== Test: normalize_cdc_in_rde recalcula CDC cuando dNumDoc no coincide ===")
+    
+    ruc = "4554737-8"
+    timbrado = "12547896"
+    establecimiento = "001"
+    punto = "001"
+    numero_original = "0000001"
+    numero_mutado = "0000002"
+    tipo_doc = "1"
+    fecha_iso = "2025-12-30T23:32:13"
+    fecha_ymd = "20251230"
+    monto_total = "100000"
+    
+    expected_cdc = generate_cdc(
+        ruc=ruc,
+        timbrado=timbrado,
+        establecimiento=establecimiento,
+        punto_expedicion=punto,
+        numero_documento=numero_mutado,
+        tipo_documento=tipo_doc,
+        fecha=fecha_ymd,
+        monto=monto_total,
+    )
+    
+    rde_xml = f"""
+    <rDE xmlns="http://ekuatia.set.gov.py/sifen/xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <dVerFor>150</dVerFor>
+        <DE Id="{'0'*44}">
+            <dDVId>0</dDVId>
+            <dFecFirma>{fecha_iso}</dFecFirma>
+            <dSisFact>1</dSisFact>
+            <gDatGralOpe>
+                <dFeEmiDE>{fecha_iso}</dFeEmiDE>
+            </gDatGralOpe>
+            <gEmis>
+                <dRucEm>4554737</dRucEm>
+                <dDVEmi>8</dDVEmi>
+                <iTipCont>1</iTipCont>
+            </gEmis>
+            <gTimb>
+                <iTiDE>{tipo_doc}</iTiDE>
+                <dNumTim>{timbrado}</dNumTim>
+                <dEst>{establecimiento}</dEst>
+                <dPunExp>{punto}</dPunExp>
+                <dNumDoc>{numero_original}</dNumDoc>
+            </gTimb>
+            <gTotSub>
+                <dTotalGs>{monto_total}</dTotalGs>
+            </gTotSub>
+        </DE>
+    </rDE>
+    """.strip()
+    
+    root = etree.fromstring(rde_xml.encode("utf-8"))
+    
+    # Mutar solo dNumDoc para simular edición manual
+    ns = {"s": "http://ekuatia.set.gov.py/sifen/xsd"}
+    gtimb = root.find(".//s:gTimb", namespaces=ns)
+    gtimb.find("s:dNumDoc", namespaces=ns).text = numero_mutado
+    
+    result = normalize_cdc_in_rde(root, log_if_unchanged=True)
+    
+    de_elem = root.find(".//s:DE", namespaces=ns)
+    ddvid_elem = root.find(".//s:dDVId", namespaces=ns)
+    
+    assert de_elem.get("Id") == expected_cdc, "DE@Id debe recomponerse con el CDC esperado"
+    assert ddvid_elem.text == expected_cdc[-1], "dDVId debe ser el último dígito del CDC"
+    assert result["new_cdc"] == expected_cdc
+    assert result["new_numdoc"] == numero_mutado
+    
+    print(f"  ✅ CDC normalizado: {expected_cdc}")
+    print(f"  ✅ dDVId actualizado: {ddvid_elem.text}")
 
 
 if __name__ == "__main__":

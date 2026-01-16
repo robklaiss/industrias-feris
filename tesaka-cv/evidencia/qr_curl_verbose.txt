@@ -1,0 +1,3 @@
+* URL rejected: Bad hostname
+* Closing connection
+curl: (3) URL rejected: Bad hostname

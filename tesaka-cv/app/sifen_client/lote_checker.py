@@ -16,12 +16,17 @@ from lxml import etree
 
 logger = logging.getLogger(__name__)
 
-# Importar función de consulta desde tools y helper PKCS12
-try:
-    from tools.consulta_lote_de import call_consulta_lote_raw
-except ImportError:
-    logger.error("No se pudo importar call_consulta_lote_raw desde tools.consulta_lote_de")
-    raise
+# Lazy import para evitar errores de collection si falta zeep
+# call_consulta_lote_raw se importa solo cuando se necesita (dentro de check_lote_status)
+def _get_call_consulta_lote_raw():
+    """Lazy import de call_consulta_lote_raw"""
+    try:
+        from tools.consulta_lote_de import call_consulta_lote_raw
+        return call_consulta_lote_raw
+    except (ImportError, SystemExit) as e:
+        raise ImportError(
+            "zeep no está instalado. Instale con: pip install zeep"
+        ) from e
 
 # Importar helper PKCS12 desde módulo correcto
 try:
@@ -166,6 +171,7 @@ def check_lote_status(
                 if attempt > 0:
                     print(f"[SIFEN DEBUG] check_lote_status: retry {attempt+1}/3")
                 
+                call_consulta_lote_raw = _get_call_consulta_lote_raw()
                 xml_response = call_consulta_lote_raw(
                     session=None, env=env, prot=prot, timeout=timeout
                 )

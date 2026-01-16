@@ -1,5 +1,32 @@
 # Guía de Generación y Validación XML para SIFEN
 
+## Prevalidador SIFEN (upload seguro)
+
+1) Generar XML firmado (ejemplo)
+
+```bash
+./scripts/sign_sirecepde_v4.sh /tmp/sirecepde.xml
+```
+
+2) Exportar el archivo listo para subir (byte-safe, sin reserializar)
+
+```bash
+.venv/bin/python -m tools.export_prevalidator_upload /tmp/sirecepde.signed.xml \
+  --out "$HOME/Desktop/SIFEN_PREVALIDADOR_UPLOAD.xml"
+```
+
+3) Verificar criptográficamente con `xmlsec1` antes de subir
+
+```bash
+.venv/bin/python -m tools.verify_xmlsec "$HOME/Desktop/SIFEN_PREVALIDADOR_UPLOAD.xml"
+```
+
+Opcional (estructura):
+
+```bash
+.venv/bin/python -m tools.verify_sig_location "$HOME/Desktop/SIFEN_PREVALIDADOR_UPLOAD.xml"
+```
+
 Este documento explica cómo generar y validar XML para SIFEN (Sistema Integrado de Facturación Electrónica Nacional) de Paraguay.
 
 ## Conceptos Clave

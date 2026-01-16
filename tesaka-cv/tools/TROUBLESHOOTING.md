@@ -92,3 +92,38 @@ schema.validate(xml)
 
 Si falla, los errores estarán en `schema.error_log`.
 
+## Cómo confirmar que el XML embebe el certificado correcto y la firma valida
+
+Para verificar que:
+1. El certificado embebido en el XML (`ds:X509Certificate`) coincide con el leaf del P12
+2. La cadena del certificado valida contra la CA de Documenta
+3. La firma XMLDSig es criptográficamente válida
+
+Usar el verificador PKI completo:
+
+```bash
+# Uso básico con defaults
+SIFEN_CERT_PASS="tu_password" ./tools/run_verify_pki.sh
+
+# Especificar paths personalizados
+SIFEN_CERT_PASS="tu_password" ./tools/run_verify_pki.sh \
+  --xml /path/to/signed.xml \
+  --p12 /path/to/cert.p12 \
+  --ca /path/to/ca-documenta.crt
+```
+
+El script genera un resumen corto en stdout y guarda todos los detalles en `/tmp/sifen_verify_run/`:
+- `p12_leaf.pem` - Certificado extraído del P12
+- `xml_embedded.pem` - Certificado extraído del XML
+- `fingerprints.txt` - Comparación de fingerprints SHA256
+- `openssl_verify.txt` - Resultado de validación de cadena
+- `crypto_verify.txt` - Resultado de verificación de firma
+- `summary.json` - Resumen completo en JSON
+
+### Defaults del verificador
+
+- XML: `/tmp/sifen_preval/smoke_python_de_preval_signed.xml`
+- P12: `~/.sifen/certs/F1T_65478.p12`
+- CA: `~/.sifen/certs/ca-documenta.crt`
+- Password: variable de entorno `SIFEN_CERT_PASS` (requerido)
+

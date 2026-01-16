@@ -2,6 +2,11 @@
 Tests unitarios para pkcs12_utils
 """
 import pytest
+
+# Skip si faltan dependencias opcionales (este test no las necesita directamente,
+# pero el import de app.sifen_client puede fallar si __init__.py importa signxml)
+pytest.importorskip("signxml", reason="signxml requerido para importar sifen_client")
+
 import os
 import tempfile
 from pathlib import Path

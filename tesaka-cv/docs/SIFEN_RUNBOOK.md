@@ -83,6 +83,31 @@ Scripts:
 
 ---
 
+### 1.7 XMLDSIG/Digest mismatch – Confirmación de predigest vs DE final
+**Aprendizaje clave:** Confirmación de que `predigest.xml` extraído desde xmlsec (`== PreDigest data`) es idéntico al `<DE>` presente en el XML final (`diff` vacío cuando se exporta el DE sin XML declaration). Esto confirma que el problema NO es "XML modificado después de firmar" por declaración XML u otras diferencias de serialización simple; el mismatch viene de que el `DigestValue` embebido fue calculado con otro pipeline/representación (p.ej. transforms diferentes).
+
+**Comandos de verificación:**
+```bash
+# Extraer predigest desde xmlsec
+xmlsec1 --verify --insecure --id-attr:Id DE \
+  --store-references \
+  --print-debug \
+  --print-xml-debug \
+  --verbose lote_from_zip.xml 2>&1 \
+  | awk '/== PreDigest data - start buffer:/{flag=1; next}
+         /== PreDigest data - end buffer/{flag=0}
+         flag{print}' > predigest.xml
+
+# Extraer DE del XML final (sin XML declaration)
+xmllint --xpath "//DE" lote_from_zip.xml > de_final.xml
+
+# Comparar
+diff predigest.xml de_final.xml
+# Si diff está vacío: el DE no fue modificado post-firma
+```
+
+---
+
 ## 2) Flujo de punta a punta (lo que debe pasar)
 1) Generar DE (XML) con CDC válido y DV correcto.
 2) Firmar DE y normalizar orden de nodos del `rDE` (si aplica).
@@ -180,3 +205,41 @@ Scripts:
 
 # Fin del documento
 
+
+---
+
+## Aprendizaje / Anti-regresión — Error 0160 "XML Mal Formado"
+
+**Síntoma**
+- SIFEN devuelve 0160 "XML Mal Formado" pero `xmlsec1 --verify ...` da OK.
+
+**Causa real encontrada**
+- Faltaba `dVerFor` dentro de `rDE` (debe ser el primer hijo, valor 150 para v150), por lo que el XSD falla aunque la firma sea correcta.
+
+**Checklist anti-regresión**
+1) Siempre extraer y revisar el lote REAL enviado (desde soap_last_request_SENT → xDE → zip → lote.xml)
+2) Verificar firma con xmlsec
+3) Verificar estructura mínima: `rDE children` debe comenzar con `dVerFor`, y `gCamFuFD` NO debe estar dentro de `DE`.
+
+**Comandos de verificación**
+```bash
+# Extraer lote del SOAP enviado
+unzip -p artifacts/soap_last_request_SENT.xml xDE > xDE.zip
+unzip -p xDE.zip lote.xml > lote_from_SENT.xml
+
+# Verificar firma
+xmlsec1 --verify --insecure --id-attr:Id DE lote_from_SENT.xml
+
+# Verificar estructura
+python - <<'PY'
+from lxml import etree
+doc = etree.parse("lote_from_SENT.xml")
+NS="http://ekuatia.set.gov.py/sifen/xsd"
+ns={"s":NS}
+rde = doc.xpath("//s:rDE", namespaces=ns)[0]
+children = [c.tag.split("}")[-1] for c in rde]
+print("rDE children:", children)
+dver = rde.find(f"{{{NS}}}dVerFor")
+print("dVerFor:", None if dver is None else dver.text)
+PY
+```

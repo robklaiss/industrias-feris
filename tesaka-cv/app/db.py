@@ -264,6 +264,50 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_submissions_invoice_id ON submissions(invoice_id)
     """)
     
+    # Tabla sifen_submissions - Registro de envíos a SIFEN
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS sifen_submissions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            invoice_id INTEGER NOT NULL,
+            sifen_env TEXT NOT NULL CHECK(sifen_env IN ('test', 'prod')),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            http_code INTEGER,
+            dCodRes TEXT,
+            dMsgRes TEXT,
+            signed_xml_sha256 TEXT,
+            endpoint TEXT,
+            request_xml TEXT,
+            response_xml TEXT,
+            ruc_validated INTEGER DEFAULT 0,
+            ruc_validation_result TEXT,
+            ok INTEGER DEFAULT 0,
+            error TEXT,
+            FOREIGN KEY (invoice_id) REFERENCES invoices(id)
+        )
+    """)
+    # Índice para búsquedas por invoice_id
+    cursor.execute("""
+        CREATE INDEX IF NOT EXISTS idx_sifen_submissions_invoice_id ON sifen_submissions(invoice_id)
+    """)
+    
+    # Agregar columnas SIFEN a invoices si no existen (compatibilidad)
+    try:
+        cursor.execute("ALTER TABLE invoices ADD COLUMN sifen_status TEXT")
+    except sqlite3.OperationalError:
+        pass  # Columna ya existe
+    try:
+        cursor.execute("ALTER TABLE invoices ADD COLUMN sifen_last_cod TEXT")
+    except sqlite3.OperationalError:
+        pass  # Columna ya existe
+    try:
+        cursor.execute("ALTER TABLE invoices ADD COLUMN sifen_last_msg TEXT")
+    except sqlite3.OperationalError:
+        pass  # Columna ya existe
+    try:
+        cursor.execute("ALTER TABLE invoices ADD COLUMN sifen_last_sent_at TIMESTAMP")
+    except sqlite3.OperationalError:
+        pass  # Columna ya existe
+    
     conn.commit()
     conn.close()
 

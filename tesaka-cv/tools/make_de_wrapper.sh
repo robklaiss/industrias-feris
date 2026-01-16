@@ -159,7 +159,16 @@ echo "🔧 Ambiente: $ENV"
 echo "🔑 IdCSC: $SIFEN_IDCSC"
 echo "🔒 CSC: *** (oculto)"
 
-TMP_XML="/tmp/sifen_de.xml"
+TMP_XML="${TMP_XML:-/tmp/sifen_de.xml}"
+# Extraer --out del generador (cuando es generar_prevalidador)
+if [[ "$GEN_CMD" == *"generar_prevalidador.py"* ]]; then
+  GEN_OUT="$(echo "$GEN_CMD" | sed -nE 's/.*--out[[:space:]]+([^[:space:]]+).*/\1/p')"
+  # Expandir ~ si vino así
+  GEN_OUT="${GEN_OUT/#\~/$HOME}"
+  if [[ -n "$GEN_OUT" ]]; then
+    TMP_XML="$GEN_OUT"
+  fi
+fi
 TMP_SIGNED="/tmp/sifen_de_signed.xml"
 OUT_EXPANDED="$(python3 - <<PY
 import os
@@ -195,7 +204,7 @@ fi
 if [[ -f "$TMP_SIGNED" ]]; then
   echo "XML ya está firmado (generador prevalidador)"
 else
-  [[ -f "$TMP_XML" ]] || { echo "No encuentro XML generado. Ajustá tu --gen para escribir /tmp/sifen_de.xml"; exit 1; }
+  [[ -f "$TMP_XML" ]] || { echo "No encuentro XML generado. Esperaba: $TMP_XML"; exit 1; }
   echo "XML generado: $TMP_XML"
 
   echo ""
@@ -215,7 +224,18 @@ fi
 
 echo ""
 echo "== 3) Recalcular QR (sin tocar firma) =="
-python3 tools/make_valid_de.py --in "$TMP_SIGNED" --out "$OUT_EXPANDED" --env "$ENV"
+GEN_DIR="$(dirname "$TMP_XML")"
+# Preferir el firmado generado por el generador en el mismo directorio
+CAND_SIGNED="$(ls -t "$GEN_DIR"/xml_firmado_*.xml 2>/dev/null | head -n 1)"
+if [[ -n "$CAND_SIGNED" ]]; then
+  TMP_SIGNED="$CAND_SIGNED"
+fi
+
+echo "XML firmado (input QR): $TMP_SIGNED"
+
+PYTHONPATH=. .venv/bin/python -m tools.make_valid_de --in "$TMP_SIGNED" --out "$OUT_EXPANDED" --env "$ENV"
+# Verificar que se generó correctamente
+[[ -f "$OUT_EXPANDED" ]] || { echo "❌ Error: make_valid_de.py no generó salida"; exit 1; }
 
 echo ""
 echo "✅ LISTO: $OUT_EXPANDED"

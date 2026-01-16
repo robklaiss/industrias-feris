@@ -1,0 +1,160 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ns0:Envelope xmlns:ns0="http://www.w3.org/2003/05/soap-envelope"><ns0:Header/><ns0:Body><ns1:rEnviDe xmlns:ns1="http://ekuatia.set.gov.py/sifen/xsd"><ns1:dId>1768242965490</ns1:dId><ns1:xDE><rLoteDE><ns1:rDE xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd">
+    <ns1:dVerFor>150</ns1:dVerFor>
+    <ns1:DE Id="01800140664029010018945612026010915677380320">
+        <ns1:dDVId>0</ns1:dDVId>
+        <ns1:dFecFirma>2026-01-10T00:00:23</ns1:dFecFirma>
+        <ns1:dSisFact>1</ns1:dSisFact>
+        <ns1:gOpeDE>
+            <ns1:iTipEmi>1</ns1:iTipEmi>
+            <ns1:dDesTipEmi>Normal</ns1:dDesTipEmi>
+            <ns1:dCodSeg>567738032</ns1:dCodSeg>
+        </ns1:gOpeDE>
+        <ns1:gTimb>
+            <ns1:iTiDE>1</ns1:iTiDE>
+            <ns1:dDesTiDE>Factura electrónica</ns1:dDesTiDE>
+            <ns1:dNumTim>16284685</ns1:dNumTim>
+            <ns1:dEst>029</ns1:dEst>
+            <ns1:dPunExp>010</ns1:dPunExp>
+            <ns1:dNumDoc>0189456</ns1:dNumDoc>
+            <ns1:dFeIniT>2023-03-16</ns1:dFeIniT>
+        </ns1:gTimb>
+        <ns1:gDatGralOpe>
+            <ns1:dFeEmiDE>2026-01-09T23:49:01</ns1:dFeEmiDE>
+            <ns1:gOpeCom>
+                <ns1:iTipTra>1</ns1:iTipTra>
+                <ns1:dDesTipTra>Venta de mercadería</ns1:dDesTipTra>
+                <ns1:iTImp>1</ns1:iTImp>
+                <ns1:dDesTImp>IVA</ns1:dDesTImp>
+                <ns1:cMoneOpe>PYG</ns1:cMoneOpe>
+                <ns1:dDesMoneOpe>Guarani</ns1:dDesMoneOpe>
+            </ns1:gOpeCom>
+            <ns1:gEmis>
+                <ns1:dRucEm>80014066</ns1:dRucEm>
+                <ns1:dDVEmi>4</ns1:dDVEmi>
+                <ns1:iTipCont>1</ns1:iTipCont>
+                <ns1:cTipReg>2</ns1:cTipReg>
+                <ns1:dNomEmi>SERVICIOS RAPIDOS DEL PARAGUAY S.A.</ns1:dNomEmi>
+                <ns1:dNomFanEmi>SERVICIOS RAPIDOS DEL PARAGUAY S.A.</ns1:dNomFanEmi>
+                <ns1:dDirEmi>AVDA CACIQUE LAMBARE E/HEROES DEL 70 Y CARLOS ALBERTO GOMEZ (PASEO CERRO ALTO)//INTERIOR</ns1:dDirEmi>
+                <ns1:dNumCas>0</ns1:dNumCas>
+                <ns1:dCompDir1>N/A</ns1:dCompDir1>
+                <ns1:dCompDir2>N/A</ns1:dCompDir2>
+                <ns1:cDepEmi>12</ns1:cDepEmi>
+                <ns1:dDesDepEmi>CENTRAL</ns1:dDesDepEmi>
+                <ns1:cDisEmi>169</ns1:cDisEmi>
+                <ns1:dDesDisEmi>LAMBARE</ns1:dDesDisEmi>
+                <ns1:cCiuEmi>6106</ns1:cCiuEmi>
+                <ns1:dDesCiuEmi>LAMBARE</ns1:dDesCiuEmi>
+                <ns1:dTelEmi>0974 200014</ns1:dTelEmi>
+                <ns1:dEmailE>fesrpa@mcd.com.py</ns1:dEmailE>
+                <ns1:dDenSuc>LAMBARE</ns1:dDenSuc>
+                <ns1:gActEco>
+                    <ns1:cActEco>56101</ns1:cActEco>
+                    <ns1:dDesActEco>RESTAURANTES Y PARRILLADAS</ns1:dDesActEco>
+                </ns1:gActEco>
+            </ns1:gEmis>
+            <ns1:gDatRec>
+                <ns1:iNatRec>1</ns1:iNatRec>
+                <ns1:iTiOpe>2</ns1:iTiOpe>
+                <ns1:cPaisRec>PRY</ns1:cPaisRec>
+                <ns1:dDesPaisRe>Paraguay</ns1:dDesPaisRe>
+                <ns1:iTiContRec>1</ns1:iTiContRec>
+                <ns1:dRucRec>7524653</ns1:dRucRec>
+                <ns1:dDVRec>8</ns1:dDVRec>
+                <ns1:dNomRec>ROBIN CLAISS</ns1:dNomRec>
+                <ns1:dEmailRec>ROBIN@VINCULO.COM.PY</ns1:dEmailRec>
+            </ns1:gDatRec>
+        </ns1:gDatGralOpe>
+        <ns1:gDtipDE>
+            <ns1:gCamFE>
+                <ns1:iIndPres>1</ns1:iIndPres>
+                <ns1:dDesIndPres>Operación presencial</ns1:dDesIndPres>
+            </ns1:gCamFE>
+            <ns1:gCamCond>
+                <ns1:iCondOpe>1</ns1:iCondOpe>
+                <ns1:dDCondOpe>Contado</ns1:dDCondOpe>
+                <ns1:gPaConEIni>
+                    <ns1:iTiPago>99</ns1:iTiPago>
+                    <ns1:dDesTiPag>Otro</ns1:dDesTiPag>
+                    <ns1:dMonTiPag>114500.0000</ns1:dMonTiPag>
+                    <ns1:cMoneTiPag>PYG</ns1:cMoneTiPag>
+                    <ns1:dDMoneTiPag>Guarani</ns1:dDMoneTiPag>
+                </ns1:gPaConEIni>
+            </ns1:gCamCond>
+            <ns1:gCamItem>
+                <ns1:dCodInt>50022</ns1:dCodInt>
+                <ns1:dDesProSer>ComBigMacMd</ns1:dDesProSer>
+                <ns1:cUniMed>77</ns1:cUniMed>
+                <ns1:dDesUniMed>UNI</ns1:dDesUniMed>
+                <ns1:dCantProSer>2.0000</ns1:dCantProSer>
+                <ns1:gValorItem>
+                    <ns1:dPUniProSer>38500.00000000</ns1:dPUniProSer>
+                    <ns1:dTotBruOpeItem>77000.00000000</ns1:dTotBruOpeItem>
+                    <ns1:gValorRestaItem>
+                        <ns1:dTotOpeItem>77000.00000000</ns1:dTotOpeItem>
+                    </ns1:gValorRestaItem>
+                </ns1:gValorItem>
+                <ns1:gCamIVA>
+                    <ns1:iAfecIVA>1</ns1:iAfecIVA>
+                    <ns1:dDesAfecIVA>Gravado IVA</ns1:dDesAfecIVA>
+                    <ns1:dPropIVA>100.00000000</ns1:dPropIVA>
+                    <ns1:dTasaIVA>10</ns1:dTasaIVA>
+                    <ns1:dBasGravIVA>70000.00000000</ns1:dBasGravIVA>
+                    <ns1:dLiqIVAItem>7000.00000000</ns1:dLiqIVAItem>
+                    <ns1:dBasExe>0.00000000</ns1:dBasExe>
+                </ns1:gCamIVA>
+            </ns1:gCamItem>
+            <ns1:gCamItem>
+                <ns1:dCodInt>50035</ns1:dCodInt>
+                <ns1:dDesProSer>CboPoMcChiMd</ns1:dDesProSer>
+                <ns1:cUniMed>77</ns1:cUniMed>
+                <ns1:dDesUniMed>UNI</ns1:dDesUniMed>
+                <ns1:dCantProSer>1.0000</ns1:dCantProSer>
+                <ns1:gValorItem>
+                    <ns1:dPUniProSer>37500.00000000</ns1:dPUniProSer>
+                    <ns1:dTotBruOpeItem>37500.00000000</ns1:dTotBruOpeItem>
+                    <ns1:gValorRestaItem>
+                        <ns1:dTotOpeItem>37500.00000000</ns1:dTotOpeItem>
+                    </ns1:gValorRestaItem>
+                </ns1:gValorItem>
+                <ns1:gCamIVA>
+                    <ns1:iAfecIVA>1</ns1:iAfecIVA>
+                    <ns1:dDesAfecIVA>Gravado IVA</ns1:dDesAfecIVA>
+                    <ns1:dPropIVA>100.00000000</ns1:dPropIVA>
+                    <ns1:dTasaIVA>10</ns1:dTasaIVA>
+                    <ns1:dBasGravIVA>34090.91000000</ns1:dBasGravIVA>
+                    <ns1:dLiqIVAItem>3409.09100000</ns1:dLiqIVAItem>
+                    <ns1:dBasExe>0.00000000</ns1:dBasExe>
+                </ns1:gCamIVA>
+            </ns1:gCamItem>
+        </ns1:gDtipDE>
+        <ns1:gTotSub>
+            <ns1:dSubExe>0.00000000</ns1:dSubExe>
+            <ns1:dSub5>0.00000000</ns1:dSub5>
+            <ns1:dSub10>114500.00000000</ns1:dSub10>
+            <ns1:dTotOpe>114500.00000000</ns1:dTotOpe>
+            <ns1:dTotDesc>0.00000000</ns1:dTotDesc>
+            <ns1:dTotDescGlotem>0.00000000</ns1:dTotDescGlotem>
+            <ns1:dTotAntItem>0.00000000</ns1:dTotAntItem>
+            <ns1:dTotAnt>0.00000000</ns1:dTotAnt>
+            <ns1:dPorcDescTotal>0.00000000</ns1:dPorcDescTotal>
+            <ns1:dDescTotal>0.00000000</ns1:dDescTotal>
+            <ns1:dAnticipo>0.00000000</ns1:dAnticipo>
+            <ns1:dRedon>0.0000</ns1:dRedon>
+            <ns1:dTotGralOpe>114500.00000000</ns1:dTotGralOpe>
+            <ns1:dIVA5>0.00000000</ns1:dIVA5>
+            <ns1:dIVA10>10409.00000000</ns1:dIVA10>
+            <ns1:dTotIVA>10409.00000000</ns1:dTotIVA>
+            <ns1:dBaseGrav5>0.00000000</ns1:dBaseGrav5>
+            <ns1:dBaseGrav10>104091.00000000</ns1:dBaseGrav10>
+            <ns1:dTBasGraIVA>104091.00000000</ns1:dTBasGraIVA>
+        </ns1:gTotSub>
+    </ns1:DE>
+
+	<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><Reference URI="#01800140664029010018945612026010915677380320"><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><DigestValue>oQoOTIkbCqMcCXgeLBq10tY3plcMpzf7Fv4eU7vWGnI=</DigestValue></Reference></SignedInfo><SignatureValue>nrRF+nRaJtjb7tig28C9gMexhfaBmoEFBGjFaDoZ+wS5JliXdf8DojjH+2HkRlr0VnJFJ9ijuCFd5K06C4ZHQpQujqBqiWHCpfe2D5S0mmNsouEQuADkstB5n+bCXXkSBq7PYca5A9E70yDJ6mOZUDxnSShMpOzXBeU75oD3lXkO1bm4dugqMq0MLx3yN6p0XGdfAcl1h3Pue1ppdRWfoNE8kH4lwLo6pDR7bY3naNflg+7WW4FeLRB3tIaqxIDrwGe8ppDuHECuxL6l1NXK924Olh16x9OsfTLjRo6S2scIZq0s5EVQSlg20VKEl+5e666rHlMRZGyEef6E0HZTQQ==</SignatureValue><KeyInfo><X509Data><X509Certificate>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</X509Certificate></X509Data></KeyInfo></Signature>
+	<ns1:gCamFuFD>
+		<ns1:dCarQR>https://ekuatia.set.gov.py/consultas/qr?nVersion=150&amp;Id=01800140664029010018945612026010915677380320&amp;dFeEmiDE=323032362d30312d30395432333a34393a3031&amp;dRucRec=7524653&amp;dTotGralOpe=114500.00000000&amp;dTotIVA=10409.00000000&amp;cItems=2&amp;DigestValue=6f516f4f54496b6243714d63435867654c42713130745933706c634d707a66374676346555377657476e493d&amp;IdCSC=0001&amp;cHashQR=02af18bc538048d7567f1183ea9e9895cc05401c71334ac4be90bff57c27acf0</ns1:dCarQR>
+	</ns1:gCamFuFD>
+</ns1:rDE>
+	</rLoteDE></ns1:xDE></ns1:rEnviDe></ns0:Body></ns0:Envelope>

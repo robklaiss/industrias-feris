@@ -1,0 +1,9 @@
+.PHONY: dev sign
+
+# Start dev server
+dev:
+	./scripts/dev_server.sh
+
+# Sign a siRecepDE XML
+sign:
+	./scripts/sign_sirecepde.sh $(FILE)

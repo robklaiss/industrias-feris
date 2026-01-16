@@ -23,29 +23,29 @@ OPCIÓN 2 (Manual):
 NOTA: Asegúrate de que el venv esté activado (deberías ver (.venv) en el prompt).
 """
 import os
+from datetime import datetime, timezone
 from pathlib import Path as FSPath
 from typing import Optional
 from fastapi import FastAPI, HTTPException, Request, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-# Cargar variables de entorno desde .env si existe
 try:
     from dotenv import load_dotenv
-    # Buscar .env en el directorio raíz del proyecto (tesaka-cv/)
-    project_root = FSPath(__file__).parent.parent
-    env_file = project_root / ".env"
+    PROJECT_ROOT = FSPath(__file__).resolve().parent.parent
+    env_file = PROJECT_ROOT / ".env"
     if env_file.exists():
         load_dotenv(env_file)
     else:
-        # También intentar en el directorio padre (por si estamos en raíz del repo)
-        parent_env = project_root.parent / ".env"
+        parent_env = PROJECT_ROOT.parent / ".env"
         if parent_env.exists():
             load_dotenv(parent_env)
 except ImportError:
-    # python-dotenv no está instalado, continuar sin cargar .env
-    pass
+    PROJECT_ROOT = FSPath(__file__).resolve().parent.parent
+
+ARTIFACTS_DIR = FSPath(os.getenv("SIFEN_ARTIFACTS_DIR", PROJECT_ROOT / "artifacts")).resolve()
+ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
 
 from . import db
 from . import lotes_db
@@ -92,7 +92,7 @@ def _check_emisor_ruc():
     
     # Fallback final: usar RUC de prueba por defecto para desarrollo
     # Este es el RUC oficial de prueba de SIFEN según documentación
-    default_ruc_num = "80012345"
+    default_ruc_num = os.getenv("SIFEN_TEST_RUC", "80012345").split("-")[0].strip()
     # Calcular DV automáticamente
     digits = ''.join(c for c in default_ruc_num if c.isdigit())
     dv = str(sum(int(d) for d in digits) % 10) if digits else "0"
@@ -165,6 +165,17 @@ async def index(request: Request):
             },
             status_code=500
         )
+
+
+@app.get("/health")
+def health():
+    return JSONResponse(
+        {
+            "ok": True,
+            "service": "tesaka-web",
+            "ts": datetime.now(timezone.utc).isoformat(),
+        }
+    )
 
 
 @app.get("/de/new", response_class=HTMLResponse)
@@ -854,7 +865,15 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                     habilitado = d_fact_normalized in ("1", "S", "SI")
                     
                     if cod != "0502":
-                        error_msg = f"BLOQUEADO: SIFEN siConsRUC no confirmó el RUC. dCodRes={cod} dMsgRes={msg}"
+                        http_status = ruc_check.get("http_status", 0)
+                        raw_xml = ruc_check.get("raw_xml", "")
+                        response_snippet = raw_xml[:300] if raw_xml else "(sin respuesta)"
+                        
+                        error_msg = (
+                            f"BLOQUEADO: SIFEN siConsRUC no confirmó el RUC. "
+                            f"dCodRes={cod} dMsgRes={msg} | HTTP status={http_status} | "
+                            f"Respuesta: {response_snippet}"
+                        )
                         logger.error(error_msg)
                         db.update_document_status(doc_id, status="error", message=error_msg)
                         return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
@@ -1095,6 +1114,15 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+
+if __name__ == "__main__":
+    import os
+    import uvicorn
+
+    host = os.getenv("SIFEN_WEB_HOST", "127.0.0.1")
+    port = int(os.getenv("SIFEN_WEB_PORT", "8001"))
+    uvicorn.run("web.main:app", host=host, port=port, reload=True)
 
 
 async def _check_lote_status_async(lote_id: int, env: str, prot: str):

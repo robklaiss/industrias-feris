@@ -25,6 +25,28 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 
+def _local(tag: str) -> str:
+    """Extrae el local-name (sin namespace)."""
+    return tag.split("}", 1)[1] if tag.startswith("{") else tag
+
+
+def _ns(tag: str) -> Optional[str]:
+    """Extrae el namespace URI del tag."""
+    if tag.startswith("{"):
+        return tag[1:].split("}", 1)[0]
+    return None
+
+
+def _first_by_local(root, name: str):
+    """Encuentra el primer elemento por local-name."""
+    if root is None:
+        return None
+    for elem in root.iter():
+        if _local(elem.tag) == name:
+            return elem
+    return None
+
+
 def extract_soap_info(soap_file: Path) -> Dict[str, Any]:
     """Extrae información relevante del SOAP enviado."""
     if not soap_file.exists():
@@ -37,58 +59,31 @@ def extract_soap_info(soap_file: Path) -> Dict[str, Any]:
         # Parsear XML
         root = etree.fromstring(content)
 
-        # Namespaces
-        nsmap = root.nsmap
-        soap_ns = None
-        for prefix, uri in nsmap.items():
-            if uri == "http://www.w3.org/2003/05/soap-envelope":
-                soap_ns = prefix
-                break
+        env = root
+        soap_ns = _ns(env.tag)
 
-        # Body
-        body = None
-        if soap_ns:
-            body = root.find(f"{{{soap_ns}}}Body")
-        else:
-            # Buscar sin namespace
-            body = root.find("Body")
+        body = _first_by_local(env, "Body")
+        has_body = body is not None
 
-        # rEnviDe
-        r_envi_de = None
-        sifen_ns = None
-        if body is not None:
-            for child in body:
-                if "rEnviDe" in child.tag:
-                    r_envi_de = child
-                    # Extraer namespace SIFEN
-                    if "}" in child.tag:
-                        sifen_ns = child.tag.split("}")[0][1:]
-                    break
+        r_envi_de = _first_by_local(body, "rEnviDe") if body is not None else None
+        has_r_envi_de = r_envi_de is not None
 
-        # Estructura dentro de rEnviDe
+        sifen_ns = _ns(r_envi_de.tag) if r_envi_de is not None else None
+
         structure = {}
         if r_envi_de is not None:
-            structure["has_dId"] = any("dId" in child.tag for child in r_envi_de)
-            structure["has_xDE"] = any("xDE" in child.tag for child in r_envi_de)
-
-            # Verificar si hay rDE dentro de xDE
-            x_de = None
-            for child in r_envi_de:
-                if "xDE" in child.tag:
-                    x_de = child
-                    break
-
-            if x_de is not None:
-                structure["has_rDE"] = any("rDE" in child.tag for child in x_de)
-                structure["has_DE"] = any("DE" in child.tag and "rDE" not in child.tag for child in x_de)
+            structure["has_dId"] = _first_by_local(r_envi_de, "dId") is not None
+            structure["has_xDE"] = _first_by_local(r_envi_de, "xDE") is not None
+            structure["has_rDE"] = _first_by_local(r_envi_de, "rDE") is not None
+            structure["has_DE"] = _first_by_local(r_envi_de, "DE") is not None
 
         return {
             "file": str(soap_file),
             "size": len(content),
             "soap_ns": soap_ns,
             "sifen_ns": sifen_ns,
-            "has_body": body is not None,
-            "has_rEnviDe": r_envi_de is not None,
+            "has_body": has_body,
+            "has_rEnviDe": has_r_envi_de,
             "structure": structure,
             "xml_preview": content[:500].decode("utf-8", errors="replace"),
         }

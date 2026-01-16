@@ -1,8 +1,12 @@
 """
 Tests para el convertidor de factura interna a formato Tesaka
 """
-import json
 import pytest
+
+# Skip si falta jsonschema (debe estar ANTES de importar src.*)
+pytest.importorskip("jsonschema", reason="jsonschema requerido para tests de validación")
+
+import json
 from pathlib import Path
 from jsonschema import Draft202012Validator, ValidationError
 

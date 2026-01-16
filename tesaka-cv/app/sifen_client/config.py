@@ -2,8 +2,11 @@
 Configuración para cliente SIFEN
 """
 import os
+from functools import lru_cache
 from typing import Optional, Dict, Any, Tuple
 from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 # Cargar dotenv si está disponible (opcional)
 try:
@@ -12,6 +15,43 @@ try:
 except ImportError:
     # dotenv no está instalado, continuar sin cargar .env
     pass
+
+
+def get_project_root() -> Path:
+    """Retorna la raíz del proyecto (tesaka-cv)."""
+    return PROJECT_ROOT
+
+
+@lru_cache(maxsize=1)
+def _default_artifacts_dir() -> Path:
+    """Resuelve y crea (si es necesario) el directorio base de artifacts."""
+    configured = os.getenv("SIFEN_ARTIFACTS_DIR")
+    if configured:
+        path = Path(configured)
+        if not path.is_absolute():
+            path = PROJECT_ROOT / path
+    else:
+        path = PROJECT_ROOT / "artifacts"
+    path = path.resolve()
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def get_artifacts_dir(subpath: Optional[str] = None, ensure_parent: bool = True) -> Path:
+    """
+    Devuelve el directorio base de artifacts (o una ruta dentro de él).
+    
+    Args:
+        subpath: Ruta relativa dentro del directorio de artifacts.
+        ensure_parent: Si True, crea el parent del subpath.
+    """
+    base = _default_artifacts_dir()
+    if not subpath:
+        return base
+    target = base / subpath
+    if ensure_parent:
+        target.parent.mkdir(parents=True, exist_ok=True)
+    return target
 
 
 def get_cert_path_and_password() -> Tuple[str, str]:
@@ -113,7 +153,7 @@ class SifenConfig:
             "recibe_lote": _MOCK_BASE + "/de/ws/async/recibe-lote.wsdl?wsdl" if _USE_MOCK else "https://sifen-test.set.gov.py/de/ws/async/recibe-lote.wsdl?wsdl",
             "evento": _MOCK_BASE + "/de/ws/eventos/evento.wsdl" if _USE_MOCK else "https://sifen-test.set.gov.py/de/ws/eventos/evento.wsdl",
             "consulta_lote": _MOCK_BASE + "/de/ws/consultas-lote/consulta-lote.wsdl" if _USE_MOCK else "https://sifen-test.set.gov.py/de/ws/consultas-lote/consulta-lote.wsdl",
-            "consulta_ruc": _MOCK_BASE + "/de/ws/consultas/consulta-ruc.wsdl" if _USE_MOCK else "https://sifen-test.set.gov.py/de/ws/consultas/consulta-ruc.wsdl",
+            "consulta_ruc": _MOCK_BASE + "/de/ws/consultas-ruc/consulta-ruc.wsdl?wsdl" if _USE_MOCK else "https://sifen-test.set.gov.py/de/ws/consultas/consulta-ruc.wsdl",
             "consulta": _MOCK_BASE + "/de/ws/consultas/consulta.wsdl" if _USE_MOCK else "https://sifen-test.set.gov.py/de/ws/consultas/consulta.wsdl",
         },
         "prod": {
@@ -121,7 +161,7 @@ class SifenConfig:
             "recibe_lote": _MOCK_BASE + "/de/ws/async/recibe-lote.wsdl" if _USE_MOCK else "https://sifen.set.gov.py/de/ws/async/recibe-lote.wsdl",
             "evento": _MOCK_BASE + "/de/ws/eventos/evento.wsdl" if _USE_MOCK else "https://sifen.set.gov.py/de/ws/eventos/evento.wsdl",
             "consulta_lote": _MOCK_BASE + "/de/ws/consultas-lote/consulta-lote.wsdl" if _USE_MOCK else "https://sifen.set.gov.py/de/ws/consultas-lote/consulta-lote.wsdl",
-            "consulta_ruc": _MOCK_BASE + "/de/ws/consultas/consulta-ruc.wsdl" if _USE_MOCK else "https://sifen.set.gov.py/de/ws/consultas/consulta-ruc.wsdl",
+            "consulta_ruc": _MOCK_BASE + "/de/ws/consultas-ruc/consulta-ruc.wsdl?wsdl" if _USE_MOCK else "https://sifen.set.gov.py/de/ws/consultas/consulta-ruc.wsdl",
             "consulta": _MOCK_BASE + "/de/ws/consultas/consulta.wsdl" if _USE_MOCK else "https://sifen.set.gov.py/de/ws/consultas/consulta.wsdl",
         }
     }

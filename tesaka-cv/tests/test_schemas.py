@@ -1,9 +1,16 @@
-from typing import List
 """
 Tests de validación de schemas para comprobantes virtuales Tesaka
 """
-import json
 import pytest
+
+# Marker para skip automático si falta jsonschema
+pytestmark = pytest.mark.requires_jsonschema
+
+# Skip si falta jsonschema (debe estar ANTES de importar jsonschema)
+pytest.importorskip("jsonschema", reason="jsonschema requerido para tests de validación de schemas")
+
+from typing import List
+import json
 from pathlib import Path
 from jsonschema import Draft202012Validator, ValidationError
 

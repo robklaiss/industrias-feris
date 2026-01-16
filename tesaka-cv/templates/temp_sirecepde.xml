@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rDE xmlns="http://ekuatia.set.gov.py/sifen/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <dVerFor>150</dVerFor>
+    <DE Id="01045547378001001000001512026011311234567898">
+        <dDVId>8</dDVId>
+        <dFecFirma>2026-01-13T10:18:00</dFecFirma>
+        <dSisFact>1</dSisFact>
+        <gOpeDE>
+            <iTipEmi>1</iTipEmi>
+            <dDesTipEmi>Normal</dDesTipEmi>
+            <dCodSeg>123456789</dCodSeg>
+        </gOpeDE>
+        <gTimb>
+            <iTiDE>1</iTiDE>
+            <dDesTiDE>Factura electrónica</dDesTiDE>
+            <dNumTim>12345678</dNumTim>
+            <dEst>001</dEst>
+            <dPunExp>001</dPunExp>
+            <dNumDoc>0000015</dNumDoc>
+            <dFeIniT>2026-01-13</dFeIniT>
+        </gTimb>
+        <gDatGralOpe>
+            <dFeEmiDE>2026-01-13T10:18:00</dFeEmiDE>
+            <gEmis>
+                <dRucEm>4554737</dRucEm>
+                <dDVEmi>8</dDVEmi>
+                <iTipCont>1</iTipCont>
+                <dNomEmi>DE generado en ambiente de prueba - sin valor comercial ni fiscal</dNomEmi>
+                <dDirEmi>Asunción</dDirEmi>
+                <dNumCas>1234</dNumCas>
+                <cDepEmi>1</cDepEmi>
+                <dDesDepEmi>CAPITAL</dDesDepEmi>
+                <cCiuEmi>1</cCiuEmi>
+                <dDesCiuEmi>Asunción</dDesCiuEmi>
+                <dTelEmi>021123456</dTelEmi>
+                <dEmailE>test@example.com</dEmailE>
+                <gActEco>
+                    <cActEco>471100</cActEco>
+                    <dDesActEco>Venta al por menor en comercios no especializados</dDesActEco>
+                </gActEco>
+            </gEmis>
+            <gDatRec>
+                <iNatRec>1</iNatRec>
+                <iTiOpe>1</iTiOpe>
+                <cPaisRec>PRY</cPaisRec>
+                <dDesPaisRe>Paraguay</dDesPaisRe>
+                <dRucRec>80012345</dRucRec>
+                <dDVRec>7</dDVRec>
+                <dNomRec>Cliente de Prueba</dNomRec>
+                <dDirRec>Asunción</dDirRec>
+                <dNumCasRec>5678</dNumCasRec>
+                <cDepRec>1</cDepRec>
+                <dDesDepRec>CAPITAL</dDesDepRec>
+                <cCiuRec>1</cCiuRec>
+                <dDesCiuRec>Asunción</dDesCiuRec>
+            </gDatRec>
+        </gDatGralOpe>
+        <gDtipDE>
+            <gCamItem>
+                <iItem>1</iItem>
+                <dCodInt>001</dCodInt>
+                <dDesPro>Producto de prueba</dDesPro>
+                <dCantPro>1</dCantPro>
+                <dUniPro>1</dUniPro>
+                <dDesUniMed>UND</dDesUniMed>
+                <dPrcUniPro>100000</dPrcUniPro>
+                <dTotGralItem>100000</dTotGralItem>
+            </gCamItem>
+        </gDtipDE>
+        <gCamFE>
+            <dTotalGs>100000</dTotalGs>
+            <dTotIVA>0</dTotIVA>
+            <dTotalIVA>0</dTotalIVA>
+            <dTotGralOpe>100000</dTotGralOpe>
+        </gCamFE>
+    </DE>
+</rDE>
