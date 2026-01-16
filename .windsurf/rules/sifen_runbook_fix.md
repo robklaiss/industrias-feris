@@ -1,0 +1,250 @@
+# SIFEN Runbook (anti-regresión)
+
+## 1) Regla de oro: siempre depurar el XML REAL ENVIADO
+- Extraer el xDE desde artifacts/soap_last_request_SENT.xml
+- Decodificar base64 -> ZIP -> extraer lote.xml
+- Validar contra ese lote.xml, no contra archivos "intermedios".
+
+## 2) LOTE AS-IS
+- Si `--xml` apunta a un lote (root `rLoteDE`), se envía AS-IS:
+  - No reconstruir
+  - No re-firmar
+  - No normalizar CDC
+  - No fallback a artifacts/last_lote.xml
+- Si el parse/detección falla, abortar con error explícito (prohibido enviar otro archivo silenciosamente).
+
+## 3) Diferenciar firma vs XSD
+- `xmlsec1 --verify OK` NO garantiza que SIFEN acepte.
+- Para error 0160 ("XML Mal Formado"), la acción obligatoria es:
+  - Validar `lote_from_SENT.zip.xml` contra el XSD correcto de LOTE (v150).
+  - El mensaje exacto del validador define el fix (orden de elementos / ubicación / namespace).
+
+## 4) Check rápido recomendado antes de enviar
+
+## XSD: no asumir ruta fija
+
+## Validación XSD v150 (xmllint)
+Para validar un lote/DE con xmllint, entrar al directorio donde está el XSD para que funcionen los imports/includes:
+- `cd tesaka-cv/xsd`
+- `xmllint --noout --schema siRecepDE_v150.xsd ../<ruta-al-xml>`
+Si `exit=0`, el XML pasa XSD localmente; si SIFEN devuelve 0160 igual, investigar reglas adicionales server-side (estructura, namespaces, valores, etc.).- El XML puede declarar `xsi:schemaLocation` con un nombre como `siRecepDE_v150.xsd`.
+- Antes de validar, localizar el XSD real en el repo:
+  - `find .. -maxdepth 8 -type f \( -iname "siRecepDE_v150.xsd" -o -iname "*v150*.xsd" \)`
+- Si no existe en el repo, se debe descargar/instalar el paquete XSD v150 correspondiente y guardar su ruta para validaciones futuras.
+
+- xmlsec verify del lote real
+- XSD validate del lote real
+- Comparar SHA256 del lote real vs archivo que se quiso enviar
+
+---
+
+# SIFEN / TESAKA – Runbook + Anti-regresión
+
+## 0) Principios
+- Siempre trabajar con evidencias (archivos en artifacts/runs_async/*).
+- Si un arreglo se confirma, agregarlo acá como "anti-regresión".
+- Evitar cambios grandes: preferir diffs mínimos y verificables.
+
+## 1) Paths y convenciones del repo
+- Repo raíz: /Users/robinklaiss/Dev/industrias-feris-facturacion-electronica-simplificado
+- Python: usar .venv/bin/python (no usar `python`)
+- Artifacts: artifacts/runs_async/<timestamp>_<env>/
+- En cada run guardar: DE unsigned, rDE/lote firmado, lote extraído, logs de verificación.
+
+## 2) Variables de entorno clave
+- SIFEN_SKIP_RUC_GATE=1 (solo si se necesita bypass de gate)
+- SIFEN_EMISOR_RUC="4554737-8"
+- SIFEN_CERT_PATH, SIFEN_KEY_PATH (o P12 y pass según flujo)
+- Nota: documentar aquí cualquier variable nueva antes de usarla en prod.
+
+## 3) Flujo estándar de generación y envío
+### 3.1 Generar DE (ejemplo)
+- Comando ejemplo (ajustar doc/timbrado):
+  cd tesaka-cv && .venv/bin/python -m tools.generar_de_simple --timbrado <TIMBRADO> --est 001 --pun 001 --doc <DOC> --output ../artifacts/runs_async/<RUN>/de_<env>_<RUN>.xml
+
+### 3.2 Enviar a SIFEN (siRecepDE)
+- Comando ejemplo:
+  .venv/bin/python -m tools.send_sirecepde --env <test|prod> --xml <PATH_XML> --dump-http
+
+### 3.3 Qué archivos verificar (regla de oro)
+- NO verificar el DE "unsigned".
+- Verificar SIEMPRE el XML que contiene la firma (rDE firmado o lote firmado extraído del zip).
+- Si un archivo dice ".xml" pero es zip, detectarlo con `file` antes.
+
+## 4) Diagnóstico rápido
+### 4.1 Identificar si un ".xml" es ZIP
+- file <archivo>
+- Si es Zip: usar `unzip -p <zip> lote.xml > lote_from_zip.xml` 
+
+### 4.2 Verificación con xmlsec1
+- Verificación base:
+  xmlsec1 --verify --insecure --id-attr:Id DE <archivo_firmado.xml>
+
+- Para logs completos (debug):
+  xmlsec1 --verify --insecure --id-attr:Id DE --store-references --print-debug --print-xml-debug --verbose <archivo_firmado.xml>
+
+## 5) XMLDSIG – DigestValue mismatch (REFERENCE) – Checklist anti-regresión
+(esta sección es CRÍTICA y debe quedar tal cual, en bullets cortos)
+
+- SignedInfo/CanonicalizationMethod (exc-c14n) NO define el digest del Reference: el digest depende de Reference/Transforms.
+- Si Reference/Transforms no incluye c14n, xmlsec puede aplicar c14n "default" (y el digest cambia).
+- En nuestros lotes, Signature es SIBLING de DE => enveloped-signature no elimina nada dentro de DE.
+- Si se modifica el DE después de firmar (ej: insertar gCamFuFD/QR, cambiar xmlns:xsi, pretty-print/indentación), el digest queda inválido.
+- Diagnóstico recomendado:
+  1) Ejecutar xmlsec con debug para extraer "PreDigest data"
+  2) Guardar predigest.xml desde el log y hashear (sha256 base64) para comparar con DigestValue
+- Regla: "No tocar el DE después de firmar. Si hay que insertar QR/gCamFuFD, hacerlo antes o re-firmar".
+
+### 5.1 Comando para extraer PreDigest a predigest.xml
+- Incluir un snippet copy/paste:
+  RUN="<path_run>"
+  ( cd "$RUN" && \
+    xmlsec1 --verify --insecure --id-attr:Id DE \
+      --store-references \
+      --print-debug \
+      --print-xml-debug \
+      --verbose \
+      "lote_from_zip.xml" 2>&1 \
+    | awk '
+        /== PreDigest data - start buffer:/{flag=1; next}
+        /== PreDigest data - end buffer/{flag=0}
+        flag{print}
+      ' > predigest.xml
+  )
+
+### 5.2 Regla de serialización / canonicalización (anti-regresión)
+- Nunca "pretty print" ni reserializar el XML firmado.
+- No agregar nodos (gCamFuFD) después de firmar.
+- Si se requiere agregar QR: hacerlo antes de firmar, o firmar nuevamente el DE resultante.
+
+### 5.3 XMLDSIG — Digest mismatch (REFERENCE) por mutación post-firma
+
+**Síntoma**
+- `xmlsec1 --verify ...` falla con `Failure reason: REFERENCE` 
+- Ningún C14N manual del DE coincide con `DigestValue` del Reference.
+
+**Causa raíz (confirmada)**
+- Se firmaba un `<DE>` en cierto estado (sin `gCamFuFD` dentro),
+  pero luego el código movía `gCamFuFD` **DENTRO del `<DE>` después de firmar**:
+  ```py
+  if gcam_elem is not None and de_elem is not None:
+      de_elem.append(gcam_elem)
+  ```
+
+**Confirmación del problema**
+1. Extraer el `predigest.xml` desde xmlsec (`== PreDigest data`):
+   ```bash
+   xmlsec1 --verify --insecure --id-attr:Id DE \
+     --store-references \
+     --print-debug \
+     --print-xml-debug \
+     --verbose lote_from_zip.xml 2>&1 \
+     | awk '/== PreDigest data - start buffer:/{flag=1; next}
+            /== PreDigest data - end buffer/{flag=0}
+            flag{print}' > predigest.xml
+   ```
+
+2. Extraer el DE final del XML:
+   ```bash
+   xmllint --xpath "//DE" lote_from_zip.xml > de_final.xml
+   ```
+
+3. Comparar para ver las diferencias:
+   ```bash
+   diff predigest.xml de_final.xml
+   # Muestra que de_final.xml tiene gCamFuFD dentro del DE
+   ```
+
+**Fix mínimo**
+- Mover `gCamFuFD` al DE **ANTES** de firmar, no después.
+- O si debe ir después, re-firmar el DE completo.
+
+**Regla anti-regresión**
+- NUNCA modificar el contenido de un elemento firmado después de la firma.
+- Cualquier cambio dentro del `<DE>` invalida la firma digest.
+
+
+### 5.4 2026-01-16 — 0160 "XML Mal Formado" (debug correcto)
+
+**Síntoma**
+- SIFEN responde 0160 aunque `xmlsec1 --verify` pueda dar OK en un archivo local.
+
+**Causa probable**
+- Lo que se firma/valida localmente NO es necesariamente lo que termina dentro del `xDE` enviado (ZIP Base64).
+- Puede haber diferencias por:
+  - Se zipea/embebe el archivo equivocado
+  - ZIP contiene un `lote.xml` distinto al esperado
+  - BOM/encoding raro/truncamiento/whitespace fuera de lugar
+  - El flujo "reconstruye" o "normaliza" antes de enviar y cambia el contenido final
+
+**Regla de oro**
+- Para debug de 0160, SIEMPRE inspeccionar el `xDE` real enviado:
+  1) Leer `artifacts/soap_last_request_SENT.xml` 
+  2) Extraer `<xDE>...</xDE>` 
+  3) Base64-decode -> ZIP
+  4) Unzip `lote.xml` 
+  5) Correr `xmlsec1 --verify --insecure --id-attr:Id DE` sobre ese `lote.xml` 
+
+**Comando recomendado**
+- Guardar artifacts: `artifacts/last_sent_payload/xDE.zip` y `lote_from_SENT.zip.xml` para comparación.
+## 6) Tabla de errores conocidos
+Crear una tabla markdown con columnas:
+- Síntoma
+- Causa probable
+- Confirmación (comando)
+- Fix mínimo
+
+Agregar al menos estos renglones:
+- "SIFEN responde 0160" -> "XML mal formado en xDE (ZIP Base64)" -> "extraer xDE del SOAP enviado -> unzip -> xmlsec verify" -> "verificar que lo firmado local = lo enviado en ZIP"
+- "Verification status: FAILED / Failure reason: REFERENCE" -> "Digest mismatch (post-firma o transforms)" -> "xmlsec debug + predigest" -> "no modificar post-firma / re-firmar"
+- "lxml XMLSyntaxError: Start tag expected" -> "archivo era ZIP con extensión .xml" -> "file <archivo>" -> "unzip -p ..."
+
+
+## Reglas anti-regresión SIFEN (TESAKA)
+
+### Regla 0 — Siempre depurar con el payload REAL enviado
+Cuando SIFEN devuelve error (ej: 0160), no asumir que el archivo local es el enviado.
+
+Checklist:
+1) Abrir `artifacts/soap_last_request_SENT.xml` 
+2) Extraer `<xDE>...</xDE>` 
+3) Base64 decode → ZIP
+4) Unzip `lote.xml` 
+5) Validar firma sobre **ese** lote:
+   `xmlsec1 --verify --insecure --id-attr:Id DE lote.xml` 
+
+Artifacts sugeridos:
+- `artifacts/last_sent_payload/xDE.zip` 
+- `artifacts/last_sent_payload/lote_from_SENT.zip.xml` 
+
+### Regla 1 — xmlsec OK ≠ SIFEN OK
+`xmlsec1` solo valida firma/digest. SIFEN además valida **estructura/XSD**.
+
+Caso típico:
+- xmlsec OK
+- SIFEN 0160 "XML Mal Formado"
+=> mirar estructura `rLoteDE/rDE` vs XSD (p.ej., presencia/orden de nodos obligatorios).
+
+### Regla 2 — rDE estructura esperada (referencia práctica)
+En el smoke test que verificó OK, `rDE` tenía hijos:
+- `dVerFor` 
+- `DE` 
+- `Signature` 
+- `gCamFuFD` 
+
+Si falta `dVerFor` o cambia el orden, puede disparar 0160 aunque la firma verifique.
+
+### Notas de herramientas
+
+### Anti-regresión: envío debe respetar el archivo --xml
+- Si se pasa un lote (root rLoteDE) por `--xml`, el sender debe enviarlo AS-IS (sin reconstruir, sin re-firmar, sin normalizar CDC).
+- Prohibido fallback silencioso a `artifacts/last_lote.xml`.
+- Si hay warning de parse/detección (ej: `etree` no definido), abortar con error explícito (no continuar enviando otro archivo).
+- Validación obligatoria post-envío: extraer xDE desde `artifacts/soap_last_request_SENT.xml` y comparar SHA256/bytes contra el archivo que se quiso enviar.
+
+- `cat -A` en macOS no funciona. Usar `sed -n ""1,5p"" file` o `python` para inspección.
+## 7) Checklist antes de intentar PROD
+- Confirmar que el XML a enviar contiene Signature.
+- Confirmar que `file` no indica Zip cuando esperamos XML.
+- Confirmar que xmlsec verify pasa en el archivo correcto.
+- Guardar evidencias en artifacts/runs_async/<timestamp>_prod/

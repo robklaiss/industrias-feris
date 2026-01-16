@@ -26,7 +26,7 @@ EOF
 
 # 3) guardar "headers esperados" solo como referencia local
 cat > artifacts/soap_last_sent_headers.txt <<EOF
-Content-Type: application/xml; charset=utf-8
+Content-Type: application/soap+xml; charset=utf-8
 SOAPAction: (none)
 Endpoint: .../recibe.wsdl (según Roshka)
 EOF

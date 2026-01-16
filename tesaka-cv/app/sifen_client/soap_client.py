@@ -108,7 +108,7 @@ ERROR_CODES = {
 def _preferred_envio_root_name() -> str:
     val = os.getenv("SIFEN_ENVIOLOTE_ROOT", "").strip()
     if val not in ("rEnvioLote", "rEnvioLoteDe"):
-        return "rEnvioLoteDe"
+        return "rEnvioLote"
     return val
 
 
@@ -954,7 +954,7 @@ class SoapClient:
                 if roshka_headers:
                     # Roshka usa application/xml sin SOAPAction
                     headers_local = {
-                        "Content-Type": "application/xml; charset=utf-8",
+                        "Content-Type": "application/soap+xml; charset=utf-8",
                         "Accept": "application/xml, text/xml, */*",
                     }
                 else:
@@ -1608,7 +1608,7 @@ class SoapClient:
         # 3) Headers - usar application/xml como el sistema Java de Roshka que funciona
         # SIFEN rechaza con 0160 cuando se usa application/soap+xml
         headers = {
-            "Content-Type": "application/xml; charset=utf-8",
+            "Content-Type": "application/soap+xml; charset=utf-8",
             "Accept": "application/soap+xml, application/xml, text/xml, */*",
             "Connection": "close",
         }
@@ -1669,7 +1669,11 @@ class SoapClient:
         xDE_elem = etree.SubElement(r_envio, "xDE")  # Sin namespace, hereda del parent
         xDE_elem.text = xDE_val
         
-        payload_xml = etree.tostring(env, xml_declaration=True, encoding="UTF-8", pretty_print=False).decode("utf-8")
+        # Serializar SOAP (pretty_print opcional para debug)
+        pretty_print = os.getenv("SIFEN_SOAP_PRETTY_PRINT", "0") in ("1", "true", "True")
+        payload_xml = etree.tostring(env, xml_declaration=True, encoding="UTF-8", pretty_print=pretty_print).decode("utf-8")
+        # Fix: SIFEN expects double quotes in XML declaration
+        payload_xml = payload_xml.replace("<?xml version='1.0' encoding='UTF-8'?>", '<?xml version="1.0" encoding="UTF-8"?>')
         logger.debug(f"SOAP envelope construido con formato soap:/xsd: para siRecepLoteDE, dId={dId_val[:20]}...")
 
         # 6) POST

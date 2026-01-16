@@ -100,7 +100,7 @@ def compare_with_roshka(our_soap: Path) -> None:
 
     # Información esperada de Roshka (según código Java)
     roshka_expected = {
-        "content_type": "application/xml; charset=utf-8",
+        "content_type": "application/soap+xml; charset=utf-8",
         "endpoint_pattern": ".wsdl",  # Roshka postea a la URL exacta del WSDL
         "soap_action": None,  # NO usa SOAPAction header
         "action_in_content_type": False,  # NO usa action= en Content-Type

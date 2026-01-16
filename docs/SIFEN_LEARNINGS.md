@@ -298,7 +298,33 @@ export SIFEN_SIGNATURE_PARENT=DE
 3. **Documentar otros errores**: Si SIFEN cambia el error, documentar el siguiente bloqueo
 4. **Optimizar performance**: El movimiento de firma es O(n), podría mejorarse
 
-## 📅 Historial de Descubrimientos
+## [2026-01-16] Error 0160 "XML Mal Formado" - Estructura incorrecta del lote
+**Síntoma:** SIFEN devuelve error 0160 "XML Mal Formado" pero la firma XML es válida.
+**Contexto/archivo:** `/tmp/lote_extracted/lote.xml` extraído de `soap_last_request_SENT.xml`
+**Causa real:** El lote XML tiene estructura anidada incorrecta: `<rLoteDE><xDE><rDE>...` en lugar de `<rLoteDE><rDE>...`. Además, `gCamFuFD` está después de `Signature` en lugar de ser hijo directo de `rDE`.
+**Comandos para verificar:**
+```bash
+# Extraer lote del SOAP enviado
+unzip -p artifacts/soap_last_request_SENT.xml xDE > xDE.zip
+unzip -p xDE.zip lote.xml > lote_from_SENT.xml
+
+# Verificar estructura
+python3 -c "
+import xml.etree.ElementTree as ET
+doc = ET.parse('lote_from_SENT.xml')
+root = doc.getroot()
+print('Root:', root.tag)
+rde = root.find('.//rDE')
+if rde is not None:
+    children = [c.tag for c in rde]
+    print('rDE children:', children)
+    print('Primer hijo:', children[0] if children else 'NONE')
+"
+```
+
+**Fix:** Corregir la generación del lote para que `rLoteDE` contenga `rDE` directamente (no dentro de `xDE`) y asegurar que `gCamFuFD` sea hijo de `rDE` en el orden correcto: `dVerFor`, `DE`, `Signature`, `gCamFuFD`.
+
+## 📅 Historial de Descubrimimientos
 
 - **2026-01-12**: Descubierto problema pretty_print lxml
 - **2026-01-12**: Confirmado que Signature debe estar dentro de DE para XML individual

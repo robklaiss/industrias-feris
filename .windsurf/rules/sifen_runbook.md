@@ -1,203 +1,199 @@
-# SIFEN / TESAKA – Runbook + Anti-regresión
+# SIFEN Runbook (anti-regresión)
 
-## 0) Principios
-- Siempre trabajar con evidencias (archivos en artifacts/runs_async/*).
-- Si un arreglo se confirma, agregarlo acá como "anti-regresión".
-- Evitar cambios grandes: preferir diffs mínimos y verificables.
+## 1) Regla de oro: siempre depurar el XML REAL ENVIADO
+- Extraer el xDE desde artifacts/soap_last_request_SENT.xml
+- Decodificar base64 -> ZIP -> extraer lote.xml
+- Validar contra ese lote.xml, no contra archivos "intermedios".
 
-## 1) Paths y convenciones del repo
-- Repo raíz: /Users/robinklaiss/Dev/industrias-feris-facturacion-electronica-simplificado
-- Python: usar .venv/bin/python (no usar `python`)
-- Artifacts: artifacts/runs_async/<timestamp>_<env>/
-- En cada run guardar: DE unsigned, rDE/lote firmado, lote extraído, logs de verificación.
+## 2) LOTE AS-IS
+- Si `--xml` apunta a un lote (root `rLoteDE`), se envía AS-IS:
+  - No reconstruir
+  - No re-firmar
+  - No normalizar CDC
+  - No fallback a artifacts/last_lote.xml
+- Si el parse/detección falla, abortar con error explícito (prohibido enviar otro archivo silenciosamente).
 
-## 2) Variables de entorno clave
-- SIFEN_SKIP_RUC_GATE=1 (solo si se necesita bypass de gate)
-- SIFEN_EMISOR_RUC="4554737-8"
-- SIFEN_CERT_PATH, SIFEN_KEY_PATH (o P12 y pass según flujo)
-- Nota: documentar aquí cualquier variable nueva antes de usarla en prod.
+## 3) Diferenciar firma vs XSD
+- `xmlsec1 --verify OK` NO garantiza que SIFEN acepte.
+- Para error 0160 ("XML Mal Formado"), la acción obligatoria es:
+  - Validar `lote_from_SENT.zip.xml` contra el XSD correcto de LOTE (v150).
+  - El mensaje exacto del validador define el fix (orden de elementos / ubicación / namespace).
 
-## 3) Flujo estándar de generación y envío
-### 3.1 Generar DE (ejemplo)
-- Comando ejemplo (ajustar doc/timbrado):
-  cd tesaka-cv && .venv/bin/python -m tools.generar_de_simple --timbrado <TIMBRADO> --est 001 --pun 001 --doc <DOC> --output ../artifacts/runs_async/<RUN>/de_<env>_<RUN>.xml
+## 4) Check rápido recomendado antes de enviar
+- xmlsec verify del lote real
+- XSD validate del lote real
+- Comparar SHA256 del lote real vs archivo que se quiso enviar
+## Validación XSD v150 (xmllint)
+Para validar un lote/DE con xmllint, entrar al directorio donde está el XSD para que funcionen los imports/includes:
+- `cd tesaka-cv/xsd`
+- `xmllint --noout --schema siRecepDE_v150.xsd ../<ruta-al-xml>`
+Si `exit=0`, el XML pasa XSD localmente; si SIFEN devuelve 0160 igual, investigar reglas adicionales server-side (estructura, namespaces, valores, etc.).
 
-### 3.2 Enviar a SIFEN (siRecepDE)
-- Comando ejemplo:
-  .venv/bin/python -m tools.send_sirecepde --env <test|prod> --xml <PATH_XML> --dump-http
 
-### 3.3 Qué archivos verificar (regla de oro)
-- NO verificar el DE "unsigned".
-- Verificar SIEMPRE el XML que contiene la firma (rDE firmado o lote firmado extraído del zip).
-- Si un archivo dice ".xml" pero es zip, detectarlo con `file` antes.
 
-## 4) Diagnóstico rápido
-### 4.1 Identificar si un ".xml" es ZIP
-- file <archivo>
-- Si es Zip: usar `unzip -p <zip> lote.xml > lote_from_zip.xml` 
+## Validación XSD: NO validar rLoteDE con siRecepDE_v150.xsd
+- Error típico al validar lote: "Element 'rLoteDE': No matching global declaration available for the validation root."
+- Causa: siRecepDE_v150.xsd no tiene como root a rLoteDE; es para DE/rDE, no para el lote.
+- Acción correcta:
+  1) Buscar qué XSD declara rLoteDE con: grep -R "rLoteDE" en xsd/ y schemas_sifen/
+  2) Usar ese XSD como entrypoint para xmllint.
+- Nota: includes tipo rde/150/RDE_Group.xsd pueden no existir como URL pública; preferir resolver desde XSD locales del repo (rshk-jsifenlib/docs/… o tmp/roshka-sifen/…) antes de intentar curl.
 
-### 4.2 Verificación con xmlsec1
-- Verificación base:
-  xmlsec1 --verify --insecure --id-attr:Id DE <archivo_firmado.xml>
+## Validación XSD offline: Lote vs rDE
+- NO intentar validar un XML de lote con `siRecepDE_v150.xsd` si el root es `<rLoteDE>`: ese XSD no declara `rLoteDE` y `xmllint` falla con:
+  "Element 'rLoteDE': No matching global declaration…".
+- Para validar offline:
+  1) Crear `xsd_local/` como copia de `xsd/` y reemplazar URLs absolutas:
+     `https://ekuatia.set.gov.py/sifen/xsd/` -> path relativo (ej: `Paises_v100.xsd`).
+  2) Extraer el nodo `<rDE>` del lote a `rde_only.xml`.
+  3) Validar `rde_only.xml` con `xsd_local/siRecepRDE_v150.xsd` (o `rDE_prevalidador_v150.xsd` si aplica).
+- Confirmación: el repo ya contiene diccionarios requeridos como `Paises_v100.xsd`, `Monedas_v150.xsd`, `Departamentos_v141.xsd`, etc; el problema era el root equivocado, no la ausencia de XSD.
 
-- Para logs completos (debug):
-  xmlsec1 --verify --insecure --id-attr:Id DE --store-references --print-debug --print-xml-debug --verbose <archivo_firmado.xml>
+## XSD: no asumir ruta fija
 
-## 5) XMLDSIG – DigestValue mismatch (REFERENCE) – Checklist anti-regresión
-(esta sección es CRÍTICA y debe quedar tal cual, en bullets cortos)
 
-- SignedInfo/CanonicalizationMethod (exc-c14n) NO define el digest del Reference: el digest depende de Reference/Transforms.
-- Si Reference/Transforms no incluye c14n, xmlsec puede aplicar c14n "default" (y el digest cambia).
-- En nuestros lotes, Signature es SIBLING de DE => enveloped-signature no elimina nada dentro de DE.
-- Si se modifica el DE después de firmar (ej: insertar gCamFuFD/QR, cambiar xmlns:xsi, pretty-print/indentación), el digest queda inválido.
-- Diagnóstico recomendado:
-  1) Ejecutar xmlsec con debug para extraer "PreDigest data"
-  2) Guardar predigest.xml desde el log y hashear (sha256 base64) para comparar con DigestValue
-- Regla: "No tocar el DE después de firmar. Si hay que insertar QR/gCamFuFD, hacerlo antes o re-firmar".
+## Aprendizaje: rEnvioLote vs rEnvioLoteDe (siRecepLoteDE)
 
-### 5.1 Comando para extraer PreDigest a predigest.xml
-- Incluir un snippet copy/paste:
-  RUN="<path_run>"
-  ( cd "$RUN" && \
-    xmlsec1 --verify --insecure --id-attr:Id DE \
-      --store-references \
-      --print-debug \
-      --print-xml-debug \
-      --verbose \
-      "lote_from_zip.xml" 2>&1 \
-    | awk '
-        /== PreDigest data - start buffer:/{flag=1; next}
-        /== PreDigest data - end buffer/{flag=0}
-        flag{print}
-      ' > predigest.xml
-  )
+## Async recibe-lote (siRecepLoteDE) – wrapper correcto
 
-### 5.2 Regla de serialización / canonicalización (anti-regresión)
-- Nunca "pretty print" ni reserializar el XML firmado.
-- No agregar nodos (gCamFuFD) después de firmar.
-- Si se requiere agregar QR: hacerlo antes de firmar, o firmar nuevamente el DE resultante.
+## Aprendizaje: ZIP contenido en siRecepLoteDE (rLoteDE vs rDE)
 
-### 5.3 XMLDSIG — Digest mismatch (REFERENCE) por mutación post-firma
+## SIFEN recibe-lote (TEST) — WSDL y endpoint
 
-**Síntoma**
-- `xmlsec1 --verify ...` falla con `Failure reason: REFERENCE` 
-- Ningún C14N manual del DE coincide con `DigestValue` del Reference.
+## Aprendizaje: eliminar xsi:schemaLocation para evitar 0160
 
-**Causa raíz (confirmada)**
-- Se firmaba un `<DE>` en cierto estado (sin `gCamFuFD` dentro),
-  pero luego el código movía `gCamFuFD` **DENTRO del `<DE>` después de firmar**:
-  ```py
-  if gcam_elem is not None and de_elem is not None:
-      de_elem.append(gcam_elem)
+## Aprendizaje: validar helpers después de parches regex
+
+## Aprendizaje: ZIP debe contener lote.xml (no de_*.xml)
+
+## 2026-01-16 — siRecepLoteDE: ZIP debe contener `lote.xml` (no `de_1.xml`)
+- **Síntoma**: SIFEN devuelve `dCodRes=0160` ("XML Mal Formado") y/o preflight local falla porque el ZIP trae `de_1.xml`.
+- **Causa**: función `_zip_lote_xml_bytes()` empaquetaba cada DE como `de_{n}.xml` cuando el root era `rDE` o se estaba normalizando mal; SIFEN espera SIEMPRE un ZIP con un único archivo llamado `lote.xml`.
+- **Fix**: asegurar `_zip_lote_xml_bytes(lote_xml_bytes)` => crea ZIP en memoria con `zf.writestr("lote.xml", lote_xml_bytes)` únicamente.
+- **Check**: inspector debe mostrar `zip files=["lote.xml"]` y `root=rLoteDE ns=http://ekuatia.set.gov.py/sifen/xsd rDE>=1 xDE>=1`.
+
+## 2026-01-16 — Lote interno NO debe incluir `<xDE>` dentro de `lote.xml`
+
+## 2026-01-16 — curl: opción --key con argumento vacío
+
+## 2026-01-16 — Estructura XSD: rLoteDE debe contener rDE directo (no xDE)
+- **Síntoma**: SIFEN responde 0160 "XML Mal Formado" aunque lote.xml sea well-formed.
+- **Causa real**: el lote.xml dentro del ZIP no cumple el XSD: root rLoteDE contiene xDE (wrapper) en vez de rDE directo; además el orden de hijos de rDE es sensible.
+- **Fix**: al construir lote.xml, asegurar rLoteDE -> rDE* directo (sin xDE). Reordenar hijos de rDE según XSD si aplica. Validar extrayendo xDE base64 desde soap_last_request_SENT.xml, decodificando a ZIP y verificando la estructura con namespaces.
+- **Verificación reproducible**:
+  1) Extraer xDE (base64) -> _debug_xde.zip y descomprimir
+  2) Chequear: rLoteDE tiene rDE directos (xDE=0) y el orden de hijos de rDE.
+
+- **Síntoma**: `curl: option --key: blank argument` al probar WSDL con `--key "$SIFEN_KEY_PATH"`.
+- **Causa**: `SIFEN_KEY_PATH` vacío/no exportado (o ruta inválida), por lo que curl recibe `--key ""`.
+- **Fix**: verificar env vars con `printf %q`, y si solo hay .p12/.pfx convertir a PEM (cert.pem + key.pem) y exportar `SIFEN_CERT_PATH`/`SIFEN_KEY_PATH`.
+- **Verificación**:
+  ```bash
+  printf "SIFEN_CERT_PATH=%q SIFEN_KEY_PATH=%q\n" "$SIFEN_CERT_PATH" "$SIFEN_KEY_PATH"
+  ls -lah "$SIFEN_CERT_PATH" "$SIFEN_KEY_PATH"
+  curl -vk --cert "$SIFEN_CERT_PATH" --key "$SIFEN_KEY_PATH" "<WSDL_URL>" -o /tmp/wsdl && head -n 5 /tmp/wsdl
   ```
 
-**Confirmación del problema**
-1. Extraer el `predigest.xml` desde xmlsec (`== PreDigest data`):
-   ```bash
-   xmlsec1 --verify --insecure --id-attr:Id DE \
-     --store-references \
-     --print-debug \
-     --print-xml-debug \
-     --verbose lote_from_zip.xml 2>&1 \
-     | awk '/== PreDigest data - start buffer:/{flag=1; next}
-            /== PreDigest data - end buffer/{flag=0}
-            flag{print}' > predigest.xml
-   ```
-
-2. Extraer el DE final del XML:
-   ```bash
-   xmllint --xpath "//DE" lote_from_zip.xml > de_final.xml
-   ```
-
-3. Comparar para ver las diferencias:
-   ```bash
-   diff predigest.xml de_final.xml
-   # Muestra que de_final.xml tiene gCamFuFD dentro del DE
-   ```
-
-**Fix mínimo**
-- Mover `gCamFuFD` al DE **ANTES** de firmar, no después.
-- O si debe ir después, re-firmar el DE completo.
-
-**Regla anti-regresión**
-- NUNCA modificar el contenido de un elemento firmado después de la firma.
-- Cualquier cambio dentro del `<DE>` invalida la firma digest.
+- **Síntoma**: siRecepLoteDE responde `dCodRes=0160` ("XML Mal Formado") aunque:
+  - el ZIP tiene `lote.xml`
+  - `xmllint --noout lote.xml` pasa
+- **Causa probable**: `lote.xml` estaba estructurado como `rLoteDE -> xDE -> rDE ...`
+  - `xDE` es un wrapper del SOAP (base64 del ZIP), no pertenece al lote interno.
+- **Regla**: Dentro del ZIP, `lote.xml` debe ser `rLoteDE` conteniendo `rDE` directos (repetibles), sin `<xDE>`.
+- **Test rápido**: si `head lote.xml` muestra `<rLoteDE> <xDE> ...` => unwrap antes de zippear/enviar.
 
 
-### 5.4 2026-01-16 — 0160 "XML Mal Formado" (debug correcto)
+- No confiar en parches por regex que "mueven bloques" dentro de tools/send_sirecepde.py sin validar que no borren helpers.
+- Regla: antes de tocar preflight/ZIP, correr `rg -n "def _zip_lote_xml_bytes|_zip_lote_xml_bytes(" tools/send_sirecepde.py` y asegurar que el helper existe + py_compile pasa.
+- Síntoma típico: NameError: _zip_lote_xml_bytes is not defined en send_sirecepde.py durante construcción del lote (antes del POST a SIFEN).
 
-**Síntoma**
-- SIFEN responde 0160 aunque `xmlsec1 --verify` pueda dar OK en un archivo local.
+- Si aparece 0160 "XML Mal Formado" al enviar siRecepLoteDE / recibe-lote, revisar y eliminar xsi:schemaLocation del XML que va dentro del ZIP.
+- Especialmente importante en el root `<rDE>` o `<rLoteDE>`.
+- Mantener el XML "limpio" (namespace OK, sin schemaLocation) antes de comprimir y base64.
 
-**Causa probable**
-- Lo que se firma/valida localmente NO es necesariamente lo que termina dentro del `xDE` enviado (ZIP Base64).
-- Puede haber diferencias por:
-  - Se zipea/embebe el archivo equivocado
-  - ZIP contiene un `lote.xml` distinto al esperado
-  - BOM/encoding raro/truncamiento/whitespace fuera de lugar
-  - El flujo "reconstruye" o "normaliza" antes de enviar y cambia el contenido final
-
-**Regla de oro**
-- Para debug de 0160, SIEMPRE inspeccionar el `xDE` real enviado:
-  1) Leer `artifacts/soap_last_request_SENT.xml` 
-  2) Extraer `<xDE>...</xDE>` 
-  3) Base64-decode -> ZIP
-  4) Unzip `lote.xml` 
-  5) Correr `xmlsec1 --verify --insecure --id-attr:Id DE` sobre ese `lote.xml` 
-
-**Comando recomendado**
-- Guardar artifacts: `artifacts/last_sent_payload/xDE.zip` y `lote_from_SENT.zip.xml` para comparación.
-## 6) Tabla de errores conocidos
-Crear una tabla markdown con columnas:
-- Síntoma
-- Causa probable
-- Confirmación (comando)
-- Fix mínimo
-
-Agregar al menos estos renglones:
-- "SIFEN responde 0160" -> "XML mal formado en xDE (ZIP Base64)" -> "extraer xDE del SOAP enviado -> unzip -> xmlsec verify" -> "verificar que lo firmado local = lo enviado en ZIP"
-- "Verification status: FAILED / Failure reason: REFERENCE" -> "Digest mismatch (post-firma o transforms)" -> "xmlsec debug + predigest" -> "no modificar post-firma / re-firmar"
-- "lxml XMLSyntaxError: Start tag expected" -> "archivo era ZIP con extensión .xml" -> "file <archivo>" -> "unzip -p ..."
+- El WSDL recibe-lote.wsdl?wsdl define operación rEnvioLote (no siRecepLoteDE).
+- El soap12:address location declara el endpoint https://sifen-test.set.gov.py/de/ws/async/recibe-lote.wsdl.
+- No "normalizar" el endpoint removiendo .wsdl/?wsdl a mano: usar el soap12:address location del WSDL.
+  Stripping incorrecto puede causar HTTP 400 + dCodRes=0160 (XML Mal Formado).
 
 
-## Reglas anti-regresión SIFEN (TESAKA)
+- El schema importado desde el WSDL (recibe-lote.wsdl.xsd1.xsd) declara el request root como rEnvioLote (sin "De").
+- Si se envía rEnvioLoteDe, SIFEN puede responder 0160 "XML Mal Formado".
+- Checklist de verificación:
+  - grep en /tmp/recibe-lote.wsdl.xsd1.xsd para <xs:element name="rEnvioLote">
+  - grep en artifacts/soap_last_request_SENT.xml para confirmar que el Body usa <rEnvioLote ...>
+- Fecha: 2026-01-16, caso real: RUC 4554737-8, endpoint test async recibe-lote.
 
-### Regla 0 — Siempre depurar con el payload REAL enviado
-Cuando SIFEN devuelve error (ej: 0160), no asumir que el archivo local es el enviado.
+## P12 / Password / curl
+- Si `openssl pkcs12 -info -in "$SIFEN_CERT_PATH" -noout` devuelve `exit=0`, el .p12 es válido y contiene cert + key.
+- Si curl da: `LibreSSL error ... PKCS12 ... mac verify failure`, casi siempre es password incorrecta (o caracteres/espacios invisibles).
+- Para bajar recursos protegidos (WSDL/XSD) usar:
+  `curl --cert-type P12 --cert "$SIFEN_CERT_PATH:$P12PASS" "<URL>" -o "<OUT>"`
+- Evitar pegar líneas sueltas que empiecen con `#` en zsh (puede intentar ejecutarlas y ensuciar la sesión); pegar bloques completos o eliminar esas líneas.
+## XSD v150 trae includes con URLs absolutas (cadena completa)
+xmllint puede fallar (exit=5) porque los XSD usan xsd:include con URLs tipo:
+https://ekuatia.set.gov.py/sifen/xsd/<archivo>.xsd
+No solo en siRecepDE_v150.xsd, también dentro de DE_v150.xsd y otros (ej: Paises_v100.xsd).
 
-Checklist:
-1) Abrir `artifacts/soap_last_request_SENT.xml` 
-2) Extraer `<xDE>...</xDE>` 
-3) Base64 decode → ZIP
-4) Unzip `lote.xml` 
-5) Validar firma sobre **ese** lote:
-   `xmlsec1 --verify --insecure --id-attr:Id DE lote.xml` 
+Solución local/offline:
+1) Copiar carpeta de XSD a un workspace local:
+   rm -rf xsd_local && cp -R xsd xsd_local
+2) Reescribir URLs absolutas a paths relativos en TODOS los XSD:
+   perl -pi -e 's#https://ekuatia.set.gov.py/sifen/xsd/##g' xsd_local/*.xsd
+3) Validar con el entrypoint:
+   ( cd xsd_local && xmllint --noout --schema siRecepDE_v150.xsd ../<xml> )
 
-Artifacts sugeridos:
-- `artifacts/last_sent_payload/xDE.zip` 
-- `artifacts/last_sent_payload/lote_from_SENT.zip.xml` 
 
-### Regla 1 — xmlsec OK ≠ SIFEN OK
-`xmlsec1` solo valida firma/digest. SIFEN además valida **estructura/XSD**.
 
-Caso típico:
-- xmlsec OK
-- SIFEN 0160 "XML Mal Formado"
-=> mirar estructura `rLoteDE/rDE` vs XSD (p.ej., presencia/orden de nodos obligatorios).
+## Validación XSD: NO validar rLoteDE con siRecepDE_v150.xsd
+- Error típico al validar lote: "Element 'rLoteDE': No matching global declaration available for the validation root."
+- Causa: siRecepDE_v150.xsd no tiene como root a rLoteDE; es para DE/rDE, no para el lote.
+- Acción correcta:
+  1) Buscar qué XSD declara rLoteDE con: grep -R "rLoteDE" en xsd/ y schemas_sifen/
+  2) Usar ese XSD como entrypoint para xmllint.
+- Nota: includes tipo rde/150/RDE_Group.xsd pueden no existir como URL pública; preferir resolver desde XSD locales del repo (rshk-jsifenlib/docs/… o tmp/roshka-sifen/…) antes de intentar curl.
 
-### Regla 2 — rDE estructura esperada (referencia práctica)
-En el smoke test que verificó OK, `rDE` tenía hijos:
-- `dVerFor` 
-- `DE` 
-- `Signature` 
-- `gCamFuFD` 
+## Validación XSD offline: Lote vs rDE
+- NO intentar validar un XML de lote con `siRecepDE_v150.xsd` si el root es `<rLoteDE>`: ese XSD no declara `rLoteDE` y `xmllint` falla con:
+  "Element 'rLoteDE': No matching global declaration…".
+- Para validar offline:
+  1) Crear `xsd_local/` como copia de `xsd/` y reemplazar URLs absolutas:
+     `https://ekuatia.set.gov.py/sifen/xsd/` -> path relativo (ej: `Paises_v100.xsd`).
+  2) Extraer el nodo `<rDE>` del lote a `rde_only.xml`.
+  3) Validar `rde_only.xml` con `xsd_local/siRecepRDE_v150.xsd` (o `rDE_prevalidador_v150.xsd` si aplica).
+- Confirmación: el repo ya contiene diccionarios requeridos como `Paises_v100.xsd`, `Monedas_v150.xsd`, `Departamentos_v141.xsd`, etc; el problema era el root equivocado, no la ausencia de XSD.
 
-Si falta `dVerFor` o cambia el orden, puede disparar 0160 aunque la firma verifique.
+## XSD: no asumir ruta fija
 
-### Notas de herramientas
-- `cat -A` en macOS no funciona. Usar `sed -n ""1,5p"" file` o `python` para inspección.
-## 7) Checklist antes de intentar PROD
-- Confirmar que el XML a enviar contiene Signature.
-- Confirmar que `file` no indica Zip cuando esperamos XML.
-- Confirmar que xmlsec verify pasa en el archivo correcto.
-- Guardar evidencias en artifacts/runs_async/<timestamp>_prod/
+
+## Aprendizaje: rEnvioLote vs rEnvioLoteDe (siRecepLoteDE)
+
+## Async recibe-lote (siRecepLoteDE) – wrapper correcto
+
+
+## SIFEN recibe-lote (TEST) — WSDL y endpoint
+
+
+- El WSDL recibe-lote.wsdl?wsdl define operación rEnvioLote (no siRecepLoteDE).
+- El soap12:address location declara el endpoint https://sifen-test.set.gov.py/de/ws/async/recibe-lote.wsdl.
+- No "normalizar" el endpoint removiendo .wsdl/?wsdl a mano: usar el soap12:address location del WSDL.
+  Stripping incorrecto puede causar HTTP 400 + dCodRes=0160 (XML Mal Formado).
+
+
+- El schema importado desde el WSDL (recibe-lote.wsdl.xsd1.xsd) declara el request root como rEnvioLote (sin "De").
+- Si se envía rEnvioLoteDe, SIFEN puede responder 0160 "XML Mal Formado".
+- Checklist de verificación:
+  - grep en /tmp/recibe-lote.wsdl.xsd1.xsd para <xs:element name="rEnvioLote">
+  - grep en artifacts/soap_last_request_SENT.xml para confirmar que el Body usa <rEnvioLote ...>
+- Fecha: 2026-01-16, caso real: RUC 4554737-8, endpoint test async recibe-lote.
+
+## P12 / Password / curl
+- Si `openssl pkcs12 -info -in "$SIFEN_CERT_PATH" -noout` devuelve `exit=0`, el .p12 es válido y contiene cert + key.
+- Si curl da: `LibreSSL error ... PKCS12 ... mac verify failure`, casi siempre es password incorrecta (o caracteres/espacios invisibles).
+- Para bajar recursos protegidos (WSDL/XSD) usar:
+  `curl --cert-type P12 --cert "$SIFEN_CERT_PATH:$P12PASS" "<URL>" -o "<OUT>"`
+- Evitar pegar líneas sueltas que empiecen con `#` en zsh (puede intentar ejecutarlas y ensuciar la sesión); pegar bloques completos o eliminar esas líneas.- El XML puede declarar `xsi:schemaLocation` con un nombre como `siRecepDE_v150.xsd`.
+- Antes de validar, localizar el XSD real en el repo:
+  - `find .. -maxdepth 8 -type f \( -iname "siRecepDE_v150.xsd" -o -iname "*v150*.xsd" \)`
+- Si no existe en el repo, se debe descargar/instalar el paquete XSD v150 correspondiente y guardar su ruta para validaciones futuras.
+
