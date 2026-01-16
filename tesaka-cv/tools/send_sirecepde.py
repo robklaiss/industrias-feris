@@ -4654,6 +4654,7 @@ def send_sirecepde(
     strict_xsd: bool = False,
     xsd_dir: Optional[str] = None,
     lote_source: Optional[str] = None,
+    goto_send: bool = False
 ) -> dict:
     """
     Envía un XML siRecepDE al servicio SOAP de Recepción de SIFEN
@@ -4669,6 +4670,8 @@ def send_sirecepde(
     """
     # Inicializar variable did para evitar UnboundLocalError
     did = None
+    # Inicializar goto_send
+    goto_send = goto_send  # Usar el parámetro
     
     # Configurar bypass del GATE (puede venir por ENV o CLI)
     env_skip_gate = os.getenv("SIFEN_SKIP_RUC_GATE", "").strip().lower() in ("1", "true", "yes", "y", "s", "si")
@@ -4889,6 +4892,7 @@ def send_sirecepde(
 
             lote_xml_bytes = xml_bytes
             zip_bytes = _zip_lote_xml_bytes(lote_xml_bytes)
+            import base64
             zip_base64 = base64.b64encode(zip_bytes).decode("ascii")
             print("✓ Lote provisto validado\n")
             
@@ -4935,8 +4939,16 @@ def send_sirecepde(
             )
             
             # Para modo AS-IS, saltar directamente al envío (omitir _select_lote_payload)
+            print("🔍 DEBUG: Estableciendo goto_send = True")
             goto_send = True
+            # Continuar con el flujo normal dentro del try principal
+            # No return aquí, dejamos que el flujo continúe al bloque if goto_send más adelante
+            print("🔍 DEBUG: Bloque AS-IS completado, continuando...")
+            
+            # Continuar con el flujo normal...
+            print("🔍 DEBUG: Saliendo del bloque if/else de detección de lote")
         else:
+            print("🔍 DEBUG: Entrando al bloque else (no es lote pre-firmado)")
             # GUARD-RAIL: Verificar dependencias críticas antes de firmar
             try:
                 _check_signing_dependencies()
@@ -4960,26 +4972,28 @@ def send_sirecepde(
                     "error": error_msg,
                     "error_type": "DependencyError"
                 }
-
-            try:
-                print("📦 Construyendo y firmando lote desde XML individual...")
-                
-                # Leer certificado de firma (fallback a mTLS o CERT_PATH si no hay específico de firma)
-                sign_cert_path = os.getenv("SIFEN_SIGN_P12_PATH") or os.getenv("SIFEN_MTLS_P12_PATH") or os.getenv("SIFEN_CERT_PATH")
-                sign_cert_password = os.getenv("SIFEN_SIGN_P12_PASSWORD") or os.getenv("SIFEN_MTLS_P12_PASSWORD") or os.getenv("SIFEN_CERT_PASSWORD")
-                
-                if not sign_cert_path or not sign_cert_password:
-                    return {
-                        "success": False,
-                        "error": "Falta certificado de firma (SIFEN_SIGN_P12_PATH o SIFEN_MTLS_P12_PATH y su contraseña)",
-                        "error_type": "ConfigurationError"
-                    }
-                
-                # Verificar si el XML ya es un lote firmado (rLoteDE)
-                xml_root = etree.fromstring(xml_bytes)
-                is_already_lote = xml_root.tag == f"{{{SIFEN_NS}}}rLoteDE"
-                
-                if is_already_lote:
+        
+        print("🔍 DEBUG: Antes de entrar al bloque if goto_send final")
+        
+        try:
+            print("📦 Construyendo y firmando lote desde XML individual...")
+            
+            # Leer certificado de firma (fallback a mTLS o CERT_PATH si no hay específico de firma)
+            sign_cert_path = os.getenv("SIFEN_SIGN_P12_PATH") or os.getenv("SIFEN_MTLS_P12_PATH") or os.getenv("SIFEN_CERT_PATH")
+            sign_cert_password = os.getenv("SIFEN_SIGN_P12_PASSWORD") or os.getenv("SIFEN_MTLS_P12_PASSWORD") or os.getenv("SIFEN_CERT_PASSWORD")
+            
+            if not sign_cert_path or not sign_cert_password:
+                return {
+                    "success": False,
+                    "error": "Falta certificado de firma (SIFEN_SIGN_P12_PATH o SIFEN_MTLS_P12_PATH y su contraseña)",
+                    "error_type": "ConfigurationError"
+                }
+            
+            # Verificar si el XML ya es un lote firmado (rLoteDE)
+            xml_root = etree.fromstring(xml_bytes)
+            is_already_lote = xml_root.tag == f"{{{SIFEN_NS}}}rLoteDE"
+            
+            if is_already_lote:
                     print("✓ XML detectado como lote ya firmado (rLoteDE)")
                     # Para lotes ya firmados, solo necesitamos:
                     # 1. Verificar que tenga dVerFor
@@ -5022,39 +5036,39 @@ def send_sirecepde(
                         zip_path.write_bytes(zip_bytes)
                         lote_path = artifacts_dir / "last_lote.xml"
                         lote_path.write_bytes(lote_xml_bytes)
-                else:
-                    print("🔐 Construyendo lote completo y firmando rDE in-place...")
-                    # Flujo normal para DE individual
-                    try:
-                        # Crear directorio del run
-                        timestamp = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
-                        run_dir = (artifacts_dir or Path("artifacts")) / f"runs_async/{timestamp}_{env}"
-                        run_dir.mkdir(parents=True, exist_ok=True)
-                        
-                        # Guardar DE original (unsigned)
-                        de_unsigned_path = run_dir / f"de_unsigned_{timestamp}.xml"
-                        de_unsigned_path.write_bytes(xml_bytes)
-                        print(f"📄 UNSIGNED: {de_unsigned_path}")
-                        
-                        # Verificar que DE unsigned no tiene Signature
-                        if b'<Signature' in xml_bytes:
-                            print("⚠️  WARNING: DE unsigned contiene Signature - no debería tenerla")
+            else:
+                print("🔐 Construyendo lote completo y firmando rDE in-place...")
+                # Flujo normal para DE individual
+                try:
+                    # Crear directorio del run
+                    timestamp = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+                    run_dir = (artifacts_dir or Path("artifacts")) / f"runs_async/{timestamp}_{env}"
+                    run_dir.mkdir(parents=True, exist_ok=True)
+                    
+                    # Guardar DE original (unsigned)
+                    de_unsigned_path = run_dir / f"de_unsigned_{timestamp}.xml"
+                    de_unsigned_path.write_bytes(xml_bytes)
+                    print(f"📄 UNSIGNED: {de_unsigned_path}")
+                    
+                    # Verificar que DE unsigned no tiene Signature
+                    if b'<Signature' in xml_bytes:
+                        print("⚠️  WARNING: DE unsigned contiene Signature - no debería tenerla")
+                    else:
+                        print("✅ DE unsigned verificado: no contiene Signature")
+                    
+                    # NUEVO FLUJO: construir lote completo ANTES de firmar, luego firmar in-place
+                    result = build_and_sign_lote_from_xml(
+                        xml_bytes=xml_bytes,
+                        cert_path=sign_cert_path,
+                        cert_password=sign_cert_password,
+                        return_debug=True,
+                        dump_http=dump_http
+                    )
+                    if isinstance(result, tuple):
+                        if len(result) == 4:
+                            zip_base64, lote_xml_bytes, zip_bytes, _ = result  # _ es None (lote_did ya no existe)
                         else:
-                            print("✅ DE unsigned verificado: no contiene Signature")
-                        
-                        # NUEVO FLUJO: construir lote completo ANTES de firmar, luego firmar in-place
-                        result = build_and_sign_lote_from_xml(
-                            xml_bytes=xml_bytes,
-                            cert_path=sign_cert_path,
-                            cert_password=sign_cert_password,
-                            return_debug=True,
-                            dump_http=dump_http
-                        )
-                        if isinstance(result, tuple):
-                            if len(result) == 4:
-                                zip_base64, lote_xml_bytes, zip_bytes, _ = result  # _ es None (lote_did ya no existe)
-                            else:
-                                zip_base64, lote_xml_bytes, zip_bytes = result
+                            zip_base64, lote_xml_bytes, zip_bytes = result
                             
                             # Extraer y guardar rDE firmado
                             import xml.etree.ElementTree as ET
@@ -5091,33 +5105,21 @@ def send_sirecepde(
                                 print(f"  xmlsec1 --verify --insecure --id-attr:Id http://ekuatia.set.gov.py/sifen/xsd:DE {lote_extraido_path}")
                                 
                                 # Continuar con el flujo normal...
-                        else:
-                            zip_base64 = result
-                            zip_bytes = base64.b64decode(zip_base64)
-                            lote_xml_bytes = None
-                    except Exception as e:
-                        error_msg = f"Error al construir lote: {str(e)}"
-                        error_type = type(e).__name__
-                        import traceback
-                        traceback.print_exc()
-                        return {
-                            "success": False,
-                            "error": error_msg,
-                            "error_type": error_type,
-                            "traceback": traceback.format_exc()
-                        }
-            except Exception as e:
-                error_msg = f"Error al procesar lote: {str(e)}"
-                print(f"❌ {error_msg}", file=sys.stderr)
-                import traceback
-                traceback.print_exc(file=sys.stderr)
-                return {
-                    "success": False,
-                    "error": error_msg,
-                    "error_type": type(e).__name__,
-                    "traceback": traceback.format_exc()
-                }
-            
+                    else:
+                        zip_base64 = result
+                        zip_bytes = base64.b64decode(zip_base64)
+                        lote_xml_bytes = None
+                except Exception as e:
+                    error_msg = f"Error al construir lote: {str(e)}"
+                    error_type = type(e).__name__
+                    import traceback
+                    traceback.print_exc()
+                    return {
+                        "success": False,
+                        "error": error_msg,
+                        "error_type": error_type,
+                        "traceback": traceback.format_exc()
+                    }
             # EXTRAER rDE FIRMADO del lote para usarlo en el SOAP
             # El xml_bytes original ya no sirve - necesitamos el rDE firmado
             if zip_bytes:
@@ -5251,19 +5253,16 @@ def send_sirecepde(
             _run_sanity_checks(lote_xml_bytes, cert_path=sign_cert_path)
             
             # Modo AS-IS: usar XML/ZIP tal cual sin firmar ni construir
+            print(f"🔍 DEBUG: goto_send = {goto_send}")
             if goto_send:
                 try:
-                    # Para modo AS-IS, xml_bytes ya debe contener el rDE firmado
-                    if not xml_bytes:
+                    # Para modo AS-IS, ya tenemos zip_base64 y zip_bytes del lote provisto
+                    if not zip_base64:
                         return {
                             "success": False,
-                            "error": "Modo AS-IS requiere que --xml apunte a un rDE firmado",
+                            "error": "No se pudo crear el ZIP del lote",
                             "error_type": "ValidationError"
                         }
-                    
-                    # Generar ZIP desde el rDE firmado
-                    zip_base64 = build_lote_base64_from_single_xml(xml_bytes, return_debug=False)
-                    zip_bytes = base64.b64decode(zip_base64)
                     
                     # Generar dId
                     did = make_did_15()
@@ -5271,7 +5270,7 @@ def send_sirecepde(
                     # Construir payload
                     payload_xml = build_r_envio_lote_xml(
                         did=did,
-                        xml_bytes=xml_bytes,
+                        xml_bytes=lote_xml_bytes,
                         zip_base64=zip_base64
                     )
                     
@@ -5284,7 +5283,7 @@ def send_sirecepde(
                         "success": response.ok,
                         "response": response,
                         "payload_xml": payload_xml,
-                        "xml_bytes": xml_bytes,
+                        "lote_xml_bytes": lote_xml_bytes,
                         "zip_bytes": zip_bytes,
                         "zip_base64": zip_base64,
                         "artifacts_dir": artifacts_dir
@@ -5306,7 +5305,7 @@ def send_sirecepde(
             client = SoapClient(env=env)
             response = client.recepcion_lote(payload_xml)
             
-            return {
+            result = {
                 "success": response.ok,
                 "response": response,
                 "payload_xml": payload_xml,
@@ -5316,17 +5315,19 @@ def send_sirecepde(
                 "validation": validation_result,
                 "artifacts_dir": artifacts_dir
             }
-    except Exception as e:
-        error_msg = f"Error general al procesar: {str(e)}"
-        print(f"❌ {error_msg}", file=sys.stderr)
-        import traceback
-        traceback.print_exc(file=sys.stderr)
-        return {
-            "success": False,
-            "error": error_msg,
-            "error_type": type(e).__name__,
-            "traceback": traceback.format_exc()
-        }
+        except Exception as e:
+            error_msg = f"Error general al procesar: {str(e)}"
+            print(f"❌ {error_msg}", file=sys.stderr)
+            import traceback
+            traceback.print_exc(file=sys.stderr)
+            return {
+                "success": False,
+                "error": error_msg,
+                "error_type": type(e).__name__,
+                "traceback": traceback.format_exc()
+            }
+        
+        return result
 
 
 def make_did_15() -> str:
@@ -5432,7 +5433,7 @@ Configuración requerida (variables de entorno):
         return 1
     
     # Enviar
-    result = send_sirecepde_lote(
+    result = send_sirecepde(
         xml_path=xml_path,
         env=env,
         dump_http=args.dump_http,
@@ -5440,8 +5441,7 @@ Configuración requerida (variables de entorno):
         bump_doc=args.bump_doc,
         lote_source=args.lote_source,
         skip_ruc_gate=False,
-        skip_last_lote_mismatch=False,
-        goto_send=args.goto_send
+        skip_ruc_gate_reason=None
     )
     
     exit_code = 0 if result.get("success") is True else 1
