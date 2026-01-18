@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://ekuatia.set.gov.py/sifen/xsd"
+	xmlns="http://ekuatia.set.gov.py/sifen/xsd"
+	xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+	elementFormDefault="qualified">
+
+	<xs:import namespace="http://www.w3.org/2000/09/xmldsig#" />
+	<xs:include schemaLocation= "DE_v150_local.xsd" />
+
+	<xs:element name="rLoteDE">
+		<xs:annotation>
+			<xs:documentation>Lote de Documentos Electrónicos
+			Contiene hasta 50 DE del mismo tipo, cada uno firmado digitalmente
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<!-- Identificador del lote -->
+				<xs:element name="dId" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Identificador del lote
+						</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:annotation>
+							<xs:documentation>Identificador del lote
+							</xs:documentation>
+						</xs:annotation>
+						<xs:restriction base="xs:long">
+							<xs:minInclusive value="1" />
+							<xs:maxInclusive value="999999999999999" />
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+
+				<!-- Lista de Documentos Electrónicos -->
+				<xs:element name="rDE" maxOccurs="50">
+					<xs:annotation>
+						<xs:documentation>Documento Electrónico firmado
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+						</xs:sequence>
+						<xs:attribute name="Id" type="xs:string" use="required"/>
+					</xs:complexType>
+				</xs:element>
+
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

@@ -1,0 +1,13 @@
+{
+  "ns2:rResEnviLoteDe": {
+    "$": {
+      "xmlns:ns2": "http://ekuatia.set.gov.py/sifen/xsd"
+    },
+    "ns2:dFecProc": "2026-01-18T15:42:14-03:00",
+    "ns2:dCodRes": "0301",
+    "ns2:dMsgRes": "Lote no encolado para procesamiento",
+    "ns2:dProtConsLote": "0",
+    "ns2:dTpoProces": "0"
+  },
+  "id": "1768761734071"
+}

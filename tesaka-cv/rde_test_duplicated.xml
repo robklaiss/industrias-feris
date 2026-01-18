@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rDE xmlns="http://ekuatia.set.gov.py/sifen/xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+    <dVerFor>150</dVerFor>
+    <DE Id="01455473788001001000000112026011810000000018">
+        <dDVId>8</dDVId>
+        <dFecFirma>2026-01-18T17:32:56</dFecFirma>
+        <dSisFact>1</dSisFact>
+        <gOpeDE>
+            <iTipEmi>1</iTipEmi>
+            <dDesTipEmi>Normal</dDesTipEmi>
+            <dCodSeg>000000001</dCodSeg>
+        </gOpeDE>
+        <gTimb>
+            <iTiDE>1</iTiDE>
+            <dDesTiDE>Factura electrónica</dDesTiDE>
+            <dNumTim>12345678</dNumTim>
+            <dEst>001</dEst>
+            <dPunExp>001</dPunExp>
+            <dNumDoc>0000001</dNumDoc>
+            <dFeIniT>2026-01-18</dFeIniT>
+        </gTimb>
+        <gDatGralOpe>
+            <dFeEmiDE>2026-01-18T17:32:56</dFeEmiDE>
+            <gOpeCom>
+                <iTipTra>1</iTipTra>
+                <dDesTipTra>Venta de mercadería</dDesTipTra>
+                <iTImp>1</iTImp>
+                <dDesTImp>IVA</dDesTImp>
+                <cMoneOpe>PYG</cMoneOpe>
+                <dDesMoneOpe>Guarani</dDesMoneOpe>
+            </gOpeCom>
+                <gEmis>
+                <dRucEm>45547378</dRucEm>
+                <dDVEmi>3</dDVEmi>
+                <iTipCont>1</iTipCont>
+                <dNomEmi>Contribuyente de Prueba S.A.</dNomEmi>
+                <dDirEmi>Asunción</dDirEmi>
+                <dNumCas>1234</dNumCas>
+                <cDepEmi>1</cDepEmi>
+                <dDesDepEmi>CAPITAL</dDesDepEmi>
+                <cCiuEmi>1</cCiuEmi>
+                <dDesCiuEmi>ASUNCION (DISTRITO)</dDesCiuEmi>
+                <dTelEmi>021123456</dTelEmi>
+                <dEmailE>test@example.com</dEmailE>
+                <gActEco>
+                    <cActEco>64990</cActEco>
+                    <dDesActEco>OTRAS ACTIVIDADES DE SERVICIOS FINANCIEROS, EXCEPTO LA FINANCIACIÓN DE PLANES DE SEGUROS Y DE PENSIONES</dDesActEco>
+                </gActEco>
+            </gEmis>
+            <gDatRec>
+                <iNatRec>1</iNatRec>
+                <iTiOpe>1</iTiOpe>
+                <cPaisRec>PRY</cPaisRec>
+                <dDesPaisRe>Paraguay</dDesPaisRe>
+                <iTiContRec>2</iTiContRec>
+                <dRucRec>80012345</dRucRec>
+                <dDVRec>0</dDVRec>
+                <dNomRec>Cliente de Prueba</dNomRec>
+                <dDirRec>Asunción</dDirRec>
+                <dNumCasRec>5678</dNumCasRec>
+                <cDepRec>1</cDepRec>
+                <dDesDepRec>CAPITAL</dDesDepRec>
+                <cCiuRec>1</cCiuRec>
+                <dDesCiuRec>ASUNCION (DISTRITO)</dDesCiuRec>
+            </gDatRec>
+        </gDatGralOpe>
+        <gDtipDE>
+            <gCamFE>
+                <iIndPres>1</iIndPres>
+                <dDesIndPres>Operación presencial</dDesIndPres>
+            </gCamFE>
+            <gCamCond>
+                <iCondOpe>1</iCondOpe>
+                <dDCondOpe>Contado</dDCondOpe>
+                <gPaConEIni>
+                    <iTiPago>1</iTiPago>
+                    <dDesTiPag>Efectivo</dDesTiPag>
+                    <dMonTiPag>100000</dMonTiPag>
+                    <cMoneTiPag>PYG</cMoneTiPag>
+                    <dDMoneTiPag>Guarani</dDMoneTiPag>
+                </gPaConEIni>
+            </gCamCond>
+            <gCamItem>
+                <dCodInt>001</dCodInt>
+                <dDesProSer>Producto de Prueba</dDesProSer>
+                <cUniMed>99</cUniMed>
+                <dDesUniMed>UNI</dDesUniMed>
+                <dCantProSer>1.00</dCantProSer>
+                <gValorItem>
+                    <dPUniProSer>100000</dPUniProSer>
+                    <dTotBruOpeItem>100000</dTotBruOpeItem>
+                    <gValorRestaItem>
+                        <dTotOpeItem>100000</dTotOpeItem>
+                    </gValorRestaItem>
+                </gValorItem>
+                <gCamIVA>
+                    <iAfecIVA>1</iAfecIVA>
+                    <dDesAfecIVA>Gravado IVA</dDesAfecIVA>
+                    <dPropIVA>100</dPropIVA>
+                    <dTasaIVA>10</dTasaIVA>
+                    <dBasGravIVA>90909</dBasGravIVA>
+                    <dLiqIVAItem>9091</dLiqIVAItem>
+                    <dBasExe>0</dBasExe>
+                </gCamIVA>
+            </gCamItem>
+            <gCamItem>
+                <dCodInt>002</dCodInt>
+                <dDesProSer>Producto de Prueba</dDesProSer>
+                <cUniMed>99</cUniMed>
+                <dDesUniMed>UNI</dDesUniMed>
+                <dCantProSer>1.00</dCantProSer>
+                <gValorItem>
+                    <dPUniProSer>100000</dPUniProSer>
+                    <dTotBruOpeItem>100000</dTotBruOpeItem>
+                    <gValorRestaItem>
+                        <dTotOpeItem>100000</dTotOpeItem>
+                    </gValorRestaItem>
+                </gValorItem>
+                <gCamIVA>
+                    <iAfecIVA>1</iAfecIVA>
+                    <dDesAfecIVA>Gravado IVA</dDesAfecIVA>
+                    <dPropIVA>100</dPropIVA>
+                    <dTasaIVA>10</dTasaIVA>
+                    <dBasGravIVA>90909</dBasGravIVA>
+                    <dLiqIVAItem>9091</dLiqIVAItem>
+                    <dBasExe>0</dBasExe>
+                </gCamIVA>
+            </gCamItem>
+        </gDtipDE>
+        <gTotSub>
+            <dSubExe>0</dSubExe>
+            <dSubExo>0</dSubExo>
+            <dSub5>0</dSub5>
+            <dSub10>200000</dSub10>
+            <dTotOpe>200000</dTotOpe>
+            <dTotDesc>0</dTotDesc>
+            <dTotDescGlotem>0</dTotDescGlotem>
+            <dTotAntItem>0</dTotAntItem>
+            <dTotAnt>0</dTotAnt>
+            <dPorcDescTotal>0</dPorcDescTotal>
+            <dDescTotal>0</dDescTotal>
+            <dAnticipo>0</dAnticipo>
+            <dRedon>0</dRedon>
+            <dTotGralOpe>200000</dTotGralOpe>
+            <dIVA5>0</dIVA5>
+            <dIVA10>18182</dIVA10>
+            <dTotIVA>18182</dTotIVA>
+            <dBaseGrav5>0</dBaseGrav5>
+            <dBaseGrav10>181818</dBaseGrav10>
+            <dTBasGraIVA>181818</dTBasGraIVA>
+        </gTotSub>
+    </DE>
+</rDE>

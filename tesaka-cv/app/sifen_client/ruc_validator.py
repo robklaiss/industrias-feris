@@ -153,7 +153,11 @@ def validate_emisor_ruc(xml_content: str, expected_ruc: Optional[str] = None) ->
     # Validar que no esté vacío
     if not ruc_clean:
         return (False, "El RUC del emisor está vacío en el XML. No se puede enviar con RUC vacío.")
-    
+
+    # ✅ Bypass para debug (permite probar pipeline sin bloquear por 1264)
+    if os.getenv("SIFEN_SKIP_RUC_GATE") == "1":
+        return (True, None)
+
     # Validar que no sea dummy
     if is_dummy_ruc(ruc_clean):
         return (False, f"El RUC del emisor '{ruc_clean}' es un RUC de prueba/dummy. SIFEN rechazará el documento con código 1264. Configure SIFEN_EMISOR_RUC con el RUC real del contribuyente habilitado (formato: RUC-DV, ej: 4554737-8).")

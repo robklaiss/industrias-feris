@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+  <rewriteURI uriStartString="https://ekuatia.set.gov.py/sifen/xsd/" rewritePrefix="./"/>
+</catalog>

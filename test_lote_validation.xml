@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rLoteDE xmlns="http://ekuatia.set.gov.py/sifen/xsd">
+  <dId>123456789012345</dId>
+  <rDE Id="01234567890123456789012345678901234567890123">
+    <dVerFor>150</dVerFor>
+    <dId>123456789012345</dId>
+    <dCar>1</dCar>
+    <dFecFirma>2025-01-17T18:00:00</dFecFirma>
+    <dSisFact>1</dSisFact>
+    <gOpeDE>
+      <iTipEmi>1</iTipEmi>
+      <dDesTipEmi>Normal</dDesTipEmi>
+      <iTipRec>1</iTipRec>
+      <dDesTipRec>Contribuyente</dDesTipRec>
+      <iCont>1</iCont>
+      <dDesCont>Contado</dDesCont>
+      <cPais>PRY</cPais>
+      <dDesPais>Paraguay</dDesPais>
+      <iTiDE>1</iTiDE>
+      <dDesTiDE>Factura Electrónica</dDesTiDE>
+      <cMone>PYG</cMone>
+      <dDesMone>Guarani</dDesMone>
+      <dTiCam>1.00</dTiCam>
+    </gOpeDE>
+    <gDatGral>
+      <dRucEmi>80012345-6</dRucEmi>
+      <dDVEmi>6</dDVEmi>
+      <dNomEmi>Empresa Test S.A.</dNomEmi>
+      <dNomFanEmi>Test</dNomFanEmi>
+      <dDirEmi>Av. Principal 123</dDirEmi>
+      <dNumCas>123</dNumCas>
+      <dDepEmi>01</dDepEmi>
+      <dDesDepEmi>Asunción</dDesDepEmi>
+      <dDisEmi>001</dDisEmi>
+      <dDesDisEmi>Asunción</dDesDisEmi>
+      <dCiuEmi>Asunción</dCiuEmi>
+      <dTelEmi>521123456</dTelEmi>
+      <dEmailEmi>test@example.com</dEmailEmi>
+    </gDatGral>
+    <gDatRec>
+      <dRucRec>80098765-4</dRucRec>
+      <dDVRec>4</dDVRec>
+      <dNomRec>Cliente Test</dNomRec>
+      <dDirRec>Calle Secundaria 456</dDirRec>
+      <dNumCas>456</dNumCas>
+      <dDepRec>01</dDepRec>
+      <dDesDepRec>Asunción</dDesDepRec>
+      <dDisRec>001</dDisRec>
+      <dDesDisRec>Asunción</dDesDisRec>
+      <dCiuRec>Asunción</dCiuRec>
+      <dTelRec>521987654</dTelRec>
+      <dEmailRec>cliente@example.com</dEmailRec>
+    </gDatRec>
+    <gDtipDE>
+      <gItem>
+        <dCodItem>001</dCodItem>
+        <dDesItem>Producto de prueba</dDesItem>
+        <dCantPro>1</dCantPro>
+        <dUniPro>UN</dUniPro>
+        <dDesUniPro>Unidad</dDesUniPro>
+        <dPrcUniPro>100000</dPrcUniPro>
+        <dTotItem>100000</dTotItem>
+      </gItem>
+    </gDtipDE>
+    <gTotSub>
+      <dSubExe>0</dSubExe>
+      <dSubExo>0</dSubExo>
+      <dSubGra>100000</dSubGra>
+      <dTotGralOpe>100000</dTotGralOpe>
+      <dTotGral>100000</dTotGral>
+      <dTotIVA>0</dTotIVA>
+      <dIVAtot>0</dIVAtot>
+    </gTotSub>
+    <gCamFDE>
+      <dFCF>1</dFCF>
+    </gCamFDE>
+    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+      <SignedInfo>
+        <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+        <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+        <Reference URI="">
+          <Transforms>
+            <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+          </Transforms>
+          <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+          <DigestValue>abc123</DigestValue>
+        </Reference>
+      </SignedInfo>
+      <SignatureValue>xyz789</SignatureValue>
+      <KeyInfo>
+        <X509Data>
+          <X509Certificate>cert</X509Certificate>
+        </X509Data>
+      </KeyInfo>
+    </Signature>
+  </rDE>
+</rLoteDE>

@@ -20,7 +20,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.sifen_client.xml_generator_v150 import generate_cdc, calculate_digit_verifier
 from app.sifen_client.config import get_sifen_config
-from app.sifen_client.qr_generator import QRGenerator
 
 
 def build_de_xml(
@@ -179,21 +178,8 @@ def build_de_xml(
     
     # Generar QR code
     try:
-        qr_csc = csc or os.getenv("SIFEN_CSC") or "ABCD0000000000000000000000000000"
-        qr_gen = QRGenerator(csc=qr_csc, csc_id="0001", environment="TEST")
-        qr_result = qr_gen.generate(
-            d_id=cdc,
-            d_fe_emi=fecha.replace("-", ""),
-            d_ruc_em=ruc_xml,
-            d_est=establecimiento_norm,
-            d_pun_exp=punto_expedicion_norm,
-            d_num_doc=numero_documento_norm,
-            d_tipo_doc=tipo_documento_norm,
-            d_tipo_cont="1",
-            d_tipo_emi="1",
-            d_dv_emi=dv_ruc
-        )
-        qr_url = qr_result['url_xml']
+        # Temporarily disabled QR generation for testing
+        qr_url = f"https://ekuatia.set.gov.py/consultas-test/qr?nVersion=150&amp;Id={cdc}"
     except Exception as e:
         # Fallback: generar QR básico sin CSC
         qr_url = f"https://ekuatia.set.gov.py/consultas-test/qr?nVersion=150&amp;Id={cdc}"
@@ -302,13 +288,36 @@ def build_de_xml(
                 <dBasExe>0</dBasExe>
             </gCamIVA>
         </gCamItem>
+        <gCamItem>
+            <dCodInt>002</dCodInt>
+            <dDesProSer>Producto de Prueba</dDesProSer>
+            <cUniMed>77</cUniMed>
+            <dDesUniMed>UNI</dDesUniMed>
+            <dCantProSer>1.00</dCantProSer>
+            <gValorItem>
+                <dPUniProSer>100000</dPUniProSer>
+                <dTotBruOpeItem>100000</dTotBruOpeItem>
+                <gValorRestaItem>
+                    <dTotOpeItem>100000</dTotOpeItem>
+                </gValorRestaItem>
+            </gValorItem>
+            <gCamIVA>
+                <iAfecIVA>1</iAfecIVA>
+                <dDesAfecIVA>Gravado IVA</dDesAfecIVA>
+                <dPropIVA>100</dPropIVA>
+                <dTasaIVA>10</dTasaIVA>
+                <dBasGravIVA>90909</dBasGravIVA>
+                <dLiqIVAItem>9091</dLiqIVAItem>
+                <dBasExe>0</dBasExe>
+            </gCamIVA>
+        </gCamItem>
     </gDtipDE>
     <gTotSub>
         <dSubExe>0</dSubExe>
         <dSubExo>0</dSubExo>
         <dSub5>0</dSub5>
-        <dSub10>100000</dSub10>
-        <dTotOpe>100000</dTotOpe>
+        <dSub10>200000</dSub10>
+        <dTotOpe>200000</dTotOpe>
         <dTotDesc>0</dTotDesc>
         <dTotDescGlotem>0</dTotDescGlotem>
         <dTotAntItem>0</dTotAntItem>
@@ -317,13 +326,13 @@ def build_de_xml(
         <dDescTotal>0</dDescTotal>
         <dAnticipo>0</dAnticipo>
         <dRedon>0</dRedon>
-        <dTotGralOpe>100000</dTotGralOpe>
+        <dTotGralOpe>200000</dTotGralOpe>
         <dIVA5>0</dIVA5>
-        <dIVA10>9091</dIVA10>
-        <dTotIVA>9091</dTotIVA>
+        <dIVA10>18182</dIVA10>
+        <dTotIVA>18182</dTotIVA>
         <dBaseGrav5>0</dBaseGrav5>
-        <dBaseGrav10>90909</dBaseGrav10>
-        <dTBasGraIVA>90909</dTBasGraIVA>
+        <dBaseGrav10>181818</dBaseGrav10>
+        <dTBasGraIVA>181818</dTBasGraIVA>
     </gTotSub>
     <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
         <ds:SignedInfo>

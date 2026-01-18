@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rDE xmlns="http://ekuatia.set.gov.py/sifen/xsd" Id="rDE_TEST_001">
+    <dVerFor>150</dVerFor>
+    <DE Id="018004554737010010000001202601171234567891">
+        <dDVId>001</dDVId>
+        <dFecFirma>2026-01-17T12:00:00</dFecFirma>
+        <dSisFact>1</dSisFact>
+        <gOpeDE>
+            <dTiOpe>1</dTiOpe>
+            <dDesTiOpe>Exportación</dDesTiOpe>
+            <dCodSeg>123456</dCodSeg>
+            <dInfoEmi>
+                <dPunExp>1</dPunExp>
+                <dNumDoc>001-001-000000001</dNumDoc>
+                <dFeIniT>2026-01-01</dFeIniT>
+                <dFeEmiDE>2026-01-17</dFeEmiDE>
+            </dInfoEmi>
+        </gOpeDE>
+        <gTimb>
+            <dNumTim>01-001-01-000000001</dNumTim>
+            <dEst>1</dEst>
+            <dPunExp>1</dPunExp>
+        </gTimb>
+        <gDatGralOpe>
+            <dFeIniT>2026-01-01</dFeIniT>
+            <dFeEmiDE>2026-01-17</dFeEmiDE>
+            <dFeCont>2026-01-17</dFeCont>
+            <gOpeRec>
+                <dTipTra>1</dTipTra>
+                <dCarExt>1</dCarExt>
+            </gOpeRec>
+        </gDatGralOpe>
+        <gEmis>
+            <dRucEm>4554737</dRucEm>
+            <dDVEmi>8</dDVEmi>
+            <iTiEmi>1</iTiEmi>
+            <dDesTipEmi>Contribuyente</dDesTipEmi>
+            <dNomEmi>EMPRESA DE PRUEBA SA</dNomEmi>
+            <dDirEmi>DIRECCION DE PRUEBA 123</dDirEmi>
+            <cDepEmi>12</cDepEmi>
+            <dDesDepEmi>ASUNCION</dDesDepEmi>
+            <cDisEmi>101</cDisEmi>
+            <dDesDisEmi>ASUNCION</dDesDisEmi>
+            <cPaisEmi>558</cPaisEmi>
+            <dDesPaisEmi>PY</dDesPaisEmi>
+            <cTelEmi>521123456</cTelEmi>
+            <dEmailEmi>test@example.com</dEmailEmi>
+        </gEmis>
+        <gDatRec>
+            <dRucRec>4567890</dRucRec>
+            <dDVRec>1</dDVRec>
+            <iTiRec>1</iTiRec>
+            <dDesTipRec>Contribuyente</dDesTipRec>
+            <dNomRec>CLIENTE DE PRUEBA</dNomRec>
+            <dDirRec>DIRECCION DEL CLIENTE 456</dDirRec>
+            <dNumCasRec>123</dNumCasRec>
+            <cDepRec>12</cDepRec>
+            <dDesDepRec>ASUNCION</dDesDepRec>
+            <cDisRec>101</cDisRec>
+            <dDesDisRec>ASUNCION</dDesDisRec>
+            <cPaisRec>558</cPaisRec>
+            <dDesPaisRec>PY</dDesPaisRec>
+            <cTelRec>521987654</cTelRec>
+            <dEmailRec>cliente@example.com</dEmailRec>
+        </gDatRec>
+        <gDtipDE>
+            <dAlti>1</dAlti>
+            <dDesAlti>Factura electrónica</dDesAlti>
+            <iNatDE>1</iNatDE>
+            <dDesNatDE>Venta de mercadería</dDesNatDE>
+            <dTipTra>1</dTipTra>
+            <dDesTipTra>Venta local</dDesTipTra>
+            <cClaDE>1</cClaDE>
+            <dDesClaDE>Factura</dDesClaDE>
+            <dTiemPE>1</dTiemPE>
+            <dDesTiemPE>30 días</dDesTiemPE>
+            <iEntDE>1</iEntDE>
+            <dDesEntDE>Entrega inmediata</dDesEntDE>
+        </gDtipDE>
+        <gCamDE>
+            <iCondOpe>1</iCondOpe>
+            <dDesCondOpe>Contado</dDesCondOpe>
+            <iTiOpe>1</iTiOpe>
+            <dDesTiOpe>Transferencia</dDesTiOpe>
+            <cPaCon>1</cPaCon>
+            <dDesPaCon>Guaraní</dDesPaCon>
+            <dMonTiOpe>100000</dMonTiOpe>
+            <dMonTiOpeCam>100000</dMonTiOpeCam>
+            <dTiCam>1</dTiCam>
+            <dMonTiOpeOtr>100000</dMonTiOpeOtr>
+        </gCamDE>
+        <gCamItem>
+            <dDenPro>PRODUCTO DE PRUEBA</dDenPro>
+            <cCodPro>PROD001</cCodPro>
+            <cUniMed>77</cUniMed>
+            <dDesUniMed>UNIDADES</dDesUniMed>
+            <dCantPro>10</dCantPro>
+            <dPrecUniPro>10000</dPrecUniPro>
+            <dTotItem>100000</dTotItem>
+        </gCamItem>
+        <gCamItem>
+            <dDenPro>SERVICIO DE PRUEBA</dDenPro>
+            <cCodPro>SERV001</cCodPro>
+            <cUniMed>49</cUniMed>
+            <dDesUniMed>SERVICIOS</dDesUniMed>
+            <dCantPro>1</dCantPro>
+            <dPrecUniPro>50000</dPrecUniPro>
+            <dTotItem>50000</dTotItem>
+        </gCamItem>
+        <gValItem>
+            <dTotGralOp>150000</dTotGralOp>
+            <dTotGralOpe>150000</dTotGralOpe>
+            <dTotIVA>0</dTotIVA>
+            <dTotGravOp>150000</dTotGravOp>
+            <dTotExeOp>0</dTotExeOp>
+            <dTotExoOp>0</dTotExoOp>
+            <dTotDesc>0</dTotDesc>
+            <dTotDescGlob>0</dTotDescGlob>
+            <dTotAntItem>0</dTotAntItem>
+            <dTotAnt>0</dTotAnt>
+            <dRedon>0</dRedon>
+            <dTiDeb>0</dTiDeb>
+            <dLiqTot>150000</dLiqTot>
+        </gValItem>
+    </DE>
+    <gCamFuFD>
+        <gOpeDE>
+            <iTipCont>1</iTipCont>
+        </gOpeDE>
+    </gCamFuFD>
+</rDE>

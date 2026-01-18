@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
-elementFormDefault="qualified"
-xmlns="http://ekuatia.set.gov.py/sifen/xsd"
-targetNamespace="http://ekuatia.set.gov.py/sifen/xsd">
+	xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+	elementFormDefault="qualified"
+	xmlns="http://ekuatia.set.gov.py/sifen/xsd"
+	targetNamespace="http://ekuatia.set.gov.py/sifen/xsd">
 
-<xs:import namespace="http://www.w3.org/2000/09/xmldsig#"
-schemaLocation="xmldsig-core-schema.xsd" />
+	<xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd" />
 
     <xs:include schemaLocation="Paises_v100.xsd"/>
     <xs:include schemaLocation="Departamentos_v141.xsd"/>
     <xs:include schemaLocation="Monedas_v150.xsd"/>
     <xs:include schemaLocation="Unidades_Medida_v141.xsd"/>
     <xs:include schemaLocation="DE_Types_v150.xsd"/>
+
 	<xs:complexType name="tgCOpeDE">
 		<xs:annotation>
 			<xs:documentation>

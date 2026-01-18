@@ -195,7 +195,7 @@ def main() -> None:
         "qrEnv": env_detected,
         "qrParams": qr_params,
         "modo": args.modo,
-        "mismatchWarning": mismatch,
+        "mismatchWarning": locals().get("mismatch", False),
     }
 
     print("\nJSON_RESULT:")

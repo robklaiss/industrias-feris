@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rLoteDE xmlns="http://ekuatia.set.gov.py/sifen/xsd">
+  <rDE xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd">
+    <dVerFor>150</dVerFor>
+    <DE Id="01800455473701001000000112026011711234567891">
+      <dDVId>1</dDVId>
+      <dFecFirma>2026-01-17T14:00:00</dFecFirma>
+      <dSisFact>1</dSisFact>
+      <gOpeDE>
+        <dCodSeg>1</dCodSeg>
+        <dCS>123456</dCS>
+      </gOpeDE>
+      <gTimb>
+        <dSTi>1</dSTi>
+        <dNumTim>1</dNumTim>
+        <dEst>1</dEst>
+        <dPunExp>1</dPunExp>
+      </gTimb>
+      <gDatGralOpe>
+        <dFeEmi>2026-01-17</dFeEmi>
+      </gDatGralOpe>
+      <gDtipDE>
+        <dTipTra>1</dTipTra>
+        <dTipEmi>1</dTipEmi>
+        <dCodEnt>1</dCodEnt>
+        <dCodSuc>1</dCodSuc>
+      </gDtipDE>
+      <gTotSub>
+        <dTotGralOp>100000</dTotGralOp>
+        <dTotGralOpe>100000</dTotGralOpe>
+        <dTotIVA>10000</dTotIVA>
+      </gTotSub>
+      <gEmis>
+        <dRucEm>4554737</dRucEm>
+        <dDVEmi>8</dDVEmi>
+      </gEmis>
+      <gCamFuFD>
+        <dDesTrib>10</dDesTrib>
+      </gCamFuFD>
+    </DE>
+  </rDE>
+</rLoteDE>

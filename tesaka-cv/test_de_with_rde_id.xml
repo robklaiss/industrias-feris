@@ -1,0 +1,8 @@
+✅ DE generado: artifacts/de_simple_01045547378001001000000112026011710508910830.xml
+   CDC: 01045547378001001000000112026011710508910830
+   Timbrado: 12345678
+   Documento: 001-001-0000001
+   Monto: 100,000 Gs
+
+Para enviar a SIFEN:
+  .venv/bin/python -m tools.send_sirecepde --env test --xml "artifacts/de_simple_01045547378001001000000112026011710508910830.xml" --dump-http

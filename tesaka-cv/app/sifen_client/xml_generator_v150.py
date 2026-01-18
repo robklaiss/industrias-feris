@@ -365,13 +365,36 @@ def create_rde_xml_v150(
                     <dBasExe>0</dBasExe>
                 </gCamIVA>
             </gCamItem>
+            <gCamItem>
+                <dCodInt>002</dCodInt>
+                <dDesProSer>Producto de Prueba</dDesProSer>
+                <cUniMed>99</cUniMed>
+                <dDesUniMed>UNI</dDesUniMed>
+                <dCantProSer>1.00</dCantProSer>
+                <gValorItem>
+                    <dPUniProSer>100000</dPUniProSer>
+                    <dTotBruOpeItem>100000</dTotBruOpeItem>
+                    <gValorRestaItem>
+                        <dTotOpeItem>100000</dTotOpeItem>
+                    </gValorRestaItem>
+                </gValorItem>
+                <gCamIVA>
+                    <iAfecIVA>1</iAfecIVA>
+                    <dDesAfecIVA>Gravado IVA</dDesAfecIVA>
+                    <dPropIVA>100</dPropIVA>
+                    <dTasaIVA>10</dTasaIVA>
+                    <dBasGravIVA>90909</dBasGravIVA>
+                    <dLiqIVAItem>9091</dLiqIVAItem>
+                    <dBasExe>0</dBasExe>
+                </gCamIVA>
+            </gCamItem>
         </gDtipDE>
         <gTotSub>
             <dSubExe>0</dSubExe>
             <dSubExo>0</dSubExo>
             <dSub5>0</dSub5>
-            <dSub10>100000</dSub10>
-            <dTotOpe>100000</dTotOpe>
+            <dSub10>200000</dSub10>
+            <dTotOpe>200000</dTotOpe>
             <dTotDesc>0</dTotDesc>
             <dTotDescGlotem>0</dTotDescGlotem>
             <dTotAntItem>0</dTotAntItem>
@@ -380,13 +403,13 @@ def create_rde_xml_v150(
             <dDescTotal>0</dDescTotal>
             <dAnticipo>0</dAnticipo>
             <dRedon>0</dRedon>
-            <dTotGralOpe>100000</dTotGralOpe>
+            <dTotGralOpe>200000</dTotGralOpe>
             <dIVA5>0</dIVA5>
-            <dIVA10>9091</dIVA10>
-            <dTotIVA>9091</dTotIVA>
+            <dIVA10>18182</dIVA10>
+            <dTotIVA>18182</dTotIVA>
             <dBaseGrav5>0</dBaseGrav5>
-            <dBaseGrav10>90909</dBaseGrav10>
-            <dTBasGraIVA>90909</dTBasGraIVA>
+            <dBaseGrav10>181818</dBaseGrav10>
+            <dTBasGraIVA>181818</dTBasGraIVA>
         </gTotSub>
     </DE>
 </rDE>"""

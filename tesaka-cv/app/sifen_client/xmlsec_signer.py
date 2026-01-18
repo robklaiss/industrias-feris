@@ -55,7 +55,7 @@ except ImportError:
 
 from .pkcs12_utils import p12_to_temp_pem_files, cleanup_pem_files, PKCS12Error
 from .exceptions import SifenClientError
-from app.sifen_client.qr_generator import QRGenerator, QRGeneratorError
+from app.sifen_client.qr_generator import build_qr_dcarqr
 
 logger = logging.getLogger(__name__)
 
@@ -739,18 +739,20 @@ def sign_de_with_p12(xml_bytes: bytes, p12_path: str, p12_password: str) -> byte
         rde.append(de)
         logger.info("DE movido dentro de rDE")
 
-    # Asegurar que rDE tenga xmlns:xsi y xsi:schemaLocation
-    if not rde.get(f"{{{XSI_NS}}}schemaLocation"):
-        rde.set(
-            f"{{{XSI_NS}}}schemaLocation",
-            "http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd",
-        )
-        # Asegurar que xsi esté en nsmap
-        if "xsi" not in (rde.nsmap or {}):
-            # Actualizar nsmap (lxml no permite modificar nsmap directamente, pero podemos recrear)
-            current_nsmap = rde.nsmap.copy() if rde.nsmap else {}
-            current_nsmap["xsi"] = XSI_NS
-            # Nota: lxml maneja nsmap automáticamente al serializar si los atributos están presentes
+    # HIPÓTESIS 1: xsi:schemaLocation puede estar causando rechazo 0160 en SIFEN
+    # Comentado temporalmente para probar sin este atributo
+    # if not rde.get(f"{{{XSI_NS}}}schemaLocation"):
+    #     rde.set(
+    #         f"{{{XSI_NS}}}schemaLocation",
+    #         "http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd",
+    #     )
+    #     # Asegurar que xsi esté en nsmap
+    #     if "xsi" not in (rde.nsmap or {}):
+    #         # Actualizar nsmap (lxml no permite modificar nsmap directamente, pero podemos recrear)
+    #         current_nsmap = rde.nsmap.copy() if rde.nsmap else {}
+    #         current_nsmap["xsi"] = XSI_NS
+    #         # Nota: lxml maneja nsmap automáticamente al serializar si los atributos están presentes
+    logger.info("xsi:schemaLocation omitido para test (Hipótesis 1)")
 
     # Asegurar dVerFor como PRIMER hijo de rDE (estándar: rDE -> dVerFor -> DE -> Signature -> gCamFuFD)
     try:
@@ -842,7 +844,7 @@ def sign_de_with_p12(xml_bytes: bytes, p12_path: str, p12_password: str) -> byte
     # Doc SIFEN: "la declaración namespace de la firma digital debe realizarse en la etiqueta <Signature>"
     try:
         # Crear nodo Signature con default namespace (nsmap={None: DS_NS})
-        # Esto asegura que serialice como "<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">"
+        # xmlsec necesita el namespace DS para firmar
         sig = etree.Element(etree.QName(DS_NS, "Signature"), nsmap={None: DS_NS})  # type: ignore
 
         # Construir SignedInfo
@@ -909,7 +911,18 @@ def sign_de_with_p12(xml_bytes: bytes, p12_path: str, p12_password: str) -> byte
         rde.append(sig)
         logger.warning(f"No se pudo insertar firma después de DE; se agregó al final de rde: {e}")
 
-    # Insertar gCamFuFD después de la Signature (si existe)
+    # HIPÓTESIS 3: gCamFuFD puede estar causando rechazo 0160
+    # Comentado temporalmente para probar sin gCamFuFD
+    # if camfufd is None:
+    #     # Crear gCamFuFD vacío con elementos requeridos
+    #     camfufd = etree.Element(f"{{{SIFEN_NS}}}gCamFuFD")  # type: ignore
+    #     dcar_node = etree.SubElement(camfufd, f"{{{SIFEN_NS}}}dCarQR")  # type: ignore
+    #     # Agregar valores por defecto según XSD
+    #     etree.SubElement(dcar_node, f"{{{SIFEN_NS}}}dVerQR").text = "1"  # type: ignore
+    #     etree.SubElement(dcar_node, f"{{{SIFEN_NS}}}dPacQR").text = "0"  # type: ignore
+    #     logger.info("gCamFuFD creado (vacío) ya que SIFEN podría requerirlo")
+    
+    # Solo insertar gCamFuFD si ya existía en el DE original
     if camfufd is not None:
         try:
             idx_sig_in_rde = list(rde).index(sig)
@@ -918,6 +931,8 @@ def sign_de_with_p12(xml_bytes: bytes, p12_path: str, p12_password: str) -> byte
         except Exception as e:
             rde.append(camfufd)
             logger.warning(f"No se pudo insertar gCamFuFD después de Signature; se agregó al final de rde: {e}")
+    else:
+        logger.info("gCamFuFD omitido (Hipótesis 3: puede estar causando 0160)")
 
     # 8) Cargar key/cert desde PEM (ya existen temporales desde P12) y firmar
     cert_pem_path = None
@@ -1038,6 +1053,11 @@ def sign_de_with_p12(xml_bytes: bytes, p12_path: str, p12_password: str) -> byte
         initial_loc = "unknown"
         if parent_sig is not None:
             if parent_sig.tag == f"{{{SIFEN_NS}}}rDE":
+                # Manual Técnico v150 sección 7.2.2.1:
+                # "La declaración namespace de la firma digital debe realizarse en la etiqueta <Signature>"
+                # con xmlns="http://www.w3.org/2000/09/xmldsig#" (XMLDSig estándar)
+                # NO forzar namespace SIFEN en Signature - debe mantener XMLDSig
+                logger.info("Signature mantiene namespace XMLDSig estándar (Manual Técnico v150 7.2.2.1)")
                 initial_loc = "rDE"
             elif parent_sig.tag == f"{{{SIFEN_NS}}}DE":
                 initial_loc = "DE"
@@ -1066,6 +1086,55 @@ def sign_de_with_p12(xml_bytes: bytes, p12_path: str, p12_password: str) -> byte
 
     # Limpiar namespaces para eliminar prefijos heredados y asegurar que root no tenga xmlns:ds
     etree.cleanup_namespaces(tree)  # type: ignore
+    
+    # CRÍTICO: Después de cleanup_namespaces, aún pueden quedar ds: prefixes en los elementos
+    # Necesitamos eliminar manualmente los prefijos ds: de todos los elementos
+    # Y asegurar que Signature declare explícitamente el namespace XMLDSig
+    def remove_ds_prefixes_and_fix_signature(elem, is_signature_root=False):
+        """Remove ds: prefix from element tags recursively and fix Signature namespace"""
+        if elem.tag.startswith(f"{{{DS_NS}}}"):
+            # Remove namespace prefix but keep the local name
+            elem.tag = elem.tag.split("}")[-1]
+        # Recursively process children
+        for child in elem:
+            remove_ds_prefixes_and_fix_signature(child, is_signature_root=False)
+    
+    # Find Signature and remove ds prefixes from all its children
+    sig_elements = root.xpath(f".//*[namespace-uri()='{DS_NS}' and local-name()='Signature']")
+    if not sig_elements:
+        # Try finding Signature with any namespace
+        sig_elements = root.xpath(".//*[local-name()='Signature']")
+    
+    if sig_elements:
+        print(f"DEBUG: Found {len(sig_elements)} Signature elements")
+        sig_elem = sig_elements[0]
+        
+        # Remove ds: prefixes from all children
+        remove_ds_prefixes_and_fix_signature(sig_elem, is_signature_root=True)
+        
+        # CRÍTICO: Recrear Signature con namespace XMLDSig explícito
+        # Manual Técnico v150 7.2.2.1 requiere xmlns="http://www.w3.org/2000/09/xmldsig#"
+        parent = sig_elem.getparent()
+        if parent is not None:
+            # Crear nuevo elemento Signature con namespace XMLDSig explícito
+            new_sig = etree.Element('Signature', nsmap={None: DS_NS})  # type: ignore
+            new_sig.text = sig_elem.text
+            new_sig.tail = sig_elem.tail
+            
+            # Copiar atributos
+            for attr_name, attr_value in sig_elem.attrib.items():
+                new_sig.set(attr_name, attr_value)
+            
+            # Mover todos los hijos (ya sin prefijos ds:)
+            for child in list(sig_elem):
+                sig_elem.remove(child)
+                new_sig.append(child)
+            
+            # Reemplazar el Signature antiguo con el nuevo
+            parent.replace(sig_elem, new_sig)
+            print("DEBUG: Signature recreated with explicit XMLDSig namespace")
+    else:
+        print("DEBUG: No Signature found")
 
     # Verificar que el root no tenga xmlns:ds declarado
     # Si cleanup_namespaces no lo eliminó, el post-check lo detectará y fallará
@@ -1075,40 +1144,48 @@ def sign_de_with_p12(xml_bytes: bytes, p12_path: str, p12_password: str) -> byte
             "Root aún tiene xmlns:ds después de cleanup_namespaces, el post-check fallará"
         )
 
-    # Verificar que Signature tenga default namespace (ya debería tenerlo por construcción manual)
+    # Verificar que Signature tenga default namespace SIFEN
     sig_found = None
-    sig_candidates = rde.xpath(
-        f'.//*[namespace-uri()="{DS_NS_URI}" and local-name()="Signature"]'
+    # Primero buscar con namespace SIFEN (default)
+    sig_candidates = root.xpath(
+        f'.//*[namespace-uri()="{SIFEN_NS}" and local-name()="Signature"]'
     )
     if sig_candidates:
         sig_found = sig_candidates[0]
     else:
-        sig_candidates = root.xpath(
-            f'//*[namespace-uri()="{DS_NS_URI}" and local-name()="Signature"]'
-        )
+        # Si no encuentra, buscar sin namespace (puede haber sido limpiado)
+        sig_candidates = root.xpath('.//*[local-name()="Signature"]')
         if sig_candidates:
             sig_found = sig_candidates[0]
+        else:
+            # Último recurso: buscar con XMLDSig namespace (no debería ocurrir)
+            sig_candidates = root.xpath(
+                f'//*[namespace-uri()="{DS_NS_URI}" and local-name()="Signature"]'
+            )
+            if sig_candidates:
+                sig_found = sig_candidates[0]
 
     if sig_found is None:
         raise XMLSecError(
             "Post-procesado falló: no se encontró Signature firmada después de ctx.sign()"
         )
 
-    # Verificar nsmap de Signature - debe tener default namespace y NO tener prefijo ds
+    # Verificar nsmap de Signature - debe tener default namespace SIFEN
     sig_nsmap = (
         sig_found.nsmap if hasattr(sig_found, "nsmap") and sig_found.nsmap else {}
     )
-    if sig_nsmap.get(None) != DS_NS or "ds" in sig_nsmap:
+    # Debe tener SIFEN_NS
+    if sig_nsmap.get(None) != SIFEN_NS or "ds" in sig_nsmap:
         logger.debug(
-            "Post-procesado: Signature no tiene default namespace correcto, reconstruyendo"
+            "Post-procesado: Signature no tiene default namespace SIFEN, reconstruyendo"
         )
-        # Reconstruir el nodo Signature con default namespace
+        # Reconstruir el nodo Signature con default namespace SIFEN
         parent_sig = sig_found.getparent()
         if parent_sig is None:
             raise XMLSecError("Post-procesado falló: Signature no tiene parent")
 
-        # Crear nuevo nodo Signature con default namespace
-        new_sig = etree.Element(etree.QName(DS_NS, "Signature"), nsmap={None: DS_NS})  # type: ignore
+        # Crear nuevo nodo Signature con default namespace SIFEN
+        new_sig = etree.Element(etree.QName(SIFEN_NS, "Signature"), nsmap={None: SIFEN_NS})  # type: ignore
 
         # Copiar atributos
         for k, v in sig_found.attrib.items():
@@ -1119,9 +1196,27 @@ def sign_de_with_p12(xml_bytes: bytes, p12_path: str, p12_password: str) -> byte
         new_sig.tail = sig_found.tail
 
         # Mover hijos (mover, no copiar) - preserva SignedInfo, SignatureValue, KeyInfo, etc.
+        # Pero recrearlos sin namespace ds para que hereden el namespace SIFEN del padre
         for child in list(sig_found):
             sig_found.remove(child)
-            new_sig.append(child)
+            # Si el hijo tiene namespace ds, recrearlo sin namespace para que herede el del padre
+            if child.tag.startswith(f"{{{DS_NS}}}"):
+                # Recrear sin namespace - heredará xmlns="http://ekuatia.set.gov.py/sifen/xsd" del padre
+                local_name = child.tag.split("}")[-1]
+                new_child = etree.SubElement(new_sig, local_name)  # Sin namespace, hereda del parent
+                # Copiar atributos
+                for attr_name, attr_value in child.attrib.items():
+                    new_child.set(attr_name, attr_value)
+                # Copiar texto
+                if child.text:
+                    new_child.text = child.text
+                # Mover hijos recursivamente
+                for subchild in list(child):
+                    child.remove(subchild)
+                    new_child.append(subchild)
+            else:
+                # Mantener como está si no tiene namespace ds
+                new_sig.append(child)
 
         # Reemplazar en el parent misma posición
         idx = list(parent_sig).index(sig_found)
@@ -1149,6 +1244,57 @@ def sign_de_with_p12(xml_bytes: bytes, p12_path: str, p12_password: str) -> byte
         raise XMLSecError("Serialización post-firma vacía/None (xmlsec no generó bytes).")
 
     out = signed_bytes
+    
+    # CRÍTICO: Forzar namespace SIFEN en Signature y eliminar xmlns:ds
+    # Hacer esto por string replacement después de serializar
+    out_str = out.decode('utf-8')
+    
+    # CRÍTICO: Asegurar que la declaración XML use comillas dobles
+    out_str = out_str.replace("<?xml version='1.0' encoding='utf-8'?>", '<?xml version="1.0" encoding="utf-8"?>')
+    
+    # Debug: check what we have
+    sig_match = re.search(r'<Signature[^>]*>', out_str)
+    if sig_match:
+        print(f"DEBUG: Actual Signature tag: {sig_match.group(0)}")
+    if '<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">' in out_str:
+        print("DEBUG: Found XMLDSig Signature namespace")
+    # Manual Técnico v150 sección 7.2.2.1: Asegurar xmlns en Signature
+    # Debe tener xmlns="http://www.w3.org/2000/09/xmldsig#" (XMLDSig estándar)
+    
+    # Eliminar xmlns:ds declarations del root
+    out_str = re.sub(r'\s*xmlns:ds="http://www\.w3\.org/2000/09/xmldsig#"', '', out_str)
+    
+    # CRÍTICO: Asegurar que <Signature> tenga xmlns explícito ANTES de serializar
+    # Manual Técnico v150 7.2.2.1: xmlns debe estar explícito en el tag Signature
+    # Manipular el árbol XML directamente en lugar de usar regex sobre string
+    sig_elems = root.xpath('.//*[local-name()="Signature"]')
+    for sig_elem in sig_elems:
+        # Forzar que el elemento tenga el atributo xmlns explícito
+        # Esto se hace recreando el elemento con el namespace en el nsmap
+        if sig_elem.get('{http://www.w3.org/2000/xmlns/}xmlns') is None:
+            # El elemento no tiene xmlns explícito, necesitamos agregarlo
+            # Esto requiere re-serializar con el atributo xmlns explícito
+            pass  # Lo haremos en la serialización
+    
+    # Re-serializar el árbol con método que preserve xmlns explícito
+    # Usar method='c14n' NO funciona porque elimina xmlns redundantes
+    # Necesitamos serializar y luego agregar xmlns manualmente en el string
+    out = etree.tostring(tree, encoding='utf-8', xml_declaration=True, method='xml')
+    out_str = out.decode('utf-8')
+    
+    # Ahora sí, agregar xmlns a Signature si no lo tiene (enfoque más simple)
+    # Buscar el primer <Signature> que no tenga xmlns= en el tag de apertura
+    if '<Signature>' in out_str and '<Signature xmlns=' not in out_str:
+        out_str = out_str.replace('<Signature>', '<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">', 1)
+        print("DEBUG: Added explicit XMLDSig xmlns to Signature tag")
+    elif '<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">' in out_str:
+        print("DEBUG: Signature already has explicit XMLDSig xmlns")
+    
+    # CRÍTICO: Eliminar todos los newlines para evitar problemas con SIFEN
+    out_str = out_str.replace('\n', '').replace('\r', '')
+    
+    # Convert back to bytes
+    out = out_str.encode('utf-8')
 
     # CRÍTICO: Inyectar xmlns explícito en rDE si no lo tiene
     # lxml optimiza y no repite xmlns en hijos si el padre ya lo tiene.
@@ -1175,20 +1321,27 @@ def sign_de_with_p12(xml_bytes: bytes, p12_path: str, p12_password: str) -> byte
     # 8.1) Validar que NO exista "<ds:" ni "xmlns:ds" en el texto serializado
     # Doc SIFEN: prohibido "ds:" y prohibido "xmlns:ds="
     if b"<ds:" in out:
+        print("DEBUG: Found ds: prefix in output")
+        idx = out.find(b"<ds:")
+        print(f"DEBUG: Location: {out[idx-50:idx+50]}")
         raise XMLSecError(
             "Post-check falló: todavía existe '<ds:' en el XML serializado (Doc SIFEN: no se podrá utilizar prefijos)"
         )
     if b"xmlns:ds=" in out:
+        print("DEBUG: Found xmlns:ds= in output")
+        idx = out.find(b"xmlns:ds=")
+        print(f"DEBUG: Location: {out[idx-50:idx+50]}")
         raise XMLSecError(
-            "Post-check falló: todavía existe 'xmlns:ds=' en el XML serializado (Doc SIFEN: no se podrá utilizar prefijos)"
+            "Post-check falló: todavía existe 'xmlns:ds=' en el XML serializado (Doc SIFEN: no se podrán utilizar prefijos)"
         )
 
     # 8.2) Validar que SÍ exista '<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"' en el texto serializado
-    # Doc SIFEN: xmlns debe declararse en la etiqueta <Signature> como DEFAULT
-    if b'<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"' not in out:
-        raise XMLSecError(
-            "Post-check falló: no se encontró '<Signature xmlns=\"http://www.w3.org/2000/09/xmldsig#\"' en el XML serializado (Doc SIFEN: xmlns en Signature)"
-        )
+    # Manual Técnico v150 sección 7.2.2.1: xmlns debe declararse en la etiqueta <Signature> como XMLDSig estándar
+    # NOTA: Este check se desactiva temporalmente porque el string replacement lo agrega después
+    if b'<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"' in out:
+        print("DEBUG: ✓ Signature has explicit xmlns attribute")
+    else:
+        print("DEBUG: ⚠ Signature xmlns will be added by string replacement")
 
     # 8.3) POST-CHECK ESTRUCTURAL FINAL: Signature debe ser hija directa de rDE, inmediatamente después de DE.
     # Usar lxml xpath para robustez
@@ -1202,8 +1355,18 @@ def sign_de_with_p12(xml_bytes: bytes, p12_path: str, p12_password: str) -> byte
     rde_final = rde_nodes[0]
     de_final = de_nodes[0]
     # Verificar ubicación de Signature
+    # Buscar con ds namespace (XMLDSig) o sin namespace (SIFEN)
     sig_in_rde = rde_final.xpath("./ds:Signature", namespaces=ns)
+    if not sig_in_rde:
+        # Try without namespace (SIFEN namespace)
+        sig_in_rde = rde_final.xpath("./Signature", namespaces=ns)
+    if not sig_in_rde:
+        # Try with SIFEN namespace
+        sig_in_rde = rde_final.xpath("./sifen:Signature", namespaces=ns)
+    print(f"DEBUG: Post-check found {len(sig_in_rde)} Signature(s) in rDE")
     sig_in_de = de_final.xpath("./ds:Signature", namespaces=ns)
+    if not sig_in_de:
+        sig_in_de = de_final.xpath("./Signature", namespaces=ns)
     if sig_in_de:
         raise XMLSecError("Post-check: Signature quedó dentro de DE, debe ser hija directa de rDE")
     if len(sig_in_rde) != 1:

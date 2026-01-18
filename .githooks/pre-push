@@ -1,0 +1,66 @@
+#!/bin/bash
+# Pre-push hook para ejecutar smoke test 0160 guardrail
+# Se ejecuta solo si hay cambios en archivos relacionados con SIFEN
+
+# Colores para output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${YELLOW}🔍 Ejecutando pre-push hook 0160 guardrail...${NC}"
+
+# Archivos que activan el smoke test
+SIFEN_FILES=(
+    "tesaka-cv/tools/send_sirecepde.py"
+    "tesaka-cv/app/sifen_client/soap_client.py"
+    "tesaka-cv/app/sifen_client/sifen_client.py"
+    "tesaka-cv/app/sifen/sifen_build_soap12_envelope.py"
+    "tesaka-cv/app/sifen/xmldsig_signer.py"
+    "tesaka-cv/app/sifen/sifen_xml_utils.py"
+)
+
+# Obtener archivos cambiados en este push
+CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git diff --name-only HEAD^ 2>/dev/null || echo "")
+
+# Verificar si algún archivo relevante cambió
+SHOULD_RUN=false
+for file in $CHANGED_FILES; do
+    for sifen_file in "${SIFEN_FILES[@]}"; do
+        if [[ "$file" == *"$sifen_file"* ]]; then
+            echo -e "${YELLOW}⚠️  Cambio detectado en: $file${NC}"
+            SHOULD_RUN=true
+            break 2
+        fi
+    done
+done
+
+# Si no hay cambios relevantes, salir exitosamente
+if [ "$SHOULD_RUN" = false ]; then
+    echo -e "${GREEN}✅ Sin cambios en archivos SIFEN, omitiendo smoke test${NC}"
+    exit 0
+fi
+
+# Buscar un XML firmado para probar
+XML_FILE=""
+if [ -f "tesaka-cv/artifacts/signed_lote.xml" ]; then
+    XML_FILE="tesaka-cv/artifacts/signed_lote.xml"
+elif [ -f "artifacts/signed_lote.xml" ]; then
+    XML_FILE="artifacts/signed_lote.xml"
+else
+    echo -e "${RED}❌ No se encontró archivo XML firmado para probar${NC}"
+    echo -e "${YELLOW}💡 Genera un XML firmado primero o coloca uno en artifacts/signed_lote.xml${NC}"
+    exit 1
+fi
+
+echo -e "${YELLOW}🚀 Ejecutando smoke test 0160 con: $XML_FILE${NC}"
+
+# Ejecutar smoke test
+if .venv/bin/python tools/smoke_send_0160_guardrail.py --xml "$XML_FILE" --dump-path artifacts/http_last_dump.txt; then
+    echo -e "${GREEN}✅ Smoke test 0160 pasado${NC}"
+    exit 0
+else
+    echo -e "${RED}❌ FAIL: 0160 guardrail — revisar dump en artifacts/http_last_dump.txt${NC}"
+    echo -e "${RED}❌ Push bloqueado. Corregir el error 0160 antes de continuar.${NC}"
+    exit 1
+fi

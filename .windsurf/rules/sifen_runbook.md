@@ -84,6 +84,35 @@ Si `exit=0`, el XML pasa XSD localmente; si SIFEN devuelve 0160 igual, investiga
   1) Extraer xDE (base64) -> _debug_xde.zip y descomprimir
   2) Chequear: rLoteDE tiene rDE directos (xDE=0) y el orden de hijos de rDE.
 
+## 2026-01-16 — Error 0160 puede persistir si se reutiliza xDE (ZIP base64) existente
+**Síntoma:** logs muestran "zip_base64 al inicio = presente" y "Usando ZIP existente…", pero cambios de namespace/wrapper/estructura no se reflejan en el envío real.
+**Causa:** el script reusa el ZIP base64 ya construido, por lo que cualquier corrección previa al build no impacta el payload final.
+**Fix anti-regresión:** agregar ENV `SIFEN_NO_REUSE_ZIP=1` (o flag CLI) para **ignorar zip_base64 existente** y **reconstruir el ZIP siempre desde `lote_xml_bytes`**.
+**Verificación:** extraer `xDE` desde `artifacts/soap_last_request_SENT.xml`, descomprimir `lote.xml`, y confirmar estructura esperada.
+
+
+## CLI: forzar wrapper SOAP (rEnvioLote vs rEnvioLoteDe)
+- **Problema**: el wrapper real del Body se decidía por WSDL guess / ENV (SIFEN_ENVIOLOTE_ROOT), pero el CLI no exponía `--wrapper`, causando `unrecognized arguments`.
+- **Fix**: agregar `--wrapper {rEnvioLote,rEnvioLoteDe}` al argparse.
+- **Conexión mínima y segura**: si `args.wrapper` está presente, setear `os.environ["SIFEN_ENVIOLOTE_ROOT"]=args.wrapper` antes de construir el payload.
+- **Resultado**: permite probar rápidamente rEnvioLote vs rEnvioLoteDe sin tocar código ni depender de artifacts de WSDL.
+
+
+## Learning (SIFEN 0160): revisar capa SOAP/HTTP antes de volver a tocar ZIP
+Aunque lote.xml esté correcto (solo rLoteDE con rDE directos, sin xDE, con dVerFor como primer hijo), SIFEN puede seguir devolviendo 0160 si el problema está en la capa SOAP/HTTP. Verificar siempre el request real en artifacts/soap_last_request_SENT.xml: debe coincidir con SOAP 1.2 (Envelope/Body) y el Content-Type esperado (a menudo application/soap+xml para SOAP 1.2). Si persiste 0160, priorizar revisión de Envelope, wrapper root y headers antes de volver a tocar el ZIP.
+
+## Learning: asegurar dump SOAP en cada run (independientemente del modo)
+**Problema**: artifacts/soap_raw_sent.xml y soap_raw_sent_nonamespace.xml eran dumps viejos (Dec 29) y no reflejan el envío actual. Los envíos recientes se registran en soap_raw_sent_lote_*.xml, pero algunas ramas (modo AS-IS / requests) pueden NO generar soap_last_request_SENT.xml aunque se pase --dump-http.
+**Acción anti-regresión**: asegurar que el código escriba SIEMPRE un dump del SOAP real posteado (y hash del ZIP base64) para cada run, con timestamp, independientemente del modo/branch.
+
+- **Síntoma**: `curl: option --key: blank argument` al probar WSDL con `--key "$SIFEN_KEY_PATH"`.
+
+## Learning: soap_raw_sent_lote_*.xml viene de DIAGNOSTICO_0301 (no de send_sirecepde.py)
+**Problema**: tools/send_sirecepde.py no escribe soap_raw_sent_lote_*.xml; esos artifacts están definidos por el flujo de DIAGNOSTICO_0301 y/o el SOAP client. No usar soap_raw_sent_lote_*.xml como "fuente de verdad" del envío sin ubicar el writer real y asegurarse de que se genera en el mismo run.
+**Acción**: centralizar el dump del SOAP request final (y el ZIP/base64 exacto) en un único lugar, con timestamp + SHA256, y que preflight_check_zip_lote.py consuma ese artifact único.
+**Problema**: artifacts/soap_raw_sent.xml y soap_raw_sent_nonamespace.xml eran dumps viejos (Dec 29) y no reflejan el envío actual. Los envíos recientes se registran en soap_raw_sent_lote_*.xml, pero algunas ramas (modo AS-IS / requests) pueden NO generar soap_last_request_SENT.xml aunque se pase --dump-http.
+**Acción anti-regresión**: asegurar que el código escriba SIEMPRE un dump del SOAP real posteado (y hash del ZIP base64) para cada run, con timestamp, independientemente del modo/branch.
+
 - **Síntoma**: `curl: option --key: blank argument` al probar WSDL con `--key "$SIFEN_KEY_PATH"`.
 - **Causa**: `SIFEN_KEY_PATH` vacío/no exportado (o ruta inválida), por lo que curl recibe `--key ""`.
 - **Fix**: verificar env vars con `printf %q`, y si solo hay .p12/.pfx convertir a PEM (cert.pem + key.pem) y exportar `SIFEN_CERT_PATH`/`SIFEN_KEY_PATH`.

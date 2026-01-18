@@ -91,3 +91,39 @@ dver = rde.find(f"{{{NS}}}dVerFor")
 print("dVerFor:", None if dver is None else dver.text)
 PY
 ```
+
+
+## [2026-01-17] Fix definitivo error 0160 + regla RUC sin DV + validaciones XML v150
+
+### 1) Bugfix 0160 (XML mal formado)
+- Se resolvió el error 0160 restaurando un commit estable de `tools/send_sirecepde.py` y re-aplicando correctamente el fix de "rebuilt ZIP".
+- Regla anti-regresión: ante cambios de empaquetado/zip/envelope, correr un "smoke send" que verifique que SIFEN ya no devuelve 0160.
+
+### 2) Bugfix 0160 en consulta_ruc por manejo de RUC
+- Causa: si el usuario provee un RUC sin DV (ej: "4554737"), el código NO debe truncar dígitos (no convertirlo en 6 dígitos).
+- Regla: aceptar ambos formatos:
+  - "4554737" (sin DV) → usar tal cual como RUC (sin DV)
+  - "4554737-8" (con DV) → extraer DV correctamente, y derivar RUC sin DV cuando el WS lo requiera.
+- Nota de dominio: guías DNIT/Marangatu y formularios indican "RUC sin dígito verificador (DV)" para estos trámites.
+
+### 3) Checklist XML correcto (v150)
+- `<rLoteDE>` sin prefijos
+- `<rDE>` sin prefijos
+- `<dVerFor>150</dVerFor>` como primer hijo de `<rDE>` 
+- `<Signature>` sin prefijos
+- Regla anti-regresión: añadir un test/validador que falle si aparece un namespace/prefijo inesperado en esos nodos.
+
+### 4) Estado actual esperado
+- `consulta_ruc` devuelve 0502 "RUC encontrado" cuando el request está bien.
+- Si `dRUCFactElec='N'`, el bloqueo ya no es técnico: requiere habilitar el RUC como facturador electrónico en Marangatu/SIFEN.
+
+### Cómo detectar rápido si es técnico vs administrativo
+- 0160 → casi siempre estructura XML/namespace/firma/envelope
+- 0502 + dRUCFactElec=N → habilitación administrativa pendiente
+
+
+
+### INVARIANTS (anti-regresión)
+- INVARIANT-0160-XML: si aparece 0160, revisar namespaces/prefijos y orden de `<dVerFor>` antes de tocar lógica de negocio.
+- INVARIANT-RUC: RUC sin DV nunca se trunca; si viene con DV, extraer DV; si viene sin DV, usar tal cual.
+- INVARIANT-V150-NO-PREFIX: `<rLoteDE>`, `<rDE>`, `<Signature>` deben ir sin prefijos.

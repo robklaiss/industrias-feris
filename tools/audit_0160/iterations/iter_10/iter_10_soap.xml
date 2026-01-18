@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap12:Envelope xmlns:soap12="http://www.w3.org/2003/05/soap-envelope" xmlns:xsd="http://ekuatia.set.gov.py/sifen/xsd">
+  <soap12:Header>
+    <xsd:Auth>
+      <xsd:dUsu>testuser</xsd:dUsu>
+      <xsd:dPass>testpass</xsd:dPass>
+    </xsd:Auth>
+  </soap12:Header>
+  <soap12:Body>
+    <xsd:rEnvioLote>
+      <xsd:dId>xDE_cff4af10-2069-4f4c-a412-8217a45a43f9</xsd:dId>
+      <xsd:xDE>UEsDBBQAAAAIAAZwMlxHQvxaKAAAACYAAAAIAAAAbG90ZS54bWyzsa/IzVEoSy0qzszPs1U31DNQV0jNS85PycxLt1UPDXHTtVC3twMAUEsBAhQDFAAAAAgABnAyXEdC/FooAAAAJgAAAAgAAAAAAAAAAAAAAKSBAAAAAGxvdGUueG1sUEsFBgAAAAABAAEANgAAAE4AAAAAAA==</xsd:xDE>
+    </xsd:rEnvioLote>
+  </soap12:Body>
+</soap12:Envelope>

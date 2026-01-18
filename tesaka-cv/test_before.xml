@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rLoteDE xmlns="http://ekuatia.set.gov.py/sifen/xsd">
+  <rDE Id="rDE123">
+    <dVerFor>150</dVerFor>
+    <DE Id="DE123">
+      <dVerFor>150</dVerFor>
+      <!-- Some DE content -->
+      <gCamFuFD>
+        <dCarQR>
+          <dVerQR>1</dVerQR>
+          <dPacQR>0</dPacQR>
+        </dCarQR>
+      </gCamFuFD>
+    </DE>
+    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+      <!-- Signature content -->
+    </Signature>
+  </rDE>
+</rLoteDE>

@@ -1,0 +1,169 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:DE xmlns:ns0="http://ekuatia.set.gov.py/sifen/xsd" xmlns:ns1="http://www.w3.org/2000/09/xmldsig#" Id="01045547378001001000000112026011811234567815">
+    <ns0:dDVId>0</ns0:dDVId>
+    <ns0:dFecFirma>2026-01-18T17:32:33</ns0:dFecFirma>
+    <ns0:dSisFact>1</ns0:dSisFact>
+    <ns0:gOpeDE>
+        <ns0:iTipEmi>1</ns0:iTipEmi>
+        <ns0:dDesTipEmi>Normal</ns0:dDesTipEmi>
+        <ns0:dCodSeg>000000001</ns0:dCodSeg>
+    </ns0:gOpeDE>
+    <ns0:gTimb>
+        <ns0:iTiDE>1</ns0:iTiDE>
+        <ns0:dDesTiDE>Factura electrónica</ns0:dDesTiDE>
+        <ns0:dNumTim>12345678</ns0:dNumTim>
+        <ns0:dEst>001</ns0:dEst>
+        <ns0:dPunExp>001</ns0:dPunExp>
+        <ns0:dNumDoc>0000001</ns0:dNumDoc>
+        <ns0:dFeIniT>2026-01-18</ns0:dFeIniT>
+    </ns0:gTimb>
+    <ns0:gDatGralOpe>
+        <ns0:dFeEmiDE>2026-01-18T17:32:33</ns0:dFeEmiDE>
+        <ns0:gOpeCom>
+            <ns0:iTipTra>1</ns0:iTipTra>
+            <ns0:dDesTipTra>Venta de mercadería</ns0:dDesTipTra>
+            <ns0:iTImp>1</ns0:iTImp>
+            <ns0:dDesTImp>IVA</ns0:dDesTImp>
+            <ns0:cMoneOpe>PYG</ns0:cMoneOpe>
+            <ns0:dDesMoneOpe>Guarani</ns0:dDesMoneOpe>
+        </ns0:gOpeCom>
+        <ns0:gEmis>
+            <ns0:dRucEm>4554737</ns0:dRucEm>
+            <ns0:dDVEmi>8</ns0:dDVEmi>
+            <ns0:iTipCont>1</ns0:iTipCont>
+            <ns0:dNomEmi>DE generado en ambiente de prueba - sin valor comercial ni fiscal</ns0:dNomEmi>
+            <ns0:dDirEmi>Asunción</ns0:dDirEmi>
+            <ns0:dNumCas>1234</ns0:dNumCas>
+            <ns0:cDepEmi>1</ns0:cDepEmi>
+            <ns0:dDesDepEmi>CAPITAL</ns0:dDesDepEmi>
+            <ns0:cCiuEmi>1</ns0:cCiuEmi>
+            <ns0:dDesCiuEmi>ASUNCION (DISTRITO)</ns0:dDesCiuEmi>
+            <ns0:dTelEmi>021123456</ns0:dTelEmi>
+            <ns0:dEmailE>test@example.com</ns0:dEmailE>
+            <ns0:gActEco>
+                <ns0:cActEco>64990</ns0:cActEco>
+                <ns0:dDesActEco>OTRAS ACTIVIDADES DE SERVICIOS FINANCIEROS, EXCEPTO LA FINANCIACIÓN DE PLANES DE SEGUROS Y DE PENSIONES</ns0:dDesActEco>
+            </ns0:gActEco>
+        </ns0:gEmis>
+        <ns0:gDatRec>
+            <ns0:iNatRec>1</ns0:iNatRec>
+            <ns0:iTiOpe>1</ns0:iTiOpe>
+            <ns0:cPaisRec>PRY</ns0:cPaisRec>
+            <ns0:dDesPaisRe>Paraguay</ns0:dDesPaisRe>
+            <ns0:iTiContRec>2</ns0:iTiContRec>
+            <ns0:dRucRec>80012345</ns0:dRucRec>
+            <ns0:dDVRec>0</ns0:dDVRec>
+            <ns0:dNomRec>Cliente de Prueba</ns0:dNomRec>
+            <ns0:dDirRec>Asunción</ns0:dDirRec>
+            <ns0:dNumCasRec>5678</ns0:dNumCasRec>
+            <ns0:cDepRec>1</ns0:cDepRec>
+            <ns0:dDesDepRec>CAPITAL</ns0:dDesDepRec>
+            <ns0:cCiuRec>1</ns0:cCiuRec>
+            <ns0:dDesCiuRec>ASUNCION (DISTRITO)</ns0:dDesCiuRec>
+        </ns0:gDatRec>
+    </ns0:gDatGralOpe>
+    <ns0:gDtipDE>
+        <ns0:gCamFE>
+            <ns0:iIndPres>1</ns0:iIndPres>
+            <ns0:dDesIndPres>Operación presencial</ns0:dDesIndPres>
+        </ns0:gCamFE>
+        <ns0:gCamCond>
+            <ns0:iCondOpe>1</ns0:iCondOpe>
+            <ns0:dDCondOpe>Contado</ns0:dDCondOpe>
+            <ns0:gPaConEIni>
+                <ns0:iTiPago>1</ns0:iTiPago>
+                <ns0:dDesTiPag>Efectivo</ns0:dDesTiPag>
+                <ns0:dMonTiPag>100000</ns0:dMonTiPag>
+                <ns0:cMoneTiPag>PYG</ns0:cMoneTiPag>
+                <ns0:dDMoneTiPag>Guarani</ns0:dDMoneTiPag>
+            </ns0:gPaConEIni>
+        </ns0:gCamCond>
+        <ns0:gCamItem>
+            <ns0:dCodInt>001</ns0:dCodInt>
+            <ns0:dDesProSer>Producto de Prueba</ns0:dDesProSer>
+            <ns0:cUniMed>77</ns0:cUniMed>
+            <ns0:dDesUniMed>UNI</ns0:dDesUniMed>
+            <ns0:dCantProSer>1.00</ns0:dCantProSer>
+            <ns0:gValorItem>
+                <ns0:dPUniProSer>100000</ns0:dPUniProSer>
+                <ns0:dTotBruOpeItem>100000</ns0:dTotBruOpeItem>
+                <ns0:gValorRestaItem>
+                    <ns0:dTotOpeItem>100000</ns0:dTotOpeItem>
+                </ns0:gValorRestaItem>
+            </ns0:gValorItem>
+            <ns0:gCamIVA>
+                <ns0:iAfecIVA>1</ns0:iAfecIVA>
+                <ns0:dDesAfecIVA>Gravado IVA</ns0:dDesAfecIVA>
+                <ns0:dPropIVA>100</ns0:dPropIVA>
+                <ns0:dTasaIVA>10</ns0:dTasaIVA>
+                <ns0:dBasGravIVA>90909</ns0:dBasGravIVA>
+                <ns0:dLiqIVAItem>9091</ns0:dLiqIVAItem>
+                <ns0:dBasExe>0</ns0:dBasExe>
+            </ns0:gCamIVA>
+        </ns0:gCamItem>
+        <ns0:gCamItem>
+            <ns0:dCodInt>002</ns0:dCodInt>
+            <ns0:dDesProSer>Producto de Prueba</ns0:dDesProSer>
+            <ns0:cUniMed>77</ns0:cUniMed>
+            <ns0:dDesUniMed>UNI</ns0:dDesUniMed>
+            <ns0:dCantProSer>1.00</ns0:dCantProSer>
+            <ns0:gValorItem>
+                <ns0:dPUniProSer>100000</ns0:dPUniProSer>
+                <ns0:dTotBruOpeItem>100000</ns0:dTotBruOpeItem>
+                <ns0:gValorRestaItem>
+                    <ns0:dTotOpeItem>100000</ns0:dTotOpeItem>
+                </ns0:gValorRestaItem>
+            </ns0:gValorItem>
+            <ns0:gCamIVA>
+                <ns0:iAfecIVA>1</ns0:iAfecIVA>
+                <ns0:dDesAfecIVA>Gravado IVA</ns0:dDesAfecIVA>
+                <ns0:dPropIVA>100</ns0:dPropIVA>
+                <ns0:dTasaIVA>10</ns0:dTasaIVA>
+                <ns0:dBasGravIVA>90909</ns0:dBasGravIVA>
+                <ns0:dLiqIVAItem>9091</ns0:dLiqIVAItem>
+                <ns0:dBasExe>0</ns0:dBasExe>
+            </ns0:gCamIVA>
+        </ns0:gCamItem>
+    </ns0:gDtipDE>
+    <ns0:gTotSub>
+        <ns0:dSubExe>0</ns0:dSubExe>
+        <ns0:dSubExo>0</ns0:dSubExo>
+        <ns0:dSub5>0</ns0:dSub5>
+        <ns0:dSub10>200000</ns0:dSub10>
+        <ns0:dTotOpe>200000</ns0:dTotOpe>
+        <ns0:dTotDesc>0</ns0:dTotDesc>
+        <ns0:dTotDescGlotem>0</ns0:dTotDescGlotem>
+        <ns0:dTotAntItem>0</ns0:dTotAntItem>
+        <ns0:dTotAnt>0</ns0:dTotAnt>
+        <ns0:dPorcDescTotal>0</ns0:dPorcDescTotal>
+        <ns0:dDescTotal>0</ns0:dDescTotal>
+        <ns0:dAnticipo>0</ns0:dAnticipo>
+        <ns0:dRedon>0</ns0:dRedon>
+        <ns0:dTotGralOpe>200000</ns0:dTotGralOpe>
+        <ns0:dIVA5>0</ns0:dIVA5>
+        <ns0:dIVA10>18182</ns0:dIVA10>
+        <ns0:dTotIVA>18182</ns0:dTotIVA>
+        <ns0:dBaseGrav5>0</ns0:dBaseGrav5>
+        <ns0:dBaseGrav10>181818</ns0:dBaseGrav10>
+        <ns0:dTBasGraIVA>181818</ns0:dTBasGraIVA>
+    </ns0:gTotSub>
+    <ns1:Signature>
+        <ns1:SignedInfo>
+            <ns1:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315" />
+            <ns1:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" />
+            <ns1:Reference URI="">
+                <ns1:Transforms>
+                    <ns1:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
+                </ns1:Transforms>
+                <ns1:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+                <ns1:DigestValue>dGhpcyBpcyBhIHRlc3QgZGlnZXN0IHZhbHVl</ns1:DigestValue>
+            </ns1:Reference>
+        </ns1:SignedInfo>
+        <ns1:SignatureValue>dGhpcyBpcyBhIHRlc3Qgc2lnbmF0dXJlIHZhbHVlIGZvciBwcnVlYmFzIG9ubHk=</ns1:SignatureValue>
+        <ns1:KeyInfo>
+            <ns1:X509Data>
+                <ns1:X509Certificate>LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVKakNDQWpLZ0F3SUJBZ0lEQW5CZ2txaGtpRzl3MEJBUXNGQUFEV1lqRU1NQW9HQTFVRUNoTURVbVZzWVcKd2dnRWlNQTBHQ1NxR1NJYjM=</ns1:X509Certificate>
+            </ns1:X509Data>
+        </ns1:KeyInfo>
+    </ns1:Signature>
+</ns0:DE>

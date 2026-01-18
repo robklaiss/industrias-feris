@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://ekuatia.set.gov.py/sifen/xsd"
+	xmlns="http://ekuatia.set.gov.py/sifen/xsd"
+	elementFormDefault="qualified">
+
+	<xs:include schemaLocation= "SIFEN_Types_v141.xsd" />
+
+	<xs:element name="rProtLoteDE">
+		<xs:annotation>
+			<xs:documentation>Protocolo de procesamiento del Lote de Documentos Electrónicos
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<!-- Número de protocolo de procesamiento -->
+				<xs:element name="dProt">
+					<xs:annotation>
+						<xs:documentation>Número de protocolo de procesamiento
+						</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:annotation>
+							<xs:documentation>Número de protocolo de procesamiento
+							</xs:documentation>
+						</xs:annotation>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="30"></xs:maxLength>
+							<xs:minLength value="1"></xs:minLength>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+
+				<!-- Fecha y hora de procesamiento -->
+				<xs:element name="dFecProc" type="fecUTC">
+					<xs:annotation>
+						<xs:documentation>Fecha y hora de procesamiento
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+
+				<!-- Código de estado del procesamiento -->
+				<xs:element name="dEstado">
+					<xs:annotation>
+						<xs:documentation>Código de estado del procesamiento
+						</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:annotation>
+							<xs:documentation>Código de estado del procesamiento
+							</xs:documentation>
+						</xs:annotation>
+						<xs:restriction base="xs:integer">
+							<xs:minInclusive value="0" />
+							<xs:maxInclusive value="2" />
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+
+				<!-- Mensaje de respuesta -->
+				<xs:element name="dMsgRes" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Mensaje de respuesta
+						</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:annotation>
+							<xs:documentation>Mensaje de respuesta
+							</xs:documentation>
+						</xs:annotation>
+						<xs:restriction base="xs:string" />
+					</xs:simpleType>
+				</xs:element>
+
+				<!-- Lista de DE procesados -->
+				<xs:element name="gResProcDE" minOccurs="0" maxOccurs="50">
+					<xs:annotation>
+						<xs:documentation>Grupo de respuesta de procesamiento de DE
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<!-- Código único del DE -->
+							<xs:element name="dCodDE" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Código único del DE
+									</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:annotation>
+										<xs:documentation>Código único del DE
+										</xs:documentation>
+									</xs:annotation>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="44"></xs:maxLength>
+										<xs:minLength value="1"></xs:minLength>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+
+							<!-- Número de CDC -->
+							<xs:element name="dCDC" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Número de CDC
+									</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:annotation>
+										<xs:documentation>Número de CDC
+										</xs:documentation>
+									</xs:annotation>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="44"></xs:maxLength>
+										<xs:minLength value="1"></xs:minLength>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+
+							<!-- Código de estado del DE -->
+							<xs:element name="dEstadoDE" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Código de estado del DE
+									</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:annotation>
+										<xs:documentation>Código de estado del DE
+										</xs:documentation>
+									</xs:annotation>
+									<xs:restriction base="xs:integer">
+										<xs:minInclusive value="0" />
+										<xs:maxInclusive value="2" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+
+							<!-- Mensaje de respuesta del DE -->
+							<xs:element name="dMsgResDE" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Mensaje de respuesta del DE
+									</xs:documentation>
+								</xs:annotation>
+								<xs:simpleType>
+									<xs:annotation>
+										<xs:documentation>Mensaje de respuesta del DE
+										</xs:documentation>
+									</xs:annotation>
+									<xs:restriction base="xs:string" />
+								</xs:simpleType>
+							</xs:element>
+
+							<!-- XML del DE aprobado -->
+							<xs:element name="dXMLDE" type="xs:base64Binary" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>XML del DE aprobado
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

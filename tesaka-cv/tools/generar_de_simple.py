@@ -119,7 +119,7 @@ def generar_de_xml(
     iva_10 = monto_total - base_gravada
     
     xml = f'''<?xml version='1.0' encoding='utf-8'?>
-<rDE xmlns="http://ekuatia.set.gov.py/sifen/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd">
+<rDE xmlns="http://ekuatia.set.gov.py/sifen/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd" Id="rDE{cdc}">
 <DE Id="{cdc}">
     <dDVId>{dv_id}</dDVId>
     <dFecFirma>{fecha_firma}</dFecFirma>
@@ -224,9 +224,6 @@ def generar_de_xml(
         <dTBasGraIVA>{base_gravada}</dTBasGraIVA>
         <dTotalGs>{monto_total}</dTotalGs>
     </gTotSub>
-    <gCamFuFD>
-        <dCarQR>https://ekuatia.set.gov.py/consultas/qr?nVersion=150&amp;Id={cdc}</dCarQR>
-    </gCamFuFD>
 </DE>
 </rDE>'''
     
