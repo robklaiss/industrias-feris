@@ -2596,31 +2596,30 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False) 
     #     del rde_elem.attrib[schema_attr]
     #     print("✅ Eliminado xsi:schemaLocation de rDE")
         
-        # CRÍTICO: Agregar xsi:schemaLocation si no está presente
-        XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
-        schema_attr = f"{{{XSI_NS}}}schemaLocation"
-        if schema_attr not in rde_elem.attrib:
-            # Para agregar xmlns:xsi, necesitamos reconstruir el elemento con nsmap
-            # ya que lxml no permite modificar nsmap después de creado
-            new_rde = etree.Element(rde_elem.tag, nsmap=rde_elem.nsmap)
-            if XSI_NS not in new_rde.nsmap:
-                new_rde.nsmap['xsi'] = XSI_NS
-            
-            # Copiar todos los atributos existentes
-            for k, v in rde_elem.attrib.items():
-                new_rde.set(k, v)
-            
-            # Agregar schemaLocation
-            new_rde.set(schema_attr, "http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd")
-            
-            # Copiar todos los hijos
-            for child in rde_elem:
-                new_rde.append(child)
-            
-            rde_elem = new_rde
-            print("✅ Agregado xsi:schemaLocation a rDE")
-        
-        # Verificar si rDE tiene el atributo Id
+        # CRÍTICO: NO agregar xsi:schemaLocation - causa error 0160
+        # XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
+        # schema_attr = f"{{{XSI_NS}}}schemaLocation"
+        # if schema_attr not in rde_elem.attrib:
+        #     # Para agregar xmlns:xsi, necesitamos reconstruir el elemento con nsmap
+        #     # ya que lxml no permite modificar nsmap después de creado
+        #     new_rde = etree.Element(rde_elem.tag, nsmap=rde_elem.nsmap)
+        #     if XSI_NS not in new_rde.nsmap:
+        #         new_rde.nsmap['xsi'] = XSI_NS
+        #     
+        #     # Copiar todos los atributos existentes
+        #     for k, v in rde_elem.attrib.items():
+        #         new_rde.set(k, v)
+        #     
+        #     # Agregar schemaLocation
+        #     new_rde.set(schema_attr, "http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd")
+        #     
+        #     # Copiar todos los hijos
+        #     for child in rde_elem:
+        #         new_rde.append(child)
+        #     
+        #     rde_elem = new_rde
+        # (PATCH) No agregar xsi:schemaLocation al rDE: puede causar 0160
+# Verificar si rDE tiene el atributo Id
         if 'Id' not in rde_elem.attrib:
             print("⚠️  rDE no tiene atributo Id, agregando...")
             # Buscar el DE interno para obtener su Id
@@ -2795,31 +2794,9 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False) 
         print(f"⚠️  No se pudo guardar artifact: {e}")
     
     # Construir lote.xml como bytes (sin lxml)
-    # CRÍTICO: Eliminar xmlns:xsi y xsi:schemaLocation del rDE (causan 0160)
-    # El rDE debe venir solo con el Id agregado, sin declaraciones xmlns
-    rde_str = rde_bytes.decode('utf-8')
-    # Eliminar xmlns:xsi="..." del start tag del rDE
-    rde_str = re.sub(r'\s+xmlns:xsi="[^"]*"', '', rde_str)
-    # Eliminar xsi:schemaLocation="..."
-    rde_str = re.sub(r'\s+xsi:schemaLocation="[^"]*"', '', rde_str)
-    # Eliminar cualquier xmlns declarado en rDE (debe usar default del lote)
-    # IMPORTANTE: Solo eliminar del start tag del rDE, no del Signature
-    # Buscar el start tag del rDE y remover xmlns de ahí
-    rde_str = re.sub(r'(<rDE[^>]*)\s+xmlns="[^"]*"', r'\1', rde_str)
-    rde_bytes = rde_str.encode('utf-8')
-    
-    # Reemplazar >\s+< con ><
-    rde_clean = re.sub(rb'>\s+<', b'><', rde_bytes)
-    
-    # Eliminar newlines y tabs al inicio
-    rde_clean = re.sub(rb'[\r\n\t]+', b'', rde_clean)
-    
-    if rde_clean != rde_bytes:
-        print("✅ Eliminado xmlns:xsi, schemaLocation y whitespace extra del rDE")
-        rde_bytes = rde_clean
-    
-    # Construir lote.xml exactamente como TIPS: SIN XML declaration y con default namespace
-    # SIN el extra <rLoteDE> que parece ser un artifact del dump
+# PASSTHROUGH REAL: NO tocar rDE firmado (NO remover xmlns, NO schemaLocation, NO whitespace)
+# Cualquier cambio puede romper namespaces heredados y/o digest de la firma.
+
     lote_xml_bytes = (
         b'<rLoteDE xmlns="' + SIFEN_NS.encode('utf-8') + b'">'
         + rde_bytes +
@@ -2878,26 +2855,33 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False) 
 
 def build_xde_zip_bytes_from_lote_xml(lote_xml: str) -> bytes:
     """
-    Construye el ZIP xDE exactamente como TIPS lo requiere.
-    
-    Args:
-        lote_xml: XML del lote (sin XML declaration)
-        
-    Returns:
-        Bytes del ZIP con xml_file.xml y el wrapper específico
+    Construye un ZIP (bytes) con un único archivo: lote.xml
+
+    lote.xml debe contener:
+      <?xml version="1.0" encoding="UTF-8"?>
+      <rLoteDE xmlns="http://ekuatia.set.gov.py/sifen/xsd"> ... </rLoteDE>
+
+    Nota: evitamos redeclarar el default xmlns en el primer <rDE>, porque hereda de <rLoteDE>.
     """
+    import io
+    import re
+    import zipfile
+
     # 1) quitar XML declaration si ya venía
     lote_xml = re.sub(r'^\s*<\?xml[^>]*\?>\s*', '', lote_xml, flags=re.S)
 
-    # 2) FORZAR doble wrapper EXACTO de TIPS
-    #    Resultado: <?xml?><rLoteDE>[<rLoteDE xmlns=...>...</rLoteDE>]</rLoteDE>
-    xml_payload = '<?xml version="1.0" encoding="UTF-8"?>' + '<rLoteDE>' + lote_xml + '</rLoteDE>'
+    # 2) evitar redeclarar default xmlns en el primer <rDE ...>
+    #    (soporta comillas dobles o simples)
+    lote_xml = re.sub(r'(<rDE\b[^>]*?)\s+xmlns=(["\']).*?\2', r'\1', lote_xml, count=1)
 
-    # 3) CLONAR TIPS: nombre interno xml_file.xml + ZIP_STORED (sin compresión)
-    import io
+    # 3) armar payload final
+    xml_payload = '<?xml version="1.0" encoding="UTF-8"?>' + lote_xml
+
+    # 4) ZIP_STORED (sin compresión) con entry lote.xml
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_STORED) as z:
         z.writestr("xml_file.xml", xml_payload.encode("utf-8"))
+
     return buf.getvalue()
 
 
@@ -3389,8 +3373,8 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
                 zip_files = zf.namelist()
                 print(f"🧪 DEBUG [build_lote_base64] ZIP files: {zip_files}")
                 
-                if "xml_file.xml" in zip_files:
-                    lote_content = zf.read("xml_file.xml")
+                if "lote.xml" in zip_files:
+                    lote_content = zf.read("lote.xml")
                     # El contenido incluye wrapper: <?xml?><rLoteDE><rLoteDE>...</rLoteDE></rLoteDE>
                     # Necesitamos extraer el rLoteDE interno para verificar
                     import re
@@ -4252,52 +4236,36 @@ def build_and_sign_lote_from_xml(
     # El lote ahora tiene rDE firmado directamente dentro de rLoteDE (NO xDE)
     lote_final = lote_root
     
+    # 9.5. CRÍTICO: Eliminar xsi:schemaLocation de todos los rDE antes de serializar
+    for rde_elem in lote_final.xpath('//rDE', namespaces={'s': SIFEN_NS}):
+        if '{http://www.w3.org/2001/XMLSchema-instance}schemaLocation' in rde_elem.attrib:
+            del rde_elem.attrib['{http://www.w3.org/2001/XMLSchema-instance}schemaLocation']
+            print("✅ Eliminado xsi:schemaLocation del rDE")
+        # También eliminar xmlns:xsi si está presente
+        if '{http://www.w3.org/2001/XMLSchema-instance}' in rde_elem.nsmap:
+            # No se puede eliminar del nsmap fácilmente, pero se limpiará en la serialización
+            pass
+    
     # 10. Serializar lote final UNA SOLA VEZ (pretty_print=False para preservar exactamente)
     print("\n🔧 DEBUG: Serializando lote final UNA SOLA VEZ")
     try:
-        # IMPORTANTE: NO volver a parsear/reconstruir después de firmar
-        # Serializar directamente el árbol que ya contiene el rDE firmado
-        lote_xml_bytes = etree.tostring(
-            lote_final,
-            encoding="utf-8",
-            xml_declaration=True,
-            pretty_print=False  # CRÍTICO: pretty_print altera espacios y rompe firma
-        )
-        print(f"DEBUG: XML generado: {lote_xml_bytes[:100]}")
-        print(f"✅ Lote serializado: {len(lote_xml_bytes)} bytes")
+        # (PATCH) No agregar xsi:schemaLocation al DE (evitar 0160)
+        lote_xml_str = etree.tostring(lote_final, encoding='utf-8', pretty_print=False, xml_declaration=False, standalone=False).decode('utf-8')
         
-        # CRÍTICO: Forzar xmlns SIFEN en Signature después de serializar
-        # El XML puede venir con xmlns XMLDSig y SIFEN lo rechaza
-        if False:
-            # Serializar con lxml para asegurar orden consistente
-            lote_xml_str = lote_xml_bytes.decode('utf-8')
-            
-            # CRÍTICO: NO forzar xmlns SIFEN en Signature - debe permanecer en XMLDSig
-            # lote_xml_str = re.sub(
-            #     r'<Signature xmlns="http://www\.w3\.org/2000/09/xmldsig#">',
-            #     r'<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd">',
-            #     lote_xml_str
-            # )
-            # También reemplazar si no tiene xmlns
-            # lote_xml_str = re.sub(
-            #     r'<Signature(?=>)',
-            #     r'<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd"',
-            #     lote_xml_str
-            # )
-            
-            # CRÍTICO: Agregar xsi:schemaLocation al DE si no lo tiene
-            # SIFEN requiere esto para validar correctamente
-            if 'xsi:schemaLocation=' not in lote_xml_str:
-                # Buscar el tag <DE Id=...> y agregar schemaLocation
-                lote_xml_str = re.sub(
-                    r'(<DE\s+Id="[^"]+")>',
-                    r'\1 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd">',
-                    lote_xml_str
-                )
-                print("✅ Agregado xsi:schemaLocation a DE")
-            
-            lote_xml_bytes = lote_xml_str.encode('utf-8')
-            print("✅ Forzado xmlns SIFEN en Signature después de serializar")
+        # CRÍTICO: Eliminar xsi:schemaLocation del XML final (causa 0160)
+        # Usar múltiples patrones para asegurar que se elimine
+        patterns_to_remove = [
+            r'\s*xsi:schemaLocation="[^"]*"',  # Con espacio antes
+            r'xsi:schemaLocation="[^"]*"\s*',   # Con espacio después
+            r'\s+xmlns:xsi="[^"]*"',          # xmlns:xsi con espacio antes
+            r'xmlns:xsi="[^"]*"\s*',          # xmlns:xsi con espacio después
+        ]
+        
+        for pattern in patterns_to_remove:
+            lote_xml_str = re.sub(pattern, '', lote_xml_str, flags=re.MULTILINE | re.DOTALL)
+        
+        lote_xml_bytes = lote_xml_str.encode('utf-8')
+        # Mantener el log original si existía (no es obligatorio)
     except Exception as e:
         raise RuntimeError(f"Error al serializar lote final: {e}")
     
@@ -4426,7 +4394,17 @@ def build_and_sign_lote_from_xml(
     # 14. Comprimir en ZIP - usando helper que coincide exactamente con TIPS
     print("\n📦 Comprimiendo lote en ZIP...")
     try:
-        zip_bytes = build_xde_zip_bytes_from_lote_xml(lote_xml_bytes.decode('utf-8'))
+        # FIX: Remove XML declaration to avoid double declaration
+        # lote_xml_bytes contains: <?xml?><rLoteDE>...content...</rLoteDE>
+        # build_xde_zip_bytes_from_lote_xml will add its own XML declaration
+        lote_xml_str = lote_xml_bytes.decode('utf-8')
+        # Remove XML declaration if present
+        lote_xml_str = re.sub(r'^\s*<\?xml[^>]*\?>\s*', '', lote_xml_str, flags=re.S)
+        # (CANDADO) evitar redeclarar default xmlns en el primer <rDE> (hereda de <rLoteDE>)
+        lote_xml_str = re.sub(r'(<rDE\\b[^>]*?)\\s+xmlns="[^"]*"', r'\\1', lote_xml_str, count=1)
+
+        
+        zip_bytes = build_xde_zip_bytes_from_lote_xml(lote_xml_str)
         print(f"✅ ZIP creado: {len(zip_bytes)} bytes (STORED, xml_file.xml)")
     except Exception as e:
         raise RuntimeError(f"Error al crear ZIP: {e}")
@@ -4442,14 +4420,14 @@ def build_and_sign_lote_from_xml(
     try:
         with zipfile.ZipFile(BytesIO(zip_bytes), "r") as zf:
             namelist = zf.namelist()
-            if "xml_file.xml" not in namelist:
+            if "lote.xml" not in namelist:
                 raise RuntimeError("ZIP no contiene 'xml_file.xml'")
             
             # Validar que contiene SOLO xml_file.xml
             if len(namelist) != 1:
                 raise RuntimeError(f"ZIP debe contener solo 'xml_file.xml', encontrado: {namelist}")
             
-            lote_xml_from_zip = zf.read("xml_file.xml")
+            lote_xml_from_zip = zf.read("lote.xml")
             
             # DEBUG: Comparar XML del ZIP con el XML original
             # El XML del ZIP incluye wrapper, necesitamos extraer el contenido interno
@@ -4787,13 +4765,21 @@ def preflight_soap_request(
         try:
             with zipfile.ZipFile(BytesIO(zip_bytes), "r") as zf:
                 namelist = zf.namelist()
-                if "xml_file.xml" not in namelist:
-                    error_msg = f"ZIP no contiene 'xml_file.xml'. Archivos encontrados: {namelist}"
+                # Normalizar (por safety: bytes/quotes/whitespace)
+                namelist_norm = [
+                    (n.decode('utf-8','replace') if isinstance(n, (bytes, bytearray)) else str(n))
+                    for n in namelist
+                ]
+                namelist_norm = [n.strip().strip("'\"") for n in namelist_norm]
+                namelist_norm = [n.replace("\ufeff", "").translate({0x200B: None, 0x200C: None, 0x200D: None}) for n in namelist_norm]
+
+                if "xml_file.xml" not in namelist_norm:
+                    error_msg = f"ZIP no contiene 'xml_file.xml'. Archivos encontrados: {namelist_norm}"
                     artifacts_dir.joinpath("preflight_zip.zip").write_bytes(zip_bytes)
                     return (False, error_msg)
                 
-                if len(namelist) != 1:
-                    error_msg = f"ZIP debe contener solo 'xml_file.xml', encontrado: {namelist}"
+                if set(namelist_norm) != {"xml_file.xml"}:
+                    error_msg = f"ZIP debe contener solo 'xml_file.xml', encontrado: {namelist_norm}"
                     artifacts_dir.joinpath("preflight_zip.zip").write_bytes(zip_bytes)
                     return (False, error_msg)
                 
