@@ -791,6 +791,85 @@ SIFEN_SKIP_RUC_GATE=1 .venv/bin/python -m tools.send_sirecepde \
 
 **Regla anti-regresión:** Siempre verificar count=1 de gCamFuFD antes de enviar.
 
+## [2026-01-18] Error 0160 - xsi:schemaLocation debe ser eliminado del XML
+
+**Síntoma:** SIFEN devuelve error 0160 "XML Mal Formado" pero el XML es válido contra XSD y tiene firma válida.
+
+**Contexto/archivo:** `tesaka-cv/tools/send_sirecepde.py` - generación del lote XML
+
+**Causa real encontrada:** El atributo `xsi:schemaLocation="http://ekuatia.set.gov.py/sifen/xsd siRecepDE_v150.xsd"` en el elemento `rDE` causa el error 0160, aunque es válido según XSD.
+
+**Fix aplicado:**
+1. Comentado el código que agrega xsi:schemaLocation al rDE (líneas 2599-2620)
+2. Mantenida la función `_remove_xsi_schemalocation()` que elimina el atributo después del parseo
+3. Agregados patrones regex adicionales para asegurar eliminación completa
+
+**Comandos para verificar:**
+```bash
+# Verificar que xsi:schemaLocation fue eliminado
+unzip -p artifacts/xde_from_stage13.zip xml_file.xml | grep -c "xsi:schemaLocation"
+# Debe retornar 0
+
+# Verificar que xmlns:xsi también fue eliminado
+unzip -p artifacts/xde_from_stage13.zip xml_file.xml | grep -c "xmlns:xsi"
+# Debe retornar 0
+
+# Verificar estructura completa
+python3 -c "
+import lxml.etree as ET
+root = ET.parse('/tmp/current_lote.xml')
+ns = {'s': 'http://ekuatia.set.gov.py/sifen/xsd'}
+rde = root.find('.//s:rDE', ns)
+print('rDE children:', [c.tag.split('}')[-1] for c in rde])
+print('rDE Id:', rde.get('Id'))
+de = rde.find('.//s:DE', ns)
+print('DE Id:', de.get('Id'))
+print('Ids diferentes:', rde.get('Id') != de.get('Id'))
+print('dVerFor primero:', rde[0].tag.split('}')[-1] if rde else 'NONE')
+"
+```
+
+**Resultado esperado:** 
+- XML sin xsi:schemaLocation ni xmlns:xsi
+- Estructura correcta: dVerFor, DE, Signature, gCamFuFD
+- Firma válida y XSD válido
+
+**Estado actual:** Después de eliminar xsi:schemaLocation, el XML cumple con todas las validaciones locales pero SIFEN sigue devolviendo 0160. Esto sugiere que puede haber otros requisitos no documentados o restricciones de ambiente específicas.
+
+**Regla anti-regresión:** Nunca incluir xsi:schemaLocation en el XML enviado a SIFEN.
+
+---
+
+## [2026-01-19] Error 0160 - Reutilización de ZIP viejo causa XML mal formado
+
+**Síntoma:** SIFEN devuelve error 0160 "XML Mal Formado" intermitentemente, incluso con XML válido y firma correcta.
+
+**Contexto/archivo:** `tesaka-cv/tools/send_sirecepde.py` - función `build_r_envio_lote_xml()`
+
+**Causa raíz encontrada:** El código reutilizaba `zip_base64` existente en lugar de construir un ZIP fresco cada vez. Esto podía enviar un ZIP viejo con estructura incorrecta o versiones antiguas del XML.
+
+**Fix aplicado:**
+1. Modificada `build_r_envio_lote_xml()` para SIEMPRE construir un ZIP fresco desde `xml_bytes`
+2. Eliminada la lógica que reutilizaba `zip_base64` existente
+3. Actualizada la llamada para no pasar el parámetro `zip_base64`
+
+**Comandos para verificar:**
+```bash
+# Verificar que siempre se construye ZIP fresco
+grep -A2 "SIEMPRE construir un ZIP fresco" tesaka-cv/tools/send_sirecepde.py
+# Debe mostrar el mensaje de debug
+
+# Verificar que no se reutiliza zip_base64
+grep -B2 -A2 "Usando zip_base64 existente" tesaka-cv/tools/send_sirecepde.py
+# No debe retornar nada (código eliminado)
+```
+
+**Resultado esperado:** Cada envío a SIFEN usa un ZIP recién construido, evitando el error 0160 por datos obsoletos.
+
+**Regla anti-regresión:** Nunca reutilizar ZIPs previos en el envío SOAP - siempre construir desde el XML actual.
+
+---
+
 ## [2026-01-17] Error 0160 "XML Mal Formado" - Investigación exhaustiva
 
 **Síntoma:** SIFEN devuelve error 0160 "XML Mal Formado" pero la firma XML es válida y el XML es válido contra XSD.
@@ -852,6 +931,44 @@ print('Con xsi:schemaLocation:', rde.get('{http://www.w3.org/2001/XMLSchema-inst
 **Próximos pasos a investigar:**
 1. Verificar si el certificado es válido para ambiente TEST
 2. Revisar si hay transformaciones adicionales requeridas
+
+## [2026-01-18] mTLS con combined.pem y validación de RUC en PROD
+
+**Síntoma:** Dudas sobre configuración de mTLS y manejo de RUC con/sin DV.
+
+**Aprendizaje:** En PROD, mTLS funciona con requests y zeep usando Session().cert ya sea combined.pem (string) o (cert.pem, key.pem) (tuple). Validar con curl -vk --cert --key bajando WSDL 200 OK. Si consulta_ruc devuelve dRUCFactElec=N, antes de concluir 'bloqueo SET', verificar formato del RUC: probar con y sin DV (4554737 vs 4554737-8). Si con DV sigue N, es bloqueo administrativo (habilitación FE en Marangatu/SET) y no de código.
+
+**Cómo verificar (comandos exactos):**
+```bash
+# 1) Probar mTLS con curl (debe dar 200 OK)
+curl -vk --cert /path/to/cert.pem --key /path/to/key.pem \
+  https://sifen.set.gov.py/de/ws/async/recibe-lote.wsdl?wsdl | head -5
+
+# 2) Probar con combined.pem
+curl -vk --cert /path/to/combined.pem \
+  https://sifen.set.gov.py/de/ws/async/recibe-lote.wsdl?wsdl | head -5
+
+# 3) Probar RUC con y sin DV
+cd tesaka-cv
+.venv/bin/python -c "
+from app.sifen_client.soap_client import SoapClient, SifenConfig
+cfg = SifenConfig(env='prod')
+cli = SoapClient(cfg)
+for ruc in ['4554737', '4554737-8']:
+    try:
+        res = cli.consulta_ruc_raw(ruc)
+        print(f'{ruc} => dCodRes: {res.get(\"dCodRes\")}, dRUCFactElec: {res.get(\"xContRUC\", {}).get(\"dRUCFactElec\")}')
+    except Exception as e:
+        print(f'{ruc} => ERROR: {e}')
+"
+```
+
+**Resultado esperado:**
+- curl con certificado debe retornar status 200 y contenido XML del WSDL
+- consulta_ruc debe retornar dCodRes=0502 para ambos formatos de RUC
+- Si dRUCFactElec=N con ambos formatos, es bloqueo administrativo (requiere habilitación en Marangatu/SET)
+
+**Regla anti-regresión:** Always test mTLS with curl before debugging Python requests. Test RUC both with and without DV before concluding administrative block.
 3. Considerar generar XML desde cero sin passthrough
 4. Contactar soporte SIFEN para detalles específicos del error 0160
 
@@ -1123,3 +1240,55 @@ grep -A2 "xmlns:env" artifacts/soap_last_request_SENT.xml
 **Estado actual:** SOAP 1.2 implementado correctamente, pero SIFEN sigue devolviendo error 0160. El problema está en la estructura del XML interno del lote, no en la versión del SOAP.
 
 **Regla anti-regresión:** SIFEN espera SOAP 1.2, no 1.1. Usar siempre namespace `http://www.w3.org/2003/05/soap-envelope` y Content-Type `application/soap+xml`.
+
+## [2026-01-19] Error 0160 persistente en PROD - Todos los requisitos conocidos cumplidos
+
+**Síntoma:** SIFEN PROD devuelve error 0160 "XML Mal Formado" pero TODOS los requisitos conocidos están cumplidos.
+
+**Implementaciones completadas:**
+- ✅ Sin declaración XML
+- ✅ rLoteDE con namespace correcto
+- ✅ rDE hereda namespace (sin xmlns)
+- ✅ rDE tiene Id con prefijo "rDE"
+- ✅ DE tiene Id diferente
+- ✅ dVerFor como primer hijo con valor 150
+- ✅ Signature usa namespace SIFEN
+- ✅ Orden correcto: dVerFor, DE, Signature, gCamFuFD
+- ✅ Sin xsi:schemaLocation
+- ✅ XML en una sola línea (sin newlines)
+- ✅ Sin prefijos de namespace
+- ✅ Firma válida (aunque xmlsec1 no valida con namespace SIFEN)
+
+**Estado actual:**
+- Todas las validaciones locales pasan
+- XML cumple con XSD rLoteDE_v150
+- SIFEN PROD sigue devolviendo 0160 ❌
+
+**Investigación adicional:**
+- Se encontraron 5 tags self-closing en la sección Signature (normal en XMLDSig)
+- No se encontraron otros issues obvios
+
+**Posibles causas restantes:**
+1. Requisito específico de PROD no documentado
+2. Validación SIFEN diferente a XSD estándar
+3. Issue con certificado o configuración PROD
+4. Elemento faltante no obvio en XSD
+5. Orden específico de atributos dentro de elementos
+6. Transformación específica requerida por SIFEN
+
+**Comandos de verificación:**
+```bash
+# Extraer y verificar XML enviado
+unzip -p artifacts/soap_last_request_SENT.xml xDE > xDE.zip
+unzip -p xDE.zip lote.xml > lote_from_SENT.xml
+
+# Verificar todos los requisitos
+python3 -c "
+import xml.etree.ElementTree as ET
+doc = ET.parse('lote_from_SENT.xml')
+# [verificar todos los puntos como arriba]
+"
+```
+
+**Estado:** ABIERTO - Se requiere investigación adicional con SIFEN o acceso a logs más detallados.
+

@@ -26,6 +26,9 @@ from dataclasses import dataclass
 import re
 from io import BytesIO
 
+# Constante para el nombre del archivo XML dentro del ZIP (debe coincidir con send_sirecepde.py)
+ZIP_INTERNAL_FILENAME = "lote.xml"
+
 try:
     # Import lxml.etree - el linter puede no reconocerlo, pero funciona correctamente
     import lxml.etree as etree  # noqa: F401
@@ -301,13 +304,13 @@ def _verify_double_wrapper_tips(payload_xml: str, artifacts_dir: Path):
             f.write(zip_bytes)
         print(f"✅ DEBUG DOUBLE WRAPPER: ZIP guardado: {xde_zip_path}")
         
-        # Extraer xml_file.xml
+        # Extraer lote.xml
         with zipfile.ZipFile(BytesIO(zip_bytes), "r") as zf:
-            if "xml_file.xml" not in zf.namelist():
-                print("❌ DEBUG DOUBLE WRAPPER: No se encontró xml_file.xml en el ZIP")
+            if ZIP_INTERNAL_FILENAME not in zf.namelist():
+                print(f"❌ DEBUG DOUBLE WRAPPER: No se encontró {ZIP_INTERNAL_FILENAME} en el ZIP")
                 return
             
-            xml_content = zf.read("xml_file.xml").decode("utf-8")
+            xml_content = zf.read(ZIP_INTERNAL_FILENAME).decode("utf-8")
         
         # Verificar doble wrapper
         # Buscar patrón: <?xml ...?><rLoteDE><rLoteDE xmlns=...
@@ -632,91 +635,41 @@ class SoapClient:
         """Crea el transporte Zeep con requests.Session configurada para mTLS."""
         session = Session()
 
-        # Usar certificado combinado PEM (combined.pem)
-        # Prioridad: 1) SIFEN_CERT_PATH env var, 2) config.cert_path
-        combined_cert_path = os.getenv("SIFEN_CERT_PATH") or getattr(self.config, "cert_path", None)
-        
-        if combined_cert_path:
-            cert_path = Path(combined_cert_path)
-            if not cert_path.exists():
-                raise SifenClientError(f"Certificado combinado PEM no encontrado: {cert_path}")
-            
-            # Usar el archivo combinado PEM para mTLS
-            session.cert = str(cert_path)
-            logger.info(f"Usando mTLS via PEM combinado: {cert_path.name}")
+        # Usar certificado mTLS (PEM)
+        # Soporta:
+        #   - combined.pem (cert+key en un solo archivo) via SIFEN_CERT_PATH
+        #   - cert/key separados via SIFEN_CERT_PATH + SIFEN_KEY_PATH
+        cert_path = os.getenv('SIFEN_CERT_PATH') or getattr(self.config, 'cert_path', None)
+        key_path  = os.getenv('SIFEN_KEY_PATH')  or getattr(self.config, 'key_path', None)
+
+        if cert_path:
+            cert_path_p = Path(str(cert_path))
+            if not cert_path_p.exists():
+                raise SifenClientError(f'Certificado PEM no encontrado: {cert_path_p}')
+
+            if key_path:
+                key_path_p = Path(str(key_path))
+                if not key_path_p.exists():
+                    raise SifenClientError(f'Key PEM no encontrada: {key_path_p}')
+                session.cert = (str(cert_path_p), str(key_path_p))
+                logger.info(f'Usando mTLS via cert/key: {cert_path_p.name} + {key_path_p.name}')
+            else:
+                session.cert = str(cert_path_p)
+                logger.info(f'Usando mTLS via combined PEM: {cert_path_p.name}')
         else:
             raise SifenClientError(
-                "mTLS es requerido para SIFEN. Falta SIFEN_CERT_PATH (debe apuntar al combined.pem)",
+                "mTLS es requerido para SIFEN. Configurá SIFEN_CERT_PATH (combined.pem) o SIFEN_CERT_PATH+SIFEN_KEY_PATH (cert/key separados).",
                 result={
-                    "ok": False,
-                    "error": "Missing SIFEN_CERT_PATH for combined PEM certificate",
-                    "endpoint": None,
-                    "http_status": None,
-                    "raw_xml": None,
-                    "dCodRes": None,
-                    "dMsgRes": None,
+                    'ok': False,
+                    'error': 'Missing SIFEN_CERT_PATH for mTLS certificate',
+                    'endpoint': None,
+                    'http_status': None,
+                    'raw_xml': None,
+                    'dCodRes': None,
+                    'dMsgRes': None,
                 }
             )
 
-        # SSL verify
-        session.verify = True
-        ca_bundle_path = getattr(self.config, "ca_bundle_path", None)
-        if ca_bundle_path:
-            session.verify = ca_bundle_path
-
-        # Forzar TLS 1.2 mínimo (y permitir TLS 1.3)
-        # Crear SSLContext con versión mínima TLS 1.2
-        ssl_context = ssl.create_default_context()
-        # Python 3.7+ soporta minimum_version
-        if hasattr(ssl, 'TLSVersion'):
-            ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
-            ssl_context.maximum_version = ssl.TLSVersion.MAXIMUM_SUPPORTED
-        # Deshabilitar TLS 1.0 y 1.1 explícitamente (compatible con Python 3.6+)
-        ssl_context.options |= ssl.OP_NO_TLSv1
-        ssl_context.options |= ssl.OP_NO_TLSv1_1
-        
-        # Crear HTTPAdapter con SSLContext personalizado
-        # HTTPAdapter.init_poolmanager acepta ssl_context en urllib3 1.26+
-        adapter = HTTPAdapter()
-        try:
-            # Configurar el SSLContext en el adapter
-            adapter.init_poolmanager(
-                connections=10,
-                maxsize=10,
-                block=False,
-                ssl_context=ssl_context,
-            )
-        except TypeError:
-            # urllib3 < 1.26 no acepta ssl_context directamente
-            # Intentar método alternativo
-            try:
-                import urllib3.poolmanager
-                # Crear poolmanager con ssl_context
-                adapter.poolmanager = urllib3.poolmanager.PoolManager(
-                    ssl_context=ssl_context,
-                )
-            except Exception as e:
-                logger.warning(
-                    f"No se pudo configurar SSLContext personalizado: {e}. "
-                    f"Usando configuración por defecto (puede no forzar TLS 1.2 mínimo)."
-                )
-        except Exception as e:
-            logger.warning(
-                f"No se pudo configurar SSLContext personalizado: {e}. "
-                f"Usando configuración por defecto (puede no forzar TLS 1.2 mínimo)."
-            )
-        
-        session.mount("https://", adapter)
-        
-        # Log de configuración TLS (sin secretos)
-        if hasattr(ssl, 'TLSVersion') and hasattr(ssl_context, 'minimum_version'):
-            tls_min_version = ssl_context.minimum_version.name if hasattr(ssl_context.minimum_version, 'name') else str(ssl_context.minimum_version)
-        else:
-            tls_min_version = "TLSv1.2 (via OP_NO_TLSv1/OP_NO_TLSv1_1)"
-        logger.info(f"TLS configurado: mínimo={tls_min_version}, máximo=MAXIMUM_SUPPORTED")
-
-        # Transport está disponible porque ZEEP_AVAILABLE es True (verificado en __init__)
-        # timeout puede ser int o tuple (connect, read) según requests/zeep
         return Transport(  # type: ignore[arg-type]
             session=session,
             timeout=(self.connect_timeout, self.read_timeout),  # type: ignore[arg-type]
@@ -1541,6 +1494,29 @@ class SoapClient:
                     except Exception:
                         pass
                 raise SifenClientError(f"Error al consultar DE por CDC: {e}") from e
+        
+        # AUTO_EXTRACT_DRUCFactElec: extraer dRUCFactElec del XML crudo
+        
+        if result.get('raw_xml') and result.get('dRUCFactElec') in (None, ''):
+        
+            try:
+        
+                import xml.etree.ElementTree as ET
+        
+                root = ET.fromstring(result['raw_xml'])
+        
+                ns = {'s': 'http://ekuatia.set.gov.py/sifen/xsd'}
+        
+                el = root.find('.//s:dRUCFactElec', ns)
+        
+                if el is not None and el.text is not None:
+        
+                    result['dRUCFactElec'] = el.text.strip()
+        
+            except Exception as e:
+        
+                result.setdefault('warnings', []).append(f"Could not parse dRUCFactElec: {e}")
+
         
         return result
 

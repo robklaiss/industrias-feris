@@ -4,6 +4,19 @@ Diagnostic script for SIFEN access issues.
 Tests RUC status and WSDL availability, protecting against BIG-IP logout/hangup.
 """
 
+def _resolve_requests_cert():
+    """
+    requests cert:
+      - "combined.pem"  -> string
+      - ("cert.pem","key.pem") -> tuple
+    """
+    import os
+    cert_path = os.getenv("SIFEN_CERT_PATH")
+    key_path  = os.getenv("SIFEN_KEY_PATH")
+    if cert_path and key_path:
+        return (cert_path, key_path)
+    return cert_path
+
 import os
 ENV = (os.getenv('SIFEN_ENV') or 'test').strip().lower()
 if ENV not in ('test', 'prod'):
@@ -12,6 +25,7 @@ BASE_HOST = 'sifen.set.gov.py' if ENV == 'prod' else 'sifen-test.set.gov.py'
 import sys
 import json
 import requests
+import ssl
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, Optional
@@ -116,11 +130,23 @@ def test_wsdl_availability() -> Dict[str, Any]:
     }
     
     try:
+        # Get certificate configuration directly from environment
+        cert_path = os.getenv("SIFEN_CERT_PATH")
+        
+        if not cert_path:
+            result["error"] = "SIFEN_CERT_PATH environment variable not set"
+            print(f"✗ Error: {result['error']}")
+            return result
+        
+        # Create a session with proper SSL configuration
+        session = requests.Session()
+        
         # Make request without following redirects
-        resp = requests.get(
+        resp = session.get(
             result["url"],
             allow_redirects=False,
-            timeout=20
+            timeout=20,
+            cert=_resolve_requests_cert()# tuple(cert,key) o combined.pem
         )
         
         result["status_code"] = resp.status_code
@@ -162,6 +188,10 @@ def test_wsdl_availability() -> Dict[str, Any]:
     except Exception as e:
         result["error"] = str(e)
         print(f"✗ Error: {e}")
+    finally:
+        # Clean up session
+        if 'session' in locals():
+            session.close()
     
     return result
 

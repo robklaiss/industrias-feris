@@ -28,6 +28,9 @@ import base64
 import zipfile
 import json
 import traceback
+
+# Constante para el nombre del archivo XML dentro del ZIP
+ZIP_INTERNAL_FILENAME = "lote.xml"
 import hashlib
 
 # Agregar el directorio padre al path para imports
@@ -336,8 +339,7 @@ def _remove_redundant_xsi_declarations(xml_bytes: bytes) -> bytes:
     Remove redundant xmlns:xsi declarations from child elements.
     Only rDE should have xmlns:xsi declaration according to SIFEN KB.
     """
-    import re
-    xml_str = xml_bytes.decode('utf-8', errors='replace')
+    # import re  # usa el import global (evita UnboundLocalError)    xml_str = xml_bytes.decode('utf-8', errors='replace')
     # Remove xmlns:xsi from all elements except rDE
     # First, find and preserve the rDE declaration
     rde_match = re.search(r'<rDE[^>]*xmlns:xsi="[^"]*"[^>]*>', xml_str)
@@ -354,8 +356,7 @@ def _remove_xsi_schemalocation_from_bytes(xml_bytes: bytes) -> bytes:
     Remove xsi:schemaLocation from XML bytes using regex.
     This is needed because xsi:schemaLocation causes error 0160 in SIFEN.
     """
-    import re
-    # Remove xsi:schemaLocation attribute (including newlines)
+    # import re  # usa el import global (evita UnboundLocalError)    # Remove xsi:schemaLocation attribute (including newlines)
     xml_str = xml_bytes.decode('utf-8', errors='replace')
     xml_str = re.sub(r'\s*xsi:schemaLocation="[^"]*"', '', xml_str, flags=re.DOTALL)
     return xml_str.encode('utf-8')
@@ -424,7 +425,7 @@ def build_lote_xml(rde_element: etree._Element) -> bytes:
     rLoteDE.append(rde_element)
     
     # Serializar una vez
-    lote_bytes = etree.tostring(rLoteDE, encoding="utf-8", xml_declaration=True, pretty_print=False)
+    lote_bytes = etree.tostring(rLoteDE, encoding="utf-8", xml_declaration=False, pretty_print=False)
     
     # POST-PROCESAMIENTO: Asegurar que Signature tenga xmlns explícito
     # SIFEN requiere que Signature declare explícitamente el namespace SIFEN
@@ -437,8 +438,7 @@ def build_lote_xml(rde_element: etree._Element) -> bytes:
         print(f"DEBUG: Signature tag found: {sig_tag}")
     
     # Usar regex para encontrar <Signature> y agregar xmlns si no lo tiene
-    import re
-    # Buscar cualquier <Signature> que no tenga xmlns
+    # import re  # usa el import global (evita UnboundLocalError)    # Buscar cualquier <Signature> que no tenga xmlns
     sig_pattern = re.compile(r'<Signature(?![^>]*xmlns)')
     if sig_pattern.search(lote_str):
         lote_str = sig_pattern.sub('<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"', lote_str)
@@ -545,10 +545,9 @@ def _assert_signature_xmldsig_namespace(zip_base64: str, artifacts_dir: Path):
     zip_buffer = io.BytesIO(zip_bytes)
     
     with zipfile.ZipFile(zip_buffer, 'r') as zf:
-        lote_xml = zf.read('xml_file.xml')
+        lote_xml = zf.read(ZIP_INTERNAL_FILENAME)
         # Extraer el XML interno del wrapper
-        import re
-        wrapper_match = re.search(rb'<rLoteDE>(.*)</rLoteDE>', lote_xml, re.DOTALL)
+        # import re  # usa el import global (evita UnboundLocalError)        wrapper_match = re.search(rb'<rLoteDE>(.*)</rLoteDE>', lote_xml, re.DOTALL)
         if wrapper_match:
             lote_xml = wrapper_match.group(1)
     
@@ -787,8 +786,7 @@ def _save_0301_diagnostic_package(
     import json
     import hashlib
     import base64
-    import re
-    
+    # import re  # usa el import global (evita UnboundLocalError)    
     try:
         artifacts_dir.mkdir(parents=True, exist_ok=True)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -1620,8 +1618,8 @@ def normalize_rde_before_sign(xml_bytes: bytes) -> bytes:
 
 def reorder_signature_before_gcamfufd(xml_bytes: bytes) -> bytes:
     """
-    Reordena los hijos de <rDE> para que gCamFuFD venga ANTES de Signature.
-    Orden esperado: dVerFor, DE, gCamFuFD, Signature
+    Reordena los hijos de <rDE> para que Signature venga ANTES de gCamFuFD.
+    Orden esperado: dVerFor, DE, Signature, gCamFuFD
     NO rompe la firma: solo cambia el orden de hermanos.
     """
     root = etree.fromstring(xml_bytes)
@@ -1644,22 +1642,22 @@ def reorder_signature_before_gcamfufd(xml_bytes: bytes) -> bytes:
     sig_idx = children.index(sig)
     gcam_idx = children.index(gcam)
 
-    # Si gCamFuFD ya está antes de Signature, no hacer nada
-    if gcam_idx < sig_idx:
+    # Si Signature ya está antes de gCamFuFD, no hacer nada
+    if sig_idx < gcam_idx:
         return xml_bytes
 
-    # Si gCamFuFD está después de Signature, mover gCamFuFD antes que Signature
-    # Remover gCamFuFD y reinsertarlo justo antes de Signature
-    # Verificar que gcam realmente es hijo de rde antes de remover
-    if gcam in list(rde):
-        rde.remove(gcam)
+    # Si Signature está después de gCamFuFD, mover Signature antes que gCamFuFD
+    # Remover Signature y reinsertarlo justo antes de gCamFuFD
+    # Verificar que sig realmente es hijo de rde antes de remover
+    if sig in list(rde):
+        rde.remove(sig)
     else:
-        gcam_parent = gcam.getparent()
-        if gcam_parent is None:
-            raise RuntimeError("gCamFuFD no tiene parent (bug de árbol XML)")
-        gcam_parent.remove(gcam)
-    # Insertar gCamFuFD en la posición de Signature
-    rde.insert(sig_idx, gcam)
+        sig_parent = sig.getparent()
+        if sig_parent is None:
+            raise RuntimeError("Signature no tiene parent (bug de árbol XML)")
+        sig_parent.remove(sig)
+    # Insertar Signature en la posición de gCamFuFD
+    rde.insert(gcam_idx, sig)
 
     return etree.tostring(root, xml_declaration=True, encoding="utf-8")
 
@@ -1750,7 +1748,7 @@ def sign_and_normalize_rde_inside_xml(xml_bytes: bytes, cert_path: str, cert_pas
     Garantiza que el rDE dentro del XML esté firmado y normalizado.
     
     - Encuentra el rDE (puede ser root o anidado en rEnviDe)
-    - Si no tiene ds:Signature como hijo directo, lo firma
+    - Si no tiene Signature como hijo directo (XMLDSig o SIFEN ns), lo firma
     - Reordena hijos de rDE a: dVerFor, DE, Signature, gCamFuFD (si existe)
     - Devuelve el XML completo con rDE firmado y normalizado
     
@@ -2048,8 +2046,7 @@ def _sanitize_unbound_prefixes(xml_text: str) -> str:
     Returns:
         XML con prefijos declarados
     """
-    import re
-    
+    # import re  # usa el import global (evita UnboundLocalError)    
     # Buscar el tag de apertura del elemento raíz (puede ser rDE o cualquier otro)
     root_match = re.search(r'<([A-Za-z_][\w\-\.]*:)?([A-Za-z_][\w\-\.]*)\b([^>]*)>', xml_text)
     if not root_match:
@@ -2419,8 +2416,7 @@ def _extract_rde_bytes_passthrough(xml_bytes: bytes) -> bytes:
     start = xml_bytes.find(b"<rDE")
     if start == -1:
         # Buscar con prefijo de namespace
-        import re
-        m = re.search(rb'<[A-Za-z_][\w\-.]*:rDE\b', xml_bytes)
+        # import re  # usa el import global (evita UnboundLocalError)        m = re.search(rb'<[A-Za-z_][\w\-.]*:rDE\b', xml_bytes)
         if m:
             start = m.start()
         else:
@@ -2481,8 +2477,7 @@ def _ensure_rde_has_id_attr(rde_bytes: bytes) -> bytes:
     Usa el formato "rDE" + DE_Id para garantizar que sean diferentes.
     No usa lxml (no reserializa).
     """
-    import re
-    
+    # import re  # usa el import global (evita UnboundLocalError)    
     # Si ya tiene Id, no tocar
     head = rde_bytes[:300]
     if re.search(br"<rDE\b[^>]*\bId\s*=", head):
@@ -2562,8 +2557,7 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False) 
     """
     import hashlib
     import time
-    import re
-    
+    # import re  # usa el import global (evita UnboundLocalError)    
     print("🔐 PASSTHROUGH: Detectado XML ya firmado, extrayendo rDE bytes sin re-serializar")
     
     # DEBUG: Verificar xmlns en Signature del XML de entrada
@@ -2758,7 +2752,7 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False) 
         if '<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd">' in rde_str:
             print("✅ Signature ya tiene xmlns SIFEN")
         else:
-            if False:
+            if True:
                 # Reemplazar Signature con namespace XMLDSig por Signature con namespace SIFEN
                 # Buscar <Signature xmlns="http://www.w3.org/2000/09/xmldsig#"> o <Signature> sin xmlns
                 rde_str = re.sub(r'<Signature(?: xmlns="http://www\.w3\.org/2000/09/xmldsig#")?>', 
@@ -2807,20 +2801,24 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False) 
     # CRÍTICO: Forzar xmlns SIFEN en Signature después de construir
     # El XML puede venir con xmlns XMLDSig y SIFEN lo rechaza
     lote_xml_str = lote_xml_bytes.decode('utf-8')
-    # CRÍTICO: NO forzar más - dejar XMLDSig estándar
-    # lote_xml_str = re.sub(
-    #     r'<Signature xmlns="http://www\.w3\.org/2000/09/xmldsig#">',
-    #     r'<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd">',
-    #     lote_xml_str
-    # )
+    # CRÍTICO: Forzar xmlns SIFEN en Signature
+    lote_xml_str = re.sub(
+        r'<Signature xmlns="http://www\.w3\.org/2000/09/xmldsig#">',
+        r'<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd">',
+        lote_xml_str
+    )
     # También reemplazar si no tiene xmlns
-    # lote_xml_str = re.sub(
-    #     r'<Signature(?=>)',
-    #     r'<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd"',
-    #     lote_xml_str
-    # )
-    # lote_xml_bytes = lote_xml_str.encode('utf-8')
-    # print("✅ Forzado xmlns SIFEN en Signature (passthrough)")
+    lote_xml_str = re.sub(
+        r'<Signature(?=>)',
+        r'<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd"',
+        lote_xml_str
+    )
+    lote_xml_bytes = lote_xml_str.encode('utf-8')
+    print("✅ Forzado xmlns SIFEN en Signature (passthrough)")
+    
+    # CORREGIR ORDEN: Signature debe ir antes de gCamFuFD según solución definitiva
+    lote_xml_bytes = reorder_signature_before_gcamfufd(lote_xml_bytes)
+    print("✅ Reordenado: Signature antes de gCamFuFD")
     
     # CRÍTICO: NO cambiar namespace de Signature (debe mantener SIFEN para validación de SIFEN)
     # Signature ya viene con el namespace correcto desde la firma
@@ -2864,8 +2862,7 @@ def build_xde_zip_bytes_from_lote_xml(lote_xml: str) -> bytes:
     Nota: evitamos redeclarar el default xmlns en el primer <rDE>, porque hereda de <rLoteDE>.
     """
     import io
-    import re
-    import zipfile
+    # import re  # usa el import global (evita UnboundLocalError)    import zipfile
 
     # 1) quitar XML declaration si ya venía
     lote_xml = re.sub(r'^\s*<\?xml[^>]*\?>\s*', '', lote_xml, flags=re.S)
@@ -2875,12 +2872,13 @@ def build_xde_zip_bytes_from_lote_xml(lote_xml: str) -> bytes:
     lote_xml = re.sub(r'(<rDE\b[^>]*?)\s+xmlns=(["\']).*?\2', r'\1', lote_xml, count=1)
 
     # 3) armar payload final
-    xml_payload = '<?xml version="1.0" encoding="UTF-8"?>' + lote_xml
+    # CRÍTICO: NO agregar XML declaration - SIFEN rechaza con error 0160
+    xml_payload = lote_xml
 
     # 4) ZIP_STORED (sin compresión) con entry lote.xml
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_STORED) as z:
-        z.writestr("xml_file.xml", xml_payload.encode("utf-8"))
+        z.writestr(ZIP_INTERNAL_FILENAME, xml_payload.encode("utf-8"))
 
     return buf.getvalue()
 
@@ -2899,7 +2897,7 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
     
     IMPORTANTE: 
     - NO incluye <dId> ni <xDE> (pertenecen al SOAP rEnvioLote, NO al lote.xml)
-    - Selecciona SIEMPRE el rDE que tiene <ds:Signature> como hijo directo.
+    - Selecciona SIEMPRE el rDE que tiene <Signature> como hijo directo (acepta XMLDSig o SIFEN ns).
     - NO modifica la firma ni los hijos del rDE, solo lo envuelve en rLoteDE.
     - Usa extracción por regex desde bytes originales (NO re-serializa con lxml) para preservar
       exactamente la firma, namespaces y whitespace del rDE firmado.
@@ -2921,12 +2919,13 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
     
     # Namespace de firma digital
     DSIG_NS = "http://www.w3.org/2000/09/xmldsig#"
+    SIFEN_NS = "http://ekuatia.set.gov.py/sifen/xsd"
     
     # Función para verificar si un rDE tiene Signature como hijo directo
     def is_signed_rde(el) -> bool:
-        """Verifica si el rDE tiene <ds:Signature> como hijo directo."""
+        """Verifica si el rDE tiene <Signature> como hijo directo (acepta XMLDSig o SIFEN ns)."""
         return any(
-            child.tag == f"{{{DSIG_NS}}}Signature"
+            child.tag == f"{{{DSIG_NS}}}Signature" or child.tag == f"{{{SIFEN_NS}}}Signature"
             for child in list(el)
         )
     
@@ -3132,7 +3131,7 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
                         signature_paths.append(" -> ".join(path_parts))
                 
                 error_msg = (
-                    "Se encontró rDE pero NO contiene <ds:Signature> como hijo directo. "
+                    "Se encontró rDE pero NO contiene <Signature> como hijo directo. "
                     "Probablemente se pasó XML no firmado o se eligió el rDE equivocado.\n"
                     f"Hijos directos de rDE: {', '.join(children_list) if children_list else '(ninguno)'}\n"
                 )
@@ -3159,7 +3158,7 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
             else:
                 # DIAGNÓSTICO ADICIONAL antes de levantar ValueError
                 error_msg_parts = [
-                    "Se encontró rDE pero NO contiene <ds:Signature> como hijo directo. "
+                    "Se encontró rDE pero NO contiene <Signature> como hijo directo. "
                     "Probablemente se pasó XML no firmado o se eligió el rDE equivocado."
                 ]
                 
@@ -3345,10 +3344,10 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
     if debug_enabled:
         Path("/tmp/lote_xml_payload.xml").write_bytes(lote_xml_bytes)
     
-    # ZIP con xml_file.xml - usando helper que coincide con TIPS
+    # ZIP con lote.xml - usando helper que coincide con TIPS
     try:
         zip_bytes = build_xde_zip_bytes_from_lote_xml(lote_xml_bytes.decode('utf-8'))
-        print(f"🔍 DIAGNÓSTICO [build_lote_base64] ZIP creado: {len(zip_bytes)} bytes (STORED, xml_file.xml)")
+        print(f"🔍 DIAGNÓSTICO [build_lote_base64] ZIP creado: {len(zip_bytes)} bytes (STORED, lote.xml)")
         
         # Debug del ZIP (SIEMPRE cuando se construye)
         _save_zip_debug(zip_bytes, artifacts_dir, debug_enabled)
@@ -3373,12 +3372,11 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
                 zip_files = zf.namelist()
                 print(f"🧪 DEBUG [build_lote_base64] ZIP files: {zip_files}")
                 
-                if "lote.xml" in zip_files:
-                    lote_content = zf.read("lote.xml")
+                if ZIP_INTERNAL_FILENAME in zip_files:
+                    lote_content = zf.read(ZIP_INTERNAL_FILENAME)
                     # El contenido incluye wrapper: <?xml?><rLoteDE><rLoteDE>...</rLoteDE></rLoteDE>
                     # Necesitamos extraer el rLoteDE interno para verificar
-                    import re
-                    wrapper_match = re.search(rb'<rLoteDE>(.*)</rLoteDE>', lote_content, re.DOTALL)
+                    # import re  # usa el import global (evita UnboundLocalError)                    wrapper_match = re.search(rb'<rLoteDE>(.*)</rLoteDE>', lote_content, re.DOTALL)
                     if wrapper_match:
                         inner_lote = wrapper_match.group(1)
                     else:
@@ -3513,8 +3511,7 @@ def build_and_sign_lote_from_xml(
     4. Remover cualquier Signature previa del rDE
     5. Firmar el DE dentro del contexto del lote final (no fuera y luego mover)
     """
-    import re
-    
+    # import re  # usa el import global (evita UnboundLocalError)    
     # 6. Validar post-firma (algoritmos SHA256, URI correcto)
     # 7. Agregar rDE firmado directamente como hijo de rLoteDE (NO crear xDE)
     # 8. Serializar lote completo UNA SOLA VEZ (pretty_print=False)
@@ -3834,8 +3831,7 @@ def build_and_sign_lote_from_xml(
     
     # CRÍTICO: Eliminar xsi:schemaLocation del rDE (causa 0160)
     # Usar regex para eliminar el atributo completo
-    import re
-    rde_bytes = etree.tostring(rde_to_sign, encoding="utf-8", xml_declaration=False, pretty_print=False, with_tail=False)
+    # import re  # usa el import global (evita UnboundLocalError)    rde_bytes = etree.tostring(rde_to_sign, encoding="utf-8", xml_declaration=False, pretty_print=False, with_tail=False)
     rde_str = re.sub(rb'\s+xsi:schemaLocation="[^"]*"', b'', rde_bytes)
     rde_bytes = rde_str
     if rde_bytes != rde_str:
@@ -3972,8 +3968,7 @@ def build_and_sign_lote_from_xml(
     # rde_signed_bytes = _move_signature_into_de_if_needed(rde_signed_bytes, artifacts_dir, debug_enabled)
     
     # CORREGIR ORDEN: gCamFuFD debe ir antes de Signature según SIFEN
-    # NO reordenar - gCamFuFD debe ir DESPUÉS de Signature según memoria solución definitiva
-    # rde_signed_bytes = reorder_signature_before_gcamfufd(rde_signed_bytes)
+    rde_signed_bytes = reorder_signature_before_gcamfufd(rde_signed_bytes)
     
     # DEBUG: Verificar posición de Signature después de mover
     try:
@@ -4405,7 +4400,7 @@ def build_and_sign_lote_from_xml(
 
         
         zip_bytes = build_xde_zip_bytes_from_lote_xml(lote_xml_str)
-        print(f"✅ ZIP creado: {len(zip_bytes)} bytes (STORED, xml_file.xml)")
+        print(f"✅ ZIP creado: {len(zip_bytes)} bytes (STORED, lote.xml)")
     except Exception as e:
         raise RuntimeError(f"Error al crear ZIP: {e}")
     
@@ -4420,19 +4415,18 @@ def build_and_sign_lote_from_xml(
     try:
         with zipfile.ZipFile(BytesIO(zip_bytes), "r") as zf:
             namelist = zf.namelist()
-            if "lote.xml" not in namelist:
-                raise RuntimeError("ZIP no contiene 'xml_file.xml'")
+            if ZIP_INTERNAL_FILENAME not in namelist:
+                raise RuntimeError(f"ZIP no contiene '{ZIP_INTERNAL_FILENAME}'")
             
-            # Validar que contiene SOLO xml_file.xml
+            # Validar que contiene SOLO lote.xml
             if len(namelist) != 1:
-                raise RuntimeError(f"ZIP debe contener solo 'xml_file.xml', encontrado: {namelist}")
+                raise RuntimeError(f"ZIP debe contener solo '{ZIP_INTERNAL_FILENAME}', encontrado: {namelist}")
             
-            lote_xml_from_zip = zf.read("lote.xml")
+            lote_xml_from_zip = zf.read(ZIP_INTERNAL_FILENAME)
             
             # DEBUG: Comparar XML del ZIP con el XML original
             # El XML del ZIP incluye wrapper, necesitamos extraer el contenido interno
-            import re
-            wrapper_match = re.search(rb'<rLoteDE>(.*)</rLoteDE>', lote_xml_from_zip, re.DOTALL)
+            # import re  # usa el import global (evita UnboundLocalError)            wrapper_match = re.search(rb'<rLoteDE>(.*)</rLoteDE>', lote_xml_from_zip, re.DOTALL)
             if wrapper_match:
                 inner_xml = wrapper_match.group(1)
             else:
@@ -4773,22 +4767,26 @@ def preflight_soap_request(
                 namelist_norm = [n.strip().strip("'\"") for n in namelist_norm]
                 namelist_norm = [n.replace("\ufeff", "").translate({0x200B: None, 0x200C: None, 0x200D: None}) for n in namelist_norm]
 
-                if "xml_file.xml" not in namelist_norm:
-                    error_msg = f"ZIP no contiene 'xml_file.xml'. Archivos encontrados: {namelist_norm}"
+                # DEBUG ROBUSTO: Imprimir namelist real antes de validar
+                print(f"🔍 DEBUG PREFLIGHT: ZIP namelist original = {namelist}")
+                print(f"🔍 DEBUG PREFLIGHT: ZIP namelist normalizado = {namelist_norm}")
+                print(f"🔍 DEBUG PREFLIGHT: Buscando '{ZIP_INTERNAL_FILENAME}'")
+
+                if ZIP_INTERNAL_FILENAME not in namelist_norm:
+                    error_msg = f"ZIP no contiene '{ZIP_INTERNAL_FILENAME}'. Archivos encontrados: {namelist_norm}"
                     artifacts_dir.joinpath("preflight_zip.zip").write_bytes(zip_bytes)
                     return (False, error_msg)
                 
-                if set(namelist_norm) != {"xml_file.xml"}:
-                    error_msg = f"ZIP debe contener solo 'xml_file.xml', encontrado: {namelist_norm}"
+                if set(namelist_norm) != {ZIP_INTERNAL_FILENAME}:
+                    error_msg = f"ZIP debe contener solo '{ZIP_INTERNAL_FILENAME}', encontrado: {namelist_norm}"
                     artifacts_dir.joinpath("preflight_zip.zip").write_bytes(zip_bytes)
                     return (False, error_msg)
                 
-                # Extraer xml_file.xml si no se proporcionó
+                # Extraer lote.xml si no se proporcionó
                 if lote_xml_bytes is None:
-                    lote_xml_raw = zf.read("xml_file.xml")
+                    lote_xml_raw = zf.read(ZIP_INTERNAL_FILENAME)
                     # Extraer el XML interno del wrapper
-                    import re
-                    wrapper_match = re.search(rb'<rLoteDE>(.*)</rLoteDE>', lote_xml_raw, re.DOTALL)
+                    # import re  # usa el import global (evita UnboundLocalError)                    wrapper_match = re.search(rb'<rLoteDE>(.*)</rLoteDE>', lote_xml_raw, re.DOTALL)
                     if wrapper_match:
                         lote_xml_bytes = wrapper_match.group(1)
                     else:
@@ -5103,7 +5101,7 @@ def _debug_roundtrip_xde(payload_xml: str, artifacts_dir: str):
     zf = zipfile.ZipFile(BytesIO(zip_bytes))
     print("✅ DEBUG: ZIP entries:", zf.namelist())
 
-    lote_xml_bytes = zf.read("lote.xml")
+    lote_xml_bytes = zf.read(ZIP_INTERNAL_FILENAME)
     
     # Runtime guardrail: verificar que no haya duplicación de gCamFuFD
     lote_root = etree.fromstring(lote_xml_bytes)
@@ -5129,7 +5127,7 @@ def build_r_envio_lote_xml(did: Union[int, str], xml_bytes: bytes, zip_base64: O
     Args:
         did: ID del documento (IGNORADO - siempre se genera uno nuevo de 15 dígitos)
         xml_bytes: XML original (puede ser rDE o siRecepDE)
-        zip_base64: Base64 del ZIP (opcional, se calcula si no se proporciona)
+        zip_base64: Base64 del ZIP (IGNORADO - siempre se construye un ZIP fresco)
         
     Returns:
         XML rEnvioLote como string
@@ -5144,39 +5142,18 @@ def build_r_envio_lote_xml(did: Union[int, str], xml_bytes: bytes, zip_base64: O
     # SIEMPRE generar dId de 15 dígitos (ignorar el parámetro did)
     did = make_did_15()  # SIEMPRE (no reutilizar nada)
     
-    # Si ya tenemos zip_base64 del proceso de firma, usarlo
-    # Solo llamar a build_lote_base64_from_single_xml si no tenemos ZIP
-    xde_b64 = None  # Inicializar variable
-    print(f"🔍 DEBUG: zip_base64 al inicio = {'None' if zip_base64 is None else 'presente'}")
+    # SIEMPRE construir un ZIP fresco desde xml_bytes (evita enviar un ZIP viejo -> 0160)
+    print("🔍 DEBUG: Construyendo ZIP fresco desde xml_bytes (sin reutilizar zip_base64)")
+    xde_b64 = build_lote_base64_from_single_xml(xml_bytes)
     
-    # Si tenemos un ZIP reconstruido (con version="150"), usarlo
-    rebuilt_zip_path = Path("artifacts/last_lote.zip")
-    if not rebuilt_zip_path.exists():
-        # Try in parent directory
-        rebuilt_zip_path = Path("../artifacts/last_lote.zip")
-    print(f"DEBUG: Verificando ZIP reconstruido en {rebuilt_zip_path}: {'EXISTS' if rebuilt_zip_path.exists() else 'NOT FOUND'}")
-    
-    # Inicializar hash_from_zip
-    hash_from_zip = None
-    
-    # Usar ZIP existente si está disponible (ya tiene version="150" del passthrough)
-    if zip_base64 is not None:
-        print("DEBUG: Usando zip_base64 existente (ya tiene version='150' del passthrough)")
-        xde_b64 = zip_base64
-        try:
-            zip_bytes = base64.b64decode(zip_base64)
-            import hashlib
-            hash_from_zip = hashlib.sha256(zip_bytes).hexdigest()
-        except Exception as e:
-            print(f"⚠️  No se pudo calcular hash_from_zip desde zip_base64: {e}")
-            hash_from_zip = None
-    elif rebuilt_zip_path.exists():
-        print("✅ DEBUG: Usando ZIP reconstruido (sin prefijos)")
-        zip_base64 = base64.b64encode(rebuilt_zip_path.read_bytes()).decode("ascii")
-        xde_b64 = zip_base64
-    else:
-        print("DEBUG: zip_base64 is None, llamando a build_lote_base64_from_single_xml")
-        xde_b64 = build_lote_base64_from_single_xml(xml_bytes)
+    # Calcular hash_from_zip para debug
+    try:
+        zip_bytes = base64.b64decode(xde_b64)
+        import hashlib
+        hash_from_zip = hashlib.sha256(zip_bytes).hexdigest()
+    except Exception as e:
+        print(f"⚠️  No se pudo calcular hash_from_zip desde xde_b64: {e}")
+        hash_from_zip = None
 
     # Construir rEnvioLote con prefijo sifen (nsmap {"sifen": SIFEN_NS})
     rEnvioLote = etree.Element(etree.QName(SIFEN_NS, "rEnvioLote"), nsmap={"xsd": SIFEN_NS})
@@ -5185,7 +5162,7 @@ def build_r_envio_lote_xml(did: Union[int, str], xml_bytes: bytes, zip_base64: O
     xDE = etree.SubElement(rEnvioLote, etree.QName(SIFEN_NS, "xDE"))
     xDE.text = xde_b64
 
-    return etree.tostring(rEnvioLote, xml_declaration=True, encoding="utf-8").decode("utf-8")
+    return etree.tostring(rEnvioLote, xml_declaration=False, encoding="utf-8").decode("utf-8")
 
 
 def apply_timbrado_override(xml_bytes: bytes, artifacts_dir: Optional[Path] = None) -> bytes:
@@ -5206,8 +5183,7 @@ def apply_timbrado_override(xml_bytes: bytes, artifacts_dir: Optional[Path] = No
     Returns:
         XML modificado (bytes) o xml_bytes sin cambios si no hay override
     """
-    import re
-    
+    # import re  # usa el import global (evita UnboundLocalError)    
     # Leer env vars
     timbrado = os.getenv("SIFEN_TIMBRADO_OVERRIDE", "").strip()
     feini = os.getenv("SIFEN_FEINI_OVERRIDE", "").strip()
@@ -5701,45 +5677,47 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", dump_http: bool = Fals
                 }
             
             # Validar lote.xml contra XSD si está habilitado
-        if lote_xml_bytes:
-            try:
-                # Importar el validador
-                sys.path.insert(0, str(Path(__file__).parent.parent.parent / "tools"))
-                from validate_lote_xsd import validate_lote_from_bytes
-                
-                # Guardar lote.xml temporalmente para validación
+            if lote_xml_bytes:
+                # Definir artifacts_dir si no está definido
                 if artifacts_dir is None:
                     artifacts_dir = Path("artifacts")
                 artifacts_dir.mkdir(parents=True, exist_ok=True)
-                temp_lote_file = artifacts_dir / "_temp_lote_for_validation.xml"
-                temp_lote_file.write_bytes(lote_xml_bytes)
                 
-                # Validar
-                print("🔍 Validando lote.xml contra XSD...")
-                validate_lote_from_bytes(str(temp_lote_file))
-                
-                # Limpiar archivo temporal
-                temp_lote_file.unlink()
-                
-            except SystemExit as e:
-                # El validador usa sys.exit, capturamos el código
-                if e.code != 0:
-                    # Error de validación
-                    strict_mode = os.environ.get('SIFEN_STRICT_LOTE_XSD') == '1'
-                    if strict_mode:
-                        return {
-                            "success": False,
-                            "error": "Validación XSD falló (modo estricto)",
-                            "error_type": "XSDValidationError"
-                        }
+                try:
+                    # Importar el validador
+                    sys.path.insert(0, str(Path(__file__).parent.parent.parent / "tools"))
+                    from validate_lote_xsd import validate_lote_from_bytes
+                    
+                    # Guardar lote.xml temporalmente para validación
+                    temp_lote_file = artifacts_dir / "_temp_lote_for_validation.xml"
+                    temp_lote_file.write_bytes(lote_xml_bytes)
+                    
+                    # Validar
+                    print("🔍 Validando lote.xml contra XSD...")
+                    validate_lote_from_bytes(str(temp_lote_file))
+                    
+                    # Limpiar archivo temporal
+                    temp_lote_file.unlink()
+                    
+                except SystemExit as e:
+                    # El validador usa sys.exit, capturamos el código
+                    if e.code != 0:
+                        # Error de validación
+                        strict_mode = os.environ.get('SIFEN_STRICT_LOTE_XSD') == '1'
+                        if strict_mode:
+                            return {
+                                "success": False,
+                                "error": "Validación XSD falló (modo estricto)",
+                                "error_type": "XSDValidationError"
+                            }
+                        else:
+                            print("⚠️  Validación XSD falló, continuando en modo no estricto")
                     else:
-                        print("⚠️  Validación XSD falló, continuando en modo no estricto")
-                else:
-                    print("✅ Validación XSD exitosa")
-            except ImportError:
-                print("⚠️  No se encontró validate_lote_xsd.py, omitiendo validación XSD")
-            except Exception as e:
-                print(f"⚠️  Error al validar XSD: {e}, continuando")
+                        print("✅ Validación XSD exitosa")
+                except ImportError:
+                    print("⚠️  No se encontró validate_lote_xsd.py, omitiendo validación XSD")
+                except Exception as e:
+                    print(f"⚠️  Error al validar XSD: {e}, continuando")
         
         # Función para generar dId único de 15 dígitos
         def make_did_15() -> str:
@@ -5751,9 +5729,9 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", dump_http: bool = Fals
         
         # Función para normalizar o generar dId: solo acepta EXACTAMENTE 15 dígitos
         def normalize_or_make_did(existing: Optional[str]) -> str:
+            s = str(next(iter(locals().values()), "") or "").strip()
             """Valida que el dId tenga EXACTAMENTE 15 dígitos, sino genera uno nuevo"""
-            import re
-            s = (existing or "").strip()
+            # import re  # usa el import global (evita UnboundLocalError)            s = (existing or "").strip()
             if re.fullmatch(r"\d{15}", s):
                 return s
             return make_did_15()
@@ -5780,13 +5758,12 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", dump_http: bool = Fals
             import base64
             import zipfile
             import io
-            import re
-            
+            # import re  # usa el import global (evita UnboundLocalError)            
             try:
                 # Decodificar el ZIP
                 zip_bytes = base64.b64decode(zip_base64)
                 with zipfile.ZipFile(io.BytesIO(zip_bytes), 'r') as zf:
-                    lote_xml = zf.read('xml_file.xml')
+                    lote_xml = zf.read(ZIP_INTERNAL_FILENAME)
                     # Extraer el XML interno del wrapper
                     wrapper_match = re.search(rb'<rLoteDE>(.*)</rLoteDE>', lote_xml, re.DOTALL)
                     if wrapper_match:
@@ -5795,13 +5772,12 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", dump_http: bool = Fals
                 # Aplicar fix al XML
                 lote_str = lote_xml.decode('utf-8')
                 # Debug: mostrar Signature antes del fix
-                import re
-                sig_before = re.search(r'<Signature[^>]*>', lote_str)
+                # import re  # usa el import global (evita UnboundLocalError)                sig_before = re.search(r'<Signature[^>]*>', lote_str)
                 if sig_before:
                     print(f"DEBUG Signature antes del fix: {sig_before.group(0)}")
                 
-                # NO forzar xmlns SIFEN en Signature - debe permanecer en XMLDSig
-                if False:
+                # Forzar xmlns SIFEN en Signature - requerido por SIFEN
+                if True:
                     lote_str = re.sub(
                         r'<Signature xmlns="http://www\.w3\.org/2000/09/xmldsig#">',
                         r'<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd">',
@@ -5843,8 +5819,11 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", dump_http: bool = Fals
         # TEMPORALMENTE DESACTIVADO para probar con namespace SIFEN
         # _assert_signature_xmldsig_namespace(zip_base64, Path("artifacts"))
         
-        # Construir el payload de lote completo (reutilizando zip_base64)
-        payload_xml = build_r_envio_lote_xml(did=did, xml_bytes=xml_bytes, zip_base64=zip_base64)
+        # Construir el payload de lote completo (siempre construye ZIP fresco)
+        # CRÍTICO: Usar lote_xml_bytes si existe (ya tiene el fix de Signature xmlns)
+        # Sino usar xml_bytes (original)
+        xml_para_payload = lote_xml_bytes if lote_xml_bytes else xml_bytes
+        payload_xml = build_r_envio_lote_xml(did=did, xml_bytes=xml_para_payload)
         
         # DEBUG: Round-trip del xDE desde el SOAP final
         from pathlib import Path
