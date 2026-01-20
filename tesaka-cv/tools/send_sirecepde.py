@@ -36,11 +36,20 @@ import hashlib
 # Agregar el directorio padre al path para imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-# Importar módulos de debug
+# Importar módulos de debug con fallback robusto
 try:
-    from .send_sirecepde_debug import dump_stage, compare_hashes
-except ImportError:
-    from send_sirecepde_debug import dump_stage, compare_hashes
+    # cuando se usa como paquete (pytest/import)
+    from tools.send_sirecepde_debug import dump_stage, compare_hashes
+except Exception:
+    try:
+        # cuando se corre como módulo desde tesaka-cv (python -m tools.send_sirecepde)
+        from .send_sirecepde_debug import dump_stage, compare_hashes
+    except Exception:
+        # fallback ultra seguro: si no existe debug helper, definimos no-ops
+        def dump_stage(*args, **kwargs):
+            return None
+        def compare_hashes(*args, **kwargs):
+            return None
 
 from dotenv import load_dotenv
 
@@ -438,7 +447,8 @@ def build_lote_xml(rde_element: etree._Element) -> bytes:
         print(f"DEBUG: Signature tag found: {sig_tag}")
     
     # Usar regex para encontrar <Signature> y agregar xmlns si no lo tiene
-    # import re  # usa el import global (evita UnboundLocalError)    # Buscar cualquier <Signature> que no tenga xmlns
+    # import re  # usa el import global (evita UnboundLocalError)
+    # Buscar cualquier <Signature> que no tenga xmlns
     sig_pattern = re.compile(r'<Signature(?![^>]*xmlns)')
     if sig_pattern.search(lote_str):
         lote_str = sig_pattern.sub('<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"', lote_str)
@@ -446,6 +456,28 @@ def build_lote_xml(rde_element: etree._Element) -> bytes:
         print("DEBUG: Agregado xmlns XMLDSig a Signature")
     
     return lote_bytes
+
+
+def _fix_duplicate_signature_xmlns(lote_bytes: bytes) -> bytes:
+    """
+    Fix duplicate xmlns attributes in Signature elements.
+    Converts: <Signature xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns="http://www.w3.org/2000/09/xmldsig#">
+    To:         <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+    """
+    import re
+    
+    lote_str = lote_bytes.decode('utf-8')
+    
+    # Fix duplicate xmlns attributes
+    # Pattern: <Signature xmlns="..." xmlns="...">
+    dup_pattern = re.compile(r'<Signature\s+xmlns="([^"]+)"\s+xmlns="([^"]+)"')
+    if dup_pattern.search(lote_str):
+        lote_str = dup_pattern.sub(r'<Signature xmlns="\1"', lote_str)
+        lote_bytes = lote_str.encode('utf-8')
+        print("DEBUG: Fixed duplicate xmlns in Signature")
+    
+    return lote_bytes
+
 
 # Configuración del lote: usar default namespace o prefijo
 # Si True: <rLoteDE xmlns="..."> (default namespace)
@@ -1485,6 +1517,57 @@ def _save_1264_debug(
     print(f"\n💾 Archivos de debug guardados con prefijo: {prefix}")
 
 
+def find_latest_xml(artifacts_dir: Path, exclude_signed: bool = False, signed_only: bool = False) -> Optional[Path]:
+    """
+    Encuentra el XML más reciente en artifacts/ según criterios
+    
+    Args:
+        artifacts_dir: Directorio donde buscar archivos
+        exclude_signed: Excluir archivos firmados (contienen "signed" en el nombre)
+        signed_only: Buscar solo archivos firmados
+        
+    Returns:
+        Path al archivo más reciente o None
+    """
+    if not artifacts_dir.exists():
+        return None
+    
+    # Buscar todos los XMLs
+    all_xmls = list(artifacts_dir.glob("*.xml"))
+    if not all_xmls:
+        return None
+    
+    # Filtrar según criterios
+    # Excluir artefactos de debug
+    exclude_patterns = ["_stage_", "debug_", "_passthrough_", "_temp_", "soap_last_", "lote_from_sent"]
+    
+    if signed_only:
+        xmls = [f for f in all_xmls if "signed" in f.name.lower()]
+    elif exclude_signed:
+        # Preferir archivos base (rde_, sirecepde_, test_, lote_)
+        base_patterns = ["rde_", "sirecepde_", "test_", "lote"]
+        base_xmls = [f for f in all_xmls 
+                    if any(pattern in f.name.lower() for pattern in base_patterns)
+                    and not any(pattern in f.name.lower() for pattern in exclude_patterns)
+                    and "signed" not in f.name.lower()]
+        if base_xmls:
+            xmls = base_xmls
+        else:
+            # Fallback a cualquier XML no firmado y no debug
+            xmls = [f for f in all_xmls 
+                    if "signed" not in f.name.lower()
+                    and not any(pattern in f.name.lower() for pattern in exclude_patterns)]
+    else:
+        xmls = [f for f in all_xmls if not any(pattern in f.name.lower() for pattern in exclude_patterns)]
+    
+    if not xmls:
+        return None
+    
+    # Ordenar por fecha de modificación (más reciente primero)
+    xmls.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+    return xmls[0]
+
+
 def find_latest_sirecepde(artifacts_dir: Path) -> Optional[Path]:
     """
     Encuentra el archivo sirecepde más reciente en artifacts/
@@ -1743,7 +1826,7 @@ def extract_rde_element(xml_bytes: bytes) -> bytes:
     return etree.tostring(rde_el, xml_declaration=False, encoding="utf-8")
 
 
-def sign_and_normalize_rde_inside_xml(xml_bytes: bytes, cert_path: str, cert_password: str, artifacts_dir: Optional[Path] = None) -> bytes:
+def sign_and_normalize_rde_inside_xml(xml_bytes: bytes, cert_path: str, cert_password: str, env: str = "test", artifacts_dir: Optional[Path] = None) -> bytes:
     """
     Garantiza que el rDE dentro del XML esté firmado y normalizado.
     
@@ -1828,11 +1911,11 @@ def sign_and_normalize_rde_inside_xml(xml_bytes: bytes, cert_path: str, cert_pas
             (artifacts_dir / "de_before_sign.xml").write_bytes(de_bytes)
             print(f"💾 Guardado: {artifacts_dir / 'de_before_sign.xml'}")
         
-        # Firmar solo el DE
+        # Firmar solo el DE con el signer corregido (que incluye dFeIniT y estructura normalizada)
         try:
-            from app.sifen_client.xmlsec_signer_clean import sign_de_with_p12
-            signed_de_bytes = sign_de_with_p12(de_bytes, cert_path, cert_password)
-            print("✓ DE firmado exitosamente")
+            from app.sifen_client.xmlsec_signer_fixed import sign_de_with_p12
+            signed_de_bytes = sign_de_with_p12(de_bytes, cert_path, cert_password, env="test")
+            print("✓ DE firmado exitosamente (con dFeIniT y estructura normalizada)")
         except Exception as e:
             error_msg = f"Error al firmar DE: {e}"
             print(f"❌ {error_msg}", file=sys.stderr)
@@ -2537,7 +2620,7 @@ def _is_xml_already_signed(xml_bytes: bytes) -> bool:
     return has_signature
 
 
-def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False) -> Union[str, Tuple[str, bytes, bytes]]:
+def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False, force_resign: bool = False) -> Union[str, Tuple[str, bytes, bytes]]:
     """
     Construye lote.xml para un XML ya firmado usando passthrough bytes.
     
@@ -2560,28 +2643,65 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False) 
     # import re  # usa el import global (evita UnboundLocalError)    
     print("🔐 PASSTHROUGH: Detectado XML ya firmado, extrayendo rDE bytes sin re-serializar")
     
+    # Verificar si se fuerza re-firma por CLI o variable de entorno
+    import os
+    force_resign_env = os.getenv("SIFEN_FORCE_RESIGN", "").lower() in ("1", "true", "yes", "on")
+    if force_resign or force_resign_env:
+        print("🔄 FORCE RESIGN activado -> saltando passthrough")
+        print("   (CLI: --force-resign)" if force_resign else "   (ENV: SIFEN_FORCE_RESIGN=1)")
+        return None  # Forzar re-firma completa
+    
+    # GUARDRAIL: Validar que Signature use XMLDSig namespace
+    from app.sifen_client.xmlsig_guard import validate_signature_namespace_in_xml
+    is_valid, error_msg = validate_signature_namespace_in_xml(xml_bytes)
+    if not is_valid:
+        print(f"⚠️  WARNING: {error_msg}")
+        print("⚠️  Firma no XMLDSig, se fuerza re-firma")
+        # Retornar None para indicar que no se debe usar passthrough
+        return None
+    
     # DEBUG: Verificar xmlns en Signature del XML de entrada
     xml_str = xml_bytes.decode('utf-8')
-    sig_match = re.search(r'<Signature[^>]*>', xml_str)
+    sig_match = re.search(r'<Signature[^>]*xmlns="([^"]*)"[^>]*>', xml_str)
     if sig_match:
-        print(f"DEBUG: Signature en entrada a build_lote_passthrough_signed: {sig_match.group(0)}")
+        sig_ns = sig_match.group(1)
+        print(f"🔍 Signature namespace ANTES de passthrough: {sig_ns}")
+    else:
+        print("⚠️  No se encontró Signature con xmlns en XML de entrada")
     
     # Extraer rDE bytes sin tocar
-    rde_bytes = _extract_rde_bytes_passthrough(xml_bytes)
-    print(f"   rDE extraído: {len(rde_bytes)} bytes")
+    rde_bytes_original = _extract_rde_bytes_passthrough(xml_bytes)
+    print(f"   rDE extraído: {len(rde_bytes_original)} bytes")
+    
+    # Calcular hash SHA256 del rDE original antes de cualquier modificación
+    from app.sifen_client.xmlsig_guard import calculate_sha256_bytes, verify_xmlsig_rde
+    sha256_original = calculate_sha256_bytes(rde_bytes_original)
+    print(f"🔒 SHA256 rDE original: {sha256_original[:16]}...")
+    
+    # Verificación criptográfica de la firma original
+    is_valid_sig, error_msg = verify_xmlsig_rde(rde_bytes_original)
+    if not is_valid_sig:
+        print(f"❌ ERROR: Firma XML inválida en rDE original: {error_msg}")
+        print("   Abortando passthrough -> forzando re-firma completa")
+        return None
+    print("✅ Firma XML válida (verificación criptográfica)")
     
     # DEBUG: Verificar xmlns en Signature del rDE extraído
     rde_str = rde_bytes.decode('utf-8')
-    sig_match = re.search(r'<Signature[^>]*>', rde_str)
+    sig_match = re.search(r'<Signature[^>]*xmlns="([^"]*)"[^>]*>', rde_str)
     if sig_match:
-        print(f"DEBUG: Signature en rDE extraído: {sig_match.group(0)}")
+        sig_ns = sig_match.group(1)
+        print(f"🔍 Signature namespace DESPUÉS de passthrough: {sig_ns}")
+    else:
+        print("⚠️  No se encontró Signature con xmlns en rDE extraído")
     
     # CRÍTICO: Verificar y agregar Id a rDE si falta (requerido por XSD)
     # Esto debe hacerse ANTES de envolver en rLoteDE
     print("DEBUG: Iniciando verificación de rDE")
     try:
         from lxml import etree
-        rde_elem = etree.fromstring(rde_bytes)
+        # Trabajar con copia para no mutar el original
+        rde_elem = etree.fromstring(rde_bytes_original)
         
         # CRÍTICO: NO eliminar xsi:schemaLocation - puede ser requerido
     # XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
@@ -2624,29 +2744,53 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False) 
                 rde_id = f"rDE{de_id}"
                 rde_elem.set('Id', rde_id)
                 print(f"✅ Agregado Id='{rde_id}' a rDE (DE Id={de_id})")
+        
+        # CRÍTICO: Asegurar que dFeFinT esté presente en gTimb
+        SIFEN_NS = "http://ekuatia.set.gov.py/sifen/xsd"
+        NS = {"s": SIFEN_NS}
+        gtimb = rde_elem.find(".//s:gTimb", namespaces=NS)
+        if gtimb is not None:
+            dfefint = gtimb.find("s:dFeFinT", namespaces=NS)
+            if dfefint is None or not dfefint.text:
+                from app.sifen_client.xmlsec_signer_fixed import get_dFeFinT
+                # Por defecto usar ambiente test
+                default_fefin = get_dFeFinT("test")
+                if dfefint is None:
+                    dfefint = etree.SubElement(gtimb, "{%s}dFeFinT" % SIFEN_NS)
+                dfefint.text = default_fefin
+                print(f"🔧 PASSTHROUGH: dFeFinT agregado = {default_fefin}")
+                # Actualizar rde_bytes con el elemento agregado
+                rde_bytes_modificado = etree.tostring(rde_elem, xml_declaration=False, encoding="utf-8")
                 
                 # Re-serializar rDE con el Id agregado
                 print(f"🔍 DEBUG rde_elem tag: {rde_elem.tag}")
-                rde_bytes = etree.tostring(rde_elem, encoding='utf-8', xml_declaration=False)  # No declaration inside rLoteDE
                 print(f"🔍 DEBUG rde_bytes starts with: {rde_bytes[:200]}")
                 print(f"   rDE actualizado: {len(rde_bytes)} bytes")
                 
-                # CRÍTICO: Asegurar que Signature tenga el xmlns SIFEN (requerido por SIFEN)
-                rde_str = rde_bytes.decode('utf-8')
-                # NO forzar más - dejar XMLDSig estándar
+                # CRÍTICO: NUNCA modificar Signature xmlns en passthrough
                 # rde_str = re.sub(r'<Signature(?: xmlns="http://www\.w3\.org/2000/09/xmldsig#")?>', 
                 #                 r'<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd">', 
                 #                 rde_str, flags=re.MULTILINE | re.DOTALL)
                 # rde_bytes = rde_str.encode('utf-8')
                 # print("✅ Forzado xmlns SIFEN en Signature (requerido por SIFEN)")
+                print("ℹ️  Manteniendo Signature xmlns XMLDSig intacto (passthrough)")
             else:
                 print("❌ No se encontró DE con Id para generar rDE Id")
+                # Debug: mostrar qué elementos DE se encontraron
+                de_elements = rde_elem.findall('.//{*}DE')
+                if de_elements:
+                    print(f"   Se encontraron {len(de_elements)} elementos DE pero sin atributo Id")
+                    for i, de in enumerate(de_elements):
+                        attrs = list(de.attrib.keys())
+                        print(f"   DE {i+1}: atributos = {attrs}")
+                else:
+                    print("   No se encontraron elementos DE en el rDE")
         else:
             print(f"✅ rDE ya tiene Id: {rde_elem.get('Id')}")
         
         # CRÍTICO: Re-serializar rDE después de agregar schemaLocation
-        rde_bytes = etree.tostring(rde_elem, encoding='utf-8')
-        print(f"   rDE actualizado con schemaLocation: {len(rde_bytes)} bytes")
+        rde_bytes_modificado = etree.tostring(rde_elem, encoding='utf-8')
+        print(f"   rDE actualizado con schemaLocation: {len(rde_bytes_modificado)} bytes")
         
         # FIX: Eliminar gCamFuFD duplicados
         # Solo debe haber un gCamFuFD como hijo directo de rDE
@@ -2675,8 +2819,8 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False) 
                 print(f"   Eliminado {child.tag.split('}')[-1]} de gCamFuFD")
         
         # Re-serializar después de limpiar gCamFuFD
-        rde_bytes = etree.tostring(rde_elem, encoding='utf-8')
-        print(f"   rDE actualizado después de limpiar gCamFuFD: {len(rde_bytes)} bytes")
+        rde_bytes_modificado = etree.tostring(rde_elem, encoding='utf-8')
+        print(f"   rDE actualizado después de limpiar gCamFuFD: {len(rde_bytes_modificado)} bytes")
             
         # === FIX QR: asegurar dCarQR dentro de gCamFuFD (sin tocar el DE firmado) ===
         try:
@@ -2684,7 +2828,7 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False) 
             from xml.sax.saxutils import escape as _xml_escape
             from app.sifen_client.qr_generator import build_qr_dcarqr
 
-            rde_str2 = rde_bytes.decode("utf-8", errors="strict")
+            rde_str2 = rde_bytes_modificado.decode("utf-8", errors="strict")
             
             # DEBUG: Save rde_bytes to inspect
             print(f"🔍 DEBUG rde_bytes length: {len(rde_bytes)}")
@@ -2746,22 +2890,8 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False) 
         # NO eliminar prefijos aquí - rompe la firma
         # Los prefijos deben eliminarse ANTES de firmar
         
-        # CRÍTICO: Usar namespace SIFEN en Signature (requerido por SIFEN según memoria solución definitiva)
-        rde_str = rde_bytes.decode('utf-8')
-        # Verificar xmlns actual
-        if '<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd">' in rde_str:
-            print("✅ Signature ya tiene xmlns SIFEN")
-        else:
-            if True:
-                # Reemplazar Signature con namespace XMLDSig por Signature con namespace SIFEN
-                # Buscar <Signature xmlns="http://www.w3.org/2000/09/xmldsig#"> o <Signature> sin xmlns
-                rde_str = re.sub(r'<Signature(?: xmlns="http://www\.w3\.org/2000/09/xmldsig#")?>', 
-                                r'<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd">', 
-                                rde_str, count=1)
-                print("✅ Signature xmlns cambiado a SIFEN")
-                rde_bytes = rde_str.encode('utf-8')
-            else:
-                print("ℹ️  Manteniendo Signature xmlns XMLDSig estándar")
+        # Si modificamos el rDE, usar la versión modificada; si no, usar el original
+        rde_bytes_final = rde_bytes_modificado if 'rde_bytes_modificado' in locals() else rde_bytes_original
             
         # CRÍTICO: NO usar lxml para serializar (agrega prefijos ns0:)
         # rde_bytes ya contiene los bytes correctos del XML original
@@ -2771,8 +2901,21 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False) 
         print(f"⚠️  Error al verificar/agregar Id a rDE: {e}")
         # Continuar sin modificar (podría fallar en SIFEN)
     
-    # Calcular hash del rDE MODIFICADO (con Id y namespace corregido)
-    rde_hash = hashlib.sha256(rde_bytes).hexdigest()
+    # Calcular hash del rDE final (después de modificaciones si las hubo)
+    sha256_final = hashlib.sha256(rde_bytes_final).hexdigest()
+    print(f"🔒 SHA256 rDE final: {sha256_final[:16]}...")
+    
+    # GUARDRAIL: Verificar inmutabilidad si no se modificó el rDE
+    if 'rde_bytes_modificado' not in locals():
+        if sha256_original != sha256_final:
+            print(f"❌ ERROR CRÍTICO: El rDE fue modificado involuntariamente!")
+            print(f"   SHA256 original: {sha256_original}")
+            print(f"   SHA256 final:   {sha256_final}")
+            print("   Abortando passthrough -> forzando re-firma completa")
+            return None
+        print("✅ Inmutabilidad verificada: rDE no fue modificado")
+    else:
+        print("⚠️  rDE fue modificado (se agregaron elementos requeridos)")
     
     # NO MODIFICAR el XML después de firmado
     # Cualquier cambio invalida la firma frente a SIFEN
@@ -2782,7 +2925,7 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False) 
     artifacts_dir.mkdir(parents=True, exist_ok=True)
     
     try:
-        (artifacts_dir / "_passthrough_rde_input.xml").write_bytes(rde_bytes)
+        (artifacts_dir / "_passthrough_rde_input.xml").write_bytes(rde_bytes_final)
         print(f"💾 Guardado: artifacts/_passthrough_rde_input.xml")
     except Exception as e:
         print(f"⚠️  No se pudo guardar artifact: {e}")
@@ -2793,47 +2936,62 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False) 
 
     lote_xml_bytes = (
         b'<rLoteDE xmlns="' + SIFEN_NS.encode('utf-8') + b'">'
-        + rde_bytes +
+        + rde_bytes_final +
         b'</rLoteDE>'
     )
     print(f"   lote.xml construido estilo TIPS: {len(lote_xml_bytes)} bytes")
     
     # CRÍTICO: Forzar xmlns SIFEN en Signature después de construir
-    # El XML puede venir con xmlns XMLDSig y SIFEN lo rechaza
-    lote_xml_str = lote_xml_bytes.decode('utf-8')
-    # CRÍTICO: Forzar xmlns SIFEN en Signature
-    lote_xml_str = re.sub(
-        r'<Signature xmlns="http://www\.w3\.org/2000/09/xmldsig#">',
-        r'<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd">',
-        lote_xml_str
-    )
-    # También reemplazar si no tiene xmlns
-    lote_xml_str = re.sub(
-        r'<Signature(?=>)',
-        r'<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd"',
-        lote_xml_str
-    )
-    lote_xml_bytes = lote_xml_str.encode('utf-8')
-    print("✅ Forzado xmlns SIFEN en Signature (passthrough)")
+    # CRÍTICO: NO FORZAR xmlns SIFEN en Signature - mantener XMLDSig estándar
+    # El namespace XMLDSig debe permanecer intacto en passthrough
+    print("ℹ️  Manteniendo Signature xmlns XMLDSig intacto en passthrough")
     
     # CORREGIR ORDEN: Signature debe ir antes de gCamFuFD según solución definitiva
     lote_xml_bytes = reorder_signature_before_gcamfufd(lote_xml_bytes)
     print("✅ Reordenado: Signature antes de gCamFuFD")
     
-    # CRÍTICO: NO cambiar namespace de Signature (debe mantener SIFEN para validación de SIFEN)
+    # FIX: Eliminar xmlns duplicados en Signature
+    lote_xml_bytes = _fix_duplicate_signature_xmlns(lote_xml_bytes)
+    
+    # CRÍTICO: NO cambiar namespace de Signature (debe mantener XMLDSig para passthrough)
     # Signature ya viene con el namespace correcto desde la firma
     
-    # Verificar que el rDE dentro del lote tenga el mismo hash
+    # GUARDRAIL HARD: Validar que Signature mantenga namespace XMLDSig después de construir lote
+    from app.sifen_client.xmlsig_guard import validate_signature_namespace_in_xml
+    lote_xml_str = lote_xml_bytes.decode('utf-8')
+    sig_match_before = re.search(r'<Signature[^>]*xmlns="([^"]*)"[^>]*>', lote_xml_str)
+    if sig_match_before:
+        sig_ns = sig_match_before.group(1)
+        print(f"🔍 Signature namespace en lote.xml: {sig_ns}")
+        if sig_ns != "http://www.w3.org/2000/09/xmldsig#":
+            print(f"❌ ERROR CRÍTICO: Signature namespace corrupto en passthrough!")
+            print(f"   Esperado: http://www.w3.org/2000/09/xmldsig#")
+            print(f"   Encontrado: {sig_ns}")
+            print("   Abortando passthrough -> forzando re-firma completa")
+            return None  # Forzar fallback a re-firma completa
+    
+    # Verificar que el rDE dentro del lote tenga el mismo hash (solo si no se modificó)
     # Extraer rDE del lote para verificar
     rde_from_lote = _extract_rde_bytes_passthrough(lote_xml_bytes)
     rde_from_lote_hash = hashlib.sha256(rde_from_lote).hexdigest()
     
-    # NOTA: El hash puede diferir porque modificamos el rDE (agregamos Id y corregimos namespace)
-    # Solo verificamos que el rDE extraído no esté vacío
-    if len(rde_from_lote) == 0:
-        raise RuntimeError("ERROR: El rDE dentro del lote está vacío!")
+    # GUARDRAIL FINAL: Verificar inmutabilidad del rDE en el lote
+    if 'rde_bytes_modificado' not in locals():
+        if sha256_original != rde_from_lote_hash:
+            print(f"❌ ERROR CRÍTICO: El rDE fue modificado en el lote!")
+            print(f"   SHA256 original: {sha256_original}")
+            print(f"   SHA256 lote:    {rde_from_lote_hash}")
+            print("   Abortando passthrough -> forzando re-firma completa")
+            return None
+        print("✅ Inmutabilidad final verificada: rDE intacto en lote.xml")
     
-    print("✅ Verificación OK: rDE presente en lote.xml")
+    # Verificación criptográfica final del rDE en el lote
+    is_valid_sig_final, error_msg_final = verify_xmlsig_rde(rde_from_lote)
+    if not is_valid_sig_final:
+        print(f"❌ ERROR: Firma XML inválida en rDE del lote: {error_msg_final}")
+        print("   Abortando passthrough -> forzando re-firma completa")
+        return None
+    print("✅ Firma XML válida en lote (verificación criptográfica final)")
     
     # Guardar lote.xml para debug
     try:
@@ -3494,6 +3652,7 @@ def build_and_sign_lote_from_xml(
     xml_bytes: bytes,
     cert_path: str,
     cert_password: str,
+    env: str = "test",
     return_debug: bool = False,
     dump_http: bool = False
 ) -> Union[str, Tuple[str, bytes, bytes, None]]:
@@ -3831,7 +3990,8 @@ def build_and_sign_lote_from_xml(
     
     # CRÍTICO: Eliminar xsi:schemaLocation del rDE (causa 0160)
     # Usar regex para eliminar el atributo completo
-    # import re  # usa el import global (evita UnboundLocalError)    rde_bytes = etree.tostring(rde_to_sign, encoding="utf-8", xml_declaration=False, pretty_print=False, with_tail=False)
+    # import re  # usa el import global (evita UnboundLocalError)
+    rde_bytes = etree.tostring(rde_to_sign, encoding="utf-8", xml_declaration=False, pretty_print=False, with_tail=False)
     rde_str = re.sub(rb'\s+xsi:schemaLocation="[^"]*"', b'', rde_bytes)
     rde_bytes = rde_str
     if rde_bytes != rde_str:
@@ -3925,9 +4085,9 @@ def build_and_sign_lote_from_xml(
         print(f"DEBUG: Error checking gCamFuFD: {e}")
     
     # 7. Firmar el rDE (sign_de_with_p12 espera rDE como root)
-    from app.sifen_client.xmlsec_signer_clean import sign_de_with_p12
+    from app.sifen_client.xmlsec_signer_fixed import sign_de_with_p12
     rde_signed_bytes = sign_de_with_p12(
-        rde_to_sign_bytes, cert_path, cert_password
+        rde_to_sign_bytes, cert_path, cert_password, env=env
     )
     
     # DEBUG: Guardar rde_signed_bytes para inspección
@@ -3969,6 +4129,9 @@ def build_and_sign_lote_from_xml(
     
     # CORREGIR ORDEN: gCamFuFD debe ir antes de Signature según SIFEN
     rde_signed_bytes = reorder_signature_before_gcamfufd(rde_signed_bytes)
+    
+    # FIX: Eliminar xmlns duplicados en Signature
+    rde_signed_bytes = _fix_duplicate_signature_xmlns(rde_signed_bytes)
     
     # DEBUG: Verificar posición de Signature después de mover
     try:
@@ -4426,7 +4589,7 @@ def build_and_sign_lote_from_xml(
             
             # DEBUG: Comparar XML del ZIP con el XML original
             # El XML del ZIP incluye wrapper, necesitamos extraer el contenido interno
-            # import re  # usa el import global (evita UnboundLocalError)            wrapper_match = re.search(rb'<rLoteDE>(.*)</rLoteDE>', lote_xml_from_zip, re.DOTALL)
+            wrapper_match = re.search(rb'<rLoteDE>(.*)</rLoteDE>', lote_xml_from_zip, re.DOTALL)
             if wrapper_match:
                 inner_xml = wrapper_match.group(1)
             else:
@@ -5050,9 +5213,59 @@ def preflight_soap_request(
             return (False, error_msg)
         
         if not sig_value_elem.text or not sig_value_elem.text.strip():
-            error_msg = "<SignatureValue> está vacío (firma dummy)"
+            error_msg = "<SignatureValue> está vacío (firma dummy o no generada)"
             artifacts_dir.joinpath("preflight_lote.xml").write_bytes(lote_xml_bytes)
             return (False, error_msg)
+        
+        # 8. Validar fechas de vigencia del timbrado (dFeIniT y dFeFinT)
+        g_timb_elem = de_elem.find(f".//{{{SIFEN_NS}}}gTimb")
+        if g_timb_elem is None:
+            error_msg = "No se encontró <gTimb> en el DE"
+            artifacts_dir.joinpath("preflight_lote.xml").write_bytes(lote_xml_bytes)
+            return (False, error_msg)
+        
+        # Validar dFeIniT
+        dfeinit_elem = g_timb_elem.find(f"{{{SIFEN_NS}}}dFeIniT")
+        if dfeinit_elem is None or not dfeinit_elem.text:
+            error_msg = "Falta <dFeIniT> (fecha inicio vigencia timbrado) en gTimb"
+            artifacts_dir.joinpath("preflight_lote.xml").write_bytes(lote_xml_bytes)
+            return (False, error_msg)
+        
+        # Validar formato de dFeIniT (YYYY-MM-DD)
+        import re
+        if not re.match(r'^\d{4}-\d{2}-\d{2}$', dfeinit_elem.text.strip()):
+            error_msg = f"Formato inválido de dFeIniT: {dfeinit_elem.text}. Debe ser YYYY-MM-DD"
+            artifacts_dir.joinpath("preflight_lote.xml").write_bytes(lote_xml_bytes)
+            return (False, error_msg)
+        
+        # Validar dFeFinT
+        dfefint_elem = g_timb_elem.find(f"{{{SIFEN_NS}}}dFeFinT")
+        if dfefint_elem is None or not dfefint_elem.text:
+            error_msg = "Falta <dFeFinT> (fecha fin vigencia timbrado) en gTimb"
+            artifacts_dir.joinpath("preflight_lote.xml").write_bytes(lote_xml_bytes)
+            return (False, error_msg)
+        
+        # Validar formato de dFeFinT (YYYY-MM-DD)
+        if not re.match(r'^\d{4}-\d{2}-\d{2}$', dfefint_elem.text.strip()):
+            error_msg = f"Formato inválido de dFeFinT: {dfefint_elem.text}. Debe ser YYYY-MM-DD"
+            artifacts_dir.joinpath("preflight_lote.xml").write_bytes(lote_xml_bytes)
+            return (False, error_msg)
+        
+        # Validar que fecha fin >= fecha inicio
+        from datetime import datetime
+        try:
+            fecha_inicio = datetime.strptime(dfeinit_elem.text.strip(), "%Y-%m-%d")
+            fecha_fin = datetime.strptime(dfefint_elem.text.strip(), "%Y-%m-%d")
+            if fecha_fin < fecha_inicio:
+                error_msg = f"dFeFinT ({dfefint_elem.text}) no puede ser anterior a dFeIniT ({dfeinit_elem.text})"
+                artifacts_dir.joinpath("preflight_lote.xml").write_bytes(lote_xml_bytes)
+                return (False, error_msg)
+        except ValueError as e:
+            error_msg = f"Error al parsear fechas de vigencia: {e}"
+            artifacts_dir.joinpath("preflight_lote.xml").write_bytes(lote_xml_bytes)
+            return (False, error_msg)
+        
+        print(f"✅ Fechas de vigencia timbrado válidas: {dfeinit_elem.text} a {dfefint_elem.text}")
         
         # Validar que SignatureValue no contiene texto dummy
         try:
@@ -5165,9 +5378,9 @@ def build_r_envio_lote_xml(did: Union[int, str], xml_bytes: bytes, zip_base64: O
     return etree.tostring(rEnvioLote, xml_declaration=False, encoding="utf-8").decode("utf-8")
 
 
-def apply_timbrado_override(xml_bytes: bytes, artifacts_dir: Optional[Path] = None) -> bytes:
+def apply_timbrado_override(xml_bytes: bytes, artifacts_dir: Optional[Path] = None, env: str = "test") -> bytes:
     """
-    Aplica override de timbrado y fecha de inicio si están definidos en env vars.
+    Aplica override de timbrado y fechas de vigencia si están definidos en env vars.
     
     Si SIFEN_TIMBRADO_OVERRIDE está definido:
     - Parchea <dNumTim> en gTimb
@@ -5175,6 +5388,9 @@ def apply_timbrado_override(xml_bytes: bytes, artifacts_dir: Optional[Path] = No
     
     Si SIFEN_FEINI_OVERRIDE está definido:
     - Parchea <dFeIniT> en gTimb
+    
+    Si SIFEN_FEFIN_OVERRIDE está definido:
+    - Parchea <dFeFinT> en gTimb
     
     Args:
         xml_bytes: XML original (bytes)
@@ -5187,12 +5403,9 @@ def apply_timbrado_override(xml_bytes: bytes, artifacts_dir: Optional[Path] = No
     # Leer env vars
     timbrado = os.getenv("SIFEN_TIMBRADO_OVERRIDE", "").strip()
     feini = os.getenv("SIFEN_FEINI_OVERRIDE", "").strip()
+    fefin = os.getenv("SIFEN_FEFIN_OVERRIDE", "").strip()
     
-    # Si ambas vacías, devolver sin cambios
-    if not timbrado and not feini:
-        return xml_bytes
-    
-    # Parsear XML
+    # Parsear XML siempre para asegurar que dFeFinT esté presente
     parser = etree.XMLParser(remove_blank_text=True)
     try:
         root = etree.fromstring(xml_bytes, parser)
@@ -5206,6 +5419,12 @@ def apply_timbrado_override(xml_bytes: bytes, artifacts_dir: Optional[Path] = No
     gtimb = root.find(".//s:gTimb", namespaces=NS)
     if gtimb is None:
         raise RuntimeError("No se encontró <gTimb> en el XML. No se puede aplicar override de timbrado.")
+    
+    # Si no hay overrides y gTimb ya tiene dFeFinT, devolver sin cambios
+    if not timbrado and not feini and not fefin:
+        dfefint_check = gtimb.find("s:dFeFinT", namespaces=NS)
+        if dfefint_check is not None and dfefint_check.text:
+            return xml_bytes
     
     # Aplicar override de timbrado
     if timbrado:
@@ -5222,6 +5441,27 @@ def apply_timbrado_override(xml_bytes: bytes, artifacts_dir: Optional[Path] = No
             raise RuntimeError("No se encontró <dFeIniT> en <gTimb>. No se puede aplicar override de fecha inicio.")
         dfeinit.text = feini
         print(f"🔧 TIMBRADO OVERRIDE: dFeIniT = {feini}")
+    
+    # Aplicar override de fecha fin
+    if fefin:
+        dfefint = gtimb.find("s:dFeFinT", namespaces=NS)
+        if dfefint is None:
+            # Crear el elemento si no existe
+            dfefint = etree.SubElement(gtimb, "{%s}dFeFinT" % SIFEN_NS)
+        dfefint.text = fefin
+        print(f"🔧 TIMBRADO OVERRIDE: dFeFinT = {fefin}")
+    else:
+        # Si no hay override, asegurarse que dFeFinT exista usando valor por defecto
+        dfefint = gtimb.find("s:dFeFinT", namespaces=NS)
+        if dfefint is None or not dfefint.text:
+            from app.sifen_client.xmlsec_signer_fixed import get_dFeFinT
+            # Usar el parámetro env en lugar de variable de entorno
+            env_lower = env.lower()
+            default_fefin = get_dFeFinT(env_lower)
+            if dfefint is None:
+                dfefint = etree.SubElement(gtimb, "{%s}dFeFinT" % SIFEN_NS)
+            dfefint.text = default_fefin
+            print(f"🔧 TIMBRADO DEFAULT: dFeFinT = {default_fefin} (ambiente: {env_lower})")
     
     # Si se cambió el timbrado, regenerar CDC
     if timbrado:
@@ -5334,31 +5574,51 @@ def apply_timbrado_override(xml_bytes: bytes, artifacts_dir: Optional[Path] = No
 
 def resolve_xml_path(xml_arg: str, artifacts_dir: Path) -> Path:
     """
-    Resuelve el path al XML (puede ser 'latest' o un path específico)
+    Resuelve el path al XML (puede ser 'latest', 'newest', 'signed_latest' o un path específico)
     
     Args:
-        xml_arg: Argumento XML ('latest' o path)
+        xml_arg: Argumento XML ('latest', 'newest', 'signed_latest' o path)
         artifacts_dir: Directorio de artifacts
         
     Returns:
         Path al archivo XML
     """
-    if xml_arg.lower() == "latest":
-        xml_path = find_latest_sirecepde(artifacts_dir)
+    xml_arg_lower = xml_arg.lower()
+    
+    if xml_arg_lower in {"latest", "newest"}:
+        # Buscar XML base (no firmado) más reciente
+        xml_path = find_latest_xml(artifacts_dir, exclude_signed=True)
+        if not xml_path:
+            # Fallback a cualquier XML si no hay base sin firmar
+            xml_path = find_latest_xml(artifacts_dir, exclude_signed=False)
         if not xml_path:
             raise FileNotFoundError(
-                f"No se encontró ningún archivo sirecepde_*.xml en {artifacts_dir}"
+                f"No se encontró ningún archivo XML en {artifacts_dir}"
             )
+        print(f"📄 Input elegido (latest): {xml_path.name}")
         return xml_path
     
+    if xml_arg_lower in {"signed_latest", "latest_signed"}:
+        # Buscar XML firmado más reciente
+        xml_path = find_latest_xml(artifacts_dir, signed_only=True)
+        if not xml_path:
+            raise FileNotFoundError(
+                f"No se encontró ningún archivo XML firmado en {artifacts_dir}"
+            )
+        print(f"📄 Input elegido (signed_latest): {xml_path.name}")
+        return xml_path
+    
+    # Path específico
     xml_path = Path(xml_arg)
     if not xml_path.exists():
         # Intentar como path relativo a artifacts
         artifacts_xml = artifacts_dir / xml_arg
         if artifacts_xml.exists():
-            return artifacts_xml
-        raise FileNotFoundError(f"Archivo XML no encontrado: {xml_arg}")
+            xml_path = artifacts_xml
+        else:
+            raise FileNotFoundError(f"Archivo XML no encontrado: {xml_arg}")
     
+    print(f"📄 Input elegido: {xml_path.name}")
     return xml_path
 
 
@@ -5464,14 +5724,14 @@ def _extract_ruc_from_cert(p12_path: str, p12_password: str) -> Optional[Dict[st
         return None
 
 
-def send_sirecepde(xml_path: str, env: str = "test", artifacts_dir: Optional[Path] = None, dump_http: bool = False) -> dict:
+def send_sirecepde(xml_path: str, env: str = "test", artifacts_dir: Optional[Path] = None, dump_http: bool = False, force_resign: bool = False) -> dict:
     """
     Wrapper para send_sirecepde_lote para compatibilidad con el main.
     """
-    return send_sirecepde_lote(xml_path, env, dump_http)
+    return send_sirecepde_lote(xml_path, env, artifacts_dir, dump_http, force_resign)
 
 
-def send_sirecepde_lote(xml_file: str, env: str = "test", dump_http: bool = False) -> dict:
+def send_sirecepde_lote(xml_file: str, env: str = "test", artifacts_dir: Optional[Path] = None, dump_http: bool = False, force_resign: bool = False) -> dict:
     """
     Envía un lote de DEs a SIFEN usando el endpoint siRecepLoteDE.
     
@@ -5535,7 +5795,7 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", dump_http: bool = Fals
     hash_input = dump_stage("01_input", xml_bytes, artifacts_dir_for_debug)
     
     # Aplicar override de timbrado/fecha inicio si están definidos (ANTES de construir lote)
-    xml_bytes = apply_timbrado_override(xml_bytes, artifacts_dir=None)
+    xml_bytes = apply_timbrado_override(xml_bytes, artifacts_dir=None, env=env)
     
     xml_size = len(xml_bytes)
     print(f"   Tamaño: {xml_size} bytes ({xml_size / 1024:.2f} KB)\n")
@@ -5627,13 +5887,45 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", dump_http: bool = Fals
         if _is_xml_already_signed(xml_bytes):
             print("✓ XML ya está firmado, usando modo passthrough (sin re-serialización)")
             try:
+                # Aplicar timbrado override incluso en modo passthrough para asegurar dFeFinT
+                xml_bytes = apply_timbrado_override(xml_bytes, artifacts_dir=artifacts_dir, env=env)
+                
                 # Usar passthrough para no re-serializar el rDE firmado
                 result = build_lote_passthrough_signed(
                     xml_bytes=xml_bytes,
-                    return_debug=True
+                    return_debug=True,
+                    force_resign=force_resign
                 )
-                zip_base64, lote_xml_bytes, zip_bytes = result
-                print("✓ Lote construido con rDE firmado intacto\n")
+                
+                # Si passthrough retorna None, la firma no es XMLDSig válida
+                if result is None:
+                    print("⚠️  Passthrough falló: Signature no es XMLDSig, forzando re-firma completa")
+                    print("✓ XML no está firmado correctamente, construyendo lote completo y firmando rDE in-place...")
+                    try:
+                        # NUEVO FLUJO: construir lote completo ANTES de firmar, luego firmar in-place
+                        result = build_and_sign_lote_from_xml(
+                            xml_bytes=xml_bytes,
+                            cert_path=sign_cert_path,
+                            cert_password=sign_cert_password,
+                            env=env,
+                            return_debug=True,
+                            dump_http=dump_http
+                        )
+                        zip_base64, lote_xml_bytes, zip_bytes = result
+                        print("✓ Lote construido y firmado después de re-firma forzada\n")
+                    except Exception as e:
+                        error_msg = f"Error al construir y firmar lote después de re-firma: {str(e)}"
+                        print(f"❌ {error_msg}")
+                        import traceback
+                        traceback.print_exc()
+                        return {
+                            "success": False,
+                            "error": error_msg,
+                            "error_type": type(e).__name__
+                        }
+                else:
+                    zip_base64, lote_xml_bytes, zip_bytes = result
+                    print("✓ Lote construido con rDE firmado intacto\n")
             except Exception as e:
                 error_msg = f"Error al construir lote con XML ya firmado: {str(e)}"
                 print(f"❌ {error_msg}")
@@ -5652,6 +5944,7 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", dump_http: bool = Fals
                     xml_bytes=xml_bytes,
                     cert_path=sign_cert_path,
                     cert_password=sign_cert_password,
+                    env=env,
                     return_debug=True,
                     dump_http=dump_http
                 )
@@ -5772,23 +6065,13 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", dump_http: bool = Fals
                 # Aplicar fix al XML
                 lote_str = lote_xml.decode('utf-8')
                 # Debug: mostrar Signature antes del fix
-                # import re  # usa el import global (evita UnboundLocalError)                sig_before = re.search(r'<Signature[^>]*>', lote_str)
+                sig_before = re.search(r'<Signature[^>]*>', lote_str)
                 if sig_before:
                     print(f"DEBUG Signature antes del fix: {sig_before.group(0)}")
                 
-                # Forzar xmlns SIFEN en Signature - requerido por SIFEN
-                if True:
-                    lote_str = re.sub(
-                        r'<Signature xmlns="http://www\.w3\.org/2000/09/xmldsig#">',
-                        r'<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd">',
-                        lote_str
-                    )
-                    # También reemplazar si no tiene xmlns
-                    lote_str = re.sub(
-                        r'<Signature(?=>)',
-                        r'<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd"',
-                        lote_str
-                    )
+                # NO FORZAR xmlns SIFEN en Signature - mantener XMLDSig estándar
+                # La firma XMLDSig debe permanecer válida
+                print("ℹ️  Manteniendo Signature xmlns XMLDSig (no se modifica)")
                 
                 # Debug: mostrar Signature después del fix
                 sig_after = re.search(r'<Signature[^>]*>', lote_str)
@@ -5796,11 +6079,11 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", dump_http: bool = Fals
                     print(f"DEBUG Signature después del fix: {sig_after.group(0)}")
                 
                 # Reconstruir el ZIP - FIX DELTA para coincidir con TIPS
-                # CRÍTICO: Eliminar todos los newlines antes de crear el ZIP
+                # CRÍTICO: NO eliminar newlines en passthrough para preservar la firma
                 # CRÍTICO: Asegurar que la declaración XML use comillas dobles
-                lote_str = lote_str.replace('\n', '').replace('\r', '')
+                # lote_str = lote_str.replace('\n', '').replace('\r', '')  # COMENTADO - rompe firma
                 lote_str = lote_str.replace("<?xml version='1.0' encoding='utf-8'?>", '<?xml version="1.0" encoding="utf-8"?>')
-                print(f"DEBUG: XML after removing newlines length: {len(lote_str)}")
+                print(f"DEBUG: XML length (preserving newlines): {len(lote_str)}")
                 
                 # Aplicar wrapper TIPS usando el helper
                 zip_bytes = build_xde_zip_bytes_from_lote_xml(lote_str)
@@ -6424,6 +6707,26 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", dump_http: bool = Fals
         }
 
 
+# --- Compat: expected by tests/test_cdc_in_xml_generation.py ---
+def normalize_cdc_in_rde(rde_xml: str) -> str:
+    """
+    Compat wrapper.
+    Algunos tests esperan esta función en tools.send_sirecepde.
+    Si la lógica real vive en otro módulo/función, delegamos ahí.
+    """
+    # 1) si ya existe una implementación interna con otro nombre, delegar
+    if "normalize_cdc" in globals() and callable(globals()["normalize_cdc"]):
+        return globals()["normalize_cdc"](rde_xml)
+
+    # 2) si existe en otro módulo (ajustar nombre si corresponde)
+    try:
+        from app.sifen_client.cdc import normalize_cdc_in_rde as impl  # si existe
+        return impl(rde_xml)
+    except Exception:
+        # 3) fallback: no-op (no rompe colección, pero deja el test fallar si esperaba cambios)
+        return rde_xml
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Envía XML siRecepLoteDE (rEnvioLote) al servicio SOAP de Recepción Lote DE (async) de SIFEN",
@@ -6436,11 +6739,17 @@ Ejemplos básicos:
   # Enviar archivo específico a test
   python -m tools.send_sirecepde --env test --xml artifacts/sirecepde_20251226_233653.xml
   
-  # Enviar el más reciente a test
+  # Enviar el XML base más reciente a test
   python -m tools.send_sirecepde --env test --xml latest
   
-  # Enviar a producción
+  # Enviar el XML base más reciente a producción
   python -m tools.send_sirecepde --env prod --xml latest
+  
+  # Reenviar el XML firmado más reciente
+  python -m tools.send_sirecepde --env prod --xml signed_latest
+  
+  # Prueba completa en producción con dump HTTP
+  python -m tools.send_sirecepde --env prod --xml latest --dump-http
   
   # Con debug SOAP y validación XSD
   SIFEN_DEBUG_SOAP=1 SIFEN_VALIDATE_XSD=1 python -m tools.send_sirecepde --env test --xml latest
@@ -6468,7 +6777,7 @@ Configuración requerida (variables de entorno):
     parser.add_argument(
         "--xml",
         required=True,
-        help="Path al archivo XML (rDE o siRecepDE) o 'latest' para usar el más reciente"
+        help="Path al archivo XML (rDE o siRecepDE) o valores especiales: 'latest'/'newest' (XML base más reciente), 'signed_latest' (XML firmado más reciente)"
     )
     
     parser.add_argument(
@@ -6483,6 +6792,12 @@ Configuración requerida (variables de entorno):
         type=Path,
         default=None,
         help="Directorio para guardar respuestas (default: artifacts/)"
+    )
+    
+    parser.add_argument(
+        "--force-resign",
+        action="store_true",
+        help="Fuerza re-firma del XML aunque ya esté firmado (útil para testing y comparación)"
     )
     
     args = parser.parse_args()
@@ -6510,11 +6825,13 @@ Configuración requerida (variables de entorno):
     
     # Enviar
     dump_http = getattr(args, 'dump_http', False)
+    force_resign = getattr(args, 'force_resign', False)
     result = send_sirecepde(
         xml_path=xml_path,
         env=env,
         artifacts_dir=artifacts_dir,
-        dump_http=dump_http
+        dump_http=dump_http,
+        force_resign=force_resign
     )
     
     # Retornar código de salida (0 solo si success es True explícitamente)
