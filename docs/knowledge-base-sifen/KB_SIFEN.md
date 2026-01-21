@@ -47,8 +47,6 @@
 
 - Firma: **XML Digital Signature (Enveloped)** con RSA 2048 y SHA-2; canonización C14N/exclusive.
 
-
-
 ### 2) Reglas de oro al generar un `rDE` (evita rechazos sutiles)
 
 Basado en la guía de mejores prácticas:
@@ -66,8 +64,6 @@ Basado en la guía de mejores prácticas:
 - No usar valores negativos o no numéricos en campos numéricos.
 
 - Respetar mayúsculas/minúsculas exactas de nombres de grupos/campos (case sensitive).
-
-
 
 Namespace típico (ej MT 150):
 
@@ -119,7 +115,6 @@ Namespace típico (ej MT 150):
 
 - `0301`: Lote no encolado (no se procesará).
 
-
 **Consulta lote (`consulta-lote`)**
 
 - `0360`: Número de lote inexistente.
@@ -129,7 +124,6 @@ Namespace típico (ej MT 150):
 - `0362`: Procesamiento concluido (leer `gResProcLote` por CDC).
 
 - `0364`: Consulta extemporánea (hasta 48h); luego consultar cada CDC con `consulta`.
-
 
 **Consulta DE por CDC (`consulta`)**
 
@@ -145,7 +139,6 @@ Namespace típico (ej MT 150):
 
 > Extracto del Manual Técnico v150 (tabla de resumen de URLs).
 
-
 ```text
 Resumen de las Direcciones Electrónicas de los Servicios Web para Ambientes de Pruebas y
 Producción ..................................................................................................................................................... 41
@@ -154,7 +147,6 @@ Producción ....................................................................
 ### CDC — ubicación del capítulo relevante
 
 > El Manual Técnico v150 dedica una sección específica a la estructura y verificación del CDC.
-
 
 ```text
 10.1. Estructura del código de control (CDC) de los DE ......................................................................... 56
@@ -168,7 +160,6 @@ Recomendaciones
 2. Verificar la respuesta de la recepción del lote, considerando los siguientes códigos
 de respuesta:
 5
-
 
 --- PAGE 6 ---
 
@@ -196,7 +187,6 @@ Motivos de bloqueo 6
 
 > **Nota:** ajustar `xmlns` según WSDL y entorno (test/prod).
 
-
 ### `recibe-lote` (siRecepLoteDE)
 
 ```text
@@ -209,7 +199,6 @@ recibe-lote 8
 consulta-lote 10
 consulta 12
 2
-
 
 --- PAGE 3 ---
 
@@ -241,7 +230,6 @@ https://www.w3.org/TR/xmldsig-core1/#sec-EnvelopedSignature C14N,
 http://www.w3.org/2001/10/xml-exc-c14n#
 3
 
-
 --- PAGE 4 ---
 
 Generación de los Documentos Electrónicos
@@ -271,7 +259,6 @@ La DNIT disponibiliza una herramienta para pre validación del DE en tiempo de
 desarrollo, utilidad para detectar campos incorrectos en el XML.
 Prevalidador SIFEN: https://ekuatia.set.gov.py/prevalidador/
 4
-
 
 --- PAGE 5 ---
 
@@ -304,7 +291,6 @@ Recomendaciones
 2. Verificar la respuesta de la recepción del lote, considerando los siguientes códigos
 de respuesta:
 5
-
 
 --- PAGE 6 ---
 
@@ -345,7 +331,6 @@ Las siguientes operaciones generan bloqueo de recepción de documentos por RUC
 Emisor de 10 a 60 minutos, según la cantidad de reincidencia. Esto puede generar
 6
 
-
 --- PAGE 7 ---
 
 algún esquema de penalización en el futuro. Los motivos del bloqueo temporal de
@@ -366,7 +351,6 @@ Internet, apoyado en la utilización del protocolo de seguridad TLS versión 1.2
 autenticación mutua.
 Configuracióndeconexiónparaautenticaciónmutua(enPostman)
 7
-
 
 --- PAGE 8 ---
 
@@ -392,7 +376,6 @@ Pasos para crear el Body para la invocación del servicio:
 4. Convertir el contenido comprimido a Base64
 5. Crear el envelope soap, teniendo en cuenta los namespace especificados
 8
-
 
 --- PAGE 9 ---
 
@@ -430,7 +413,6 @@ consultar un lote enviado pasado 10 minutos desde el envío.
 sección "Lote no encolado para procesamiento".
 9
 
-
 --- PAGE 10 ---
 
 consulta-lote
@@ -467,7 +449,6 @@ A. En procesamiento
 <env:Header/>
 10
 
-
 --- PAGE 11 ---
 
 <env:Body>
@@ -503,7 +484,6 @@ invalido, El valor del elemento: dDirLocEnt es invalido]
 </env:Body>
 </env:Envelope>
 11
-
 
 --- PAGE 12 ---
 ```
@@ -545,7 +525,6 @@ A. No existe
 <ns2:dMsgRes>Documento No Existe en SIFEN o ha sido Rechazado
 </ns2:dMsgRes>
 12
-
 
 --- PAGE 13 ---
 
@@ -589,6 +568,37 @@ B. Existe
 
 ## Errores frecuentes / Diagnósticos de conectividad
 
+### Error 0160 (XML Mal Formado) — Digest mismatch por modificar XML después de firmar
+
+**Síntoma**
+- SIFEN responde HTTP 400 con dCodRes=0160 "XML Mal Formado" aunque XSD local valide.
+
+**Causa raíz**
+- El XML rDE/lote se modificaba (ensure/sanitize, QR, microsegundos, rDE@Id, etc.) DESPUÉS de firmar, rompiendo Digest/Signature (canonicalización) → 0160.
+
+**Fix implementado en tools/send_sirecepde.py**
+- Se aplica "Final Signature Step" DESPUÉS de sanitizar y ANTES de rebuild ZIP.
+- Se extrae rDE del XML saneado y se firma con la función existente sign_de_with_p12.
+- Se reemplaza el rDE por la versión firmada final.
+- Se construye el ZIP/base64 (xDE) desde xml_signed_final (post-sanitize + post-final-sign).
+- Se guardó un artefacto de debug: _final_signed.xml.
+
+**Guardrails agregados**
+- A: DE@Id == Reference URI (#Id)
+- B: log de SHA256 del XML final
+- C: validar ZIP: 1 rDE directo, 0 xDE, Signature presente.
+
+**Nota menor**
+- Fix del warning regex (usar raw string/escape correcto) para remover microsegundos.
+
+**Regla anti-regresión**
+- **Si el XML cambia después de firmar, hay que re-firmar. El ZIP/xDE debe construirse desde el XML final firmado, nunca desde uno pre-fix.**
+
+**Checklist rápido antes de enviar**
+- rDE@Id presente y coincide con DE@Id
+- Reference URI = #DE@Id
+- ZIP contiene lote.xml con rLoteDE→rDE (no xDE) y Signature dentro de rDE
+
 ### BIG-IP /vdesk/hangup.php3 (WSDL 302 en PROD)
 
 **Síntoma**
@@ -614,7 +624,6 @@ B. Existe
 
 <!-- SOURCE: Guía de Mejores Prácticas para la Gestión del Envío de DE (Octubre 2024) -->
 
-
 ```text
 --- PAGE 1 ---
 
@@ -623,7 +632,6 @@ para SIFEN
 Guía para el desarrollador
 Octubre 2024
 1
-
 
 --- PAGE 2 ---
 
@@ -641,7 +649,6 @@ recibe-lote 8
 consulta-lote 10
 consulta 12
 2
-
 
 --- PAGE 3 ---
 
@@ -673,7 +680,6 @@ https://www.w3.org/TR/xmldsig-core1/#sec-EnvelopedSignature C14N,
 http://www.w3.org/2001/10/xml-exc-c14n#
 3
 
-
 --- PAGE 4 ---
 
 Generación de los Documentos Electrónicos
@@ -703,7 +709,6 @@ La DNIT disponibiliza una herramienta para pre validación del DE en tiempo de
 desarrollo, utilidad para detectar campos incorrectos en el XML.
 Prevalidador SIFEN: https://ekuatia.set.gov.py/prevalidador/
 4
-
 
 --- PAGE 5 ---
 
@@ -736,7 +741,6 @@ Recomendaciones
 2. Verificar la respuesta de la recepción del lote, considerando los siguientes códigos
 de respuesta:
 5
-
 
 --- PAGE 6 ---
 
@@ -777,7 +781,6 @@ Las siguientes operaciones generan bloqueo de recepción de documentos por RUC
 Emisor de 10 a 60 minutos, según la cantidad de reincidencia. Esto puede generar
 6
 
-
 --- PAGE 7 ---
 
 algún esquema de penalización en el futuro. Los motivos del bloqueo temporal de
@@ -798,7 +801,6 @@ Internet, apoyado en la utilización del protocolo de seguridad TLS versión 1.2
 autenticación mutua.
 Configuracióndeconexiónparaautenticaciónmutua(enPostman)
 7
-
 
 --- PAGE 8 ---
 
@@ -824,7 +826,6 @@ Pasos para crear el Body para la invocación del servicio:
 4. Convertir el contenido comprimido a Base64
 5. Crear el envelope soap, teniendo en cuenta los namespace especificados
 8
-
 
 --- PAGE 9 ---
 
@@ -862,7 +863,6 @@ consultar un lote enviado pasado 10 minutos desde el envío.
 sección "Lote no encolado para procesamiento".
 9
 
-
 --- PAGE 10 ---
 
 consulta-lote
@@ -899,7 +899,6 @@ A. En procesamiento
 <env:Header/>
 10
 
-
 --- PAGE 11 ---
 
 <env:Body>
@@ -935,7 +934,6 @@ invalido, El valor del elemento: dDirLocEnt es invalido]
 </env:Body>
 </env:Envelope>
 11
-
 
 --- PAGE 12 ---
 
@@ -974,7 +972,6 @@ A. No existe
 </ns2:dMsgRes>
 12
 
-
 --- PAGE 13 ---
 
 </ns2:rEnviConsDeResponse>
@@ -1000,7 +997,6 @@ B. Existe
 # Apéndice B — Texto completo: Manual Técnico SIFEN v150 (10/09/2019)
 
 <!-- SOURCE: Manual Técnico SIFEN v150 (Versión 150) -->
-
 
 ```text
 --- PAGE 1 / 217 ---
