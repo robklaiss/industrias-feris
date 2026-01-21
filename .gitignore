@@ -90,3 +90,15 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
+
+# Local / vendor / audit dumps (NO versionar)
+tesaka-final/
+tmp/
+tools/audit_0160/
+
+# Secrets / env local (NO versionar)
+secrets/
+tesaka-cv/.env.*
+*.pem
+*.pfx
+*.key
