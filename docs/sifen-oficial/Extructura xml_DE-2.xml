@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Estructura XML DE v2 - SIFEN -->
+<!-- Este archivo es un placeholder/documentación de la estructura del XML DE -->
+<rLoteDE xmlns="http://ekuatia.set.gov.py/sifen/xsd">
+  <rDE Id="rDE-XXXX">
+    <dVerFor>150</dVerFor>
+    <DE Id="DE-XXXX">
+      <!-- Contenido del DE -->
+    </DE>
+    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+      <!-- Firma digital -->
+    </Signature>
+  </rDE>
+</rLoteDE>

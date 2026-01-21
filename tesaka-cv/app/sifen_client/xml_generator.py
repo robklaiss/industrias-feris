@@ -48,8 +48,8 @@ def create_test_de_xml(
     # Datos Generales
     dg = ET.SubElement(root, "dg")
     ET.SubElement(dg, "dVer").text = "130"
-    ET.SubElement(dg, "dFecEmi").text = datetime.now().strftime("%Y-%m-%d")
-    ET.SubElement(dg, "dHorEmi").text = datetime.now().strftime("%H:%M:%S")
+    ET.SubElement(dg, "dFecEmi").text = datetime.now().replace(microsecond=0).strftime("%Y-%m-%d")
+    ET.SubElement(dg, "dHorEmi").text = datetime.now().replace(microsecond=0).strftime("%H:%M:%S")
     ET.SubElement(dg, "dEst").text = "001"
     ET.SubElement(dg, "dPunExp").text = "001"
     ET.SubElement(dg, "dNumDoc").text = "0000001"
@@ -150,8 +150,8 @@ def create_minimal_test_xml(
     from datetime import datetime
     
     if fecha is None:
-        fecha = datetime.now().strftime("%Y-%m-%d")
-        hora = datetime.now().strftime("%H:%M:%S")
+        fecha = datetime.now().replace(microsecond=0).strftime("%Y-%m-%d")
+        hora = datetime.now().replace(microsecond=0).strftime("%H:%M:%S")
     else:
         hora = "10:00:00"
     

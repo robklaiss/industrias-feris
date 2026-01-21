@@ -1,0 +1,32 @@
+# Dependencias base para backend SIFEN
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+jinja2>=3.1.2
+python-dotenv>=1.0.0
+httpx>=0.25.0
+requests>=2.31.0
+urllib3<2
+certifi
+
+# Form data support (requerido para endpoints con Form)
+python-multipart>=0.0.6
+
+# Validación de schemas (requerido para tests y validación)
+jsonschema>=4.0.0
+
+# XML processing (requerido para SIFEN)
+lxml>=4.9.0,<6.0.0
+
+# Criptografía (requerido para P12/PEM)
+cryptography>=41.0.0
+
+# Testing
+pytest>=7.0.0
+
+# Dependencias opcionales (para firma XML - pueden ser difíciles en macOS)
+# Si no están instaladas, los tests correspondientes se skippean automáticamente
+# xmlsec>=1.3.14,<2.0.0  # Requiere: brew install xmlsec1 libxml2 libxslt pkg-config
+# signxml  # Depende de xmlsec
+
+# SOAP client (para lotes, si se usa)
+zeep>=4.2.0

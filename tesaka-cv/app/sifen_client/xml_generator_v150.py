@@ -3,10 +3,14 @@ Generador de XML para documentos electrónicos SIFEN v150
 
 Estructura correcta según XSD v150
 """
-from typing import Optional
+from typing import Optional, Dict, Any
 from datetime import datetime
 import hashlib
 import base64
+from lxml import etree
+
+SIFEN_NS = "http://ekuatia.set.gov.py/sifen/xsd"
+DS_NS = "http://www.w3.org/2000/09/xmldsig#"
 
 
 def generate_cdc(ruc: str, timbrado: str, establecimiento: str, punto_expedicion: str,
@@ -84,10 +88,12 @@ def generate_cdc(ruc: str, timbrado: str, establecimiento: str, punto_expedicion
     if not tip_emi.isdigit():
         tip_emi = "1"
 
-    # 7) Código seguridad (9)
-    codseg = os.getenv("SIFEN_CODSEG", "123456789").strip()
+    # 7) Código seguridad (9 dígitos numéricos)
+    # Para TEST, SIFEN acepta cualquier código de 9 dígitos
+    # El CSC genérico (ABCD... o EFGH...) se usa para validación, no va en el CDC
+    codseg = os.getenv("SIFEN_CODSEG", "000000001").strip()
     if not re.fullmatch(r"\d{9}", codseg):
-        raise ValueError("SIFEN_CODSEG debe ser 9 dígitos (ej: 123456789).")
+        raise ValueError("SIFEN_CODSEG debe ser 9 dígitos (ej: 000000001 para TEST).")
 
     base43 = f"{tipo}{ruc8}{dv_ruc}{est}{pun}{num}{tip_cont}{fecha8}{tip_emi}{codseg}"
     if len(base43) != 43 or (not base43.isdigit()):
@@ -123,6 +129,7 @@ def calculate_digit_verifier(base43: str) -> str:
 
 def create_rde_xml_v150(
     ruc: str = "80012345",
+    dv_ruc: Optional[str] = None,
     timbrado: str = "12345678",
     establecimiento: str = "001",
     punto_expedicion: str = "001",
@@ -150,10 +157,20 @@ def create_rde_xml_v150(
         XML como string
     """
     if fecha is None:
-        fecha = datetime.now().strftime("%Y-%m-%d")
+        fecha = datetime.now().replace(microsecond=0).strftime("%Y-%m-%d")
     if hora is None:
-        hora = datetime.now().strftime("%H:%M:%S")
+        hora = datetime.now().replace(microsecond=0).strftime("%H:%M:%S")
     
+    # Normalizar número de documento (máx 7 dígitos)
+    numero_doc_digits = "".join(c for c in str(numero_documento or "") if c.isdigit())
+    if not numero_doc_digits:
+        raise ValueError("numero_documento vacío o sin dígitos.")
+    if len(numero_doc_digits) > 7:
+        raise ValueError(
+            f"numero_documento excede 7 dígitos ({len(numero_doc_digits)}): {numero_documento!r}"
+        )
+    numero_doc_7 = numero_doc_digits.zfill(7)
+
     # Fecha formato SIFEN: YYYY-MM-DDTHH:MM:SS
     fecha_firma = f"{fecha}T{hora}"
     fecha_emision = fecha_firma
@@ -162,8 +179,19 @@ def create_rde_xml_v150(
     monto = "100000"
     
     # Generar CDC (simplificado para pruebas)
-    cdc = generate_cdc(ruc, timbrado, establecimiento, punto_expedicion, 
-                      numero_documento, tipo_documento, fecha.replace("-", ""), monto)
+    # CDC requiere RUC base de 8 dígitos zero-left
+    ruc_digits_full = "".join(c for c in str(ruc or "") if c.isdigit())
+    ruc_for_cdc = (ruc_digits_full or "80012345")[:8].zfill(8)
+    cdc = generate_cdc(
+        ruc_for_cdc,
+        timbrado,
+        establecimiento,
+        punto_expedicion,
+        numero_doc_7,
+        tipo_documento,
+        fecha.replace("-", ""),
+        monto,
+    )
     
     # Validación defensiva: asegurar que el CDC sea válido antes de usarlo
     from app.sifen_client.cdc_utils import validate_cdc, fix_cdc
@@ -203,30 +231,54 @@ def create_rde_xml_v150(
     dv_id = cdc[-1]
     
     # Código de seguridad (CSC) - debe ser entero de 9 dígitos según tiCodSe
-    # Para pruebas: generar número de 9 dígitos
+    # Para TEST SIFEN: usar código genérico
+    # IMPORTANTE: El dCodSeg (9 dígitos) va en el CDC, el CSC completo (ABCD... o EFGH...) 
+    # se usa para validación/firma pero NO va en el XML
+    import os
     if csc:
         # Asegurar que sea numérico de 9 dígitos
         cod_seg_digits = ''.join(c for c in str(csc) if c.isdigit())
-        cod_seg = cod_seg_digits[:9].zfill(9) if cod_seg_digits else "123456789"
+        cod_seg = cod_seg_digits[:9].zfill(9) if cod_seg_digits else "000000001"
     else:
-        cod_seg = "123456789"
+        # Para TEST SIFEN: usar código genérico de 9 dígitos
+        cod_seg = os.getenv("SIFEN_CODSEG", "000000001")
     
-    # RUC debe ser máximo 8 dígitos
-    ruc_str = str(ruc or "")
-    if not ruc_str or not ruc_str.strip():
-        ruc_str = "80012345"
-    ruc_clean = ruc_str[:8].zfill(8) if len(ruc_str) < 8 else ruc_str[:8]
+    # RUC emisor (sin ceros a la izquierda para gEmis)
+    ruc_display_digits = ''.join(c for c in str(ruc or "") if c.isdigit())
+    if not ruc_display_digits:
+        ruc_display_digits = "80012345"
+    ruc_display = ruc_display_digits.lstrip("0") or "0"
     
-    # Calcular DV del RUC (simplificado)
-    # Asegurar que sea un dígito válido
-    dv_ruc = "0"
-    try:
-        ruc_digits = ''.join(c for c in ruc_clean if c.isdigit())
-        if ruc_digits:
-            # Algoritmo simplificado para DV
-            dv_ruc = str(sum(int(d) for d in ruc_digits) % 10)
-    except:
-        dv_ruc = "0"
+    # Leer fechas de vigencia del timbrado desde environment variables
+    import os
+    fecha_inicio_timbrado = os.getenv("SIFEN_TIMBRADO_FECHA_INICIO", fecha)
+    fecha_fin_timbrado = os.getenv("SIFEN_TIMBRADO_FECHA_FIN", "")
+    
+    # Validar formato de fechas
+    if not fecha_inicio_timbrado:
+        raise ValueError("SIFEN_TIMBRADO_FECHA_INICIO es obligatorio (formato YYYY-MM-DD)")
+    
+    if not fecha_fin_timbrado:
+        raise ValueError("SIFEN_TIMBRADO_FECHA_FIN es obligatorio (formato YYYY-MM-DD)")
+    
+    # Validar que las fechas estén en formato correcto
+    import re
+    fecha_pattern = re.compile(r'^\d{4}-\d{2}-\d{2}$')
+    if not fecha_pattern.match(fecha_inicio_timbrado):
+        raise ValueError(f"Formato inválido de SIFEN_TIMBRADO_FECHA_INICIO: {fecha_inicio_timbrado}. Debe ser YYYY-MM-DD")
+    if not fecha_pattern.match(fecha_fin_timbrado):
+        raise ValueError(f"Formato inválido de SIFEN_TIMBRADO_FECHA_FIN: {fecha_fin_timbrado}. Debe ser YYYY-MM-DD")
+    
+    # Determinar DV del RUC
+    dv_ruc_value = (dv_ruc or "").strip()
+    if not dv_ruc_value:
+        try:
+            if ruc_display_digits:
+                dv_ruc_value = str(sum(int(d) for d in ruc_display_digits if d.isdigit()) % 10)
+            else:
+                dv_ruc_value = "0"
+        except Exception:
+            dv_ruc_value = "0"
     
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <rDE xmlns="http://ekuatia.set.gov.py/sifen/xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
@@ -246,14 +298,23 @@ def create_rde_xml_v150(
             <dNumTim>{timbrado}</dNumTim>
             <dEst>{establecimiento}</dEst>
             <dPunExp>{punto_expedicion}</dPunExp>
-            <dNumDoc>{numero_documento}</dNumDoc>
-            <dFeIniT>{fecha}</dFeIniT>
+            <dNumDoc>{numero_doc_7}</dNumDoc>
+            <dFeIniT>{fecha_inicio_timbrado}</dFeIniT>
+            <dFeFinT>{fecha_fin_timbrado}</dFeFinT>
         </gTimb>
         <gDatGralOpe>
             <dFeEmiDE>{fecha_emision}</dFeEmiDE>
-            <gEmis>
-                <dRucEm>{ruc_clean}</dRucEm>
-                <dDVEmi>{dv_ruc}</dDVEmi>
+            <gOpeCom>
+                <iTipTra>1</iTipTra>
+                <dDesTipTra>Venta de mercadería</dDesTipTra>
+                <iTImp>1</iTImp>
+                <dDesTImp>IVA</dDesTImp>
+                <cMoneOpe>PYG</cMoneOpe>
+                <dDesMoneOpe>Guarani</dDesMoneOpe>
+            </gOpeCom>
+                <gEmis>
+                <dRucEm>{ruc_display}</dRucEm>
+                <dDVEmi>{dv_ruc_value}</dDVEmi>
                 <iTipCont>1</iTipCont>
                 <dNomEmi>Contribuyente de Prueba S.A.</dNomEmi>
                 <dDirEmi>Asunción</dDirEmi>
@@ -261,31 +322,47 @@ def create_rde_xml_v150(
                 <cDepEmi>1</cDepEmi>
                 <dDesDepEmi>CAPITAL</dDesDepEmi>
                 <cCiuEmi>1</cCiuEmi>
-                <dDesCiuEmi>Asunción</dDesCiuEmi>
+                <dDesCiuEmi>ASUNCION (DISTRITO)</dDesCiuEmi>
                 <dTelEmi>021123456</dTelEmi>
                 <dEmailE>test@example.com</dEmailE>
                 <gActEco>
-                    <cActEco>471100</cActEco>
-                    <dDesActEco>Venta al por menor en comercios no especializados</dDesActEco>
+                    <cActEco>64990</cActEco>
+                    <dDesActEco>OTRAS ACTIVIDADES DE SERVICIOS FINANCIEROS, EXCEPTO LA FINANCIACIÓN DE PLANES DE SEGUROS Y DE PENSIONES</dDesActEco>
                 </gActEco>
             </gEmis>
             <gDatRec>
                 <iNatRec>1</iNatRec>
                 <iTiOpe>1</iTiOpe>
                 <cPaisRec>PRY</cPaisRec>
-                <dDesPaisRec>Paraguay</dDesPaisRec>
+                <dDesPaisRe>Paraguay</dDesPaisRe>
+                <iTiContRec>2</iTiContRec>
                 <dRucRec>80012345</dRucRec>
-                <dDVRec>7</dDVRec>
+                <dDVRec>0</dDVRec>
                 <dNomRec>Cliente de Prueba</dNomRec>
                 <dDirRec>Asunción</dDirRec>
                 <dNumCasRec>5678</dNumCasRec>
                 <cDepRec>1</cDepRec>
                 <dDesDepRec>CAPITAL</dDesDepRec>
                 <cCiuRec>1</cCiuRec>
-                <dDesCiuRec>Asunción</dDesCiuRec>
+                <dDesCiuRec>ASUNCION (DISTRITO)</dDesCiuRec>
             </gDatRec>
         </gDatGralOpe>
         <gDtipDE>
+            <gCamFE>
+                <iIndPres>1</iIndPres>
+                <dDesIndPres>Operación presencial</dDesIndPres>
+            </gCamFE>
+            <gCamCond>
+                <iCondOpe>1</iCondOpe>
+                <dDCondOpe>Contado</dDCondOpe>
+                <gPaConEIni>
+                    <iTiPago>1</iTiPago>
+                    <dDesTiPag>Efectivo</dDesTiPag>
+                    <dMonTiPag>100000</dMonTiPag>
+                    <cMoneTiPag>PYG</cMoneTiPag>
+                    <dDMoneTiPag>Guarani</dDMoneTiPag>
+                </gPaConEIni>
+            </gCamCond>
             <gCamItem>
                 <dCodInt>001</dCodInt>
                 <dDesProSer>Producto de Prueba</dDesProSer>
@@ -299,14 +376,46 @@ def create_rde_xml_v150(
                         <dTotOpeItem>100000</dTotOpeItem>
                     </gValorRestaItem>
                 </gValorItem>
+                <gCamIVA>
+                    <iAfecIVA>1</iAfecIVA>
+                    <dDesAfecIVA>Gravado IVA</dDesAfecIVA>
+                    <dPropIVA>100</dPropIVA>
+                    <dTasaIVA>10</dTasaIVA>
+                    <dBasGravIVA>90909</dBasGravIVA>
+                    <dLiqIVAItem>9091</dLiqIVAItem>
+                    <dBasExe>0</dBasExe>
+                </gCamIVA>
+            </gCamItem>
+            <gCamItem>
+                <dCodInt>002</dCodInt>
+                <dDesProSer>Producto de Prueba</dDesProSer>
+                <cUniMed>99</cUniMed>
+                <dDesUniMed>UNI</dDesUniMed>
+                <dCantProSer>1.00</dCantProSer>
+                <gValorItem>
+                    <dPUniProSer>100000</dPUniProSer>
+                    <dTotBruOpeItem>100000</dTotBruOpeItem>
+                    <gValorRestaItem>
+                        <dTotOpeItem>100000</dTotOpeItem>
+                    </gValorRestaItem>
+                </gValorItem>
+                <gCamIVA>
+                    <iAfecIVA>1</iAfecIVA>
+                    <dDesAfecIVA>Gravado IVA</dDesAfecIVA>
+                    <dPropIVA>100</dPropIVA>
+                    <dTasaIVA>10</dTasaIVA>
+                    <dBasGravIVA>90909</dBasGravIVA>
+                    <dLiqIVAItem>9091</dLiqIVAItem>
+                    <dBasExe>0</dBasExe>
+                </gCamIVA>
             </gCamItem>
         </gDtipDE>
         <gTotSub>
             <dSubExe>0</dSubExe>
             <dSubExo>0</dSubExo>
             <dSub5>0</dSub5>
-            <dSub10>0</dSub10>
-            <dTotOpe>100000</dTotOpe>
+            <dSub10>200000</dSub10>
+            <dTotOpe>200000</dTotOpe>
             <dTotDesc>0</dTotDesc>
             <dTotDescGlotem>0</dTotDescGlotem>
             <dTotAntItem>0</dTotAntItem>
@@ -315,36 +424,15 @@ def create_rde_xml_v150(
             <dDescTotal>0</dDescTotal>
             <dAnticipo>0</dAnticipo>
             <dRedon>0</dRedon>
-            <dTotGralOpe>100000</dTotGralOpe>
+            <dTotGralOpe>200000</dTotGralOpe>
             <dIVA5>0</dIVA5>
-            <dIVA10>0</dIVA10>
-            <dLiqTotIVA5>0</dLiqTotIVA5>
-            <dLiqTotIVA10>0</dLiqTotIVA10>
-            <dTotalGs>100000</dTotalGs>
+            <dIVA10>18182</dIVA10>
+            <dTotIVA>18182</dTotIVA>
+            <dBaseGrav5>0</dBaseGrav5>
+            <dBaseGrav10>181818</dBaseGrav10>
+            <dTBasGraIVA>181818</dTBasGraIVA>
         </gTotSub>
     </DE>
-    <ds:Signature>
-        <ds:SignedInfo>
-            <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-            <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-            <ds:Reference URI="">
-                <ds:Transforms>
-                    <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
-                </ds:Transforms>
-                <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-                <ds:DigestValue>dGhpcyBpcyBhIHRlc3QgZGlnZXN0IHZhbHVl</ds:DigestValue>
-            </ds:Reference>
-        </ds:SignedInfo>
-        <ds:SignatureValue>dGhpcyBpcyBhIHRlc3Qgc2lnbmF0dXJlIHZhbHVlIGZvciBwcnVlYmFzIG9ubHk=</ds:SignatureValue>
-        <ds:KeyInfo>
-            <ds:X509Data>
-                <ds:X509Certificate>LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVKakNDQWpLZ0F3SUJBZ0lEQW5CZ2txaGtpRzl3MEJBUXNGQUFEV1lqRU1NQW9HQTFVRUNoTURVbVZzWVcKd2dnRWlNQTBHQ1NxR1NJYjM=</ds:X509Certificate>
-            </ds:X509Data>
-        </ds:KeyInfo>
-    </ds:Signature>
-    <gCamFuFD>
-        <dCarQR>TESTQRCODE12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890</dCarQR>
-    </gCamFuFD>
 </rDE>"""
     
     return xml
