@@ -112,3 +112,9 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
+
+# WIP local (no versionar)
+.wip/
+
+# macOS
+.DS_Store
