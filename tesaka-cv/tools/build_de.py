@@ -144,11 +144,22 @@ def build_de_xml(
     dv_id = cdc[-1]
     
     # Código de seguridad (CSC)
+    # Según XSD v150, dCodSeg debe ser un entero de 9 dígitos (tiCodSe)
+    # El CSC puede venir alfanumérico, pero solo se usan los dígitos
     if csc:
-        cod_seg_digits = ''.join(c for c in str(csc) if c.isdigit())
-        cod_seg = cod_seg_digits[:9].zfill(9) if cod_seg_digits else "123456789"
+        # Extraer solo dígitos del CSC (puede contener letras como A62e367A...)
+        csc_digits = ''.join(c for c in str(csc) if c.isdigit())
+        if csc_digits:
+            # Usar hasta 9 dígitos, rellenando con ceros si es necesario
+            cod_seg = csc_digits[:9].zfill(9)
+        else:
+            # Si no hay dígitos, usar valor por defecto
+            cod_seg = "123456789"
+            print(f"⚠️  Advertencia: CSC '{csc}' no contiene dígitos. Usando valor por defecto.")
     else:
+        # Si no se proporciona CSC, usar valor por defecto
         cod_seg = "123456789"
+        print("⚠️  Advertencia: No se proporcionó CSC. Usando valor por defecto 123456789.")
     
     # Timbrado debe tener al menos 7 dígitos
     timbrado_str = str(timbrado or "")
@@ -396,12 +407,12 @@ def main():
     else:
         ruc = args.ruc
     
-    # Obtener CSC
-    csc = args.csc
-    if not csc:
+    # Obtener CSC desde config si no se proporciona por args
+    if not args.csc:
         try:
             config = get_sifen_config(env=args.env)
-            csc = config.test_csc if args.env == "test" else getattr(config, "prod_csc", None)
+            # Usar config.csc que ya maneja test/prod correctamente
+            csc = config.csc if config.csc else None
         except:
             csc = None
     

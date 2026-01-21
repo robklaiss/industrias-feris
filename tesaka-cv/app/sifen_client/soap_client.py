@@ -1,3 +1,8 @@
+from app.sifen_client.config import (
+    get_mtls_cert_path_and_password,
+    get_mtls_cert_and_key_paths,
+    get_mtls_config,
+)
 """
 Cliente SOAP 1.2 Document/Literal para SIFEN
 
@@ -133,6 +138,8 @@ class SoapClient:
         - .../recibe.wsdl -> HTTP 200 pero body vacío (len=0)
         - .../recibe.wsdl?wsdl -> WSDL real
         Por eso forzamos ?wsdl si no está.
+        
+        Para consulta_ruc, es CRÍTICO usar WSDL para evitar error 0160.
         """
         u = (wsdl_url or "").strip()
         if not u:
@@ -249,96 +256,46 @@ class SoapClient:
     def _create_transport(self) -> Any:  # Transport de Zeep
         """Crea el transporte Zeep con requests.Session configurada para mTLS."""
         session = Session()
-
-        # Modo 1: PEM directo (prioridad)
-        pem_cert = getattr(self.config, "cert_pem_path", None) or os.getenv(
-            "SIFEN_CERT_PEM_PATH"
-        )
-        pem_key = getattr(self.config, "key_pem_path", None) or os.getenv(
-            "SIFEN_KEY_PEM_PATH"
-        )
-
-        if pem_cert and pem_key:
-            cert_path = Path(pem_cert)
-            key_path = Path(pem_key)
-            if not cert_path.exists():
-                raise SifenClientError(f"Certificado PEM no encontrado: {cert_path}")
-            if not key_path.exists():
-                raise SifenClientError(f"Clave privada PEM no encontrada: {key_path}")
-
-            session.cert = (str(cert_path), str(key_path))
+        
+        # Usar helper unificado get_mtls_config()
+        cert_path, key_or_password, is_pem_mode = get_mtls_config()
+        
+        if is_pem_mode:
+            # Modo PEM: requests necesita (cert_path, key_path)
+            session.cert = (cert_path, key_or_password)  # key_or_password es la key PEM
             self._temp_pem_files = None
             logger.info(
-                f"Usando mTLS via PEM: cert={cert_path.name}, key={key_path.name}"
+                f"Usando mTLS modo PEM: cert={Path(cert_path).name}, key={Path(key_or_password).name}"
             )
-
         else:
-            # Modo 2: PKCS12 (fallback) - usar helper para mTLS
-            resolved_cert_path, resolved_cert_password = get_mtls_cert_path_and_password()
-            
-            # Fallback a config si no hay env vars
-            if not resolved_cert_path:
-                resolved_cert_path = getattr(self.config, "cert_path", None)
-            if not resolved_cert_password:
-                resolved_cert_password = getattr(self.config, "cert_password", None)
-
-            missing = []
-            if not resolved_cert_path:
-                missing.append("SIFEN_MTLS_P12_PATH o SIFEN_CERT_PATH")
-            if not resolved_cert_password:
-                missing.append("SIFEN_MTLS_P12_PASSWORD o SIFEN_CERT_PASSWORD")
-
-            if missing:
-                raise SifenClientError(
-                    "mTLS es requerido para SIFEN. Falta: "
-                    + ", ".join(missing)
-                    + ". Opciones: 1) export SIFEN_CERT_PEM_PATH=... "
-                    "y SIFEN_KEY_PEM_PATH=... "
-                    "2) export SIFEN_MTLS_P12_PATH=/ruta/al/certificado.p12 "
-                    "y SIFEN_MTLS_P12_PASSWORD=..."
+            # Modo P12: convertir a PEM temporales para requests/urllib3
+            try:
+                cert_pem_path, key_pem_path = p12_to_temp_pem_files(
+                    cert_path, key_or_password  # key_or_password es el password del P12
                 )
-
-            # resolved_cert_path está garantizado como no-None
-            # por la validación anterior
-            assert resolved_cert_path is not None
-            cert_path = Path(resolved_cert_path)
-            if not cert_path.exists():
-                raise SifenClientError(f"Certificado no encontrado: {cert_path}")
-
-            ext = cert_path.suffix.lower()
-            is_p12 = ext in (".p12", ".pfx")
-
-            if is_p12:
-                try:
-                    cert_pem_path, key_pem_path = p12_to_temp_pem_files(
-                        str(cert_path), resolved_cert_password or ""
+                self._temp_pem_files = (cert_pem_path, key_pem_path)
+                session.cert = (cert_pem_path, key_pem_path)
+                
+                # Debug: guardar paths si está habilitado
+                debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+                if debug_enabled:
+                    logger.info(
+                        f"mTLS: Certificado P12 convertido a PEM temporales: "
+                        f"cert={cert_pem_path}, key={key_pem_path}"
                     )
-                    self._temp_pem_files = (cert_pem_path, key_pem_path)
-                    session.cert = (cert_pem_path, key_pem_path)
-                    
-                    # Debug: guardar paths si está habilitado
-                    debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
-                    if debug_enabled:
-                        logger.info(
-                            f"mTLS: Certificado P12 convertido a PEM temporales: "
-                            f"cert={cert_pem_path}, key={key_pem_path}"
-                        )
-                    else:
-                        logger.info(
-                            f"Certificado P12 convertido a PEM temporales para mTLS: "
-                            f"{Path(cert_pem_path).name}, {Path(key_pem_path).name}"
-                        )
-                except PKCS12Error as e:
-                    raise SifenClientError(
-                        f"Error al convertir certificado P12 a PEM: {e}"
-                    ) from e
-                except Exception as e:
-                    raise SifenClientError(
-                        f"Error inesperado al procesar certificado: {e}"
-                    ) from e
-            else:
-                session.cert = str(cert_path)
-                logger.info(f"Usando certificado en formato: {ext}")
+                else:
+                    logger.info(
+                        f"Certificado P12 convertido a PEM temporales para mTLS: "
+                        f"{Path(cert_pem_path).name}, {Path(key_pem_path).name}"
+                    )
+            except PKCS12Error as e:
+                raise SifenClientError(
+                    f"Error al convertir certificado P12 a PEM: {e}"
+                ) from e
+            except Exception as e:
+                raise SifenClientError(
+                    f"Error inesperado al procesar certificado: {e}"
+                ) from e
 
         # SSL verify
         session.verify = True
@@ -1629,37 +1586,45 @@ class SoapClient:
                                         encoding="utf-8"
                                     )
                                     
-                                    # Buscar Signature dentro de DE
+                                    # Buscar Signature dentro de rDE (como hermano de DE)
+                                    # Según solución error 0160, la Signature debe estar dentro de rDE
                                     sig_elem = None
-                                    for elem in de_elem.iter():
-                                        elem_ns = None
-                                        if "}" in elem.tag:
-                                            elem_ns = elem.tag.split("}", 1)[0][1:]
-                                        if etree.QName(elem).localname == "Signature" and elem_ns == DS_NS:
-                                            sig_elem = elem
+                                    for child in rde_elem:
+                                        if etree.QName(child).localname == "Signature" and child.tag.split("}", 1)[0][1:] == DS_NS:
+                                            sig_elem = child
                                             break
                                     
-                                    if sig_elem is not None:
-                                        # Buscar Reference URI
-                                        ref_elem = sig_elem.find(f".//{{{DS_NS}}}Reference")
-                                        if ref_elem is not None:
-                                            ref_uri = ref_elem.get("URI") or ref_elem.get("uri")
-                                            artifacts_dir.joinpath("diag_sig_reference_uri.txt").write_text(
-                                                f"Reference URI: {ref_uri or 'NOT_FOUND'}\n"
-                                                f"DE Id: {de_id or 'NOT_FOUND'}\n"
-                                                f"Expected URI: #{de_id if de_id else 'MISSING_DE_ID'}\n"
-                                                f"Match: {'YES' if ref_uri == f'#{de_id}' else 'NO'}\n",
-                                                encoding="utf-8"
+                                    if sig_elem is None:
+                                        # Fallback: buscar en todo rDE
+                                        for elem in rde_elem.iter():
+                                            elem_ns = None
+                                            if "}" in elem.tag:
+                                                elem_ns = elem.tag.split("}", 1)[0][1:]
+                                            if etree.QName(elem).localname == "Signature" and elem_ns == DS_NS:
+                                                sig_elem = elem
+                                                break
+                                    
+                                    if sig_elem is None:
+                                        raise RuntimeError("No se encontró ds:Signature dentro de rDE")
+                                    
+                                    # Buscar Reference URI
+                                    ref_elem = sig_elem.find(f".//{{{DS_NS}}}Reference")
+                                    if ref_elem is not None:
+                                        ref_uri = ref_elem.get("URI") or ref_elem.get("uri")
+                                        artifacts_dir.joinpath("diag_sig_reference_uri.txt").write_text(
+                                            f"Reference URI: {ref_uri or 'NOT_FOUND'}\n"
+                                            f"DE Id: {de_id or 'NOT_FOUND'}\n"
+                                            f"Expected URI: #{de_id if de_id else 'MISSING_DE_ID'}\n"
+                                            f"Match: {'YES' if ref_uri == f'#{de_id}' else 'NO'}\n",
+                                            encoding="utf-8"
+                                        )
+                                        
+                                        if de_id and ref_uri != f"#{de_id}":
+                                            raise RuntimeError(
+                                                f"Reference URI no coincide con DE Id: URI={ref_uri}, DE@Id={de_id}"
                                             )
-                                            
-                                            if de_id and ref_uri != f"#{de_id}":
-                                                raise RuntimeError(
-                                                    f"Reference URI no coincide con DE Id: URI={ref_uri}, DE@Id={de_id}"
-                                                )
-                                        else:
-                                            raise RuntimeError("No se encontró Reference dentro de Signature")
                                     else:
-                                        raise RuntimeError("No se encontró ds:Signature dentro de DE")
+                                        raise RuntimeError("No se encontró Reference dentro de Signature")
                                 else:
                                     raise RuntimeError("No se encontró DE dentro de rDE")
                             else:
@@ -2030,12 +1995,41 @@ class SoapClient:
         
         # POST: usar SIEMPRE soap_bytes REAL (con xDE completo, sin redactar)
         try:
+            # mTLS: PEM vs P12
+            resolved_cert_path = None
+            resolved_key_path = None
+            temp_pem_files = None
+
+            key_path_env = os.environ.get("SIFEN_KEY_PATH")
+            if key_path_env:
+                # Modo PEM: cert + key
+                resolved_cert_path, resolved_key_path = get_mtls_cert_and_key_paths()
+                session.cert = (resolved_cert_path, resolved_key_path)   # ✅ PEM tuple
+            else:
+                # Modo P12: convertir a PEM temporales para requests/urllib3
+                resolved_cert_path, resolved_cert_password = get_mtls_cert_path_and_password()
+                try:
+                    cert_pem_path, key_pem_path = p12_to_temp_pem_files(
+                        resolved_cert_path, resolved_cert_password
+                    )
+                    temp_pem_files = (cert_pem_path, key_pem_path)
+                    session.cert = (cert_pem_path, key_pem_path)
+                except PKCS12Error as e:
+                    raise SifenClientError(f"Error al convertir P12 a PEM: {e}") from e
+            
             resp = session.post(
                 post_url,
                 data=soap_bytes,  # soap_bytes REAL con xDE completo
                 headers=headers_final,  # Usar headers_final único
                 timeout=(self.connect_timeout, self.read_timeout),
             )
+            
+            # Cleanup de archivos PEM temporales si se usaron
+            if temp_pem_files:
+                try:
+                    cleanup_pem_files(temp_pem_files[0], temp_pem_files[1])
+                except Exception as e:
+                    logger.warning(f"No se pudo limpiar archivos PEM temporales: {e}")
             
             # Dump HTTP completo si está habilitado
             if dump_http:
@@ -3497,6 +3491,7 @@ class SoapClient:
         # rEnviConsRUC según XSD (targetNamespace: http://ekuatia.set.gov.py/sifen/xsd)
         # XSD define: <xs:element name="rEnviConsRUC">
         # IMPORTANTE: Usar "rEnviConsRUC" (NO "rEnviConsRucRequest")
+        # SIFEN exige namespace DEFAULT sin prefijos para siConsRUC (evita HTTP 400)
         r_envi_cons_ruc = etree.SubElement(
             body, "rEnviConsRUC", nsmap={None: SIFEN_NS}
         )
@@ -3527,9 +3522,17 @@ class SoapClient:
                 raise RuntimeError(f"SOAP Body no encontrado después de generar. SOAP:\n{soap_bytes.decode('utf-8', errors='replace')}")
             
             # Validar que rEnviConsRUC existe en Body (hijo directo)
+            # Buscar con namespace default (nuevo formato) o con prefijo xsd: (fallback)
             request_elem = body_elem.find(f"{{{SIFEN_NS}}}rEnviConsRUC")
             if request_elem is None:
-                # Intentar sin namespace
+                # Intentar buscar con prefijo xsd usando QName local
+                for child in body_elem:
+                    if etree.QName(child.tag).localname == "rEnviConsRUC":
+                        request_elem = child
+                        break
+            
+            if request_elem is None:
+                # Intentar sin namespace (fallback original)
                 request_elem = body_elem.find(".//rEnviConsRUC")
             
             if request_elem is None:
@@ -3552,6 +3555,13 @@ class SoapClient:
             # Validar que tiene dId y dRUCCons como hijos directos y no vacíos
             d_id_check = request_elem.find(f"{{{SIFEN_NS}}}dId")
             if d_id_check is None:
+                # Buscar hijo con localname "dId" (para manejar namespace default)
+                for child in request_elem:
+                    if etree.QName(child.tag).localname == "dId":
+                        d_id_check = child
+                        break
+            if d_id_check is None:
+                # Intentar sin namespace (fallback original)
                 d_id_check = request_elem.find("dId")
             if d_id_check is None:
                 raise RuntimeError(
@@ -3566,6 +3576,13 @@ class SoapClient:
             
             d_ruc_check = request_elem.find(f"{{{SIFEN_NS}}}dRUCCons")
             if d_ruc_check is None:
+                # Buscar hijo con localname "dRUCCons" (para manejar namespace default)
+                for child in request_elem:
+                    if etree.QName(child.tag).localname == "dRUCCons":
+                        d_ruc_check = child
+                        break
+            if d_ruc_check is None:
+                # Intentar sin namespace (fallback original)
                 d_ruc_check = request_elem.find("dRUCCons")
             if d_ruc_check is None:
                 raise RuntimeError(
@@ -3644,6 +3661,9 @@ class SoapClient:
         
         # POST usando la sesión existente con mTLS
         session = self.transport.session
+        
+        # mTLS: la configuración ya está aplicada en _create_transport()
+        # No necesitamos hacer nada más aquí
         
         # RETRY por errores de conexión (solo para esta consulta, NO para envíos)
         max_attempts = 3
