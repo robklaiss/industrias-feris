@@ -30,7 +30,7 @@ def extraer_de():
     output_path.parent.mkdir(exist_ok=True)
     
     # Serializar con formato correcto
-    xml_bytes = etree.tostring(rde, encoding='utf-8', xml_declaration=True, standalone=False, pretty_print=False)
+    xml_bytes = etree.tostring(rde, encoding='utf-8', xml_declaration=True, pretty_print=False)
     
     output_path.write_bytes(xml_bytes)
     print(f"✅ rDE guardado en: {output_path}")

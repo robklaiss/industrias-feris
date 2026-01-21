@@ -58,6 +58,7 @@ from requests import Session
 from requests.adapters import HTTPAdapter
 import requests
 from urllib3.util.retry import Retry
+import certifi
 
 from .config import (
     SifenConfig,
@@ -69,6 +70,7 @@ from .exceptions import (
     SifenClientError,
     SifenSizeLimitError,
 )
+from .certs import load_mtls_credentials, cleanup_pem_cache
 
 try:
     from .wsdl_introspect import inspect_wsdl, save_wsdl_inspection
@@ -80,6 +82,122 @@ logger = logging.getLogger(__name__)
 
 # WSDL cache directory
 WSDL_CACHE_DIR = get_artifacts_dir("wsdl_cache")
+
+
+def validate_pem_pair(cert_path: Optional[str], key_path: Optional[str] = None) -> None:
+    """Valida que los archivos PEM del certificado sean válidos antes de usarlos.
+    
+    Args:
+        cert_path: Path al archivo del certificado PEM
+        key_path: Path opcional al archivo de la clave PEM (si no está combinado)
+        
+    Raises:
+        SifenClientError: Si los PEM no son válidos o no existen
+    """
+    if not cert_path:
+        return
+        
+    cert_p = Path(cert_path)
+    if not cert_p.exists():
+        raise SifenClientError(f"Certificado PEM no encontrado: {cert_p}")
+    
+    # Crear contexto SSL para validar PEMs
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    
+    try:
+        # Cargar CA bundle
+        ctx.load_verify_locations(cafile=certifi.where())
+        
+        # Cargar certificado y clave
+        if key_path:
+            key_p = Path(key_path)
+            if not key_p.exists():
+                raise SifenClientError(f"Key PEM no encontrada: {key_p}")
+            ctx.load_cert_chain(certfile=str(cert_p), keyfile=str(key_p))
+        else:
+            ctx.load_cert_chain(certfile=str(cert_p))
+            
+    except ssl.SSLError as e:
+        error_msg = f"PEM inválido: cert={cert_p}"
+        if key_path:
+            error_msg += f" key={key_path}"
+        error_msg += f" error={e}"
+        raise SifenClientError(error_msg) from e
+    except Exception as e:
+        error_msg = f"Error validando PEM: cert={cert_p}"
+        if key_path:
+            error_msg += f" key={key_p}"
+        error_msg += f" error={e}"
+        raise SifenClientError(error_msg) from e
+
+
+def _build_requests_session(for_service: str) -> requests.Session:
+    """Construye una requests.Session con configuración SSL unificada.
+    
+    Args:
+        for_service: Nombre del servicio ('consulta_ruc', 'recibe_lote', etc.)
+        
+    Returns:
+        requests.Session configurada con SSL verify y mTLS si corresponde
+    """
+    session = requests.Session()
+    
+    # Siempre usar certifi para verify
+    session.verify = certifi.where()
+    
+    # mTLS solo para servicios que lo requieren y solo si está explícitamente habilitado
+    mtls_services = {
+        'recibe_lote',  # siRecepLoteDE siempre necesita mTLS
+        'recibe',       # siRecepDE siempre necesita mTLS
+        'consulta',     # siConsDE necesita mTLS
+        'consulta_lote' # siConsLoteDE necesita mTLS
+    }
+    
+    # consulta_ruc NO requiere mTLS por defecto (solo si SIFEN_USE_MTLS_FOR_CONSULTA_RUC=1)
+    if for_service == 'consulta_ruc':
+        if os.getenv('SIFEN_USE_MTLS_FOR_CONSULTA_RUC', '0').strip() in ('1', 'true', 'yes', 'y'):
+            mtls_services.add('consulta_ruc')
+    
+    if for_service in mtls_services:
+        cert_path = os.getenv('SIFEN_CERT_PATH')
+        key_path = os.getenv('SIFEN_KEY_PATH')
+        
+        if cert_path:
+            try:
+                # Cargar credenciales (soporta PEM y P12)
+                resolved_cert, resolved_key = load_mtls_credentials(
+                    cert_path, key_path, os.getenv('SIFEN_P12_PASSWORD')
+                )
+                
+                # Validar PEMs resueltos
+                validate_pem_pair(resolved_cert, resolved_key)
+                
+                # Asignar al session
+                cert_p = Path(resolved_cert)
+                key_p = Path(resolved_key)
+                session.cert = (str(cert_p), str(key_p))
+                
+                # Loggear sin exponer rutas completas
+                if cert_path.lower().endswith(('.p12', '.pfx')):
+                    logger.info(f'mTLS habilitado para {for_service}: P12/PFX={Path(cert_path).name} (convertido a PEM)')
+                else:
+                    logger.info(f'mTLS habilitado para {for_service}: cert={cert_p.name} + {key_p.name}')
+                    
+            except SifenClientError:
+                # Re-raise errores de SifenClient tal cual
+                raise
+            except Exception as e:
+                raise SifenClientError(f"Error cargando certificados mTLS: {e}") from e
+        else:
+            # Para servicios que requieren mTLS, es un error si no hay cert
+            raise SifenClientError(
+                f"mTLS requerido para {for_service}. Configure SIFEN_CERT_PATH (PEM o P12/PFX) "
+                f"y SIFEN_KEY_PATH (solo para PEM) o SIFEN_P12_PASSWORD (para P12/PFX)."
+            )
+    
+    return session
 
 # Constantes de namespace SIFEN
 SIFEN_NS = "http://ekuatia.set.gov.py/sifen/xsd"
@@ -633,43 +751,9 @@ class SoapClient:
     # ---------------------------------------------------------------------
     def _create_transport(self) -> Any:  # Transport de Zeep
         """Crea el transporte Zeep con requests.Session configurada para mTLS."""
-        session = Session()
-
-        # Usar certificado mTLS (PEM)
-        # Soporta:
-        #   - combined.pem (cert+key en un solo archivo) via SIFEN_CERT_PATH
-        #   - cert/key separados via SIFEN_CERT_PATH + SIFEN_KEY_PATH
-        cert_path = os.getenv('SIFEN_CERT_PATH') or getattr(self.config, 'cert_path', None)
-        key_path  = os.getenv('SIFEN_KEY_PATH')  or getattr(self.config, 'key_path', None)
-
-        if cert_path:
-            cert_path_p = Path(str(cert_path))
-            if not cert_path_p.exists():
-                raise SifenClientError(f'Certificado PEM no encontrado: {cert_path_p}')
-
-            if key_path:
-                key_path_p = Path(str(key_path))
-                if not key_path_p.exists():
-                    raise SifenClientError(f'Key PEM no encontrada: {key_path_p}')
-                session.cert = (str(cert_path_p), str(key_path_p))
-                logger.info(f'Usando mTLS via cert/key: {cert_path_p.name} + {key_path_p.name}')
-            else:
-                session.cert = str(cert_path_p)
-                logger.info(f'Usando mTLS via combined PEM: {cert_path_p.name}')
-        else:
-            raise SifenClientError(
-                "mTLS es requerido para SIFEN. Configurá SIFEN_CERT_PATH (combined.pem) o SIFEN_CERT_PATH+SIFEN_KEY_PATH (cert/key separados).",
-                result={
-                    'ok': False,
-                    'error': 'Missing SIFEN_CERT_PATH for mTLS certificate',
-                    'endpoint': None,
-                    'http_status': None,
-                    'raw_xml': None,
-                    'dCodRes': None,
-                    'dMsgRes': None,
-                }
-            )
-
+        # Usar el helper unificado para crear la sesión
+        session = _build_requests_session('recibe_lote')  # Default para el transporte principal
+        
         return Transport(  # type: ignore[arg-type]
             session=session,
             timeout=(self.connect_timeout, self.read_timeout),  # type: ignore[arg-type]
@@ -821,12 +905,13 @@ class SoapClient:
             did = f"{base}{random.randint(0, 9)}"
 
         # Sesión robusta para GATE (retries + connection: close)
-        base_session = self.transport.session
         gate_timeout = int(os.getenv("SIFEN_GATE_TIMEOUT", str(self.connect_timeout)))
         gate_retries = int(os.getenv("SIFEN_GATE_RETRIES", "5"))
-        session = requests.Session()
-        session.cert = getattr(base_session, "cert", None)
-        session.verify = getattr(base_session, "verify", None)
+        
+        # Usar el helper unificado para crear la sesión de consulta_ruc
+        session = _build_requests_session('consulta_ruc')
+        
+        # Configurar retries para GATE
         adapter = HTTPAdapter(
             max_retries=Retry(
                 total=gate_retries,
@@ -843,23 +928,6 @@ class SoapClient:
         mtls_cert = getattr(session, "cert", None)
         verify_value = getattr(session, "verify", None)
         mtls_enabled = bool(mtls_cert)
-
-        # Asegurar mTLS para consulta_ruc aunque el transport no lo haya seteado
-        if not mtls_enabled:
-            cert_path = os.getenv("SIFEN_CERT_PATH")
-            
-            if cert_path:
-                cert_file = Path(cert_path)
-                if cert_file.exists():
-                    session.cert = str(cert_path)
-                    mtls_cert = session.cert
-                    mtls_enabled = True
-                    
-                    if dump_http:
-                        logger.info(f"consulta_ruc mTLS FORZADO desde env: cert={cert_path}")
-                else:
-                    if dump_http:
-                        logger.warning(f"No se encontró archivo de certificado: {cert_path}")
 
         if dump_http:
             logger.info(f"consulta_ruc mTLS enabled={mtls_enabled} verify={verify_value}")
@@ -1524,6 +1592,14 @@ class SoapClient:
     # Context manager
     # ---------------------------------------------------------------------
     def close(self) -> None:
+        # Limpiar cache de PEM si se usó P12/PFX
+        cert_path = os.getenv('SIFEN_CERT_PATH')
+        if cert_path and cert_path.lower().endswith(('.p12', '.pfx')):
+            try:
+                cleanup_pem_cache(cert_path)
+            except Exception as e:
+                logger.debug(f"Error limpiando cache PEM: {e}")
+        
         if (
             hasattr(self, "transport")
             and self.transport

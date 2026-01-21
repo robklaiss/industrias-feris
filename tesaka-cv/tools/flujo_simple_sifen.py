@@ -66,7 +66,7 @@ def flujo_simple(xml_validado, ruc, dv, timbrado, num_doc, output_dir):
     
     # Guardar XML listo para firmar
     xml_listo = output_path / f"xml_listo_{num_doc}.xml"
-    xml_bytes = etree.tostring(rde, encoding='utf-8', xml_declaration=True, standalone=False)
+    xml_bytes = etree.tostring(rde, encoding='utf-8', xml_declaration=True)
     xml_listo.write_bytes(xml_bytes)
     print(f"   ✅ XML listo para firmar: {xml_listo}")
     

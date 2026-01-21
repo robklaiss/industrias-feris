@@ -100,8 +100,7 @@ def fix_signature_placement(xml_path: Path) -> Path:
         root, 
         xml_declaration=True, 
         encoding="UTF-8", 
-        pretty_print=True,
-        standalone=False
+        pretty_print=True
     )
     
     output_path.write_bytes(xml_bytes)

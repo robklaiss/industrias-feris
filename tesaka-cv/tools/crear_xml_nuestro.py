@@ -151,7 +151,7 @@ def crear_xml_nuestro(xml_validado, ruc, dv, timbrado, establecimiento, punto_ex
         gCamFuFD.getparent().remove(gCamFuFD)
     
     # Guardar XML sin firma
-    xml_bytes = etree.tostring(rde, encoding='utf-8', xml_declaration=True, standalone=False)
+    xml_bytes = etree.tostring(rde, encoding='utf-8', xml_declaration=True)
     Path(output_path.replace('.xml', '_sin_firma.xml')).write_bytes(xml_bytes)
     
     print(f"\n✅ XML creado: {output_path}")

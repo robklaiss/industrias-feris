@@ -96,7 +96,7 @@ def generar_xml_preservando(xml_original, ruc, dv, output_path):
         print("✅ QR actualizado con nuevo CDC")
     
     # Guardar XML sin firma
-    xml_bytes = etree.tostring(rde, encoding='utf-8', xml_declaration=True, standalone=False)
+    xml_bytes = etree.tostring(rde, encoding='utf-8', xml_declaration=True)
     Path(output_path.replace('.xml', '_sin_firma.xml')).write_bytes(xml_bytes)
     
     print(f"\n✅ XML generado (sin firma): {output_path}")

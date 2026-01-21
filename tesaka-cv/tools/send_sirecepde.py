@@ -59,6 +59,7 @@ load_dotenv()
 # Constantes de namespace SIFEN
 SIFEN_NS = "http://ekuatia.set.gov.py/sifen/xsd"
 SIFEN_NS_URI = "http://ekuatia.set.gov.py/sifen/xsd"  # Alias para consistencia
+SIFEN_XSD_NS = "http://ekuatia.set.gov.py/sifen/xsd"
 DS_NS = "http://www.w3.org/2000/09/xmldsig#"
 DSIG_NS_URI = "http://www.w3.org/2000/09/xmldsig#"  # Alias para consistencia
 XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
@@ -66,6 +67,23 @@ XSI_NS_URI = "http://www.w3.org/2001/XMLSchema-instance"  # Alias para consisten
 NS = {"s": SIFEN_NS}
 
 # --- Namespaces ---
+def _find_first_by_localname(root, local: str):
+    """
+    Encuentra el primer elemento por nombre local, ignorando namespace.
+    Prioriza el namespace SIFEN si aplica, y luego cae a XPath local-name().
+    """
+    # 1) intento rápido con namespace SIFEN (cuando hay default xmlns)
+    el = root.find(f".//{{{SIFEN_XSD_NS}}}{local}")
+    if el is not None:
+        return el
+    # 2) fallback: cualquier namespace
+    try:
+        els = root.xpath(f'//*[local-name()="{local}"]')
+        return els[0] if els else None
+    except Exception:
+        return None
+
+
 def _qn_sifen(local: str) -> str:
     """Crea un QName SIFEN: {http://ekuatia.set.gov.py/sifen/xsd}local"""
     return f"{{{SIFEN_NS_URI}}}{local}"
@@ -194,6 +212,95 @@ def _scan_xml_bytes_for_common_malformed(xml_bytes: bytes) -> Optional[str]:
             i += 1
     
     return None
+
+
+def _atomic_write_bytes(path: Path, data: bytes) -> None:
+    """
+    Escribe bytes de forma atómica sin silenciar errores.
+    
+    Args:
+        path: Ruta donde escribir
+        data: Bytes a escribir
+        
+    Raises:
+        Exception: Propaga cualquier error de escritura
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_bytes(data)
+    tmp.replace(path)
+
+
+def ensure_xml_declaration_bytes(xml_bytes: bytes) -> bytes:
+    """
+    Asegura que los bytes del XML comiencen EXACTAMENTE con:
+    <?xml version="1.0" encoding="UTF-8"?>
+    
+    - Remueve BOM si existe
+    - Remueve cualquier declaración XML existente y la reemplaza
+    - Si no hay declaración, la inserta arriba
+    - Nunca incluye standalone= 
+    
+    Args:
+        xml_bytes: Bytes del XML (puede o no tener declaración)
+        
+    Returns:
+        Bytes del XML con la declaración correcta
+        
+    Raises:
+        AssertionError: Si la declaración final no es la esperada
+    """
+    # Remover BOM UTF-8 si existe
+    if xml_bytes.startswith(b'\xef\xbb\xbf'):
+        xml_bytes = xml_bytes[3:]
+    
+    # Convertir a string para procesar
+    xml_str = xml_bytes.decode('utf-8')
+    
+    # Remover cualquier declaración XML existente
+    # Patrones posibles:
+    # - <?xml version="1.0" encoding="UTF-8"?>
+    # - <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    # - <?xml version="1.0" standalone="no"?>
+    # - <?xml version="1.0"?>
+    xml_str = re.sub(r'^\s*<\?xml[^>]*\?>\s*', '', xml_str)
+    
+    # Insertar la declaración exacta al inicio
+    xml_str = '<?xml version="1.0" encoding="UTF-8"?>\n' + xml_str
+    
+    # Convertir a bytes
+    result = xml_str.encode('utf-8')
+    
+    # Guardrails DURO
+    first_line = result.split(b'\n', 1)[0]
+    assert first_line == b'<?xml version="1.0" encoding="UTF-8"?>', f"Primera línea incorrecta: {first_line!r}"
+    assert b'standalone' not in first_line, f"Contiene standalone: {first_line!r}"
+    
+    return result
+
+
+def _remove_microseconds_from_dates(xml_bytes: bytes) -> bytes:
+    """
+    Elimina microsegundos de los campos dFecFirma y dFeEmiDE en el XML.
+    Formato esperado: YYYY-MM-DDTHH:MM:SS (sin microsegundos)
+    """
+    import re
+    
+    xml_str = xml_bytes.decode('utf-8')
+    
+    # Patrón para encontrar fechas con microsegundos
+    # Encuentra dFecFirma>2026-01-18T11:32:24.159953</dFecFirma
+    # y lo reemplaza con dFecFirma>2026-01-18T11:32:24</dFecFirma
+    pattern = r'(<(dFecFirma|dFeEmiDE)>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.\d+'
+    
+    def replace_microseconds(match):
+        prefix = match.group(1)  # Todo hasta los segundos
+        return prefix
+    
+    # Reemplazar todas las ocurrencias
+    xml_str = re.sub(pattern, replace_microseconds, xml_str)
+    
+    return xml_str.encode('utf-8')
 
 
 def ensure_rde_sifen(rde_el: etree._Element) -> etree._Element:
@@ -570,7 +677,7 @@ def _assert_signature_xmldsig_namespace(zip_base64: str, artifacts_dir: Path):
     import base64
     import zipfile
     import io
-    from lxml import etree
+    # etree ya está importado a nivel de módulo
     
     # Decodificar y extraer lote.xml del ZIP
     zip_bytes = base64.b64decode("".join(zip_base64.split()))
@@ -630,6 +737,7 @@ except (ValueError, ImportError):
 try:
     from app.sifen_client import SoapClient, get_sifen_config, SifenClientError, SifenResponseError, SifenSizeLimitError
     from app.sifen_client.xsd_validator import validate_rde_and_lote
+    from app.sifen_client.cdc_builder import build_cdc_from_de_xml
 except ImportError as e:
     print("❌ Error: No se pudo importar módulos SIFEN")
     print(f"   Error: {e}")
@@ -1311,7 +1419,7 @@ def _save_precheck_artifacts(
     debug_soap = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
     try:
         # Parsear con lxml para redactar xDE de forma robusta
-        from lxml import etree
+        # etree ya está importado a nivel de módulo
         root = etree.fromstring(soap_real.encode("utf-8"))
         xde_elem = root.find(f".//{{{SIFEN_NS}}}xDE")
         if xde_elem is None:
@@ -1613,9 +1721,176 @@ def _find_direct_single(parent, tag_local: str):
     return None
 
 
+def validate_sifenc_csc_before_send() -> None:
+    """
+    Validación anti-0160: verifica que SIFEN_CSC esté configurado antes de enviar.
+    DNIT/SIFEN requiere CSC para generar gCamFuFD/dCarQR.
+    
+    Raises:
+        RuntimeError: Si SIFEN_CSC no está configurado (modo producción)
+    """
+    import os
+    allow_missing = os.getenv("SIFEN_ALLOW_MISSING_GCAMFUFD") == "1"
+    if not allow_missing:
+        csc = os.getenv("SIFEN_CSC")
+        if not csc:
+            raise RuntimeError(
+                "ERROR CRÍTICO 0160: SIFEN_CSC no configurado. "
+                "DNIT requiere gCamFuFD/dCarQR -> no se puede enviar sin CSC. "
+                "Configure SIFEN_CSC o use SIFEN_ALLOW_MISSING_GCAMFUFD=1 para debug local."
+            )
+
+
+def validate_gcamfufd_singleton_before_send(xml_bytes: bytes) -> None:
+    """
+    Validación anti-0160: verifica que gCamFuFD exista exactamente 1 vez y esté en la posición correcta.
+    DNIT/SIFEN requiere gCamFuFD obligatoriamente para evitar error 0160.
+    
+    Args:
+        xml_bytes: XML del lote a validar
+        
+    Raises:
+        AssertionError: Si la validación falla
+        RuntimeError: Si hay errores estructurales o falta CSC
+    """
+    import xml.etree.ElementTree as ET
+    # etree ya está importado a nivel de módulo
+    import logging
+    import os
+    
+    logger = logging.getLogger(__name__)
+    
+    # Permitir relajar la validación SOLO con flag explícito de debug
+    allow_missing = os.getenv("SIFEN_ALLOW_MISSING_GCAMFUFD") == "1"
+    if allow_missing:
+        logger.warning("⚠️ MODO DEBUG: SIFEN_ALLOW_MISSING_GCAMFUFD=1 - permitiendo gCamFuFD faltante")
+    
+    # Parsear con lxml para mejor manejo de namespaces
+    parser = etree.XMLParser(remove_blank_text=False)
+    root = etree.fromstring(xml_bytes, parser)
+    
+    # Namespace SIFEN
+    SIFEN_NS = 'http://ekuatia.set.gov.py/sifen/xsd'
+    
+    # Función helper para obtener localname (namespace-agnostic)
+    def get_localname(tag):
+        return tag.split('}')[-1] if '}' in tag else tag
+    
+    # Encontrar rDE (tolerante a namespaces)
+    rde = root.find(f'.//{{{SIFEN_NS}}}rDE')
+    if rde is None:
+        # Fallback: buscar por localname
+        for elem in root.iter():
+            if get_localname(elem.tag) == 'rDE':
+                rde = elem
+                break
+    
+    assert rde is not None, "ERROR CRÍTICO: No se encontró rDE en el XML"
+    
+    # Contar gCamFuFD como hijos directos de rDE (namespace-agnostic)
+    gcam_count = 0
+    gcam_element = None
+    for child in rde:
+        if get_localname(child.tag) == 'gCamFuFD':
+            gcam_count += 1
+            gcam_element = child
+    
+    # VALIDACIÓN: Exigir gCamFuFD obligatoriamente (modo producción/real)
+    if gcam_count == 0:
+        if allow_missing:
+            logger.info("✅ Validación gCamFuFD OK: no presente (MODO DEBUG)")
+            return
+        else:
+            # Modo real: DNIT requiere gCamFuFD obligatoriamente
+            raise RuntimeError(
+                "ERROR CRÍTICO 0160: DNIT requiere gCamFuFD obligatoriamente. "
+                "Configure SIFEN_CSC y habilite generación QR. "
+                "Use SIFEN_ALLOW_MISSING_GCAMFUFD=1 solo para debug local."
+            )
+    
+    # Si hay gCamFuFD, validar que sea exactamente 1
+    assert gcam_count == 1, f"ERROR CRÍTICO: gCamFuFD count={gcam_count}, esperado=1"
+    
+    # Validar posición relativa: debe estar después de Signature
+    rde_children = list(rde)
+    gcam_idx = -1
+    sig_idx = -1
+    
+    for i, child in enumerate(rde_children):
+        child_local = get_localname(child.tag)
+        if child_local == 'gCamFuFD':
+            gcam_idx = i
+        elif child_local == 'Signature':
+            sig_idx = i
+    
+    assert gcam_idx >= 0, "ERROR CRÍTICO: No se encontró gCamFuFD como hijo de rDE"
+    assert sig_idx >= 0, "ERROR CRÍTICO: No se encontró Signature como hermano de gCamFuFD"
+    assert gcam_idx > sig_idx, f"ERROR CRÍTICO: gCamFuFD está antes de Signature (índice {gcam_idx} vs {sig_idx})"
+    
+    # Validar que tenga dCarQR (namespace-agnostic)
+    dcar_found = False
+    for child in gcam_element:
+        if get_localname(child.tag) == 'dCarQR':
+            dcar_found = True
+            break
+    assert dcar_found, "ERROR CRÍTICO: gCamFuFD no tiene hijo dCarQR"
+    
+    # Validar dInfAdic (namespace-agnostic) - OPCIONAL (DNIT ejemplo no lo incluye)
+    dinfo_found = False
+    for child in gcam_element:
+        if get_localname(child.tag) == 'dInfAdic':
+            dinfo_found = True
+            break
+    # No forzar: dinfo_found puede ser False
+    
+    logger.info("✅ Validación gCamFuFD OK: singleton, posición correcta, estructura válida (dInfAdic opcional)")
+
+
 def _count_any(root, tag_local: str) -> int:
     """Cuenta todos los elementos con este tag en todo el documento."""
     return len(root.findall(f".//{{{SIFEN_NS}}}{tag_local}"))
+
+
+def ensure_gCamFuFD(xml_bytes: bytes) -> bytes:
+    """
+    Asegura que el elemento gCamFuFD exista en el rDE.
+    Si no existe, lo agrega como hijo directo de rDE con un dCarQR mínimo.
+    El gCamFuFD se agrega después de Signature si existe, sino al final.
+    
+    Basado en XSD v150:
+    - gCamFuFD es hijo de rDE (NO de DE)
+    - Contiene dCarQR (mínimo 100, máximo 600 caracteres)
+    """
+    parser = etree.XMLParser(remove_blank_text=False)
+    root = etree.fromstring(xml_bytes, parser)
+    
+    # Encontrar rDE (puede ser raíz o anidado)
+    rde = root if local_tag(root.tag) == "rDE" else next((e for e in root.iter() if local_tag(e.tag) == "rDE"), None)
+    if rde is None:
+        return xml_bytes
+    
+    # Verificar si ya existe gCamFuFD en cualquier parte del documento
+    # (no solo como hijo directo de rDE)
+    existing_gcam_anywhere = _count_any(root, "gCamFuFD") > 0
+    if existing_gcam_anywhere:
+        # Ya existe gCamFuFD en alguna parte, no hacer nada
+        return xml_bytes
+    
+    # Crear gCamFuFD con dCarQR mínimo
+    # El dCarQR debe tener al menos 100 caracteres, usamos un placeholder válido
+    gcam = etree.Element(etree.QName(SIFEN_NS, "gCamFuFD"))
+    dcarqr = etree.SubElement(gcam, etree.QName(SIFEN_NS, "dCarQR"))
+    # Placeholder mínimo de 100 caracteres (será reemplazado por el QR real después)
+    dcarqr.text = "https://ekuatia.set.gov.py/consultas/qr?nVersion=150&Id=0&dFeEmiDE=0&dRucRec=0&dTotGralOpe=0&dTotIVA=0&cItems=0&DigestValue=0&IdCSC=0&cHashQR=0" + "0" * 50
+    
+    # Insertar gCamFuFD después de Signature si existe, sino al final
+    sig = _find_direct_single(rde, "Signature")
+    if sig is not None:
+        rde.insert(rde.index(sig) + 1, gcam)
+    else:
+        rde.append(gcam)
+    
+    return etree.tostring(root, xml_declaration=True, encoding="utf-8")
 
 
 def normalize_rde_before_sign(xml_bytes: bytes) -> bytes:
@@ -1980,11 +2255,8 @@ def sign_and_normalize_rde_inside_xml(xml_bytes: bytes, cert_path: str, cert_pas
             nsmap={None: SIFEN_NS_URI, "ds": DSIG_NS_URI},
         )
         
-        # Agregar atributo Id requerido por XSD (usar el mismo Id del DE)
-        de_id = signed_de_root.get("Id")
-        if de_id:
-            new_rde.set("Id", de_id)
-            print(f"DEBUG: Agregado atributo Id='{de_id}' a rDE reconstruido")
+        # NO agregar atributo Id a rDE (ejemplo DNIT no lo tiene)
+        # El Id solo debe estar en DE
         
         # Agregar dVerFor
         dverfor = etree.SubElement(new_rde, _qn_sifen("dVerFor"))
@@ -2699,7 +2971,7 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False, 
     # Esto debe hacerse ANTES de envolver en rLoteDE
     print("DEBUG: Iniciando verificación de rDE")
     try:
-        from lxml import etree
+        # etree ya está importado a nivel de módulo
         # Trabajar con copia para no mutar el original
         rde_elem = etree.fromstring(rde_bytes_original)
         
@@ -2805,7 +3077,7 @@ def build_lote_passthrough_signed(xml_bytes: bytes, return_debug: bool = False, 
                     print("   Eliminado gCamFuFD duplicado")
             # No need to re-serialize here, already done above
         
-        # CRÍTICO: gCamFuFD debe contener dCarQR, dInfAdic y dDesTrib
+        # gCamFuFD debe contener dCarQR y dDesTrib (dInfAdic es opcional - DNIT ejemplo no lo incluye)
         # Eliminar cualquier hijo adicional que no sea estos tres
         for gcam in rde_elem.findall('.//{*}gCamFuFD'):
             children_to_remove = []
@@ -3029,14 +3301,27 @@ def build_xde_zip_bytes_from_lote_xml(lote_xml: str) -> bytes:
     #    (soporta comillas dobles o simples)
     lote_xml = re.sub(r'(<rDE\b[^>]*?)\s+xmlns=(["\']).*?\2', r'\1', lote_xml, count=1)
 
-    # 3) armar payload final
-    # CRÍTICO: NO agregar XML declaration - SIFEN rechaza con error 0160
+    # 3) armar payload final CON XML declaration
     xml_payload = lote_xml
+    
+    # Convert to bytes and ensure XML declaration
+    xml_bytes = xml_payload.encode("utf-8")
+    xml_bytes = ensure_xml_declaration_bytes(xml_bytes)
+    
+    # Guardrail: ensure XML declaration is present and has no standalone
+    if not xml_bytes.startswith(b'<?xml version="1.0" encoding="UTF-8"?>'):
+        raise RuntimeError("CRITICAL: Failed to add XML declaration to lote.xml")
+    
+    # Guardrail duro: verificar que la declaración tiene newline exacto y sin standalone/BOM
+    expected = b'<?xml version="1.0" encoding="UTF-8"?>\n'
+    assert xml_bytes.startswith(expected), f"XML declaration sin newline exacto: {xml_bytes[:50]!r}"
+    assert b"standalone" not in xml_bytes, "standalone detectado"
+    assert not xml_bytes.startswith(b"\xef\xbb\xbf"), "BOM detectado"
 
     # 4) ZIP_STORED (sin compresión) con entry lote.xml
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_STORED) as z:
-        z.writestr(ZIP_INTERNAL_FILENAME, xml_payload.encode("utf-8"))
+        z.writestr(ZIP_INTERNAL_FILENAME, xml_bytes)
 
     return buf.getvalue()
 
@@ -3106,6 +3391,14 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
     try:
         xml_str_preview = xml_bytes[:500].decode('utf-8', errors='replace') if len(xml_bytes) > 500 else xml_bytes.decode('utf-8', errors='replace')
         print(f"🔍 DIAGNÓSTICO [build_lote_base64] XML entrada: {len(xml_bytes)} bytes")
+        
+        # --- anti-0160: asegurar XML declaration dentro de lote.xml ---
+        if isinstance(xml_bytes, str):
+            xml_bytes = xml_bytes.encode("utf-8")
+        
+        if not xml_bytes.lstrip().startswith(b"<?xml"):
+            xml_bytes = b"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + xml_bytes
+        # -------------------------------------------------------------
         print(f"🔍 DIAGNÓSTICO [build_lote_base64] Primeros 200 chars: {xml_str_preview[:200]}")
     except Exception as e:
         print(f"⚠️  DIAGNÓSTICO [build_lote_base64] Error al leer preview XML: {e}")
@@ -3117,6 +3410,87 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
         root_ns = xml_root.tag.split("}", 1)[0][1:] if "}" in xml_root.tag else "VACÍO"
         print(f"🔍 DIAGNÓSTICO [build_lote_base64] Root localname: {root_localname}")
         print(f"🔍 DIAGNÓSTICO [build_lote_base64] Root namespace: {root_ns}")
+        
+        # Caso especial: si el XML ya es rLoteDE, manejarlo directamente para preservar rDE@Id
+        if root_localname == "rLoteDE":
+            print("🔍 DIAGNÓSTICO [build_lote_base64] XML de entrada ya es rLoteDE, preservando estructura...")
+            
+            # Buscar el rDE interno (namespace-agnostic)
+            rde_elements = xml_root.xpath('.//*[local-name()="rDE"]')
+            if len(rde_elements) != 1:
+                raise ValueError(f"Se esperaba exactamente 1 rDE dentro de rLoteDE, encontrados: {len(rde_elements)}")
+            
+            rde_el = rde_elements[0]
+            print(f"🔍 DIAGNÓSTICO [build_lote_base64] rDE encontrado en rLoteDE")
+            
+            # Aplicar ensure_rde_has_required_id si falta
+            if not rde_el.get("Id") or not rde_el.get("Id").strip():
+                print("🔍 DIAGNÓSTICO [build_lote_base64] rDE sin Id, aplicando ensure_rde_has_required_id...")
+                # Buscar DE para derivar el Id
+                de_elements = rde_el.xpath('.//*[local-name()="DE"]')
+                if not de_elements:
+                    raise ValueError("No se encontró DE dentro de rDE para derivar el Id")
+                de_el = de_elements[0]
+                de_id = de_el.get("Id")
+                if not de_id or not de_id.strip():
+                    raise ValueError("DE no tiene Id para derivar rDE@Id")
+                rde_el.set("Id", de_id.strip())
+                print(f"✓ Asignado rDE@Id = {de_id.strip()} (derivado de DE@Id)")
+            else:
+                print(f"✓ rDE ya tiene Id: {rde_el.get('Id')}")
+            
+            # Guardar el rDE modificado si se aplicó el fix
+            rde_modified = rde_el
+            
+            # Serializar el XML completo (no reconstruir)
+            # Remover xsi:schemaLocation si existe
+            _remove_xsi_schemalocation(xml_root)
+            
+            # Serializar el documento completo sin standalone
+            lote_xml_bytes = etree.tostring(xml_root, encoding="utf-8", xml_declaration=True, with_tail=False, standalone=None)
+            print(f"🔍 DIAGNÓSTICO [build_lote_base64] rLoteDE serializado completo: {len(lote_xml_bytes)} bytes")
+            
+            # Guardar artifact de debug
+            try:
+                artifacts_dir = Path("artifacts")
+                if artifacts_dir.exists():
+                    debug_file = artifacts_dir / "debug_rlotede_serialized.xml"
+                    debug_file.write_bytes(lote_xml_bytes)
+                    print(f"💾 Guardado artifact: {debug_file}")
+            except Exception:
+                pass
+            
+            # Continuar con la creación del ZIP directamente
+            lote_xml_str = lote_xml_bytes.decode('utf-8', errors='replace')
+            
+            # Validar que el XML serializado tenga rDE@Id
+            if 'rDE"' not in lote_xml_str and 'Id=' not in lote_xml_str:
+                # Búsqueda más robusta
+                import re
+                rde_id_match = re.search(r'<rDE[^>]*\bId="([^"]+)"', lote_xml_str)
+                if not rde_id_match:
+                    raise ValueError("CRÍTICO: build_lote_base64 produjo rDE sin Id en rLoteDE serializado")
+            
+            # Crear ZIP
+            try:
+                zip_bytes = build_xde_zip_bytes_from_lote_xml(lote_xml_str)
+                print(f"🔍 DIAGNÓSTICO [build_lote_base64] ZIP creado desde rLoteDE: {len(zip_bytes)} bytes")
+                
+                # Generar lote_did para consistencia con el otro camino
+                lote_did = str(int(time.time() * 1000))
+                
+                if return_debug:
+                    import base64
+                    zip_base64 = base64.b64encode(zip_bytes).decode('utf-8')
+                    return zip_base64, lote_xml_bytes, zip_bytes, lote_did
+                else:
+                    import base64
+                    zip_base64 = base64.b64encode(zip_bytes).decode('utf-8')
+                    return zip_base64
+            except Exception as e:
+                error_msg = f"Error al crear ZIP desde rLoteDE: {e}"
+                print(f"❌ ERROR en build_lote_base64_from_single_xml: {error_msg}", file=sys.stderr)
+                raise
     except Exception as e:
         error_msg = f"Error al parsear XML: {e}"
         print(f"❌ ERROR en build_lote_base64_from_single_xml: {error_msg}", file=sys.stderr)
@@ -3194,13 +3568,8 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
                 },
             )
             
-            # Agregar atributo Id usando el Id del DE
-            # CRÍTICO: Usar un Id DIFERENTE al DE para evitar duplicación
-            de_id = de_el.get("Id")
-            if de_id:
-                rde_id = "rDE" + de_id
-                rde_el.set("Id", rde_id)
-                print(f"DEBUG: build_lote_base64: Agregado Id='{rde_id}' a rDE (DE Id={de_id})")
+            # NO agregar atributo Id a rDE - solo DE debe tener Id
+            # rDE no debe tener Id según especificación SIFEN
             
             # Agregar dVerFor si no existe en DE
             # (verificar si ya existe en el DE o en algún hijo)
@@ -3359,6 +3728,30 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
         selected_children = [local_tag(c.tag) for c in list(rde_el)]
         print(f"🧪 DEBUG [build_lote_base64] selected_rDE_children: {', '.join(selected_children)}")
     
+    # IMPORTANTE: Preservar rDE@Id si existe, o derivarlo de DE@Id si falta
+    # Esto es crítico para evitar el error 0160
+    rde_id = rde_el.get("Id")
+    if not rde_id or not rde_id.strip():
+        print("🔍 DIAGNÓSTICO [build_lote_base64] rDE sin Id, buscando DE@Id para derivar...")
+        # Buscar DE dentro del rDE
+        de_elements = rde_el.xpath('.//*[local-name()="DE"]')
+        if de_elements:
+            de_id = de_elements[0].get("Id")
+            if de_id and de_id.strip():
+                rde_el.set("Id", de_id.strip())
+                rde_id = de_id.strip()
+                print(f"✓ Asignado rDE@Id = {rde_id} (derivado de DE@Id)")
+            else:
+                raise ValueError("CRÍTICO: rDE requiere Id pero DE no tiene Id para derivar")
+        else:
+            raise ValueError("CRÍTICO: rDE requiere Id pero no se encontró DE para derivar")
+    else:
+        print(f"✓ rDE ya tiene Id: {rde_id}")
+    
+    # Guardrail crítico: asegurar que rDE tenga Id antes de continuar
+    if not rde_el.get("Id") or not rde_el.get("Id").strip():
+        raise ValueError("CRÍTICO: build_lote_base64 produjo rDE sin Id")
+    
     # IMPORTANTE: Serializar rDE firmado usando etree.tostring() para preservar EXACTAMENTE la firma
     # NO volver a parsear/reconstruir el rDE después de firmar
     # REMOVER xsi:schemaLocation antes de serializar
@@ -3413,7 +3806,7 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
     
     # REMOVER xsi:schemaLocation del rDE parcheado (causa 0160)
     rde_str = rde_patched.decode('utf-8', errors='replace')
-    rde_str = re.sub(r'\s*xsi:schemaLocation="[^"]*"', '', rde_str, flags=re.DOTALL)
+    rde_str = __import__('re').sub(r'\s*xsi:schemaLocation="[^"]*"', '', rde_str, flags=__import__('re').DOTALL)
     rde_patched = rde_str.encode('utf-8')
     
     # Guardar artifact de debug del rDE fragment (si artifacts_dir existe)
@@ -3470,6 +3863,15 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
         etree.fromstring(lote_xml_bytes)
     except Exception as e:
         print(f"⚠️  WARNING [build_lote_base64] lote.xml no es well-formed: {e}")
+    
+    # GUARDRAIL CRÍTICO: verificar que rDE@Id esté presente en el lote.xml construido
+    # Esto es necesario para evitar el error 0160
+    lote_xml_str = lote_xml_bytes.decode('utf-8', errors='replace')
+    # import re  # usa el import global (evita UnboundLocalError)
+    rde_id_match = __import__('re').search(r'<rDE[^>]*\bId="([^"]+)"', lote_xml_str)
+    if not rde_id_match:
+        raise ValueError("CRÍTICO: build_lote_base64 produjo lote.xml con rDE sin Id")
+    print(f"✓ GUARDRAIL: rDE@Id presente en lote.xml: {rde_id_match.group(1)}")
     
     # Hard-guard: verificar que rLoteDE tenga la estructura correcta: <rLoteDE xmlns="..."><rDE>...</rDE></rLoteDE>
     # PROHIBIDO: <dId> y <xDE> dentro de lote.xml (pertenecen al SOAP, NO al lote.xml)
@@ -3617,7 +4019,7 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
             traceback.print_exc()
     
     # Base64 estándar sin saltos
-    b64 = base64.b64encode(zip_bytes).decode("ascii")
+    b64 = __import__('base64').b64encode(zip_bytes).decode("ascii")
     if return_debug:
         return b64, lote_xml_bytes, zip_bytes, lote_did
     return b64
@@ -3887,13 +4289,8 @@ def build_and_sign_lote_from_xml(
             )
             # Asegurar que el árbol SIFEN esté namespaced
             ensure_sifen_namespace(de_root)
-            # Agregar atributo Id usando el Id del DE
-            # CRÍTICO: Usar un Id DIFERENTE al DE para evitar duplicación
-            de_id = de_root.get("Id")
-            if de_id:
-                rde_id = "rDE" + de_id
-                rde_el.set("Id", rde_id)
-                print(f"DEBUG: Agregado Id='{rde_id}' a rDE wrapper (DE Id={de_id})")
+            # NO agregar atributo Id a rDE - solo DE debe tener Id
+            # rDE no debe tener Id según especificación SIFEN
             # Agregar dVerFor
             dverfor = etree.SubElement(rde_el, _qn_sifen("dVerFor"))
             dverfor.text = "150"
@@ -3921,13 +4318,8 @@ def build_and_sign_lote_from_xml(
         )
         # Asegurar que el árbol SIFEN esté namespaced (incluye DE y todos los hijos SIFEN)
         ensure_sifen_namespace(de_el)
-        # Agregar atributo Id usando el Id del DE
-        # CRÍTICO: Usar un Id DIFERENTE al DE para evitar duplicación
-        de_id = de_el.get("Id")
-        if de_id:
-            rde_id = "rDE" + de_id
-            rde_el.set("Id", rde_id)
-            print(f"DEBUG: Agregado Id='{rde_id}' a rDE wrapper (root es DE, DE Id={de_id})")
+        # NO agregar atributo Id a rDE - solo DE debe tener Id
+        # rDE no debe tener Id según especificación SIFEN
         # Agregar dVerFor
         dverfor = etree.SubElement(rde_el, _qn_sifen("dVerFor"))
         dverfor.text = "150"
@@ -3960,13 +4352,8 @@ def build_and_sign_lote_from_xml(
                 )
                 # Asegurar que el árbol SIFEN esté namespaced (incluye DE y todos los hijos SIFEN)
                 ensure_sifen_namespace(de_el)
-                # Agregar atributo Id usando el Id del DE
-                # CRÍTICO: Usar un Id DIFERENTE al DE para evitar duplicación
-                de_id = de_el.get("Id")
-                if de_id:
-                    rde_id = "rDE" + de_id
-                    rde_el.set("Id", rde_id)
-                    print(f"DEBUG: Agregado Id='{rde_id}' a rDE wrapper (fallback, DE Id={de_id})")
+                # NO agregar atributo Id a rDE - solo DE debe tener Id
+                # rDE no debe tener Id según especificación SIFEN
                 # Agregar dVerFor
                 dverfor = etree.SubElement(rde_el, _qn_sifen("dVerFor"))
                 dverfor.text = "150"
@@ -4017,15 +4404,78 @@ def build_and_sign_lote_from_xml(
                 print(f"🔧 Firma previa eliminada antes de firmar")
     
     # 5. Encontrar el DE dentro del rDE para firmar
-    de_candidates = rde_to_sign.xpath(".//*[local-name()='DE']")
-    if not de_candidates:
+    de_el = _find_first_by_localname(rde_to_sign, "DE")
+    if de_el is None:
         raise ValueError("No se encontró elemento DE dentro de rDE")
-    de_el = de_candidates[0]
     
-    # Obtener Id del DE
-    de_id = de_el.get("Id") or de_el.get("id")
+    # Obtener Id del DE (calcular CDC si falta)
+    de_id = (de_el.get("Id") or de_el.get("id") or "").strip()
     if not de_id:
-        raise ValueError("El elemento DE no tiene atributo Id")
+        # Calcular CDC desde el DE y setearlo como atributo Id
+        if debug_enabled:
+            print("⚠️ DE no tiene Id, calculando CDC...")
+        
+        # AUTOCURACIÓN: Insertar iTiDE y dDesTiDE en gTimb si faltan (antes de calcular CDC)
+        # etree ya está importado a nivel de módulo
+
+        def _ns_of(tag: str) -> str | None:
+            # tag puede venir como "{ns}LocalName" o "LocalName"
+            if tag.startswith("{") and "}" in tag:
+                return tag[1:].split("}", 1)[0]
+            return None
+
+        def _qname(ns: str | None, local: str) -> str:
+            return f"{{{ns}}}{local}" if ns else local
+
+        def _ensure_itide_in_gtimb(de_el):
+            # buscar gTimb namespace-agnóstico
+            gtimb = _find_first_by_localname(de_el, "gTimb")
+            if gtimb is None:
+                return
+
+            itide = _find_first_by_localname(gtimb, "iTiDE")
+            if itide is not None and (itide.text or "").strip():
+                return
+
+            # Namespace coherente con el árbol actual
+            ns = _ns_of(gtimb.tag)
+
+            # Insertar iTiDE y dDesTiDE al principio (orden del XSD tgDTim)
+            itide_el = etree.Element(_qname(ns, "iTiDE"))
+            itide_el.text = "1"  # Factura electrónica (ajustá si corresponde)
+
+            destide_el = etree.Element(_qname(ns, "dDesTiDE"))
+            destide_el.text = "Factura electrónica"
+
+            # Si ya existe dDesTiDE pero iTiDE no, evitamos duplicar
+            existing_destide = _find_first_by_localname(gtimb, "dDesTiDE")
+            if existing_destide is None:
+                gtimb.insert(0, destide_el)
+                gtimb.insert(0, itide_el)
+            else:
+                gtimb.insert(0, itide_el)
+            
+            if debug_enabled:
+                print("🔧 Autocuración: Insertados iTiDE y dDesTiDE en gTimb")
+
+        # Ejecutar autocuración antes del CDC
+        _ensure_itide_in_gtimb(de_el)
+
+        # Calcular CDC usando el helper existente
+        try:
+            cdc, dv = build_cdc_from_de_xml(de_el)
+            de_el.set("Id", cdc)
+            de_id = cdc
+            
+            if debug_enabled:
+                print(f"✓ CDC calculado y asignado: {cdc}")
+            
+            # Guardrails: validar CDC
+            if len(de_id) != 44 or not de_id.isdigit():
+                raise ValueError(f"CDC inválido para DE@Id: {de_id!r} (longitud={len(de_id)}, dígitos={de_id.isdigit()})")
+                
+        except Exception as e:
+            raise ValueError(f"No se pudo calcular CDC para DE: {e}") from e
     
     if debug_enabled:
         print(f"📋 DE encontrado con Id={de_id}")
@@ -4069,18 +4519,46 @@ def build_and_sign_lote_from_xml(
     has_schema = 'xsi:schemaLocation' in rde_str
     print(f"DEBUG: rde_to_sign_bytes contiene xsi:schemaLocation: {has_schema}")
     
-    # 6.5. Normalizar rDE antes de firmar (mover gCamFuFD de dentro de DE a fuera)
+    # 6.5. MOVER A firmador: gCamFuFD ahora lo maneja xmlsec_signer.py
+    # Comentado para evitar duplicación: el signer ahora asegura singleton gCamFuFD
+    # rde_to_sign_bytes = ensure_gCamFuFD(rde_to_sign_bytes)
+    
+    # 6.5. ELIMINAR MICROSEGUNDOS de dFecFirma y dFeEmiDE
+    # Esto es crítico para evitar error 0160
+    rde_to_sign_bytes = _remove_microseconds_from_dates(rde_to_sign_bytes)
+    print("✅ Eliminados microsegundos de dFecFirma y dFeEmiDE")
+    
+    # 6.6. HARD GUARD: Asegurar que rDE no tenga atributo Id (solo DE debe tener Id)
+    # Esto es crítico para evitar error 0160
+    try:
+        import xml.etree.ElementTree as ET
+        doc = ET.fromstring(rde_to_sign_bytes)
+        NS = {'s': 'http://ekuatia.set.gov.py/sifen/xsd'}
+        rde = doc.find('.//s:rDE', NS)
+        if rde is not None and 'Id' in rde.attrib:
+            removed_id = rde.attrib.pop('Id')
+            print(f"⚠️ HARD GUARD: Removido Id='{removed_id}' de rDE antes de firmar")
+            rde_to_sign_bytes = ET.tostring(doc, encoding='utf-8', method='xml')
+    except Exception as e:
+        print(f"⚠️ HARD GUARD Error al remover Id de rDE: {e}")
+    
+    # 6.7. Normalizar rDE antes de firmar (mover gCamFuFD de dentro de DE a fuera)
     rde_to_sign_bytes = normalize_rde_before_sign(rde_to_sign_bytes)
     
-    # DEBUG: Verificar si gCamFuFD está dentro de DE antes de firmar
+    # DEBUG: Verificar si gCamFuFD está en rDE antes de firmar
     import xml.etree.ElementTree as ET
     try:
         doc = ET.fromstring(rde_to_sign_bytes)
         NS = {'s': 'http://ekuatia.set.gov.py/sifen/xsd'}
-        de = doc.find('.//s:DE', NS)
-        if de is not None:
-            gcam_in_de = de.find('.//s:gCamFuFD', NS)
-            print(f"DEBUG: gCamFuFD inside DE before signing: {'YES' if gcam_in_de is not None else 'NO'}")
+        rde = doc.find('.//s:rDE', NS)
+        if rde is not None:
+            gcam_in_rde = rde.find('.//s:gCamFuFD', NS)
+            gcam_in_de = None
+            de = doc.find('.//s:DE', NS)
+            if de is not None:
+                gcam_in_de = de.find('.//s:gCamFuFD', NS)
+            print(f"DEBUG: gCamFuFD in rDE: {'YES' if gcam_in_rde is not None else 'NO'}")
+            print(f"DEBUG: gCamFuFD inside DE: {'YES' if gcam_in_de is not None else 'NO'}")
     except Exception as e:
         print(f"DEBUG: Error checking gCamFuFD: {e}")
     
@@ -4133,6 +4611,20 @@ def build_and_sign_lote_from_xml(
     # FIX: Eliminar xmlns duplicados en Signature
     rde_signed_bytes = _fix_duplicate_signature_xmlns(rde_signed_bytes)
     
+    # HARD GUARD FINAL: Asegurar que rDE no tenga atributo Id después de firmar
+    # Esto es crítico para evitar error 0160
+    try:
+        import xml.etree.ElementTree as ET
+        doc = ET.fromstring(rde_signed_bytes)
+        NS = {'s': 'http://ekuatia.set.gov.py/sifen/xsd'}
+        rde = doc.find('.//s:rDE', NS)
+        if rde is not None and 'Id' in rde.attrib:
+            removed_id = rde.attrib.pop('Id')
+            print(f"⚠️ HARD GUARD FINAL: Removido Id='{removed_id}' de rDE después de firmar")
+            rde_signed_bytes = ET.tostring(doc, encoding='utf-8', method='xml')
+    except Exception as e:
+        print(f"⚠️ HARD GUARD FINAL Error al remover Id de rDE: {e}")
+    
     # DEBUG: Verificar posición de Signature después de mover
     try:
         doc4 = ET.fromstring(rde_signed_bytes)
@@ -4157,12 +4649,53 @@ def build_and_sign_lote_from_xml(
         
         # Verificar que SignatureValue no esté vacío
         sig_val_start = rde_signed_bytes.find(b'<SignatureValue>', sig)
-        if sig_val_start != -1:
-            sig_val_end = rde_signed_bytes.find(b'</SignatureValue>', sig_val_start)
-            if sig_val_end != -1:
-                sig_val = rde_signed_bytes[sig_val_start + 17:sig_val_end].strip()
-                if not sig_val:
-                    raise RuntimeError("Post-firma: <SignatureValue> está vacío (firma dummy)")
+        if sig_val_start == -1:
+            raise RuntimeError("No se encontró <SignatureValue> en XML firmado")
+        sig_val_end = rde_signed_bytes.find(b'</SignatureValue>', sig_val_start)
+        if sig_val_end == -1:
+            raise RuntimeError("No se encontró </SignatureValue> en XML firmado")
+        sig_val = rde_signed_bytes[sig_val_start + 18:sig_val_end].strip()
+        if not sig_val:
+            raise RuntimeError("SignatureValue está vacío")
+        
+        # GUARDRAIL CRÍTICO: Validar que DE@Id y Reference URI coincidan
+        try:
+            import xml.etree.ElementTree as ET
+            doc = ET.fromstring(rde_signed_bytes)
+            NS = {'s': 'http://ekuatia.set.gov.py/sifen/xsd', 'ds': 'http://www.w3.org/2000/09/xmldsig#'}
+            
+            # Obtener DE@Id
+            de = doc.find('.//s:DE', NS)
+            if de is None:
+                raise RuntimeError("No se encontró elemento DE")
+            de_id = de.get('Id')
+            if not de_id:
+                raise RuntimeError("DE no tiene atributo Id")
+            
+            # Obtener Reference URI
+            ref = doc.find('.//ds:Reference', NS)
+            if ref is None:
+                raise RuntimeError("No se encontró elemento Reference en Signature")
+            ref_uri = ref.get('URI')
+            if not ref_uri:
+                raise RuntimeError("Reference no tiene atributo URI")
+            
+            # Validar que Reference URI == "#" + DE@Id
+            expected_uri = f"#{de_id}"
+            if ref_uri != expected_uri:
+                raise RuntimeError(
+                    f"Reference URI no coincide con DE@Id: "
+                    f"Reference URI='{ref_uri}', esperado='{expected_uri}'"
+                )
+            
+            print(f"✅ GUARDRAIL OK: DE@Id='{de_id}' y Reference URI='{ref_uri}' coinciden")
+            
+        except RuntimeError as e:
+            # Re-lanzar RuntimeError
+            raise e
+        except Exception as e:
+            print(f"⚠️ GUARDRAIL Error al validar DE@Id y Reference URI: {e}")
+            # No detener el flujo por este error, solo advertir
         
         # Validar que SignatureValue no es dummy
         try:
@@ -4408,7 +4941,7 @@ def build_and_sign_lote_from_xml(
     print("\n🔧 DEBUG: Serializando lote final UNA SOLA VEZ")
     try:
         # (PATCH) No agregar xsi:schemaLocation al DE (evitar 0160)
-        lote_xml_str = etree.tostring(lote_final, encoding='utf-8', pretty_print=False, xml_declaration=False, standalone=False).decode('utf-8')
+        lote_xml_str = etree.tostring(lote_final, encoding='utf-8', pretty_print=False, xml_declaration=False).decode('utf-8')
         
         # CRÍTICO: Eliminar xsi:schemaLocation del XML final (causa 0160)
         # Usar múltiples patrones para asegurar que se elimine
@@ -4777,16 +5310,34 @@ def build_and_sign_lote_from_xml(
         if debug_enabled:
             print(f"⚠️  No se pudo verificar rDE/xDE en sanity check: {e}")
     
-    # 17. Guardar artifacts SIEMPRE (aunque el envío falle)
+    # 17. Guardar artifacts SIEMPRE (aunque el envío falle) - ESCRITURA ATÓMICA
     try:
         artifacts_dir = Path("artifacts")
         artifacts_dir.mkdir(parents=True, exist_ok=True)
         
-        # Guardar ZIP
-        last_xde_zip = artifacts_dir / "last_xde.zip"
-        last_xde_zip.write_bytes(zip_bytes)
+        # Calcular paths
+        zip_path_last = artifacts_dir / "last_xde.zip"
+        zip_path_sent = artifacts_dir / "_sent_zip.zip"
         
-        # Guardar lote.xml extraído (ya se guardó antes, pero lo guardamos aquí también para consistencia)
+        # Escribir ambos zips consecutivamente de forma atómica
+        _atomic_write_bytes(zip_path_last, zip_bytes)
+        _atomic_write_bytes(zip_path_sent, zip_bytes)
+        
+        # Extraer y guardar lote.xml del ZIP para verificación (siempre)
+        try:
+            with zipfile.ZipFile(BytesIO(zip_bytes), 'r') as zf:
+                lote_from_zip = zf.read(ZIP_INTERNAL_FILENAME)
+                sent_lote = artifacts_dir / "_sent_lote.xml"
+                _atomic_write_bytes(sent_lote, lote_from_zip)
+                
+                # Guardar head para debug rápido
+                sent_lote_head = artifacts_dir / "_sent_lote_head.txt"
+                sent_lote_head.write_bytes(lote_from_zip[:120])
+        except Exception as e:
+            print(f"⚠️  No se pudo extraer lote.xml del ZIP enviado: {e}")
+            raise  # No silenciar este error
+        
+        # Guardar lote.xml original (para consistencia)
         last_lote_xml = artifacts_dir / "last_lote.xml"
         last_lote_xml.write_bytes(lote_xml_bytes)
         
@@ -4831,10 +5382,11 @@ def build_and_sign_lote_from_xml(
                     print(f"⚠️  No se pudo generar reporte de sanity: {e}")
         
         if debug_enabled:
-            print(f"💾 Guardado: {last_xde_zip} ({len(zip_bytes)} bytes)")
+            print(f"💾 Guardado: artifacts/last_xde.zip ({len(zip_bytes)} bytes)")
             print(f"💾 Guardado: {last_lote_xml} ({len(lote_xml_bytes)} bytes)")
     except Exception as e:
-        print(f"⚠️  No se pudo guardar artifacts: {e}")
+        print(f"ERROR CRÍTICO: No se pudo guardar artifacts: {e}")
+        raise  # Re-raise para no silenciar errores críticos
     
     # 16. Codificar en Base64
     b64 = base64.b64encode(zip_bytes).decode("ascii")
@@ -5355,18 +5907,11 @@ def build_r_envio_lote_xml(did: Union[int, str], xml_bytes: bytes, zip_base64: O
     # SIEMPRE generar dId de 15 dígitos (ignorar el parámetro did)
     did = make_did_15()  # SIEMPRE (no reutilizar nada)
     
-    # SIEMPRE construir un ZIP fresco desde xml_bytes (evita enviar un ZIP viejo -> 0160)
-    print("🔍 DEBUG: Construyendo ZIP fresco desde xml_bytes (sin reutilizar zip_base64)")
-    xde_b64 = build_lote_base64_from_single_xml(xml_bytes)
-    
-    # Calcular hash_from_zip para debug
-    try:
-        zip_bytes = base64.b64decode(xde_b64)
-        import hashlib
-        hash_from_zip = hashlib.sha256(zip_bytes).hexdigest()
-    except Exception as e:
-        print(f"⚠️  No se pudo calcular hash_from_zip desde xde_b64: {e}")
-        hash_from_zip = None
+    # REUTILIZAR ZIP firmado (evita rebuild que rompe digest)
+    print("🔍 DEBUG: Reutilizando ZIP firmado (NO se reconstruye desde xml_bytes)")
+    if zip_base64 is None:
+        raise ValueError("zip_base64 es requerido - no se debe reconstruir desde xml_bytes")
+    xde_b64 = zip_base64
 
     # Construir rEnvioLote con prefijo sifen (nsmap {"sifen": SIFEN_NS})
     rEnvioLote = etree.Element(etree.QName(SIFEN_NS, "rEnvioLote"), nsmap={"xsd": SIFEN_NS})
@@ -5731,6 +6276,273 @@ def send_sirecepde(xml_path: str, env: str = "test", artifacts_dir: Optional[Pat
     return send_sirecepde_lote(xml_path, env, artifacts_dir, dump_http, force_resign)
 
 
+def _normalize_build_and_sign_result(result) -> Tuple[str, bytes, bytes]:
+    """
+    Normaliza el retorno de build_and_sign_lote_from_xml y build_lote_passthrough_signed.
+    
+    Args:
+        result: Puede ser:
+            - str (cuando return_debug=False)
+            - tuple[zip_base64, lote_xml_bytes, zip_bytes] (3 elementos)
+            - tuple[zip_base64, lote_xml_bytes, zip_bytes, extra] (4 elementos)
+            - dict con keys zip_base64, lote_xml_bytes, zip_bytes
+    
+    Returns:
+        Tuple[zip_base64, lote_xml_bytes, zip_bytes]
+    
+    Raises:
+        RuntimeError: Si el formato no es reconocido
+    """
+    debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+    
+    if isinstance(result, str):
+        # Cuando return_debug=False, solo devuelve el base64
+        if debug_enabled:
+            print("DEBUG: build_and_sign retornó str (return_debug=False)")
+        zip_base64 = result
+        zip_bytes = base64.b64decode(zip_base64)
+        # Extraer lote_xml_bytes del ZIP para mantener compatibilidad
+        import zipfile
+        import io
+        with zipfile.ZipFile(io.BytesIO(zip_bytes), 'r') as zf:
+            lote_xml_bytes = zf.read('lote.xml')
+        return zip_base64, lote_xml_bytes, zip_bytes
+    
+    elif isinstance(result, tuple):
+        if debug_enabled:
+            print(f"DEBUG: build_and_sign retornó tuple con len={len(result)}")
+        if len(result) == 3:
+            # Formato de build_lote_passthrough_signed
+            zip_base64, lote_xml_bytes, zip_bytes = result
+            return zip_base64, lote_xml_bytes, zip_bytes
+        elif len(result) == 4:
+            # Formato de build_and_sign_lote_from_xml (el 4to es lote_did o None)
+            zip_base64, lote_xml_bytes, zip_bytes, _ = result
+            return zip_base64, lote_xml_bytes, zip_bytes
+        else:
+            raise RuntimeError(f"build_and_sign devolvió tuple con len inesperado: {len(result)}")
+    
+    elif isinstance(result, dict):
+        if debug_enabled:
+            print("DEBUG: build_and_sign retornó dict")
+        try:
+            zip_base64 = result["zip_base64"]
+            lote_xml_bytes = result["lote_xml_bytes"]
+            zip_bytes = result["zip_bytes"]
+            return zip_base64, lote_xml_bytes, zip_bytes
+        except KeyError as e:
+            raise RuntimeError(f"build_and_sign dict缺少 key requerida: {e}")
+    
+    else:
+        raise RuntimeError(f"build_and_sign devolvió tipo inesperado: {type(result).__name__}")
+
+
+def sanitize_lote_payload(xml_bytes: bytes) -> bytes:
+    """
+    Sanitiza el XML payload justo antes de enviar para evitar error 0160.
+    
+    1. PRESERVA el atributo Id del nodo rDE (REQUERIDO por XSD v150)
+    2. Elimina microsegundos de dFecFirma y dFeEmiDE (regex \.\d{1,6})
+    3. Regenera el QR dCarQR con los datos saneados
+    
+    Args:
+        xml_bytes: XML del lote (bytes)
+        
+    Returns:
+        XML saneado (bytes)
+    """
+    # etree ya está importado a nivel de módulo
+    import re
+    from app.sifen_client.qr_generator import build_qr_dcarqr, ensure_single_gCamFuFD_after_signature
+    
+    # Parsear XML
+    root = etree.fromstring(xml_bytes)
+    
+    # 1. NO eliminar Id de rDE - es REQUERIDO por XSD v150 (línea 47 de rLoteDE_v150.xsd)
+    # Solo eliminamos Ids de elementos que no sean rDE
+    for elem in root.xpath('//*[@Id]'):
+        if elem.tag.split('}')[-1] != 'rDE':  # Namespace-agnostic check
+            elem.attrib.pop("Id", None)
+    
+    # 2. Eliminar microsegundos de campos datetime
+    datetime_fields = ["dFecFirma", "dFeEmiDE"]
+    for field_name in datetime_fields:
+        elements = root.xpath(f'//*[local-name()="{field_name}"]')
+        for elem in elements:
+            if elem.text:
+                # Eliminar microsegundos (todo después del punto)
+                elem.text = re.sub(r'\.\d{1,6}$', '', elem.text)
+    
+    # 3. Regenerar QR si existe gCamFuFD/dCarQR
+    gcamfufd_elements = root.xpath('//*[local-name()="gCamFuFD"]')
+    if gcamfufd_elements:
+        try:
+            # Serializar XML saneado a bytes sin standalone
+            xml_saneado_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True, standalone=None)
+            
+            # Construir QR con datos saneados
+            qr_url = build_qr_dcarqr(xml_saneado_bytes)
+            
+            # Actualizar dCarQR en el XML
+            for gcamfufd in gcamfufd_elements:
+                dcarqr_elements = gcamfufd.xpath('./*[local-name()="dCarQR"]')
+                if dcarqr_elements:
+                    dcarqr = dcarqr_elements[0]
+                    # Mantener la estructura de dCarQR y actualizar solo la URL
+                    # Limpiar todos los hijos
+                    dcarqr.clear()
+                    # Reconstruir con la nueva URL
+                    # etree ya está importado a nivel de módulo, usar et como alias temporal
+                    et = etree
+                    # Parsear la URL para extraer parámetros
+                    qr_params = {}
+                    if '?' in qr_url:
+                        base_url, params = qr_url.split('?', 1)
+                        for param in params.split('&'):
+                            if '=' in param:
+                                key, value = param.split('=', 1)
+                                qr_params[key] = value
+                    
+                    # dCarQR debe contener SOLO la URL como texto puro, sin elementos hijos
+                    # La URL completa va como texto del nodo
+                    dcarqr.text = qr_url
+                    
+                    print(f"✓ QR regenerado con dFeEmiDE saneado")
+                    break
+        except Exception as e:
+            print(f"⚠️  No se pudo regenerar QR: {e}")
+            # Continuar sin regenerar QR
+    
+    # Serializar XML final CON declaración XML
+    xml_final = etree.tostring(root, encoding='utf-8', xml_declaration=True, standalone=None)
+    
+    # Guardrails de verificación
+    xml_str = xml_final.decode('utf-8')
+    
+    # NOTA: rDE@Id ahora se PRESERVA (es requerido por XSD v150)
+    # No verificamos su ausencia
+    
+    # Verificar que no hay microsegundos
+    if re.search(r'<(dFecFirma|dFeEmiDE)[^>]*>.*T\d{2}:\d{2}:\d{2}\.', xml_str):
+        raise ValueError("❌ ERROR CRÍTICO: Se encontraron microsegundos en datetime después de saneamiento")
+    
+    # Verificar que la XML declaration esté presente
+    if not xml_str.startswith('<?xml '):
+        raise ValueError("❌ ERROR CRÍTICO: XML no empieza con declaración XML después de saneamiento")
+    
+    # Verificar que dCarQR no contiene tags XML (solo texto URL)
+    # Buscar <dCarQR>...<dVerQR> o <dPacQR> o cualquier otro tag dentro
+    if re.search(r'<dCarQR[^>]*>(?:(?!<dCarQR).)*?<dVerQR>', xml_str, re.DOTALL):
+        raise ValueError("❌ ERROR CRÍTICO: dCarQR contiene elementos XML hijos (dVerQR). Debe contener solo la URL como texto.")
+    if re.search(r'<dCarQR[^>]*>(?:(?!<dCarQR).)*?<dPacQR>', xml_str, re.DOTALL):
+        raise ValueError("❌ ERROR CRÍTICO: dCarQR contiene elementos XML hijos (dPacQR). Debe contener solo la URL como texto.")
+    
+    print("✓ XML saneado correctamente (datetime sin microsegundos, dCarQR puro)")
+    return xml_final
+
+
+def ensure_rde_has_required_id(xml_bytes: bytes) -> bytes:
+    """
+    Asegura que rDE tenga el atributo Id requerido por XSD v150.
+    
+    Si rDE no tiene Id, lo deriva del elemento DE.
+    El XSD rLoteDE_v150.xsd línea 47 especifica: <xs:attribute name="Id" type="xs:string" use="required"/>
+    
+    Args:
+        xml_bytes: XML del lote (bytes)
+        
+    Returns:
+        XML con rDE@Id asegurado (bytes)
+        
+    Raises:
+        ValueError: si no se puede derivar el Id de DE
+    """
+    # etree ya está importado a nivel de módulo
+    
+    # Parsear XML
+    root = etree.fromstring(xml_bytes)
+    
+    # Buscar rDE (namespace-agnostic)
+    rde_elements = root.xpath('//*[local-name()="rDE"]')
+    if not rde_elements:
+        raise ValueError("❌ ERROR: No se encontró elemento rDE en el XML")
+    
+    if len(rde_elements) > 1:
+        raise ValueError(f"❌ ERROR: Múltiples elementos rDE encontrados ({len(rde_elements)}), se esperaba 1")
+    
+    rde = rde_elements[0]
+    
+    # Buscar DE para derivar el Id (y validar consistencia)
+    de_elements = rde.xpath('.//*[local-name()="DE"]')
+    if not de_elements:
+        raise ValueError("❌ ERROR CRÍTICO: rDE requiere atributo Id (XSD v150). No se encontró elemento DE para derivar el Id.")
+
+    de = de_elements[0]
+    de_id = de.get("Id")
+
+    if not de_id or not de_id.strip():
+        raise ValueError("❌ ERROR CRÍTICO: rDE requiere atributo Id (XSD v150). DE no tiene Id para derivar.")
+
+    de_id = de_id.strip()
+
+    # Si rDE ya tiene Id, validar que no sea placeholder y que coincida con DE@Id
+    existing_id = rde.get("Id")
+    if existing_id and existing_id.strip():
+        existing_id = existing_id.strip()
+        if existing_id == de_id:
+            print(f"✓ rDE ya tiene Id correcto: {existing_id}")
+            return xml_bytes
+        # Cualquier mismatch (ej: rDE_TEST_001) lo corregimos al CDC real
+        print(f"⚠️  rDE@Id mismatch: '{existing_id}' != DE@Id '{de_id}'. Corrigiendo rDE@Id -> DE@Id")
+        rde.set("Id", de_id)
+        return etree.tostring(root, encoding='utf-8', xml_declaration=True, standalone=None)
+
+    # Asignar Id a rDE
+    rde.set("Id", de_id)
+    print(f"✓ Asignado rDE@Id = {de_id} (derivado de DE@Id)")
+
+    # Serializar XML modificado
+    return etree.tostring(root, encoding='utf-8', xml_declaration=True, standalone=None)
+
+
+def validate_rde_has_id_before_zip(xml_bytes: bytes) -> None:
+    """
+    Guardrail crítico: verifica que rDE tenga Id antes de crear ZIP/SOAP.
+    
+    El XSD rLoteDE_v150.xsd requiere rDE@Id (use="required").
+    Esta función aborta con error claro si falta el Id.
+    
+    Args:
+        xml_bytes: XML del lote a validar
+        
+    Raises:
+        ValueError: si rDE no tiene Id o está vacío
+    """
+    # etree ya está importado a nivel de módulo
+    
+    # Parsear XML
+    root = etree.fromstring(xml_bytes)
+    
+    # Buscar rDE (namespace-agnostic)
+    rde_elements = root.xpath('//*[local-name()="rDE"]')
+    if not rde_elements:
+        raise ValueError("❌ ERROR CRÍTICO: No se encontró elemento rDE para validar Id")
+    
+    if len(rde_elements) > 1:
+        raise ValueError(f"❌ ERROR CRÍTICO: Múltiples rDE encontrados ({len(rde_elements)})")
+    
+    rde = rde_elements[0]
+    rde_id = rde.get("Id")
+    
+    if not rde_id:
+        raise ValueError("❌ ERROR CRÍTICO: rDE@Id requerido por XSD rLoteDE_v150.xsd - AUSENTE")
+    
+    if not rde_id.strip():
+        raise ValueError("❌ ERROR CRÍTICO: rDE@Id requerido por XSD rLoteDE_v150.xsd - VACÍO")
+    
+    print(f"✓ Guardrail OK: rDE@Id presente = {rde_id.strip()}")
+
+
 def send_sirecepde_lote(xml_file: str, env: str = "test", artifacts_dir: Optional[Path] = None, dump_http: bool = False, force_resign: bool = False) -> dict:
     """
     Envía un lote de DEs a SIFEN usando el endpoint siRecepLoteDE.
@@ -5911,7 +6723,7 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", artifacts_dir: Optiona
                             return_debug=True,
                             dump_http=dump_http
                         )
-                        zip_base64, lote_xml_bytes, zip_bytes = result
+                        zip_base64, lote_xml_bytes, zip_bytes = _normalize_build_and_sign_result(result)
                         print("✓ Lote construido y firmado después de re-firma forzada\n")
                     except Exception as e:
                         error_msg = f"Error al construir y firmar lote después de re-firma: {str(e)}"
@@ -5924,7 +6736,7 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", artifacts_dir: Optiona
                             "error_type": type(e).__name__
                         }
                 else:
-                    zip_base64, lote_xml_bytes, zip_bytes = result
+                    zip_base64, lote_xml_bytes, zip_bytes = _normalize_build_and_sign_result(result)
                     print("✓ Lote construido con rDE firmado intacto\n")
             except Exception as e:
                 error_msg = f"Error al construir lote con XML ya firmado: {str(e)}"
@@ -5948,15 +6760,7 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", artifacts_dir: Optiona
                     return_debug=True,
                     dump_http=dump_http
                 )
-                if isinstance(result, tuple):
-                    if len(result) == 4:
-                        zip_base64, lote_xml_bytes, zip_bytes, _ = result  # _ es None (lote_did ya no existe)
-                    else:
-                        zip_base64, lote_xml_bytes, zip_bytes = result
-                else:
-                    zip_base64 = result
-                    zip_bytes = base64.b64decode(zip_base64)
-                    lote_xml_bytes = None
+                zip_base64, lote_xml_bytes, zip_bytes = _normalize_build_and_sign_result(result)
                 
                 print("✓ Lote construido y rDE firmado exitosamente\n")
             except Exception as e:
@@ -6086,10 +6890,11 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", artifacts_dir: Optiona
                 print(f"DEBUG: XML length (preserving newlines): {len(lote_str)}")
                 
                 # Aplicar wrapper TIPS usando el helper
-                zip_bytes = build_xde_zip_bytes_from_lote_xml(lote_str)
-                
-                # Actualizar zip_base64
-                zip_base64 = base64.b64encode(zip_bytes).decode('ascii')
+                # COMENTADO: se mueve después del ensure/sanitize para no pisar valores
+                # zip_bytes = build_xde_zip_bytes_from_lote_xml(lote_str)
+                # 
+                # # Actualizar zip_base64
+                # zip_base64 = base64.b64encode(zip_bytes).decode('ascii')
                 if False:
                     print("✅ Forzado xmlns SIFEN en Signature (zip_base64)")
             except Exception as e:
@@ -6106,7 +6911,221 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", artifacts_dir: Optiona
         # CRÍTICO: Usar lote_xml_bytes si existe (ya tiene el fix de Signature xmlns)
         # Sino usar xml_bytes (original)
         xml_para_payload = lote_xml_bytes if lote_xml_bytes else xml_bytes
-        payload_xml = build_r_envio_lote_xml(did=did, xml_bytes=xml_para_payload)
+        
+        # ASEGURAR rDE@Id (REQUERIDO por XSD v150) - ANTES de sanitizar
+        print("🔍 Asegurando rDE@Id requerido por XSD...")
+        try:
+            xml_para_payload = ensure_rde_has_required_id(xml_para_payload)
+        except ValueError as e:
+            raise RuntimeError(f"❌ ERROR CRÍTICO: {e}") from e
+        
+        # SANITIZACIÓN FINAL ANTI-0160: preservar rDE Id, eliminar microsegundos y regenerar QR
+        print("🔍 Aplicando sanitización final anti-0160...")
+        try:
+            xml_para_payload = sanitize_lote_payload(xml_para_payload)
+            print("✅ XML sanitizado exitosamente")
+            
+            # DEBUG: Guardar XML saneado como _stage_12_from_zip.xml
+            if artifacts_dir:
+                dump_stage("12_from_zip", xml_para_payload, artifacts_dir)
+        except Exception as e:
+            print(f"❌ ERROR: Sanitización falló: {e}")
+            raise RuntimeError(f"Sanitización anti-0160 falló: {e}") from e
+        
+        # GUARDRAIL CRÍTICO: Verificar rDE@Id antes de crear ZIP/SOAP
+        print("🔍 Guardrail: Verificando rDE@Id antes de crear ZIP...")
+        try:
+            validate_rde_has_id_before_zip(xml_para_payload)
+        except ValueError as e:
+            raise RuntimeError(f"❌ ERROR CRÍTICO: {e}") from e
+        
+        # ✅ CRÍTICO: FIRMA FINAL DESPUÉS DE SANITIZACIÓN (asegura digest válido)
+        print("🔐 Aplicando FIRMA FINAL después de sanitización (anti-0160)...")
+        try:
+            # Extraer rDE del XML saneado para firmar
+            from lxml import etree as lxml_etree
+            import xml.etree.ElementTree as ET
+            
+            # Parsear XML saneado
+            root = lxml_etree.fromstring(xml_para_payload)
+            ns = {'s': 'http://ekuatia.set.gov.py/sifen/xsd'}
+            
+            # Encontrar el rDE
+            rde_elements = root.xpath('//s:rDE', namespaces=ns)
+            if not rde_elements:
+                raise ValueError("No se encontró rDE en XML saneado")
+            
+            rde_element = rde_elements[0]
+            
+            # Extraer DE para verificar Reference URI
+            de_elements = rde_element.xpath('./s:DE', namespaces=ns)
+            if not de_elements:
+                raise ValueError("No se encontró DE dentro de rDE")
+            
+            de_element = de_elements[0]
+            de_id = de_element.get('Id')
+            if not de_id:
+                raise ValueError("DE no tiene atributo Id")
+            
+            print(f"📋 DE@Id encontrado: {de_id}")
+            
+            # Serializar rDE a bytes para firmar
+            rde_bytes = lxml_etree.tostring(rde_element, encoding='utf-8', xml_declaration=False)
+            
+            # Firmar rDE con el signer existente
+            from app.sifen_client.xmlsec_signer_fixed import sign_de_with_p12
+            rde_signed_bytes = sign_de_with_p12(
+                rde_bytes, 
+                sign_cert_path, 
+                sign_cert_password, 
+                env=env
+            )
+            
+            # Parsear el rDE firmado y reemplazar en el XML original
+            rde_signed_root = lxml_etree.fromstring(rde_signed_bytes)
+            
+            # Reemplazar rDE original con el firmado
+            rde_element.getparent().replace(rde_element, rde_signed_root)
+            
+            # Serializar XML final con rDE firmado
+            xml_signed_final = lxml_etree.tostring(
+                root, 
+                encoding='utf-8', 
+                xml_declaration=True, 
+                standalone=False
+            )
+            
+            print("✅ FIRMA FINAL aplicada exitosamente")
+            
+            # Guardar XML firmado final para debug
+            if artifacts_dir:
+                (artifacts_dir / "_final_signed.xml").write_bytes(xml_signed_final)
+            
+            # Usar XML firmado final para payload
+            xml_para_payload = xml_signed_final
+            
+        except Exception as e:
+            print(f"❌ ERROR: FIRMA FINAL falló: {e}")
+            raise RuntimeError(f"Firma final falló: {e}") from e
+        
+        # ✅ CRÍTICO: reconstruir ZIP/base64 DESPUÉS de firma final
+        print("🔁 Rebuild ZIP/base64 desde xml_signed_final (post-firma-final)...")
+        lote_str_final = xml_para_payload.decode("utf-8")
+
+        # Asegurar XML declaration con comillas dobles (consistencia)
+        lote_str_final = lote_str_final.replace(
+            "<?xml version='1.0' encoding='utf-8'?>",
+            '<?xml version="1.0" encoding="utf-8"?>'
+        )
+
+        zip_bytes = build_xde_zip_bytes_from_lote_xml(lote_str_final)
+        zip_base64 = base64.b64encode(zip_bytes).decode("ascii")
+
+        print(f"✅ Rebuilt ZIP bytes: {len(zip_bytes)} | base64 len: {len(zip_base64)}")
+        
+        # GUARDRAIL A: Verificar DE@Id y Reference URI coinciden
+        print("🛡️ Guardrail A: Verificando DE@Id y Reference URI...")
+        try:
+            from lxml import etree as lxml_etree
+            import hashlib
+            import base64
+            
+            # Parsear XML final
+            final_root = lxml_etree.fromstring(xml_para_payload)
+            ns = {'s': 'http://ekuatia.set.gov.py/sifen/xsd', 'ds': 'http://www.w3.org/2000/09/xmldsig#'}
+            
+            # Extraer DE@Id
+            de_final = final_root.xpath('//s:DE', namespaces=ns)[0]
+            de_id_final = de_final.get('Id')
+            
+            # Extraer Reference URI
+            reference = final_root.xpath('//ds:Reference', namespaces=ns)
+            if not reference:
+                reference = final_root.xpath('//ds:Reference', namespaces={'ds': 'http://www.w3.org/2000/09/xmldsig#'})
+            
+            if reference:
+                reference_uri = reference[0].get('URI')
+                expected_uri = f"#{de_id_final}"
+                
+                if reference_uri == expected_uri:
+                    print(f"✅ Reference URI coincide: {reference_uri}")
+                else:
+                    raise ValueError(f"Reference URI no coincide: esperado {expected_uri}, encontrado {reference_uri}")
+            else:
+                raise ValueError("No se encontró elemento Reference en Signature")
+                
+        except Exception as e:
+            raise RuntimeError(f"Guardrail A falló: {e}") from e
+        
+        # GUARDRAIL B: Recalcular SHA256 y loguear
+        print("🛡️ Guardrail B: Calculando hash del XML final...")
+        try:
+            sha256_hash = hashlib.sha256(xml_para_payload).hexdigest()
+            print(f"✅ XML final size: {len(xml_para_payload)} bytes")
+            print(f"✅ XML final SHA256: {sha256_hash}")
+        except Exception as e:
+            raise RuntimeError(f"Guardrail B falló: {e}") from e
+        
+        # GUARDRAIL C: Verificar estructura del ZIP final
+        print("🛡️ Guardrail C: Verificando estructura del ZIP final...")
+        try:
+            import zipfile
+            from io import BytesIO
+            
+            with zipfile.ZipFile(BytesIO(zip_bytes), 'r') as zf:
+                files = zf.namelist()
+                if files != ['lote.xml']:
+                    raise ValueError(f"ZIP debe contener solo lote.xml, encontrado: {files}")
+                
+                # Leer y verificar lote.xml
+                lote_content = zf.read('lote.xml')
+                lote_root = lxml_etree.fromstring(lote_content)
+                ns_lote = {'s': 'http://ekuatia.set.gov.py/sifen/xsd'}
+                
+                # Verificar 1 rDE directo
+                rde_list = lote_root.xpath('/s:rLoteDE/s:rDE', namespaces=ns_lote)
+                if len(rde_list) != 1:
+                    raise ValueError(f"ZIP debe contener 1 rDE, encontrado: {len(rde_list)}")
+                
+                # Verificar 0 xDE
+                xde_list = lote_root.xpath('//s:xDE', namespaces=ns_lote)
+                if len(xde_list) != 0:
+                    raise ValueError(f"ZIP no debe contener xDE, encontrado: {len(xde_list)}")
+                
+                # Verificar Signature presente bajo rDE
+                sig_list = rde_list[0].xpath('./s:Signature', namespaces=ns_lote)
+                if len(sig_list) != 1:
+                    raise ValueError(f"rDE debe contener 1 Signature, encontrado: {len(sig_list)}")
+                
+                print("✅ Estructura del ZIP validada correctamente")
+                
+        except Exception as e:
+            raise RuntimeError(f"Guardrail C falló: {e}") from e
+        
+        # VALIDACIÓN ANTI-0160: asegurar CSC configurado antes de enviar
+        print("🔍 Verificando SIFEN_CSC configurado...")
+        try:
+            validate_sifenc_csc_before_send()
+            print("✅ SIFEN_CSC configurado")
+        except RuntimeError as e:
+            print(f"❌ ERROR: {e}")
+            raise
+        
+        # VALIDACIÓN ANTI-0160: asegurar gCamFuFD singleton antes de enviar
+        print("🔍 Ejecutando validación anti-0160 de gCamFuFD...")
+        try:
+            validate_gcamfufd_singleton_before_send(xml_para_payload)
+            print("✅ Validación gCamFuFD exitosa")
+        except Exception as e:
+            # Guardar artifacts de debug si falla
+            debug_file = f"artifacts/debug_validation_error_{int(time.time())}.xml"
+            with open(debug_file, "wb") as f:
+                f.write(xml_para_payload)
+            print(f"❌ ERROR: Validación gCamFuFD falló: {e}")
+            print(f"   Debug guardado en: {debug_file}")
+            raise RuntimeError(f"Validación anti-0160 falló: {e}") from e
+        
+        payload_xml = build_r_envio_lote_xml(did=did, xml_bytes=xml_para_payload, zip_base64=zip_base64)
         
         # DEBUG: Round-trip del xDE desde el SOAP final
         from pathlib import Path
@@ -6470,9 +7489,9 @@ def send_sirecepde_lote(xml_file: str, env: str = "test", artifacts_dir: Optiona
             if validate_lote_xsd is not None:
                 print("\n🔍 Validando lote.xml contra XSD que declara rLoteDE...")
                 try:
-                    # Guardar lote.xml temporal para validación
+                    # Guardar lote.xml temporal para validación (usar XML saneado final)
                     temp_lote_file = artifacts_dir / "_last_sent_lote.xml"
-                    temp_lote_file.write_bytes(lote_xml_bytes)
+                    temp_lote_file.write_bytes(xml_para_payload)
                     
                     # Cambiar al directorio raíz del proyecto para la validación
                     original_cwd = os.getcwd()

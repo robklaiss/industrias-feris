@@ -72,7 +72,7 @@ def flujo_completo(xml_validado, ruc, dv, timbrado, num_doc, output_dir):
     
     # Guardar XML sin firma
     xml_sin_firma = output_path / f"xml_sin_firma_{num_doc}.xml"
-    xml_bytes = etree.tostring(rde, encoding='utf-8', xml_declaration=True, standalone=False)
+    xml_bytes = etree.tostring(rde, encoding='utf-8', xml_declaration=True)
     xml_sin_firma.write_bytes(xml_bytes)
     print(f"   ✅ XML sin firma: {xml_sin_firma}")
     
@@ -147,7 +147,7 @@ def flujo_completo(xml_validado, ruc, dv, timbrado, num_doc, output_dir):
     
     # Guardar XML completo
     xml_completo = output_path / f"xml_completo_{num_doc}.xml"
-    xml_completo_bytes = etree.tostring(root_firmado, encoding='utf-8', xml_declaration=True, standalone=False)
+    xml_completo_bytes = etree.tostring(root_firmado, encoding='utf-8', xml_declaration=True)
     xml_completo.write_bytes(xml_completo_bytes)
     print(f"   ✅ XML completo: {xml_completo}")
     

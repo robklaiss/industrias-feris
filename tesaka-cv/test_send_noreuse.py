@@ -7,39 +7,49 @@ import os
 import sys
 from pathlib import Path
 
-# Configurar variables de entorno
-os.environ["SIFEN_NO_REUSE_ZIP"] = "1"
-os.environ["SIFEN_SKIP_RUC_GATE"] = "1"
-os.environ["SIFEN_SKIP_LAST_LOTE_MISMATCH"] = "1"
 
-# Limpiar artifacts anteriores
-for f in ["artifacts/soap_last_request_SENT.xml", "artifacts/soap_last_response_RECV.xml"]:
-    if Path(f).exists():
-        Path(f).unlink()
+def run_send_noreuse_test():
+    """Run send test with no reuse zip option."""
+    # Configurar variables de entorno
+    os.environ["SIFEN_NO_REUSE_ZIP"] = "1"
+    os.environ["SIFEN_SKIP_RUC_GATE"] = "1"
+    os.environ["SIFEN_SKIP_LAST_LOTE_MISMATCH"] = "1"
 
-# Importar y ejecutar
-sys.path.insert(0, str(Path(__file__).parent))
-from tools.send_sirecepde import send_sirecepde
+    # Limpiar artifacts anteriores
+    for f in ["artifacts/soap_last_request_SENT.xml", "artifacts/soap_last_response_RECV.xml"]:
+        if Path(f).exists():
+            Path(f).unlink()
 
-# Usar el XML corregido con namespace SIFEN
-xml_path = Path("artifacts/_debug_lote_fixed.xml")
-if not xml_path.exists():
-    print(f"❌ El archivo {xml_path} no existe")
-    print("Primero ejecuta: python tools/fix_signature_namespace.py artifacts/_debug_lote_from_xde.xml")
-    sys.exit(1)
+    # Importar y ejecutar
+    sys.path.insert(0, str(Path(__file__).parent))
+    from tools.send_sirecepde import send_sirecepde
 
-print(f"📄 Enviando: {xml_path}")
-print(f"🔧 SIFEN_NO_REUSE_ZIP = {os.environ['SIFEN_NO_REUSE_ZIP']}")
+    # Usar el XML corregido con namespace SIFEN
+    xml_path = Path("artifacts/_debug_lote_fixed.xml")
+    if not xml_path.exists():
+        print(f"❌ El archivo {xml_path} no existe")
+        print("Primero ejecuta: python tools/fix_signature_namespace.py artifacts/_debug_lote_from_xde.xml")
+        return False
 
-result = send_sirecepde(
-    xml_path=xml_path,
-    env="test",
-    dump_http=True
-)
+    print(f"📄 Enviando: {xml_path}")
+    print(f"🔧 SIFEN_NO_REUSE_ZIP = {os.environ['SIFEN_NO_REUSE_ZIP']}")
 
-print("\n=== RESULTADO ===")
-print(f"Success: {result.get('success')}")
-if not result.get('success'):
-    print(f"Error: {result.get('error')}")
-    print(f"Código SIFEN: {result.get('response', {}).get('dCodRes', 'N/A')}")
-    print(f"Mensaje SIFEN: {result.get('response', {}).get('dMsgRes', 'N/A')}")
+    result = send_sirecepde(
+        xml_path=xml_path,
+        env="test",
+        dump_http=True
+    )
+
+    print("\n=== RESULTADO ===")
+    print(f"Success: {result.get('success')}")
+    if not result.get('success'):
+        print(f"Error: {result.get('error')}")
+        print(f"Código SIFEN: {result.get('response', {}).get('dCodRes', 'N/A')}")
+        print(f"Mensaje SIFEN: {result.get('response', {}).get('dMsgRes', 'N/A')}")
+    
+    return result.get('success', False)
+
+
+if __name__ == "__main__":
+    success = run_send_noreuse_test()
+    sys.exit(0 if success else 1)

@@ -21,6 +21,72 @@ Este documento guarda todo lo que hemos probado y sabemos que NO funciona, para 
 
 ## 🚫 Errores Comunes y Soluciones
 
+### [2026-01-20] MODO GUERRA 0160 — Eliminar mutaciones post-firma
+
+**Síntoma:** SIFEN devuelve error 0160 "XML Mal Formado" y xmlsec verify falla en artifacts/debug_rde_fragment.xml
+
+**Contexto/archivo:** `tesaka-cv/app/sifen_client/xmlsec_signer.py` - sección post-procesado después de ctx.sign()
+
+**Causa raíz:** Se estaba mutando el árbol XML después de firmar:
+- Recreando el elemento Signature con nuevo xmlns
+- Agregando xmlns explícito a Signature post-firma
+- Modificando prefijos ds: después de la firma criptográfica
+
+**Fix aplicado:**
+1. **Eliminado** todo post-procesado que muta Signature después de ctx.sign()
+2. **Desactivado** el bloque que recrea Signature con xmlns explícito
+3. **Implementado** validación dura inmediatamente después de firmar
+4. **Agregado** guardrail que aborta si xmlsec verify falla post-firma
+
+**Cómo verificar (comandos exactos):**
+```bash
+# Verificar que la firma es válida inmediatamente después de firmar
+xmlsec1 --verify --insecure --id-attr:Id DE artifacts/rde_immediately_after_sign.xml
+
+# Verificar que no hay logs de "Signature recreated" o "Added explicit XMLDSig xmlns"
+../scripts/run.sh -m tools.send_sirecepde --env prod --xml artifacts/_temp_lote_for_validation.xml --force-resign 2>&1 | grep -E "(Signature recreated|Added explicit XMLDSig xmlns|Manteniendo Signature xmlns)"
+# No debe retornar nada
+```
+
+**Resultado esperado:** 
+- xmlsec1 verify OK en rde_immediately_after_sign.xml
+- No hay mutaciones post-firma
+- Signature mantiene xmlns XMLDSig estándar
+
+**Regla de oro:** Después de ctx.sign() → NO se modifica más el XML firmado.
+
+### [2026-01-20] Error 0160 por corrupción de namespace Signature en passthrough
+
+**Síntoma:** SIFEN devuelve error 0160 "XML Mal Formado" cuando el namespace de Signature se cambia de XMLDSig a SIFEN durante el passthrough.
+
+**Contexto/archivo:** `tesaka-cv/tools/send_sirecepde.py` - función `build_lote_passthrough_signed()`
+
+**Causa raíz:** El código forzaba el cambio de namespace de Signature de `http://www.w3.org/2000/09/xmldsig#` a `http://ekuatia.set.gov.py/sifen/xsd` durante la construcción del lote, corruptando la firma.
+
+**Fix aplicado:**
+1. Removido todo código que fuerza el cambio de namespace en passthrough
+2. Agregado guardrail que valida que Signature mantenga namespace XMLDSig después de construir lote
+3. Si se detecta corrupción, se aborta passthrough y se fuerza re-firma completa
+4. Logging mejorado para mostrar namespace antes y después del passthrough
+
+**Cómo verificar (comandos exactos):**
+```bash
+# Ejecutar test unitario
+python3 tests/test_passthrough_signature_namespace.py
+
+# Verificar en logs del flujo principal
+../scripts/run.sh -m tools.send_sirecepde --env prod --xml artifacts/_temp_lote_for_validation.xml --dump-http | grep "Signature namespace"
+
+# Debe mostrar:
+# 🔍 Signature namespace ANTES de passthrough: http://www.w3.org/2000/09/xmldsig#
+# 🔍 Signature namespace DESPUÉS de passthrough: http://www.w3.org/2000/09/xmldsig#
+# 🔍 Signature namespace en lote.xml: http://www.w3.org/2000/09/xmldsig#
+```
+
+**Resultado esperado:** Signature mantiene namespace XMLDSig throughout todo el flujo de passthrough, evitando el error 0160.
+
+**Regla de oro:** En passthrough NUNCA se debe modificar el namespace de Signature. Siempre mantener XMLDSig.
+
 ### 0. Usar Python Incorrecto
 
 **Problema**: Usar `python` del sistema en lugar de `python3` del venv.
@@ -840,6 +906,68 @@ print('dVerFor primero:', rde[0].tag.split('}')[-1] if rde else 'NONE')
 
 ---
 
+## [2026-01-20] Passthrough Byte-Preserving - Solución definitiva para error 0160
+
+**Síntoma:** SIFEN devuelve error 0160 "XML Mal Formado" cuando el XML firmado es modificado durante el passthrough.
+
+**Causa real:** Mutaciones del XML después de la firma (remover newlines, strip, re-serialize) rompen la validez criptográfica de la firma.
+
+**Implementación completa:**
+1. **Inmutabilidad SHA256:** Calcular hash antes y después del passthrough
+2. **Verificación criptográfica xmlsec:** Validar firma antes y después
+3. **Eliminación de mutaciones:** No remover newlines, no hacer strip, no re-serializar
+4. **Force Resign:** Switch --force-resign y env SIFEN_FORCE_RESIGN para testing
+
+**Fix aplicado en `tools/send_sirecepde.py`:**
+```python
+# Capturar bytes originales
+rde_bytes_original = _extract_rde_bytes_passthrough(xml_bytes)
+sha256_original = calculate_sha256_bytes(rde_bytes_original)
+
+# Verificación criptográfica
+is_valid_sig, error_msg = verify_xmlsig_rde(rde_bytes_original)
+
+# Guardrails de inmutabilidad
+if sha256_original != sha256_final:
+    print("❌ ERROR CRÍTICO: El rDE fue modificado")
+    return None  # Forzar re-firma
+
+# NO eliminar newlines en passthrough
+# lote_str = lote_str.replace('\n', '').replace('\r', '')  # COMENTADO
+```
+
+**Comandos de verificación:**
+```bash
+# Ejecutar con force-resign para comparar
+python -m tools.send_sirecepde --env prod --xml latest --force-resign
+
+# Ejecutar con variable de entorno
+SIFEN_FORCE_RESIGN=1 python -m tools.send_sirecepde --env prod --xml latest
+
+# Verificar logs de inmutabilidad
+grep -E "SHA256|Inmutabilidad|verificación criptográfica" artifacts/sirecepde_*.log
+```
+
+**Tests implementados:**
+- `tests/test_passthrough_immutability.py` - Tests unitarios para inmutabilidad
+- Verificación de preservación de newlines y whitespace
+- Detección de modificaciones con SHA256
+
+**Reglas de passthrough (anti-regresión):**
+- **PASSTHROUGH DEBE SER BYTE-PRESERVING**
+- Prohibido: `replace("\n","")`, `strip()`, `etree.tostring()` sobre rDE firmado
+- Prohibido: Re-serializar con lxml, pretty print, ordenar atributos
+- Obligatorio: Verificar SHA256 antes/después
+- Obligatorio: Verificar firma con xmlsec antes/después
+
+**Resultado esperado:**
+- Logs muestran "✅ Inmutabilidad verificada"
+- Logs muestran "✅ Firma XML válida (verificación criptográfica)"
+- NO aparece "XML after removing newlines"
+- Si SIFEN devuelve 0160, el sistema muestra hashes y fuerza re-firma
+
+---
+
 ## [2026-01-19] Error 0160 - Reutilización de ZIP viejo causa XML mal formado
 
 **Síntoma:** SIFEN devuelve error 0160 "XML Mal Formado" intermitentemente, incluso con XML válido y firma correcta.
@@ -1187,6 +1315,46 @@ print('Válido XSD:', xsd.validate(xml))
    - Borrar hijos existentes antes de insertar
    - Insertar dCarQR y dInfAdic vacío
 
+## [2026-01-20] Error 0160 "XML Mal Formado" - Root Cause: Signature xmlns SIFEN rompe XMLDSig
+
+**Síntoma:** SIFEN devuelve error 0160 "XML Mal Formado" pero la firma XML parece válida.
+
+**Causa real confirmada:** En modo passthrough estamos cambiando el xmlns de `<Signature>` a SIFEN, lo cual rompe XMLDSig y SIFEN responde 0160.
+
+**Evidencia:** El SOAP enviado contiene `<Signature xmlns="http://ekuatia.set.gov.py/sifen/xsd">` y dentro `<SignedInfo>...` sin prefijos ds, lo cual es inválido. Debe ser XMLDSig `http://www.w3.org/2000/09/xmldsig#`.
+
+**Fix implementado:**
+1. **Eliminado** el cambio forzado de xmlns de Signature a SIFEN en modo passthrough
+2. **Implementado** guardrail `xmlsig_guard.py` que valida XMLDSig namespace antes de passthrough
+3. **Agregado** hard fail validation antes de enviar a SIFEN que aborta si Signature no es XMLDSig
+4. **Corregido** bug `sig_before` NameError
+5. **Ajustado** selección de archivos "latest" para excluir artefactos de debug
+
+**REGLA PERMANENTE DEL PROYECTO:**
+- **Signature DEBE usar xmlns XMLDSig:** `http://www.w3.org/2000/09/xmldsig#`
+- **NUNCA cambiar xmlns de Signature** a SIFEN en modo passthrough
+- **Si Signature no es XMLDSig, forzar re-firma** completa
+
+**Comandos de verificación:**
+```bash
+# Verificar namespace en XML
+python3 -c "
+from app.sifen_client.xmlsig_guard import validate_signature_namespace_in_xml
+with open('lote.xml', 'rb') as f:
+    is_valid, error = validate_signature_namespace_in_xml(f.read())
+    print(f'XMLDSig válido: {is_valid}')
+    if error: print(f'Error: {error}')
+"
+
+# Verificar en SOAP enviado
+unzip -p artifacts/soap_last_request_SENT.xml xDE > xDE.zip
+unzip -p xDE.zip lote.xml > lote_from_SENT.xml
+grep -o 'Signature xmlns="[^"]*"' lote_from_SENT.xml
+# Debe mostrar: Signature xmlns="http://www.w3.org/2000/09/xmldsig#"
+```
+
+**Estado actual:** ✅ Signature mantiene XMLDSig, guardrail activado, hard fail implementado
+
 **Comandos de verificación:**
 ```bash
 # Verificar QR generado correctamente
@@ -1291,4 +1459,50 @@ doc = ET.parse('lote_from_SENT.xml')
 ```
 
 **Estado:** ABIERTO - Se requiere investigación adicional con SIFEN o acceso a logs más detallados.
+
+## [2026-01-20] MODO GUERRA 0160 — gCamFuFD + QR obligatorio (DNIT)
+
+**Síntoma:** SIFEN devuelve error 0160 "XML Mal Formado" cuando falta gCamFuFD, aunque el XSD lo marque como opcional.
+
+**Contexto/archivo:** `tesaka-cv/tools/send_sirecepde.py`, `tesaka-cv/app/sifen_client/xmlsec_signer.py`
+
+**Causa raíz:** DNIT/SIFEN requiere obligatoriamente el elemento `gCamFuFD` con `dCarQR` para evitar error 0160. El XSD lo marca como opcional pero en la práctica es obligatorio.
+
+**Fix aplicado:**
+1. **Modificado** `validate_gcamfufd_singleton_before_send()` para exigir gCamFuFD en modo producción
+2. **Asegurado** que `xmlsec_signer.py` siempre genere gCamFuFD después de la firma
+3. **Agregado** validación de SIFEN_CSC obligatorio antes de enviar
+4. **Implementado** flag `SIFEN_ALLOW_MISSING_GCAMFUFD=1` solo para debug local
+5. **Actualizado** tests anti-regresión para validar comportamiento obligatorio
+
+**Cómo verificar (comandos exactos):**
+```bash
+# Configurar CSC (obligatorio para producción)
+export SIFEN_CSC="12345678901234567890123456789012"
+export SIFEN_CSC_ID="0001"
+
+# Ejecutar flujo completo
+cd tesaka-cv
+export SIFEN_SKIP_RUC_GATE=1
+../scripts/run.sh -m tools.send_sirecepde --env prod --xml artifacts/_temp_lote_for_validation.xml --force-resign --dump-http
+
+# Verificar estructura del XML enviado
+unzip -p artifacts/soap_last_request_SENT.xml xDE > xDE.zip
+unzip -p xDE.zip lote.xml > lote_from_SENT.xml
+python3 -c "
+import lxml.etree as ET
+root = ET.parse('lote_from_SENT.xml')
+ns = {'s': 'http://ekuatia.set.gov.py/sifen/xsd'}
+rde = root.find('.//s:rDE', ns)
+print('rDE children:', [c.tag.split('}')[-1] for c in rde])
+print('gCamFuFD count:', len([c for c in rde if c.tag.split('}')[-1] == 'gCamFuFD']))
+"
+
+# Ejecutar script de verificación completo
+python3 scripts/verify_modo_guerra_0160.py
+```
+
+**Resultado esperado:** rDE children debe ser `['dVerFor', 'DE', 'Signature', 'gCamFuFD']` y `gCamFuFD count: 1`.
+
+**Regla anti-regresión:** DNIT requiere gCamFuFD obligatoriamente con dCarQR. No enviar sin SIFEN_CSC configurado. Usar `SIFEN_ALLOW_MISSING_GCAMFUFD=1` solo para debug local.
 

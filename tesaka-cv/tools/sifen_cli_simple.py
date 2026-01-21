@@ -85,7 +85,7 @@ class SifenCLISimple:
         root.replace(DE, signed_de)
         
         # Serializar XML final
-        xml_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True, standalone=False)
+        xml_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True)
         
         return xml_bytes, nuevo_cdc_completo
     

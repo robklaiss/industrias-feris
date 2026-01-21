@@ -6,6 +6,27 @@
   - Python 3.14+ no tiene wheels para lxml/xmlsec y causará errores
   - Verificar versión: `python3 --version`
 
+## Envío de Documentos - Modo Automático
+
+El script `tools/send_sirecepde.py` ahora soporta selección automática de XMLs:
+
+```bash
+# Enviar el XML base más reciente (sin firmar)
+python -m tools.send_sirecepde --env test --xml latest
+
+# Enviar a producción con el XML más reciente
+python -m tools.send_sirecepde --env prod --xml latest --dump-http
+
+# Reenviar el XML firmado más reciente
+python -m tools.send_sirecepde --env prod --xml signed_latest
+```
+
+Valores especiales para `--xml`:
+- `latest` o `newest`: Selecciona automáticamente el XML base más reciente
+- `signed_latest` o `latest_signed`: Selecciona el XML firmado más reciente
+
+Ver `docs/DEV_USAGE.md` para más detalles.
+
 ## Setup Rápido
 
 ### Opción 1: Script Automático (Recomendado)

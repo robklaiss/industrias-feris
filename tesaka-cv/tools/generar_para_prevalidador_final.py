@@ -21,7 +21,7 @@ def remove_existing_signature(xml_bytes: bytes) -> bytes:
         for sig in rde.findall(f".//{DS_NS}Signature"):
             sig.getparent().remove(sig)
     
-    return etree.tostring(root, encoding='utf-8', xml_declaration=True, standalone=False)
+    return etree.tostring(root, encoding='utf-8', xml_declaration=True)
 
 def local_tag(tag):
     """Obtiene el tag local sin namespace"""

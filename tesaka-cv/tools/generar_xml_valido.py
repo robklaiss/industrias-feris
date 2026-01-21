@@ -146,7 +146,7 @@ def generar_xml_valido(ruc, dv, timbrado, establecimiento, punto_exp, num_doc, o
         gCamFuFD.getparent().remove(gCamFuFD)
     
     # Guardar XML sin firma
-    xml_bytes = etree.tostring(rde, encoding='utf-8', xml_declaration=True, standalone=False)
+    xml_bytes = etree.tostring(rde, encoding='utf-8', xml_declaration=True)
     
     # Crear rDE contenedor
     rde_container = etree.Element(f"{SIFEN_NS}rDE", nsmap=rde.nsmap)
@@ -158,7 +158,7 @@ def generar_xml_valido(ruc, dv, timbrado, establecimiento, punto_exp, num_doc, o
         rde_container.append(child)
     
     # Guardar XML final
-    xml_final = etree.tostring(rde_container, encoding='utf-8', xml_declaration=True, standalone=False)
+    xml_final = etree.tostring(rde_container, encoding='utf-8', xml_declaration=True)
     Path(output_path).write_bytes(xml_final)
     
     print(f"\n✅ XML generado: {output_path}")

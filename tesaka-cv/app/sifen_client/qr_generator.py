@@ -16,6 +16,71 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Exception class for QR generator errors
+class QRGeneratorError(Exception):
+    """Exception raised for QR generator errors"""
+    pass
+
+# QRGenerator class wrapper for backward compatibility
+class QRGenerator:
+    """
+    Wrapper class for QR generation to maintain backward compatibility.
+    
+    This class provides a simple interface for generating QR codes for SIFEN.
+    """
+    
+    def __init__(self, csc: str = None, csc_id: str = None, environment: str = None):
+        """
+        Initialize QR generator.
+        
+        Args:
+            csc: CSC secret (32 caracteres)
+            csc_id: CSC ID (ej: "0001")
+            environment: "TEST" or "PROD"
+        """
+        self.csc = csc or os.getenv("SIFEN_QR_CSC")
+        self.csc_id = csc_id or os.getenv("SIFEN_QR_IDCSC")
+        self.environment = environment or ("TEST" if "test" in os.getenv("SIFEN_ENV", "").lower() else "PROD")
+        
+        # Validar CSC
+        if not self.csc:
+            raise QRGeneratorError("CSC no especificado")
+        if len(self.csc) != 32:
+            raise QRGeneratorError("CSC debe tener 32 caracteres")
+            
+        # Validar ambiente
+        if self.environment not in ["TEST", "PROD"]:
+            raise QRGeneratorError("Ambiente inválido: debe ser TEST o PROD")
+            
+        # Set base URL according to environment
+        if self.environment == "TEST":
+            self.qr_url_base = "https://www.ekuatia.set.gov.py/consultas-test/qr?"
+        else:
+            self.qr_url_base = "https://www.ekuatia.set.gov.py/consultas/qr?"
+    
+    def generate(self, rde_xml: bytes) -> str:
+        """
+        Generate QR URL for given rDE XML.
+        
+        Args:
+            rde_xml: XML del rDE firmado (bytes)
+            
+        Returns:
+            URL completa del QR con todos los parámetros y hash
+            
+        Raises:
+            QRGeneratorError: If QR generation fails
+        """
+        try:
+            return build_qr_dcarqr(
+                rde_xml=rde_xml,
+                base_url=self.qr_url_base.rstrip('?'),
+                idcsc=self.csc_id,
+                csc=self.csc
+            )
+        except Exception as e:
+            raise QRGeneratorError(f"Error generando QR: {str(e)}") from e
+
 # Namespace SIFEN
 SIFEN_NS = "http://ekuatia.set.gov.py/sifen/xsd"
 # Namespace XMLDSig
@@ -170,6 +235,60 @@ def build_qr_dcarqr(rde_xml: bytes, base_url: str = None, idcsc: str = None, csc
     return qr_url
 
 
+def ensure_single_gCamFuFD_after_signature(rde_root: etree._Element, dCarQR_text: str) -> None:
+    """
+    Asegura que EXACTAMENTE UN gCamFuFD exista como hijo directo de rDE,
+    inmediatamente después del elemento Signature.
+    
+    Esta función es la ÚNICA responsable de crear/mantener gCamFuFD.
+    Elimina todos los gCamFuFD existentes (en cualquier ubicación) y
+    crea uno nuevo en la posición correcta.
+    
+    Args:
+        rde_root: Elemento rDE (ya debe tener Signature)
+        dCarQR_text: Texto del QR a insertar en dCarQR
+        
+    Raises:
+        ValueError: Si no se encuentra Signature en rDE
+    """
+    ns = {"s": SIFEN_NS, "ds": DS_NS}
+    
+    # 1) Eliminar TODOS los gCamFuFD existentes (considerando con/sin namespace)
+    all_gcam = rde_root.xpath(".//s:gCamFuFD", namespaces=ns) + rde_root.xpath(".//gCamFuFD")
+    for gcam in all_gcam:
+        parent = gcam.getparent()
+        if parent is not None:
+            parent.remove(gcam)
+            logger.debug("Eliminado gCamFuFD existente")
+    
+    # 2) Crear nuevo gCamFuFD con namespace SIFEN correcto
+    gcam_new = etree.Element(f"{{{SIFEN_NS}}}gCamFuFD")
+    
+    # 3) Insertar dCarQR con el texto proporcionado
+    dcar = etree.SubElement(gcam_new, f"{{{SIFEN_NS}}}dCarQR")
+    dcar.text = dCarQR_text
+    
+    # 4) Insertar dInfAdic vacío (requerido por XSD)
+    # dinfo = etree.SubElement(gcam_new, f"{{{SIFEN_NS}}}dInfAdic")
+    
+    # 5) Buscar Signature como hijo directo de rDE
+    sig = rde_root.xpath("./ds:Signature", namespaces=ns)
+    if not sig:
+        # Intentar sin prefijo
+        sig = rde_root.xpath("./Signature")
+    
+    if not sig:
+        raise ValueError("No se encontró elemento Signature como hijo directo de rDE")
+    
+    sig_elem = sig[0]
+    
+    # 6) Insertar gCamFuFD inmediatamente después de Signature
+    sig_idx = list(rde_root).index(sig_elem)
+    rde_root.insert(sig_idx + 1, gcam_new)
+    
+    logger.info("gCamFuFD creado como hijo directo de rDE, inmediatamente después de Signature")
+
+
 def inject_qr_into_gcamfufd(rde_elem: etree._Element, qr_url: str) -> None:
     """
     Inyecta el QR en gCamFuFD/dCarQR del rDE.
@@ -198,7 +317,7 @@ def inject_qr_into_gcamfufd(rde_elem: etree._Element, qr_url: str) -> None:
     dcar.text = qr_url
     
     # Insertar dInfAdic vacío (requerido por XSD) en segundo lugar
-    dinfo = etree.SubElement(gcam, f"{{{SIFEN_NS}}}dInfAdic")
+    # dinfo = etree.SubElement(gcam, f"{{{SIFEN_NS}}}dInfAdic")
     
     logger.info(f"QR inyectado en gCamFuFD/dCarQR (hijo directo de rDE, fuera de DE)")
 
@@ -228,6 +347,46 @@ def generate_qr_for_rde(rde_xml: bytes, base_url: str = None, idcsc: str = None,
     
     # Inyectar QR
     inject_qr_into_gcamfufd(rde, qr_url)
+    
+    # Serializar
+    return etree.tostring(root, encoding="utf-8", xml_declaration=True)
+
+
+def generate_qr_for_rde_single(rde_xml: bytes, base_url: str = None, idcsc: str = None, csc: str = None) -> bytes:
+    """
+    Genera y agrega el QR a un rDE existente usando ensure_single_gCamFuFD_after_signature.
+    Esta es la función recomendada que evita duplicación de gCamFuFD.
+    
+    Args:
+        rde_xml: XML del rDE firmado
+        base_url: URL base para QR
+        idcsc: IdCSC
+        csc: CSC
+        
+    Returns:
+        XML con QR agregado (bytes)
+        
+    Raises:
+        QRGeneratorError: Si faltan datos de configuración
+    """
+    # Validar que tenemos CSC
+    if csc is None:
+        csc = os.getenv("SIFEN_QR_CSC")
+    if not csc:
+        raise QRGeneratorError("Falta SIFEN_QR_CSC para generar QR")
+    
+    # Generar QR
+    qr_url = build_qr_dcarqr(rde_xml, base_url, idcsc, csc)
+    
+    # Parsear XML
+    parser = etree.XMLParser(remove_blank_text=True)
+    root = etree.fromstring(rde_xml, parser)
+    
+    # Encontrar rDE (puede ser root o anidado)
+    rde = root if root.tag == f"{{{SIFEN_NS}}}rDE" else root.xpath(".//s:rDE", namespaces={"s": SIFEN_NS})[0]
+    
+    # Usar el helper que asegura singleton y posición correcta
+    ensure_single_gCamFuFD_after_signature(rde, qr_url)
     
     # Serializar
     return etree.tostring(root, encoding="utf-8", xml_declaration=True)

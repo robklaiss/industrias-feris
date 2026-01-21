@@ -157,9 +157,9 @@ def create_rde_xml_v150(
         XML como string
     """
     if fecha is None:
-        fecha = datetime.now().strftime("%Y-%m-%d")
+        fecha = datetime.now().replace(microsecond=0).strftime("%Y-%m-%d")
     if hora is None:
-        hora = datetime.now().strftime("%H:%M:%S")
+        hora = datetime.now().replace(microsecond=0).strftime("%H:%M:%S")
     
     # Normalizar número de documento (máx 7 dígitos)
     numero_doc_digits = "".join(c for c in str(numero_documento or "") if c.isdigit())
@@ -249,6 +249,26 @@ def create_rde_xml_v150(
         ruc_display_digits = "80012345"
     ruc_display = ruc_display_digits.lstrip("0") or "0"
     
+    # Leer fechas de vigencia del timbrado desde environment variables
+    import os
+    fecha_inicio_timbrado = os.getenv("SIFEN_TIMBRADO_FECHA_INICIO", fecha)
+    fecha_fin_timbrado = os.getenv("SIFEN_TIMBRADO_FECHA_FIN", "")
+    
+    # Validar formato de fechas
+    if not fecha_inicio_timbrado:
+        raise ValueError("SIFEN_TIMBRADO_FECHA_INICIO es obligatorio (formato YYYY-MM-DD)")
+    
+    if not fecha_fin_timbrado:
+        raise ValueError("SIFEN_TIMBRADO_FECHA_FIN es obligatorio (formato YYYY-MM-DD)")
+    
+    # Validar que las fechas estén en formato correcto
+    import re
+    fecha_pattern = re.compile(r'^\d{4}-\d{2}-\d{2}$')
+    if not fecha_pattern.match(fecha_inicio_timbrado):
+        raise ValueError(f"Formato inválido de SIFEN_TIMBRADO_FECHA_INICIO: {fecha_inicio_timbrado}. Debe ser YYYY-MM-DD")
+    if not fecha_pattern.match(fecha_fin_timbrado):
+        raise ValueError(f"Formato inválido de SIFEN_TIMBRADO_FECHA_FIN: {fecha_fin_timbrado}. Debe ser YYYY-MM-DD")
+    
     # Determinar DV del RUC
     dv_ruc_value = (dv_ruc or "").strip()
     if not dv_ruc_value:
@@ -279,7 +299,8 @@ def create_rde_xml_v150(
             <dEst>{establecimiento}</dEst>
             <dPunExp>{punto_expedicion}</dPunExp>
             <dNumDoc>{numero_doc_7}</dNumDoc>
-            <dFeIniT>{fecha}</dFeIniT>
+            <dFeIniT>{fecha_inicio_timbrado}</dFeIniT>
+            <dFeFinT>{fecha_fin_timbrado}</dFeFinT>
         </gTimb>
         <gDatGralOpe>
             <dFeEmiDE>{fecha_emision}</dFeEmiDE>

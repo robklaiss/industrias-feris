@@ -54,7 +54,7 @@ def corregir_orden(xml_path, output_path):
             de.addnext(camfu)
     
     # Guardar XML
-    xml_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True, standalone=False)
+    xml_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True)
     Path(output_path).write_bytes(xml_bytes)
     
     print(f"✅ Orden corregido: {output_path}")

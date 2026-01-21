@@ -59,7 +59,7 @@ def adaptar_xml(input_xml, output_xml, nuevo_ruc, nuevo_dv, timbrado=None):
         gCamFuFD.getparent().remove(gCamFuFD)
     
     # Guardar XML adaptado (sin firmar)
-    xml_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True, standalone=False)
+    xml_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True)
     Path(output_xml).write_bytes(xml_bytes)
     
     print(f"✅ XML adaptado guardado en: {output_xml}")

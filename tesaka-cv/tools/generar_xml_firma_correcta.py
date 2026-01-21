@@ -51,7 +51,7 @@ def main():
     print(f"   CDC generado: {current_cdc}")
     
     # Convertir a bytes para firmar
-    xml_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True, standalone=False)
+    xml_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True)
     
     # Firmar el XML COMPLETO (con rDE)
     cert_path = os.getenv("SIFEN_SIGN_P12_PATH", "/Users/robinklaiss/.sifen/certs/F1T_65478.p12")
@@ -73,7 +73,7 @@ def main():
     root.replace(de_elem, signed_de)
     
     # Serializar XML final
-    final_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True, standalone=False)
+    final_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True)
     
     # Guardar
     desktop = Path.home() / "Desktop" / "prevalidador_rde_signed.xml"

@@ -62,7 +62,7 @@ class SifenFlujoCompleto:
         
         # Guardar XML adaptado
         xml_adaptado = self.artifacts_dir / "xml_adaptado.xml"
-        xml_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True, standalone=False)
+        xml_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True)
         xml_adaptado.write_bytes(xml_bytes)
         
         print(f"✅ XML adaptado: {xml_adaptado}")

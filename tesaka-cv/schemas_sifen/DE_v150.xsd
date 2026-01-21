@@ -46,7 +46,7 @@
 			<xs:element name="dSerieNum" minOccurs="0"
 				type="tdSerieNum" />
 			<xs:element name="dFeIniT" type="tdFeIniT" />
-			<!-- <xs:element name="dFeFinT" type="tFecAAAAMMDDguion"/> -->
+			<xs:element name="dFeFinT" type="tFecAAAAMMDDguion"/>
 		</xs:sequence>
 	</xs:complexType>
 

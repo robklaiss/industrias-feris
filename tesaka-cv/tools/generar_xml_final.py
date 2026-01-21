@@ -44,7 +44,7 @@ def generar_xml_final(xml_template, output_path):
     # - gCamFuFD
     
     # Guardar XML final
-    xml_bytes = etree.tostring(rde, encoding='utf-8', xml_declaration=True, standalone=False)
+    xml_bytes = etree.tostring(rde, encoding='utf-8', xml_declaration=True)
     Path(output_path).write_bytes(xml_bytes)
     
     # Verificar CDC

@@ -135,8 +135,7 @@ def main():
             tree.getroot(),
             xml_declaration=True,
             encoding="UTF-8",
-            pretty_print=True,
-            standalone=False
+            pretty_print=True
         )
         
         args.output.write_bytes(xml_bytes)

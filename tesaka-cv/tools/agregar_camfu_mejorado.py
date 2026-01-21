@@ -141,7 +141,7 @@ def agregar_camfu_mejorado(xml_path, output_path, csc=None, id_csc="0001"):
     root.append(gCamFuFD)
     
     # Guardar XML
-    xml_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True, standalone=False)
+    xml_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True)
     Path(output_path).write_bytes(xml_bytes)
     
     print(f"✅ gCamFuFD agregado: {output_path}")

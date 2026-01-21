@@ -95,7 +95,6 @@ def _clean_xml_whitespace(xml_bytes: bytes) -> bytes:
         encoding="UTF-8", 
         method="xml",
         pretty_print=False,
-        standalone=False,
         with_tail=False,
         xml_declaration=False  # No agregar XML declaration
     )
@@ -208,7 +207,6 @@ def _sanitize_xmldsig_prefixes(xml_bytes: bytes) -> bytes:
             tree,
             encoding="UTF-8",
             xml_declaration=True,
-            standalone=False,
             with_tail=False,
             pretty_print=False  # Reverted to False to preserve signature
         )

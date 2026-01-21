@@ -77,7 +77,7 @@ def recalcular_cdc(xml_path, output_path):
     
     # Guardar XML sin firma
     xml_sin_firma = output_path.replace('.xml', '_sin_firma.xml')
-    xml_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True, standalone=False)
+    xml_bytes = etree.tostring(root, encoding='utf-8', xml_declaration=True)
     Path(xml_sin_firma).write_bytes(xml_bytes)
     
     print(f"\n✅ XML sin firma guardado: {xml_sin_firma}")
