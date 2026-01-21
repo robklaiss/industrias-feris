@@ -5155,6 +5155,63 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
         }
 
 
+
+def sanitize_lote_payload(xml_bytes: bytes) -> bytes:
+    """
+    Sanitiza el XML payload justo antes de enviar para evitar error 0160.
+    
+    1. PRESERVA el atributo Id del nodo rDE (REQUERIDO por XSD v150)
+    2. Elimina microsegundos de dFecFirma y dFeEmiDE (regex \.\d{1,6})
+    3. Regenera el QR dCarQR con los datos saneados
+    
+    Args:
+        xml_bytes: XML del lote (bytes)
+        
+    Returns:
+        XML saneado (bytes)
+    """
+    import re
+    from lxml import etree
+    from app.sifen_client.qr_generator import build_qr_dcarqr
+    
+    # Parsear XML
+    root = etree.fromstring(xml_bytes)
+    
+    # 1. NO eliminar Id de rDE - es REQUERIDO por XSD v150
+    # Solo eliminamos Ids de elementos que no sean rDE
+    for elem in root.xpath('//*[@Id]'):
+        if elem.tag.split('}')[-1] != 'rDE':  # Namespace-agnostic check
+            elem.attrib.pop("Id", None)
+    
+    # 2. Eliminar microsegundos de campos datetime
+    datetime_fields = ["dFecFirma", "dFeEmiDE"]
+    for field_name in datetime_fields:
+        elements = root.xpath(f'//*[local-name()="{field_name}"]')
+        for elem in elements:
+            if elem.text:
+                # Remover microsegundos: T..:..:..XXXXXX -> T..:..:..
+                elem.text = re.sub(r'(T\d\d:\d\d:\d\d)\.\d{1,6}', r'\1', elem.text)
+    
+    # 3. Regenerar QR con datos saneados
+    # Buscar gCamFuFD/dCarQR y regenerar
+    NS = {"s": "http://ekuatia.set.gov.py/sifen/xsd"}
+    gcam = root.xpath("//s:gCamFuFD", namespaces=NS)
+    if gcam:
+        dcar = gcam[0].xpath("./s:dCarQR", namespaces=NS)
+        if dcar:
+            # Extraer datos para QR
+            de = root.xpath("//s:DE", namespaces=NS)[0]
+            de_id = de.get("Id")
+            dfe = root.xpath("//s:dFeEmiDE", namespaces=NS)[0].text
+            
+            # Construir QR simple
+            qr_url = f"https://ekuatia.set.gov.py/consultas/qr?nVersion=150&Id={de_id}&dFeEmiDE={dfe}"
+            dcar[0].text = qr_url
+    
+    # Serializar XML sin declaración (para mantener digest)
+    return etree.tostring(root, encoding='UTF-8', xml_declaration=False)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Envía XML siRecepLoteDE (rEnvioLote) al servicio SOAP de Recepción Lote DE (async) de SIFEN",
