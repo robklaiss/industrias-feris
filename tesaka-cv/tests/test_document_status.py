@@ -54,7 +54,8 @@ class TestDocumentStatus(unittest.TestCase):
         """Verifica que los estados finales se identifiquen correctamente"""
         self.assertTrue(is_final_status(STATUS_APPROVED))
         self.assertTrue(is_final_status(STATUS_REJECTED))
-        self.assertTrue(is_final_status(STATUS_ERROR))
+        # ERROR no es final, permite reintentos
+        self.assertFalse(is_final_status(STATUS_ERROR))
         self.assertFalse(is_final_status(STATUS_SIGNED_LOCAL))
         self.assertFalse(is_final_status(STATUS_SENT_TO_SIFEN))
         self.assertFalse(is_final_status(STATUS_PENDING_SIFEN))

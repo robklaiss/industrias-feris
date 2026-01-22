@@ -291,6 +291,21 @@ def p12_to_temp_pem_files(p12_path: str, p12_password: str) -> Tuple[str, str]:
             
             return (cert_path, key_path)
             
+        except PKCS12Error:
+            # Si ya es PKCS12Error (ej: private_key o certificate None), re-raise sin fallback
+            # Limpiar archivos temporales antes
+            try:
+                if os.path.exists(cert_path):
+                    os.unlink(cert_path)
+            except Exception:
+                pass
+            try:
+                if os.path.exists(key_path):
+                    os.unlink(key_path)
+            except Exception:
+                pass
+            raise
+            
         except ValueError as e:
             # ValueError puede indicar contraseña incorrecta o algoritmo legacy no soportado
             error_msg = str(e)

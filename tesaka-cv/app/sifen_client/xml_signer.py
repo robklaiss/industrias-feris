@@ -12,7 +12,7 @@ import os
 import logging
 from typing import Optional
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography import x509
@@ -140,7 +140,7 @@ class XmlSigner:
         - Algoritmo de clave (RSA 2048)
         - Tipo X.509 v3
         """
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         
         # Validar fecha de expiración
         if self.certificate.not_valid_after_utc < now:

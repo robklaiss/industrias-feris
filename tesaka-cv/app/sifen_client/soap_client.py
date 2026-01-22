@@ -79,6 +79,7 @@ SIFEN_SCHEMA_LOCATION = "http://ekuatia.set.gov.py/sifen/xsd/siRecepDE_v150.xsd"
 # Límites de tamaño según requisitos SIFEN (en bytes)
 SIZE_LIMITS = {
     "siRecepDE": 1000 * 1024,  # 1000 KB
+    "siRecepLoteDE": 10000 * 1024,  # 10.000 KB
     "rEnvioLote": 10000 * 1024,  # 10.000 KB
     "siConsRUC": 1000 * 1024,  # 1000 KB
     "siConsDE": 1000 * 1024,  # 1000 KB (asumido)

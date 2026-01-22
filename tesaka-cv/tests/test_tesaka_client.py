@@ -134,7 +134,10 @@ class TestTesakaClient:
             assert response["success"] is True
             # Verificar que se llamó al endpoint correcto
             call_args = mock_client.request.call_args
-            assert 'retenciones/guardar' in call_args[1]['url'] or 'retenciones/guardar' in str(call_args)
+            # call_args[0] contiene los argumentos posicionales: (method, url)
+            assert len(call_args[0]) >= 2  # Al menos method y url
+            url_called = call_args[0][1]  # El segundo argumento posicional es la URL
+            assert 'retenciones/guardar' in url_called
             client.close()
     
     def test_consultar_contribuyente(self):

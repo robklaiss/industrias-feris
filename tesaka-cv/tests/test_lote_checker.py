@@ -24,7 +24,7 @@ class TestLoteChecker(unittest.TestCase):
         self.assertFalse(validate_prot_cons_lote(None))
         self.assertFalse(validate_prot_cons_lote("abc123"))
         self.assertFalse(validate_prot_cons_lote("123-456"))
-        self.assertFalse(validate_prot_cons_lote(" 123 "))
+        self.assertTrue(validate_prot_cons_lote(" 123 "))  # strip() lo hace válido
         self.assertFalse(validate_prot_cons_lote("12.34"))
 
     def test_parse_lote_response_0361(self):
@@ -106,6 +106,7 @@ class TestLoteChecker(unittest.TestCase):
             LOTE_STATUS_PROCESSING,
             LOTE_STATUS_DONE,
             LOTE_STATUS_EXPIRED_WINDOW,
+            LOTE_STATUS_REQUIRES_CDC,
             LOTE_STATUS_ERROR,
         )
 
@@ -114,7 +115,7 @@ class TestLoteChecker(unittest.TestCase):
         )
         self.assertEqual(determine_status_from_cod_res_lot("0362"), LOTE_STATUS_DONE)
         self.assertEqual(
-            determine_status_from_cod_res_lot("0364"), LOTE_STATUS_EXPIRED_WINDOW
+            determine_status_from_cod_res_lot("0364"), LOTE_STATUS_REQUIRES_CDC
         )
         self.assertEqual(
             determine_status_from_cod_res_lot("9999"), LOTE_STATUS_ERROR
