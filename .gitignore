@@ -90,3 +90,16 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
+
+# --- RESCUE3 / artifacts locales (no track) ---
+.windsurf/
+tesaka-cv/.windsurf/
+**/*.BAK_*
+diag_file.txt
+git_status_current.txt
+tesaka-cv/tools/diag_mtls_10_connections.py
+tesaka-cv/tools/diag_mtls_10_connections.txt
+tesaka-cv/tools/make_rescue_snapshot.sh
+tesaka-cv/docs/REPORTE_ESTADO_ACTUAL.md
+tesaka-cv/docs/aprendizajes/
+tesaka-cv/docs/knowledge-base/
