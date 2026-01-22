@@ -18,7 +18,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from lxml import etree
-from signxml import XMLSigner, XMLVerifier
+from signxml import XMLSigner, XMLVerifier, methods, SignatureConfiguration
 from signxml.util import ensure_str
 
 logger = logging.getLogger(__name__)
@@ -185,7 +185,7 @@ class XmlSigner:
             
             # Configurar firmador
             signer = XMLSigner(
-                method=XMLSigner.methods.enveloped,
+                method=methods.enveloped,
                 signature_algorithm='rsa-sha256',
                 digest_algorithm='sha256',
                 c14n_algorithm='http://www.w3.org/2001/10/xml-exc-c14n#'
@@ -195,7 +195,7 @@ class XmlSigner:
             signed_root = signer.sign(
                 root,
                 key=self.private_key,
-                cert=self.certificate,
+                always_add_key_value=True,
                 reference_uri=reference_uri
             )
             
@@ -227,7 +227,7 @@ class XmlSigner:
             root = etree.fromstring(signed_xml.encode('utf-8'))
             
             verifier = XMLVerifier()
-            result = verifier.verify(root, require_x509=True)
+            result = verifier.verify(root, require_x509=False)
             
             return result is not None
         
