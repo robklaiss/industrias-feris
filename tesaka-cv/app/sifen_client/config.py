@@ -2,7 +2,7 @@
 Configuración para cliente SIFEN
 """
 import os
-from typing import Optional, Dict, Any, Tuple
+from typing import Optional, Dict, Any, Tuple, Union
 from pathlib import Path
 
 # Cargar dotenv si está disponible (opcional)
@@ -43,42 +43,130 @@ def get_cert_path_and_password() -> Tuple[str, str]:
     return cert_path, cert_password
 
 
-def get_mtls_cert_path_and_password() -> Tuple[str, str]:
+def get_mtls_cert_path_and_password() -> Tuple[str, Union[str, None]]:
     """
-    Helper para obtener certificado P12 y contraseña para mTLS desde variables de entorno.
-    
-    Prioridad:
-    1. SIFEN_MTLS_P12_PATH / SIFEN_MTLS_P12_PASSWORD (específico para mTLS)
-    2. SIFEN_CERT_PATH / SIFEN_CERT_PASSWORD (fallback)
-    3. SIFEN_SIGN_P12_PATH / SIFEN_SIGN_P12_PASSWORD (fallback)
-    
-    Returns:
-        Tupla (cert_path, cert_password)
-        
-    Raises:
-        RuntimeError: Si faltan las variables de entorno o el archivo no existe
+    Compatibilidad:
+    - Si hay SIFEN_KEY_PATH => modo PEM (cert+key). En este caso NO hay password.
+      Retorna (cert_path, None)
+    - Si NO hay SIFEN_KEY_PATH => modo P12 (legacy) y requiere password.
+      Retorna (p12_path, p12_password)
+
+    IMPORTANTE:
+    - requests/urllib3 NO acepta P12 directamente en session.cert.
+      Si tu transporte usa SSLContext.load_cert_chain(), necesita PEM cert+key.
     """
-    cert_path = (
-        os.environ.get("SIFEN_MTLS_P12_PATH") or
-        os.environ.get("SIFEN_CERT_PATH") or
-        os.environ.get("SIFEN_SIGN_P12_PATH")
+    # 1) Preferir modo PEM si existe key
+    cert_path = os.environ.get("SIFEN_CERT_PATH")
+    key_path = os.environ.get("SIFEN_KEY_PATH")
+    if cert_path and key_path:
+        if not os.path.exists(cert_path):
+            raise RuntimeError(f"Certificado no encontrado: {cert_path}")
+        if not os.path.exists(key_path):
+            raise RuntimeError(f"Key no encontrada: {key_path}")
+        return cert_path, None
+
+    # 2) Fallback legacy P12 (solo si realmente lo usás en otro lado)
+    p12_path = (
+        os.environ.get("SIFEN_MTLS_P12_PATH")
+        or os.environ.get("SIFEN_P12_PATH")
+        or os.environ.get("SIFEN_SIGN_P12_PATH")
     )
-    if not cert_path:
-        raise RuntimeError("Falta SIFEN_MTLS_P12_PATH, SIFEN_CERT_PATH o SIFEN_SIGN_P12_PATH en el entorno")
-    
-    cert_password = (
-        os.environ.get("SIFEN_MTLS_P12_PASSWORD") or
-        os.environ.get("SIFEN_CERT_PASSWORD") or
-        os.environ.get("SIFEN_SIGN_P12_PASSWORD")
+    if not p12_path:
+        raise RuntimeError(
+            "Falta SIFEN_CERT_PATH+SIFEN_KEY_PATH (modo PEM) "
+            "o SIFEN_MTLS_P12_PATH/SIFEN_P12_PATH (modo P12) en el entorno"
+        )
+
+    p12_password = (
+        os.environ.get("SIFEN_MTLS_P12_PASSWORD")
+        or os.environ.get("SIFEN_P12_PASSWORD")
+        or os.environ.get("SIFEN_SIGN_P12_PASSWORD")
+        or os.environ.get("SIFEN_CERT_PASSWORD")
     )
-    if not cert_password:
-        raise RuntimeError("Falta SIFEN_MTLS_P12_PASSWORD, SIFEN_CERT_PASSWORD o SIFEN_SIGN_P12_PASSWORD en el entorno")
-    
-    # Validar que el archivo existe
+    if not p12_password:
+        raise RuntimeError(
+            "Falta password para P12: "
+            "SIFEN_MTLS_P12_PASSWORD / SIFEN_P12_PASSWORD / SIFEN_SIGN_P12_PASSWORD / SIFEN_CERT_PASSWORD"
+        )
+
+    if not os.path.exists(p12_path):
+        raise RuntimeError(f"Certificado no encontrado: {p12_path}")
+
+    return p12_path, p12_password
+
+
+def get_mtls_cert_and_key_paths() -> Tuple[str, str]:
+    """Modo correcto para mTLS en requests/urllib3: (cert_pem, key_pem)."""
+    cert_path = os.environ.get("SIFEN_CERT_PATH")
+    key_path = os.environ.get("SIFEN_KEY_PATH")
+    if not cert_path or not key_path:
+        raise RuntimeError("ERROR: faltan SIFEN_CERT_PATH y/o SIFEN_KEY_PATH en el entorno.")
     if not os.path.exists(cert_path):
         raise RuntimeError(f"Certificado no encontrado: {cert_path}")
+    if not os.path.exists(key_path):
+        raise RuntimeError(f"Key no encontrada: {key_path}")
+    return cert_path, key_path
+
+
+def get_mtls_config() -> Tuple[str, Optional[str], bool]:
+    """
+    Obtiene configuración mTLS unificada.
     
-    return cert_path, cert_password
+    Returns:
+        Tuple de (cert_path, key_or_password, is_pem_mode):
+        - cert_path: ruta al certificado (PEM o P12)
+        - key_or_password: ruta a la key PEM si es modo PEM, o password si es modo P12
+        - is_pem_mode: True si es modo PEM (cert+key), False si es modo P12
+        
+    Raises:
+        RuntimeError: Si faltan variables de entorno o archivos no existen
+    """
+    # 1) Modo PEM (prioridad): SIFEN_CERT_PATH + SIFEN_KEY_PATH
+    cert_path = os.environ.get("SIFEN_CERT_PATH")
+    key_path = os.environ.get("SIFEN_KEY_PATH")
+    
+    if cert_path and key_path:
+        if not os.path.exists(cert_path):
+            raise RuntimeError(f"Certificado PEM no encontrado: {cert_path}")
+        if not os.path.exists(key_path):
+            raise RuntimeError(f"Key PEM no encontrada: {key_path}")
+        return cert_path, key_path, True
+    
+    # 2) Modo P12 (fallback): SIFEN_MTLS_P12_PATH o equivalentes
+    p12_path = (
+        os.environ.get("SIFEN_MTLS_P12_PATH")
+        or os.environ.get("SIFEN_P12_PATH")
+        or os.environ.get("SIFEN_SIGN_P12_PATH")
+        or os.environ.get("SIFEN_CERT_PATH")  # fallback por compatibilidad
+    )
+    
+    if not p12_path:
+        raise RuntimeError(
+            "ERROR: No se encontró configuración mTLS. Opciones:\n"
+            "  1) Modo PEM: export SIFEN_CERT_PATH=... y SIFEN_KEY_PATH=...\n"
+            "  2) Modo P12: export SIFEN_MTLS_P12_PATH=... y SIFEN_MTLS_P12_PASSWORD=..."
+        )
+    
+    p12_password = (
+        os.environ.get("SIFEN_MTLS_P12_PASSWORD")
+        or os.environ.get("SIFEN_P12_PASSWORD")
+        or os.environ.get("SIFEN_SIGN_P12_PASSWORD")
+        or os.environ.get("SIFEN_CERT_PASSWORD")
+    )
+    
+    if not p12_password:
+        raise RuntimeError(
+            "ERROR: Falta password para P12. Exporte una de:\n"
+            "  - SIFEN_MTLS_P12_PASSWORD\n"
+            "  - SIFEN_P12_PASSWORD\n"
+            "  - SIFEN_SIGN_P12_PASSWORD\n"
+            "  - SIFEN_CERT_PASSWORD"
+        )
+    
+    if not os.path.exists(p12_path):
+        raise RuntimeError(f"Certificado P12 no encontrado: {p12_path}")
+    
+    return p12_path, p12_password, False
 
 
 class SifenConfig:
@@ -184,6 +272,14 @@ class SifenConfig:
             self.test_timbrado = os.getenv("SIFEN_TEST_TIMBRADO", "")
             self.test_csc = os.getenv("SIFEN_TEST_CSC", "")
             self.test_razon_social = os.getenv("SIFEN_TEST_RAZON_SOCIAL", "")
+        
+        # Código de Seguridad del Contribuyente (CSC)
+        # Para ambiente test, usa SIFEN_TEST_CSC. Para producción, usa SIFEN_PROD_CSC.
+        # Si no se configura, se deja vacío (el sistema usará un valor por defecto).
+        self.csc = (
+            self.test_csc if env == self.ENV_TEST 
+            else os.getenv("SIFEN_PROD_CSC", "")
+        )
     
     @property
     def wsdl_url(self) -> Optional[str]:
