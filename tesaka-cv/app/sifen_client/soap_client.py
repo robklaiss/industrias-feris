@@ -1,3 +1,8 @@
+from app.sifen_client.config import (
+    get_mtls_cert_path_and_password,
+    get_mtls_cert_and_key_paths,
+    get_mtls_config,
+)
 """
 Cliente SOAP 1.2 Document/Literal para SIFEN
 
@@ -74,7 +79,7 @@ SIFEN_SCHEMA_LOCATION = "http://ekuatia.set.gov.py/sifen/xsd/siRecepDE_v150.xsd"
 # Límites de tamaño según requisitos SIFEN (en bytes)
 SIZE_LIMITS = {
     "siRecepDE": 1000 * 1024,  # 1000 KB
-    "siRecepLoteDE": 10000 * 1024,  # 10.000 KB
+    "rEnvioLote": 10000 * 1024,  # 10.000 KB
     "siConsRUC": 1000 * 1024,  # 1000 KB
     "siConsDE": 1000 * 1024,  # 1000 KB (asumido)
     "siConsLoteDE": 10000 * 1024,  # 10.000 KB (asumido)
@@ -83,7 +88,7 @@ SIZE_LIMITS = {
 # Códigos de error SIFEN (parciales)
 ERROR_CODES = {
     "0200": "Mensaje excede tamaño máximo (siRecepDE)",
-    "0270": "Lote excede tamaño máximo (siRecepLoteDE)",
+    "0270": "Lote excede tamaño máximo (rEnvioLote)",
     "0460": "Mensaje excede tamaño máximo (siConsRUC)",
     "0500": "RUC inexistente",
     "0501": "Sin permiso para consultar",
@@ -133,6 +138,8 @@ class SoapClient:
         - .../recibe.wsdl -> HTTP 200 pero body vacío (len=0)
         - .../recibe.wsdl?wsdl -> WSDL real
         Por eso forzamos ?wsdl si no está.
+        
+        Para consulta_ruc, es CRÍTICO usar WSDL para evitar error 0160.
         """
         u = (wsdl_url or "").strip()
         if not u:
@@ -152,19 +159,31 @@ class SoapClient:
     def _normalize_soap_endpoint(url: str) -> str:
         """Normaliza un endpoint SOAP quitando .wsdl y query strings.
 
+        NOTA: Para recibe-lote y consulta-ruc, NO quitamos .wsdl porque el endpoint POST
+        real debe incluir .wsdl (ej: /recibe-lote.wsdl, /consulta-ruc.wsdl)
+
         Ejemplos:
         - https://.../recibe.wsdl?wsdl -> https://.../recibe
         - https://.../recibe.wsdl      -> https://.../recibe
         - https://.../recibe            -> https://.../recibe
+        - https://.../recibe-lote.wsdl -> https://.../recibe-lote.wsdl (NO cambiar)
+        - https://.../consulta-ruc.wsdl -> https://.../consulta-ruc.wsdl (NO cambiar)
         """
         if not url:
+            return url
+
+        # Para recibe-lote y consulta-ruc, conservar el .wsdl
+        if "/recibe-lote.wsdl" in url or "/consulta-ruc.wsdl" in url:
+            # Solo quitar query string si existe
+            if "?" in url:
+                url = url.split("?")[0]
             return url
 
         # Quitar query string
         if "?" in url:
             url = url.split("?")[0]
 
-        # Quitar .wsdl si termina en eso
+        # Quitar .wsdl si termina en eso (excepto para recibe-lote y consulta-ruc)
         if url.endswith(".wsdl"):
             url = url[:-5]  # quitar ".wsdl"
 
@@ -249,96 +268,46 @@ class SoapClient:
     def _create_transport(self) -> Any:  # Transport de Zeep
         """Crea el transporte Zeep con requests.Session configurada para mTLS."""
         session = Session()
-
-        # Modo 1: PEM directo (prioridad)
-        pem_cert = getattr(self.config, "cert_pem_path", None) or os.getenv(
-            "SIFEN_CERT_PEM_PATH"
-        )
-        pem_key = getattr(self.config, "key_pem_path", None) or os.getenv(
-            "SIFEN_KEY_PEM_PATH"
-        )
-
-        if pem_cert and pem_key:
-            cert_path = Path(pem_cert)
-            key_path = Path(pem_key)
-            if not cert_path.exists():
-                raise SifenClientError(f"Certificado PEM no encontrado: {cert_path}")
-            if not key_path.exists():
-                raise SifenClientError(f"Clave privada PEM no encontrada: {key_path}")
-
-            session.cert = (str(cert_path), str(key_path))
+        
+        # Usar helper unificado get_mtls_config()
+        cert_path, key_or_password, is_pem_mode = get_mtls_config()
+        
+        if is_pem_mode:
+            # Modo PEM: requests necesita (cert_path, key_path)
+            session.cert = (cert_path, key_or_password)  # key_or_password es la key PEM
             self._temp_pem_files = None
             logger.info(
-                f"Usando mTLS via PEM: cert={cert_path.name}, key={key_path.name}"
+                f"Usando mTLS modo PEM: cert={Path(cert_path).name}, key={Path(key_or_password).name}"
             )
-
         else:
-            # Modo 2: PKCS12 (fallback) - usar helper para mTLS
-            resolved_cert_path, resolved_cert_password = get_mtls_cert_path_and_password()
-            
-            # Fallback a config si no hay env vars
-            if not resolved_cert_path:
-                resolved_cert_path = getattr(self.config, "cert_path", None)
-            if not resolved_cert_password:
-                resolved_cert_password = getattr(self.config, "cert_password", None)
-
-            missing = []
-            if not resolved_cert_path:
-                missing.append("SIFEN_MTLS_P12_PATH o SIFEN_CERT_PATH")
-            if not resolved_cert_password:
-                missing.append("SIFEN_MTLS_P12_PASSWORD o SIFEN_CERT_PASSWORD")
-
-            if missing:
-                raise SifenClientError(
-                    "mTLS es requerido para SIFEN. Falta: "
-                    + ", ".join(missing)
-                    + ". Opciones: 1) export SIFEN_CERT_PEM_PATH=... "
-                    "y SIFEN_KEY_PEM_PATH=... "
-                    "2) export SIFEN_MTLS_P12_PATH=/ruta/al/certificado.p12 "
-                    "y SIFEN_MTLS_P12_PASSWORD=..."
+            # Modo P12: convertir a PEM temporales para requests/urllib3
+            try:
+                cert_pem_path, key_pem_path = p12_to_temp_pem_files(
+                    cert_path, key_or_password  # key_or_password es el password del P12
                 )
-
-            # resolved_cert_path está garantizado como no-None
-            # por la validación anterior
-            assert resolved_cert_path is not None
-            cert_path = Path(resolved_cert_path)
-            if not cert_path.exists():
-                raise SifenClientError(f"Certificado no encontrado: {cert_path}")
-
-            ext = cert_path.suffix.lower()
-            is_p12 = ext in (".p12", ".pfx")
-
-            if is_p12:
-                try:
-                    cert_pem_path, key_pem_path = p12_to_temp_pem_files(
-                        str(cert_path), resolved_cert_password or ""
+                self._temp_pem_files = (cert_pem_path, key_pem_path)
+                session.cert = (cert_pem_path, key_pem_path)
+                
+                # Debug: guardar paths si está habilitado
+                debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+                if debug_enabled:
+                    logger.info(
+                        f"mTLS: Certificado P12 convertido a PEM temporales: "
+                        f"cert={cert_pem_path}, key={key_pem_path}"
                     )
-                    self._temp_pem_files = (cert_pem_path, key_pem_path)
-                    session.cert = (cert_pem_path, key_pem_path)
-                    
-                    # Debug: guardar paths si está habilitado
-                    debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
-                    if debug_enabled:
-                        logger.info(
-                            f"mTLS: Certificado P12 convertido a PEM temporales: "
-                            f"cert={cert_pem_path}, key={key_pem_path}"
-                        )
-                    else:
-                        logger.info(
-                            f"Certificado P12 convertido a PEM temporales para mTLS: "
-                            f"{Path(cert_pem_path).name}, {Path(key_pem_path).name}"
-                        )
-                except PKCS12Error as e:
-                    raise SifenClientError(
-                        f"Error al convertir certificado P12 a PEM: {e}"
-                    ) from e
-                except Exception as e:
-                    raise SifenClientError(
-                        f"Error inesperado al procesar certificado: {e}"
-                    ) from e
-            else:
-                session.cert = str(cert_path)
-                logger.info(f"Usando certificado en formato: {ext}")
+                else:
+                    logger.info(
+                        f"Certificado P12 convertido a PEM temporales para mTLS: "
+                        f"{Path(cert_pem_path).name}, {Path(key_pem_path).name}"
+                    )
+            except PKCS12Error as e:
+                raise SifenClientError(
+                    f"Error al convertir certificado P12 a PEM: {e}"
+                ) from e
+            except Exception as e:
+                raise SifenClientError(
+                    f"Error inesperado al procesar certificado: {e}"
+                ) from e
 
         # SSL verify
         session.verify = True
@@ -550,7 +519,7 @@ class SoapClient:
         if limit and size > limit:
             error_code = {
                 "siRecepDE": "0200",
-                "siRecepLoteDE": "0270",
+                "rEnvioLote": "0270",
                 "siConsRUC": "0460",
             }.get(service, "0000")
             raise SifenSizeLimitError(service, size, limit, error_code)
@@ -831,7 +800,7 @@ class SoapClient:
         
         Args:
             version: "1.2" o "1.1"
-            action: Nombre de la acción SOAP (ej: "siRecepLoteDE")
+            action: Nombre de la acción SOAP (ej: "rEnvioLote")
             
         Returns:
             Dict con headers HTTP
@@ -844,7 +813,6 @@ class SoapClient:
         elif version == "1.1":
             return {
                 "Content-Type": "text/xml; charset=utf-8",
-                "SOAPAction": f'"{action}"',
                 "Accept": "text/xml, */*",
             }
         else:
@@ -857,7 +825,7 @@ class SoapClient:
         Args:
             payload_xml: XML del payload (ej: <rEnvioLote>...</rEnvioLote>)
             wrapper: Si True, envuelve en <action>...</action>
-            action: Nombre de la acción (ej: "siRecepLoteDE")
+            action: Nombre de la acción (ej: "rEnvioLote")
             ns: Namespace para el wrapper (ej: SIFEN_NS)
             
         Returns:
@@ -1221,11 +1189,126 @@ class SoapClient:
             headers=headers,
             timeout=(self.connect_timeout, self.read_timeout),
         )
+        
+        # Guardar JSON de routing para evidencia (solo para recibe_lote)
+        if service_key == "recibe_lote":
+            self._save_route_probe_json(service_key, url, headers, soap_bytes, resp)
+        
         if resp.status_code != 200:
             raise SifenClientError(
                 f"Error HTTP {resp.status_code} al enviar SOAP: {resp.text[:500]}"
             )
         return resp.content
+
+    def _save_route_probe_json(
+        self,
+        service_key: str,
+        post_url: str,
+        headers: dict,
+        soap_bytes: bytes,
+        resp: requests.Response,
+    ):
+        """
+        Guarda JSON con evidencia de routing para diagnóstico 0301.
+        
+        Este método NUNCA debe romper el flujo principal.
+        Si falla algo, se loguea warning y se continúa.
+        """
+        try:
+            from pathlib import Path
+            import json
+            import xml.etree.ElementTree as ET
+            from datetime import datetime
+            
+            out_dir = Path("artifacts")
+            out_dir.mkdir(exist_ok=True)
+            
+            # Parsear response para extraer campos SIFEN
+            dCodRes = dMsgRes = dProtConsLote = dTpoProces = None
+            
+            try:
+                if resp.content:
+                    resp_root = ET.fromstring(resp.content)
+                    # Buscar en namespaces SOAP
+                    ns = {
+                        'soap': 'http://www.w3.org/2003/05/soap-envelope',
+                        's': 'http://ekuatia.set.gov.py/sifen/xsd'
+                    }
+                    
+                    # Buscar dCodRes
+                    cod_res = resp_root.find('.//s:dCodRes', ns)
+                    if cod_res is not None:
+                        dCodRes = cod_res.text
+                    
+                    # Buscar dMsgRes
+                    msg_res = resp_root.find('.//s:dMsgRes', ns)
+                    if msg_res is not None:
+                        dMsgRes = msg_res.text
+                    
+                    # Buscar dProtConsLote
+                    prot = resp_root.find('.//s:dProtConsLote', ns)
+                    if prot is not None:
+                        dProtConsLote = prot.text
+                    
+                    # Buscar dTpoProces
+                    tpo = resp_root.find('.//s:dTpoProces', ns)
+                    if tpo is not None:
+                        dTpoProces = tpo.text
+            except Exception as e:
+                logger.debug(f"No se pudo parsear response para routing JSON: {e}")
+            
+            # Detectar SOAP body root y namespace
+            soap_body_root = "unknown"
+            soap_body_ns = "unknown"
+            try:
+                if soap_bytes:
+                    soap_root = ET.fromstring(soap_bytes)
+                    body = soap_root.find('.//{http://www.w3.org/2003/05/soap-envelope}Body')
+                    if body is not None and len(body) > 0:
+                        first_child = body[0]
+                        soap_body_root = first_child.tag.split('}')[-1] if '}' in first_child.tag else first_child.tag
+                        soap_body_ns = first_child.tag.split('}')[0][1:] if '}' in first_child.tag and first_child.tag.startswith('{') else "none"
+            except Exception as e:
+                logger.debug(f"No se pudo parsear SOAP body para routing JSON: {e}")
+            
+            # Extraer action de headers si existe
+            action_param = None
+            content_type = headers.get('Content-Type', '')
+            if 'action=' in content_type:
+                # Extraer action="..." del Content-Type
+                import re
+                match = re.search(r'action="([^"]*)"', content_type)
+                if match:
+                    action_param = match.group(1)
+            
+            # Construir JSON
+            route_data = {
+                "timestamp": datetime.now().isoformat(),
+                "env": "prod" if "prod" in post_url.lower() or "sifen.set.gov.py" in post_url.lower() else "test",
+                "wsdl_url": self.config.get_soap_service_url(service_key),
+                "post_url_final": post_url,
+                "headers_final": headers,
+                "action_param": action_param,
+                "soap_body_root_localname": soap_body_root,
+                "soap_body_namespace": soap_body_ns,
+                "soap_sent_preview": soap_bytes.decode('utf-8', errors='replace')[:500] + "..." if len(soap_bytes) > 500 else soap_bytes.decode('utf-8', errors='replace'),
+                "response": {
+                    "status_code": resp.status_code,
+                    "dCodRes": dCodRes,
+                    "dMsgRes": dMsgRes,
+                    "dProtConsLote": dProtConsLote,
+                    "dTpoProces": dTpoProces
+                }
+            }
+            
+            # Guardar con timestamp
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+            json_file = out_dir / f"route_probe_recibe_lote_{timestamp}.json"
+            json_file.write_text(json.dumps(route_data, indent=2, ensure_ascii=False), encoding='utf-8')
+            logger.debug(f"Route probe JSON guardado en: {json_file}")
+            
+        except Exception as e:
+            logger.warning(f"No se pudo guardar route probe JSON (ignorado): {e}")
 
     def _save_raw_soap_debug(
         self,
@@ -1629,37 +1712,45 @@ class SoapClient:
                                         encoding="utf-8"
                                     )
                                     
-                                    # Buscar Signature dentro de DE
+                                    # Buscar Signature dentro de rDE (como hermano de DE)
+                                    # Según solución error 0160, la Signature debe estar dentro de rDE
                                     sig_elem = None
-                                    for elem in de_elem.iter():
-                                        elem_ns = None
-                                        if "}" in elem.tag:
-                                            elem_ns = elem.tag.split("}", 1)[0][1:]
-                                        if etree.QName(elem).localname == "Signature" and elem_ns == DS_NS:
-                                            sig_elem = elem
+                                    for child in rde_elem:
+                                        if etree.QName(child).localname == "Signature" and child.tag.split("}", 1)[0][1:] == DS_NS:
+                                            sig_elem = child
                                             break
                                     
-                                    if sig_elem is not None:
-                                        # Buscar Reference URI
-                                        ref_elem = sig_elem.find(f".//{{{DS_NS}}}Reference")
-                                        if ref_elem is not None:
-                                            ref_uri = ref_elem.get("URI") or ref_elem.get("uri")
-                                            artifacts_dir.joinpath("diag_sig_reference_uri.txt").write_text(
-                                                f"Reference URI: {ref_uri or 'NOT_FOUND'}\n"
-                                                f"DE Id: {de_id or 'NOT_FOUND'}\n"
-                                                f"Expected URI: #{de_id if de_id else 'MISSING_DE_ID'}\n"
-                                                f"Match: {'YES' if ref_uri == f'#{de_id}' else 'NO'}\n",
-                                                encoding="utf-8"
+                                    if sig_elem is None:
+                                        # Fallback: buscar en todo rDE
+                                        for elem in rde_elem.iter():
+                                            elem_ns = None
+                                            if "}" in elem.tag:
+                                                elem_ns = elem.tag.split("}", 1)[0][1:]
+                                            if etree.QName(elem).localname == "Signature" and elem_ns == DS_NS:
+                                                sig_elem = elem
+                                                break
+                                    
+                                    if sig_elem is None:
+                                        raise RuntimeError("No se encontró ds:Signature dentro de rDE")
+                                    
+                                    # Buscar Reference URI
+                                    ref_elem = sig_elem.find(f".//{{{DS_NS}}}Reference")
+                                    if ref_elem is not None:
+                                        ref_uri = ref_elem.get("URI") or ref_elem.get("uri")
+                                        artifacts_dir.joinpath("diag_sig_reference_uri.txt").write_text(
+                                            f"Reference URI: {ref_uri or 'NOT_FOUND'}\n"
+                                            f"DE Id: {de_id or 'NOT_FOUND'}\n"
+                                            f"Expected URI: #{de_id if de_id else 'MISSING_DE_ID'}\n"
+                                            f"Match: {'YES' if ref_uri == f'#{de_id}' else 'NO'}\n",
+                                            encoding="utf-8"
+                                        )
+                                        
+                                        if de_id and ref_uri != f"#{de_id}":
+                                            raise RuntimeError(
+                                                f"Reference URI no coincide con DE Id: URI={ref_uri}, DE@Id={de_id}"
                                             )
-                                            
-                                            if de_id and ref_uri != f"#{de_id}":
-                                                raise RuntimeError(
-                                                    f"Reference URI no coincide con DE Id: URI={ref_uri}, DE@Id={de_id}"
-                                                )
-                                        else:
-                                            raise RuntimeError("No se encontró Reference dentro de Signature")
                                     else:
-                                        raise RuntimeError("No se encontró ds:Signature dentro de DE")
+                                        raise RuntimeError("No se encontró Reference dentro de Signature")
                                 else:
                                     raise RuntimeError("No se encontró DE dentro de rDE")
                             else:
@@ -1706,15 +1797,15 @@ class SoapClient:
             raise RuntimeError(f"Error al validar request: {e}") from e
     
     def recepcion_lote(self, xml_renvio_lote: str, dump_http: bool = False) -> Dict[str, Any]:
-        """Envía un rEnvioLote (siRecepLoteDE) a SIFEN vía SOAP 1.2 document/literal.
+        """Envía un rEnvioLote (rEnvioLote) a SIFEN vía SOAP 1.2 document/literal.
 
         Formato esperado según guía SIFEN:
         - SOAP 1.2 envelope con Header vacío
-        - Body contiene DIRECTAMENTE <xsd:rEnvioLote> (con prefijo xsd, SIN wrapper siRecepLoteDE)
+        - Body contiene DIRECTAMENTE <xsd:rEnvioLote> (con prefijo xsd, SIN wrapper rEnvioLote)
         - Headers HTTP sin action= en Content-Type
         - Endpoint extraído del WSDL usando mTLS
         """
-        service = "siRecepLoteDE"
+        service = "rEnvioLote"
 
         if isinstance(xml_renvio_lote, bytes):
             xml_renvio_lote = xml_renvio_lote.decode("utf-8")
@@ -1880,9 +1971,31 @@ class SoapClient:
                 pass  # No crítico si falla guardar
         
         # Usar información del WSDL para construir request
-        # POST URL: usar el WSDL URL pero sin ?wsdl (según evidencia externa)
-        wsdl_url_clean = wsdl_url.split("?")[0]  # Quitar query string (?wsdl)
-        post_url = wsdl_url_clean  # POST a la URL del WSDL sin query
+        # POST URL: siempre usar soap12:address/ del WSDL cacheado (source of truth)
+        post_url = None
+        try:
+            import lxml.etree as _et
+            wsdl_xml = wsdl_cache_path.read_bytes()
+            wsdl_root = _et.fromstring(wsdl_xml)
+            _ns = {
+                "wsdl": "http://schemas.xmlsoap.org/wsdl/",
+                "soap12": "http://schemas.xmlsoap.org/wsdl/soap12/",
+                "soap": "http://schemas.xmlsoap.org/wsdl/soap/",
+            }
+            addr = wsdl_root.find(".//soap12:address", namespaces=_ns)
+            if addr is None:
+                addr = wsdl_root.find(".//soap:address", namespaces=_ns)
+            if addr is not None and addr.get("location"):
+                post_url = addr.get("location").strip()
+        except Exception as _e:
+            logger.debug(f"No se pudo extraer soap:address del WSDL cacheado: {_e}")
+
+        # Fallback: si no se pudo leer el address, usar WSDL URL sin query
+        if not post_url:
+            post_url = wsdl_url.split("?")[0]
+
+        # NOTE: post_url YA fue determinado arriba desde soap12:address/@location (NO sobreescribir)
+        wsdl_url_clean = wsdl_url.split("?")[0]  # útil para logs/debug si querés
         body_root_qname = wsdl_info["body_root_qname"]
         is_wrapped = wsdl_info["is_wrapped"]
         soap_action = wsdl_info["soap_action"]
@@ -1964,10 +2077,10 @@ class SoapClient:
             envelope, xml_declaration=True, encoding="UTF-8", pretty_print=False
         )
         
-        # Headers FINALES (SOAP 1.2 con action para siRecepLoteDE)
+        # Headers FINALES (SOAP 1.2 con action para rEnvioLote)
         # IMPORTANTE: Construir UNA sola vez y usar para POST y debug
         headers_final = {
-            "Content-Type": 'application/soap+xml; charset=utf-8; action="siRecepLoteDE"',
+            "Content-Type": "application/soap+xml; charset=utf-8",
             "Accept": "application/soap+xml, text/xml, */*",
         }
         
@@ -2030,12 +2143,41 @@ class SoapClient:
         
         # POST: usar SIEMPRE soap_bytes REAL (con xDE completo, sin redactar)
         try:
+            # mTLS: PEM vs P12
+            resolved_cert_path = None
+            resolved_key_path = None
+            temp_pem_files = None
+
+            key_path_env = os.environ.get("SIFEN_KEY_PATH")
+            if key_path_env:
+                # Modo PEM: cert + key
+                resolved_cert_path, resolved_key_path = get_mtls_cert_and_key_paths()
+                session.cert = (resolved_cert_path, resolved_key_path)   # ✅ PEM tuple
+            else:
+                # Modo P12: convertir a PEM temporales para requests/urllib3
+                resolved_cert_path, resolved_cert_password = get_mtls_cert_path_and_password()
+                try:
+                    cert_pem_path, key_pem_path = p12_to_temp_pem_files(
+                        resolved_cert_path, resolved_cert_password
+                    )
+                    temp_pem_files = (cert_pem_path, key_pem_path)
+                    session.cert = (cert_pem_path, key_pem_path)
+                except PKCS12Error as e:
+                    raise SifenClientError(f"Error al convertir P12 a PEM: {e}") from e
+            
             resp = session.post(
                 post_url,
                 data=soap_bytes,  # soap_bytes REAL con xDE completo
                 headers=headers_final,  # Usar headers_final único
                 timeout=(self.connect_timeout, self.read_timeout),
             )
+            
+            # Cleanup de archivos PEM temporales si se usaron
+            if temp_pem_files:
+                try:
+                    cleanup_pem_files(temp_pem_files[0], temp_pem_files[1])
+                except Exception as e:
+                    logger.warning(f"No se pudo limpiar archivos PEM temporales: {e}")
             
             # Dump HTTP completo si está habilitado
             if dump_http:
@@ -2306,7 +2448,7 @@ class SoapClient:
         except Exception as e:
             # Verificar estructura del SOAP para debug
             soap_str = soap_bytes.decode("utf-8", errors="replace")
-            body_has_wrapper = "<siRecepLoteDE" in soap_str or "<tns:siRecepLoteDE" in soap_str
+            body_has_wrapper = "<rEnvioLote" in soap_str or "<tns:rEnvioLote" in soap_str
             body_has_renviolote = "<xsd:rEnvioLote" in soap_str or ("<rEnvioLote" in soap_str and 'xmlns:xsd="http://ekuatia.set.gov.py/sifen/xsd"' in soap_str)
             
             # Extraer información del body para debug
@@ -2322,7 +2464,7 @@ class SoapClient:
                     first_child = body_elem[0]
                     body_root_localname = etree.QName(first_child).localname
                     # Detectar namespace: puede estar en el tag {ns}local o en nsmap
-                    # El root del Body ahora es siRecepLoteDE (TARGET_NS)
+                    # El root del Body ahora es rEnvioLote (TARGET_NS)
                     if "}" in first_child.tag:
                         body_root_ns = first_child.tag.split("}", 1)[0][1:]
                     else:
@@ -2335,7 +2477,7 @@ class SoapClient:
                                     body_root_ns = ns
                                     break
                         body_root_ns = body_root_ns or None
-                    # Verificar si hay wrapper (rEnvioLote dentro de siRecepLoteDE)
+                    # Verificar si hay wrapper (rEnvioLote dentro de rEnvioLote)
                     if len(first_child) > 0:
                         wrapper_child = first_child[0]
                         body_wrapper_localname = etree.QName(wrapper_child).localname
@@ -2359,7 +2501,7 @@ class SoapClient:
             # Guardar debug incluso en error (usar headers_final si existe, sino construir mínimo)
             if 'headers_final' not in locals():
                 headers_final = {
-                    "Content-Type": 'application/soap+xml; charset=utf-8; action="rEnvioLote"',
+                    "Content-Type": "application/soap+xml; charset=utf-8",
                     "SOAPAction": '"rEnvioLote"',
                     "Accept": "application/soap+xml, text/xml, */*",
                 }
@@ -2570,7 +2712,7 @@ class SoapClient:
         Si HTTP=400 y dCodRes=0160, NO reintenta: devuelve error inmediato.
         
         Args:
-            dprot_cons_lote: dProtConsLote (número de lote devuelto por siRecepLoteDE)
+            dprot_cons_lote: dProtConsLote (número de lote devuelto por rEnvioLote)
             did: dId (default: 1)
             
         Returns:
@@ -2995,9 +3137,10 @@ class SoapClient:
         else:
             endpoint = "https://sifen.set.gov.py/de/ws/consultas/consulta-lote.wsdl"
         
-        # Headers SOAP 1.2 (application/soap+xml con action, sin SOAPAction header)
+        # Headers SOAP 1.2 (application/soap+xml; NO usar header SOAPAction separado)
+        # WSDL observado para consulta-lote: soapAction="" (vacío)
         headers = {
-            "Content-Type": 'application/soap+xml; charset=utf-8; action="rEnviConsLoteDe"',
+            "Content-Type": "application/soap+xml; charset=utf-8",
             "Accept": "application/soap+xml",
         }
         
@@ -3057,15 +3200,74 @@ class SoapClient:
                 except Exception:
                     pass  # No romper el flujo si falla debug
             
-            # Intentar parsear XML y extraer dCodResLot/dMsgResLot si existen
+            # Intentar parsear XML y extraer campos (dCodResLot/dMsgResLot o fallback dCodRes/dMsgRes)
             try:
                 resp_root = etree.fromstring(resp.content)
-                cod_res = resp_root.find(".//{http://ekuatia.set.gov.py/sifen/xsd}dCodResLot")
-                msg_res = resp_root.find(".//{http://ekuatia.set.gov.py/sifen/xsd}dMsgResLot")
-                if cod_res is not None and cod_res.text:
-                    result["dCodResLot"] = cod_res.text.strip()
-                if msg_res is not None and msg_res.text:
-                    result["dMsgResLot"] = msg_res.text.strip()
+                def _find_text(local_name: str) -> Optional[str]:
+                    try:
+                        nodes = resp_root.xpath(f'//*[local-name()="{local_name}"]')
+                        if nodes and nodes[0].text:
+                            return nodes[0].text.strip()
+                    except Exception:
+                        return None
+                    return None
+
+                d_cod_res_lot = _find_text("dCodResLot")
+                d_msg_res_lot = _find_text("dMsgResLot")
+                d_cod_res = _find_text("dCodRes")
+                d_msg_res = _find_text("dMsgRes")
+
+                if d_cod_res_lot:
+                    result["dCodResLot"] = d_cod_res_lot
+                if d_msg_res_lot:
+                    result["dMsgResLot"] = d_msg_res_lot
+                if d_cod_res:
+                    result["dCodRes"] = d_cod_res
+                if d_msg_res:
+                    result["dMsgRes"] = d_msg_res
+
+                # gResProcLote (detalle por CDC)
+                g_res_proc_lote = []
+                for lote_node in resp_root.xpath('//*[local-name()="gResProcLote"]'):
+                    try:
+                        id_text = None
+                        est_text = None
+                        prot_aut_text = None
+
+                        id_nodes = lote_node.xpath('./*[local-name()="id"]')
+                        if id_nodes and id_nodes[0].text:
+                            id_text = id_nodes[0].text.strip()
+                        est_nodes = lote_node.xpath('./*[local-name()="dEstRes"]')
+                        if est_nodes and est_nodes[0].text:
+                            est_text = est_nodes[0].text.strip()
+                        prot_nodes = lote_node.xpath('./*[local-name()="dProtAut"]')
+                        if prot_nodes and prot_nodes[0].text:
+                            prot_aut_text = prot_nodes[0].text.strip()
+
+                        g_res_proc = []
+                        for proc_node in lote_node.xpath('./*[local-name()="gResProc"]'):
+                            cod_nodes = proc_node.xpath('./*[local-name()="dCodRes"]')
+                            msg_nodes = proc_node.xpath('./*[local-name()="dMsgRes"]')
+                            g_res_proc.append(
+                                {
+                                    "dCodRes": cod_nodes[0].text.strip() if cod_nodes and cod_nodes[0].text else None,
+                                    "dMsgRes": msg_nodes[0].text.strip() if msg_nodes and msg_nodes[0].text else None,
+                                }
+                            )
+
+                        g_res_proc_lote.append(
+                            {
+                                "id": id_text,
+                                "dEstRes": est_text,
+                                "dProtAut": prot_aut_text,
+                                "gResProc": g_res_proc,
+                            }
+                        )
+                    except Exception:
+                        continue
+
+                if g_res_proc_lote:
+                    result["gResProcLote"] = g_res_proc_lote
             except Exception:
                 pass  # Si no se puede parsear, solo devolver raw_xml
             
@@ -3102,7 +3304,7 @@ class SoapClient:
         import time
         
         # Generar dId de 15 dígitos si no se proporciona (formato: YYYYMMDDHHMMSS + 1 dígito aleatorio)
-        # Igual que en siRecepLoteDE
+        # Igual que en rEnvioLote
         if did is None:
             base = _dt.datetime.now().strftime("%Y%m%d%H%M%S")  # 14 dígitos
             did = f"{base}{random.randint(0, 9)}"  # + 1 dígito = 15 dígitos total
@@ -3256,7 +3458,7 @@ class SoapClient:
         
         # Headers SOAP 1.2 (application/soap+xml con action="siConsDE", NO "rEnviConsDE")
         headers = {
-            "Content-Type": 'application/soap+xml; charset=utf-8; action="siConsDE"',
+            "Content-Type": "application/soap+xml; charset=utf-8",
             "Accept": "application/soap+xml, text/xml, */*",
         }
         
@@ -3472,7 +3674,7 @@ class SoapClient:
         ruc_final = ruc_clean.split("-", 1)[0].strip()  # 4554737-8 -> 4554737
         
         # Generar dId de 15 dígitos si no se proporciona (formato: YYYYMMDDHHMMSS + 1 dígito aleatorio)
-        # Igual que en siRecepLoteDE y consulta_de_por_cdc_raw
+        # Igual que en rEnvioLote y consulta_de_por_cdc_raw
         if did is None:
             base = _dt.datetime.now().strftime("%Y%m%d%H%M%S")  # 14 dígitos
             did = f"{base}{random.randint(0, 9)}"  # + 1 dígito = 15 dígitos total
@@ -3496,18 +3698,18 @@ class SoapClient:
         
         # rEnviConsRUC según XSD (targetNamespace: http://ekuatia.set.gov.py/sifen/xsd)
         # XSD define: <xs:element name="rEnviConsRUC">
-        # IMPORTANTE: Usar "rEnviConsRUC" (NO "rEnviConsRucRequest")
+        # IMPORTANTE: Usar namespace default (sin prefijo) para consulta_ruc
         r_envi_cons_ruc = etree.SubElement(
             body, "rEnviConsRUC", nsmap={None: SIFEN_NS}
         )
         
         # dId OBLIGATORIO según XSD (tipo: dIdType) - debe ser hijo directo y primero
-        d_id_elem = etree.SubElement(r_envi_cons_ruc, "dId")
+        d_id_elem = etree.SubElement(r_envi_cons_ruc, f"{{{SIFEN_NS}}}dId")
         d_id_elem.text = str(did)
         
         # dRUCCons requerido según XSD (tipo: tRuc) - debe ser hijo directo y segundo
         # tRuc: minLength=5, maxLength=8, pattern=[1-9][0-9]*[0-9A-D]? (puede incluir DV)
-        d_ruc_cons_elem = etree.SubElement(r_envi_cons_ruc, "dRUCCons")
+        d_ruc_cons_elem = etree.SubElement(r_envi_cons_ruc, f"{{{SIFEN_NS}}}dRUCCons")
         d_ruc_cons_elem.text = str(ruc_final)
         
         # Serializar SOAP
@@ -3527,9 +3729,17 @@ class SoapClient:
                 raise RuntimeError(f"SOAP Body no encontrado después de generar. SOAP:\n{soap_bytes.decode('utf-8', errors='replace')}")
             
             # Validar que rEnviConsRUC existe en Body (hijo directo)
+            # Buscar con prefijo xsd (nuevo formato)
             request_elem = body_elem.find(f"{{{SIFEN_NS}}}rEnviConsRUC")
             if request_elem is None:
-                # Intentar sin namespace
+                # Intentar buscar con prefijo xsd usando QName local
+                for child in body_elem:
+                    if etree.QName(child.tag).localname == "rEnviConsRUC":
+                        request_elem = child
+                        break
+            
+            if request_elem is None:
+                # Intentar sin namespace (fallback original)
                 request_elem = body_elem.find(".//rEnviConsRUC")
             
             if request_elem is None:
@@ -3552,6 +3762,13 @@ class SoapClient:
             # Validar que tiene dId y dRUCCons como hijos directos y no vacíos
             d_id_check = request_elem.find(f"{{{SIFEN_NS}}}dId")
             if d_id_check is None:
+                # Buscar hijo con localname "dId" (para manejar namespace con prefijo)
+                for child in request_elem:
+                    if etree.QName(child.tag).localname == "dId":
+                        d_id_check = child
+                        break
+            if d_id_check is None:
+                # Intentar sin namespace (fallback original)
                 d_id_check = request_elem.find("dId")
             if d_id_check is None:
                 raise RuntimeError(
@@ -3566,6 +3783,13 @@ class SoapClient:
             
             d_ruc_check = request_elem.find(f"{{{SIFEN_NS}}}dRUCCons")
             if d_ruc_check is None:
+                # Buscar hijo con localname "dRUCCons" (para manejar namespace con prefijo)
+                for child in request_elem:
+                    if etree.QName(child.tag).localname == "dRUCCons":
+                        d_ruc_check = child
+                        break
+            if d_ruc_check is None:
+                # Intentar sin namespace (fallback original)
                 d_ruc_check = request_elem.find("dRUCCons")
             if d_ruc_check is None:
                 raise RuntimeError(
@@ -3624,11 +3848,17 @@ class SoapClient:
             raise RuntimeError(f"Error al validar SOAP generado: {e}") from e
         
         # Determinar endpoint según ambiente (usar config existente)
+        # NOTA: get_soap_service_url devuelve el WSDL, para consulta_ruc necesitamos el endpoint POST
         endpoint = self.config.get_soap_service_url("consulta_ruc")
-        
-        # Headers SOAP 1.2 (application/soap+xml con action="siConsRUC", NO "rEnviConsRUC")
+        if dump_http:
+            print(f"[SIFEN DEBUG] POST URL (consulta_ruc): {endpoint}")
+        # Para consulta_ruc, el endpoint POST es el WSDL sin .wsdl (diferente de recibe-lote)
+        # IMPORTANTE: NO se quita .wsdl para consulta_ruc, SIFEN lo requiere con .wsdl
+                
+        # Headers SOAP 1.2 (application/soap+xml SIN action=)
+        # SIFEN NO requiere action para consulta_ruc
         headers = {
-            "Content-Type": 'application/soap+xml; charset=utf-8; action="siConsRUC"',
+            "Content-Type": "application/soap+xml; charset=utf-8",
             "Accept": "application/soap+xml, text/xml, */*",
         }
         
@@ -3644,6 +3874,9 @@ class SoapClient:
         
         # POST usando la sesión existente con mTLS
         session = self.transport.session
+        
+        # mTLS: la configuración ya está aplicada en _create_transport()
+        # No necesitamos hacer nada más aquí
         
         # RETRY por errores de conexión (solo para esta consulta, NO para envíos)
         max_attempts = 3
@@ -3712,6 +3945,22 @@ class SoapClient:
                         # Guardar body recibido
                         body_recv_file = artifacts_dir / f"consulta_ruc_response_{timestamp}.xml"
                         body_recv_file.write_text(resp.text, encoding="utf-8")
+                        
+                        # Guardar JSON completo con evidencia forense
+                        forensic_file = artifacts_dir / f"consulta_ruc_forensic_{timestamp}.json"
+                        forensic_data = {
+                            "timestamp": _dt.datetime.now().isoformat(),
+                            "post_url_final": endpoint,
+                            "sent_headers": headers,
+                            "received_headers": dict(resp.headers),
+                            "http_status": resp.status_code,
+                            "soap_envelope": soap_xml_str,
+                            "response_body": resp.text,
+                        }
+                        forensic_file.write_text(
+                            json.dumps(forensic_data, indent=2, ensure_ascii=False),
+                            encoding="utf-8"
+                        )
                     except Exception:
                         pass  # No romper el flujo si falla guardar artifacts
                 

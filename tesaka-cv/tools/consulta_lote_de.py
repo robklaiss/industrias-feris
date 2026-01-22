@@ -481,6 +481,21 @@ def _die(msg: str, code: int = 2) -> None:
     raise SystemExit(code)
 
 
+def force_env_from_args(env: str) -> None:
+    """
+    Fuerza el ambiente desde los argumentos CLI.
+    
+    Esta función asegura que si el usuario pasa --env, este siempre mande
+    sobre cualquier SIFEN_ENV heredado del shell. Esto previene la regresión
+    donde SIFEN_ENV=prod + --env test => error 0160.
+    
+    Args:
+        env: Ambiente desde args.env ('test' o 'prod')
+    """
+    if env:
+        os.environ["SIFEN_ENV"] = str(env)
+
+
 def get_cdcs_for_lote(dprot_cons_lote: str, artifacts_dir: Path, debug: bool = False) -> List[str]:
     """
     Obtiene los CDCs (Códigos de Control) de un lote desde múltiples fuentes.
@@ -620,9 +635,9 @@ def resolve_wsdl(env: str, wsdl_arg: Optional[str]) -> str:
     
     # Prioridad 3: Default según ambiente
     if env == "test":
-        return "https://sifen-test.set.gov.py/de/ws/consultas-lote/consulta-lote.wsdl?wsdl"
+        return "https://sifen-test.set.gov.py/de/ws/consultas/consulta-lote.wsdl?wsdl"
     else:
-        return "https://sifen.set.gov.py/de/ws/consultas-lote/consulta-lote.wsdl?wsdl"
+        return "https://sifen.set.gov.py/de/ws/consultas/consulta-lote.wsdl?wsdl"
 
 
 class LoggingTransport(Transport):
@@ -892,7 +907,12 @@ def create_zeep_transport(cert_path: str, cert_password: str) -> Transport:
 
 
 def call_consulta_lote_raw(
-    session: Any, env: str, prot: str, timeout: int = 30
+    session: Any,
+    env: str,
+    prot: str,
+    timeout: int = 30,
+    did: Optional[str] = None,
+    artifacts_dir: Optional[Path] = None,
 ) -> str:
     """
     Consulta el estado de un lote usando request directo estilo "try08" (sin Zeep).
@@ -908,64 +928,109 @@ def call_consulta_lote_raw(
     Returns:
         XML de respuesta como string
     """
-    import requests
+    import datetime as _dt
     import os
-    from app.sifen_client.config import get_sifen_config, get_mtls_cert_path_and_password
+    import random
+    import requests
+    from app.sifen_client.config import get_mtls_config, get_sifen_config
     from app.sifen_client.pkcs12_utils import p12_to_temp_pem_files
     
-    # Obtener configuración y certificado
+    # Validación mínima (dProtConsLote debe ser numérico)
+    prot = str(prot or "").strip()
+    if not prot.isdigit():
+        raise ValueError(f"dProtConsLote debe ser solo dígitos. Valor recibido: '{prot}'")
+
+    # dId recomendado: 15 dígitos (YYYYMMDDHHMMSS + 1 dígito random)
+    did = str(did or "").strip()
+    if not re.fullmatch(r"\d{15}", did):
+        base = _dt.datetime.now().strftime("%Y%m%d%H%M%S")  # 14 dígitos
+        did = base + str(random.randint(0, 9))
+
+    # Resolver artifacts_dir (si no se pasa, usar tesaka-cv/artifacts)
+    if artifacts_dir is None:
+        artifacts_dir = Path(__file__).resolve().parents[1] / "artifacts"
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
+
+    # Obtener configuración y certificado mTLS
     config = get_sifen_config(env=env)
-    cert_path, cert_password = get_mtls_cert_path_and_password()
-    
+    cert_path, key_or_password, is_pem_mode = get_mtls_config()
     if not cert_path:
         cert_path = config.cert_path
-    if not cert_password:
-        cert_password = config.cert_password
+    if not key_or_password and not is_pem_mode:
+        key_or_password = config.cert_password
+    if not cert_path or (not is_pem_mode and not key_or_password):
+        raise SifenClientError("Falta certificado mTLS para consulta lote (PEM o P12)")
     
-    if not cert_path or not cert_password:
-        raise SifenClientError("Falta certificado mTLS para consulta lote")
-    
-    # Convertir P12 a PEM temporales
-    cert_pem_path = None
-    key_pem_path = None
-    try:
-        cert_pem_path, key_pem_path = p12_to_temp_pem_files(cert_path, cert_password)
-        print(f"[SIFEN DEBUG] call_consulta_lote_raw: cert_pem={os.path.basename(cert_pem_path)} key_pem={os.path.basename(key_pem_path)}")
-    except Exception as e:
-        raise SifenClientError(f"Error al convertir certificado P12 a PEM: {e}") from e
+    # Convertir P12 a PEM temporales (si aplica)
+    cert_pem_path: Optional[str] = None
+    key_pem_path: Optional[str] = None
+    cert_tuple: Optional[tuple[str, str]] = None
+    if is_pem_mode:
+        cert_tuple = (cert_path, str(key_or_password))
+    else:
+        try:
+            cert_pem_path, key_pem_path = p12_to_temp_pem_files(cert_path, str(key_or_password))
+            cert_tuple = (cert_pem_path, key_pem_path)
+            print(
+                f"[SIFEN DEBUG] call_consulta_lote_raw: cert_pem={os.path.basename(cert_pem_path)} "
+                f"key_pem={os.path.basename(key_pem_path)}"
+            )
+        except Exception as e:
+            raise SifenClientError(f"Error al convertir certificado P12 a PEM: {e}") from e
     
     try:
         # Endpoint (NO ?wsdl)
         if env == "prod":
-            endpoint = "https://sifen.set.gov.py/de/ws/consultas-lote/consulta-lote"
+            endpoint = "https://sifen.set.gov.py/de/ws/consultas/consulta-lote.wsdl"
         else:
-            endpoint = "https://sifen-test.set.gov.py/de/ws/consultas-lote/consulta-lote"
+            endpoint = "https://sifen-test.set.gov.py/de/ws/consultas/consulta-lote.wsdl"
         
         print(f"[SIFEN DEBUG] call_consulta_lote_raw: endpoint={endpoint} env={env} prot={prot}")
         
-        # SOAP 1.2 + wrapper correcto (como try08)
-        soap = f"""<?xml version="1.0" encoding="UTF-8"?>
-<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
-               xmlns:tns="http://ekuatia.set.gov.py/sifen/xsd"
-               xmlns:xsd="http://ekuatia.set.gov.py/sifen/xsd">
-  <soap:Header/>
-  <soap:Body>
-    <tns:siConsLoteDE>
-      <xsd:rEnviConsLoteDe>
-        <xsd:dId>1</xsd:dId>
-        <xsd:dProtConsLote>{prot}</xsd:dProtConsLote>
-      </xsd:rEnviConsLoteDe>
-    </tns:siConsLoteDE>
-  </soap:Body>
-</soap:Envelope>
+        # SOAP 1.2 (WSDL-driven): Body contiene rEnviConsLoteDe DIRECTO (sin wrapper)
+        # WSDL local observado: operación rEnviConsLoteDe, soapAction="" (vacío)
+        soap = f"""<?xml version='1.0' encoding='utf-8'?>
+<soap-env:Envelope xmlns:soap-env="http://www.w3.org/2003/05/soap-envelope">
+  <soap-env:Body>
+    <ns0:rEnviConsLoteDe xmlns:ns0="http://ekuatia.set.gov.py/sifen/xsd">
+      <ns0:dId>{did}</ns0:dId>
+      <ns0:dProtConsLote>{prot}</ns0:dProtConsLote>
+    </ns0:rEnviConsLoteDe>
+  </soap-env:Body>
+</soap-env:Envelope>
 """.encode("utf-8")
         
         headers = {
-            'Content-Type': 'application/soap+xml; charset=utf-8; action="siConsLoteDE"',
-            'Accept': 'application/soap+xml, text/xml, */*',
-            'SOAPAction': '"siConsLoteDE"',
-            'Connection': 'close',
+            # SOAP 1.2: NO usar header SOAPAction separado; action va en Content-Type (y aquí es vacío según WSDL)
+            "Content-Type": 'application/soap+xml; charset=utf-8; action=""',
+            "Accept": "application/soap+xml",
         }
+
+        # Guardar request/headers SIEMPRE en artifacts (nombres únicos)
+        ts = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+        req_path = artifacts_dir / f"soap_consulta_lote_req_{prot}_{env}_{ts}.xml"
+        resp_path = artifacts_dir / f"soap_consulta_lote_resp_{prot}_{env}_{ts}.xml"
+        meta_path = artifacts_dir / f"soap_consulta_lote_http_{prot}_{env}_{ts}.json"
+        try:
+            req_path.write_bytes(soap)
+            meta_path.write_text(
+                json.dumps(
+                    {
+                        "timestamp": _dt.datetime.now().isoformat(),
+                        "env": env,
+                        "endpoint": endpoint,
+                        "timeout": timeout,
+                        "sent_headers": headers,
+                        "dId": did,
+                        "dProtConsLote": prot,
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+        except Exception as e:
+            print(f"[SIFEN DEBUG] call_consulta_lote_raw: no se pudo guardar request/meta: {e}")
         
         # Usar session existente si está disponible, o crear una nueva
         if session and hasattr(session, 'cert') and session.cert:
@@ -975,8 +1040,12 @@ def call_consulta_lote_raw(
             # Crear nueva session con mTLS
             session = requests.Session()
             session.verify = True
-            session.cert = (cert_pem_path, key_pem_path)
-            print(f"[SIFEN DEBUG] call_consulta_lote_raw: nueva session con cert_pem={os.path.basename(cert_pem_path)} key_pem={os.path.basename(key_pem_path)}")
+            session.cert = cert_tuple
+            if cert_tuple:
+                print(
+                    f"[SIFEN DEBUG] call_consulta_lote_raw: nueva session con cert={os.path.basename(cert_tuple[0])} "
+                    f"key={os.path.basename(cert_tuple[1])}"
+                )
         
         r = session.post(endpoint, data=soap, headers=headers, timeout=timeout)
         
@@ -987,6 +1056,21 @@ def call_consulta_lote_raw(
         body_preview = text[:300] if text else "<EMPTY>"
         
         print(f"[SIFEN HTTP] status={resp_status} ct={ct} len={cl} body_preview={body_preview}")
+
+        # Guardar response SIEMPRE en artifacts (aunque HTTP != 200)
+        try:
+            resp_path.write_bytes(r.content or b"")
+            # Actualizar meta con status y headers de respuesta
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+            meta.update(
+                {
+                    "http_status": resp_status,
+                    "received_headers": dict(r.headers),
+                }
+            )
+            meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+        except Exception as e:
+            print(f"[SIFEN DEBUG] call_consulta_lote_raw: no se pudo guardar response/meta: {e}")
         
         # IMPORTANTE: aunque venga 400, si el body es XML lo devolvemos igual
         if text.lstrip().startswith("<"):
@@ -996,12 +1080,16 @@ def call_consulta_lote_raw(
         
     finally:
         # Limpiar archivos PEM temporales
-        cleanup_pem_files(cert_pem_path, key_pem_path)
+        if not is_pem_mode:
+            cleanup_pem_files(cert_pem_path, key_pem_path)
 
 
 def consulta_ruc_cli(args: argparse.Namespace) -> int:
     """Subcomando CLI para consultar RUC."""
     from app.sifen_client.soap_client import SoapClient
+    
+    # Forzar ambiente desde args (anti-regresión 0160)
+    force_env_from_args(args.env)
     
     env = args.env
     ruc = args.ruc
