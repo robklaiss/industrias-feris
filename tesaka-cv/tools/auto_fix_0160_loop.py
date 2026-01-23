@@ -829,6 +829,25 @@ def main() -> int:
         return 2
 
     current_xml = in_xml
+    
+    # Run preflight validation before first iteration
+    print("\n" + "=" * 60)
+    print("PREFLIGHT VALIDATION")
+    print("=" * 60)
+    
+    preflight_py = REPO_ROOT / "tools" / "preflight_validate_xml.py"
+    if preflight_py.exists():
+        rc = run_cmd(
+            [str(py), str(preflight_py), "--xml", str(current_xml), "--verbose"],
+            cwd=REPO_ROOT,
+        )
+        if rc != 0:
+            eprint("❌ Preflight validation failed - aborting loop")
+            eprint("Fix the errors above before running the auto-fix loop")
+            return 1
+        print("✅ Preflight validation passed")
+    else:
+        print("⚠️  preflight_validate_xml.py not found, skipping preflight check")
 
     for i in range(1, args.max_iter + 1):
         print("\n" + "=" * 60)
