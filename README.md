@@ -6,6 +6,15 @@ Pipeline robusto para envío de documentos a SIFEN con protección contra regres
 
 Ejecuta este comando para validar todo el pipeline:
 ```bash
+# Health check del ambiente
+.venv/bin/python health_check.py && \
+
+# Release gate completo
+.venv/bin/python release_gate.py
+```
+
+Para desarrollo rápido (sin health check):
+```bash
 .venv/bin/python validate_pipeline_compliance.py --verbose && .venv/bin/python -m pytest -q
 ```
 
