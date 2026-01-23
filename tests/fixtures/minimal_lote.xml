@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rLoteDE xmlns="http://ekuatia.set.gov.py/sifen/xsd">
+    <rDE>
+        <dVerFor>150</dVerFor>
+        <DE Id="DE12345678901234567890">
+            <dTipDoc>01</dTipDoc>
+            <dNumDoc>001-001-000000001</dNumDoc>
+            <dFeEmiDE>2026-01-23T10:30:00</dFeEmiDE>
+            <gOpeDE>
+                <dTiOpe>01</dTiOpe>
+                <dTipTra>01</dTipTra>
+                <dDest>1</dDest>
+                <dPaisDest>PRY</dPaisDest>
+                <dTiEmi>1</dTiEmi>
+                <dPaisEmi>PRY</dPaisEmi>
+            </gOpeDE>
+            <gDatGrp>
+                <dGrp1>1</dGrp1>
+            </gDatGrp>
+            <gEmis>
+                <gDatGen>
+                    <dRucEm>80000001</dRucEm>
+                    <dDVEmi>1</dDVEmi>
+                    <dNomEmi>EMPRESA TEST</dNomEmi>
+                </gDatGen>
+            </gEmis>
+            <gDatRec>
+                <dRucRec>80000002</dRucRec>
+                <dDVRec>2</dDVRec>
+                <dNomRec>CLIENTE TEST</dNomRec>
+            </gDatRec>
+            <gTotSub>
+                <dTotGralOpe>100000</dTotGralOpe>
+                <dTotGravadas>100000</dTotGravadas>
+                <dTotIVA>10000</dTotIVA>
+                <dTotSubExe>0</dTotSubExe>
+                <dTotSubExo>0</dTotSubExo>
+                <dTotSubNS>0</dTotSubNS>
+                <dTotSubIVA>10000</dTotSubIVA>
+                <dTotOtrosTrib>0</dTotOtrosTrib>
+                <dTotVtaOper>100000</dTotVtaOper>
+                <dTotDesc>0</dTotDesc>
+                <dTotDescGlob>0</dTotDescGlob>
+                <dTotAnticipo>0</dTotAnticipo>
+                <dTotReteIVA>0</dTotReteIVA>
+                <dTotReteRenta>0</dTotReteRenta>
+                <dTotPerceps>0</dTotPerceps>
+                <dTotCompraTotal>0</dTotCompraTotal>
+                <dTotVtaNGrav>0</dTotVtaNGrav>
+                <dTotVtaExe>0</dTotVtaExe>
+                <dTotVtaExo>0</dTotVtaExo>
+                <dTotVtaNS>0</dTotVtaNS>
+                <dTotIVAComp>0</dTotIVAComp>
+                <dTotRetenido>0</dTotRetenido>
+                <dTotReembolso>0</dTotReembolso>
+                <dTotDescItem>0</dTotDescItem>
+                <dTotAntItem>0</dTotAntItem>
+            </gTotSub>
+            <gCamFE>
+                <dFCF>1</dFCF>
+                <dFEC>1</dFEC>
+            </gCamFE>
+            <dCarQR>https://ekuatia.set.gov.py/consultas/qr?nVersion=150&amp;cHashQR=abc123</dCarQR>
+        </DE>
+        <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+            <SignedInfo>
+                <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+                <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+                <Reference URI="#DE12345678901234567890">
+                    <Transforms>
+                        <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                    </Transforms>
+                    <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                    <DigestValue>digest123</DigestValue>
+                </Reference>
+            </SignedInfo>
+            <SignatureValue>signature123</SignatureValue>
+            <KeyInfo>
+                <X509Data>
+                    <X509Certificate>cert123</X509Certificate>
+                </X509Data>
+            </KeyInfo>
+        </Signature>
+    </rDE>
+</rLoteDE>
