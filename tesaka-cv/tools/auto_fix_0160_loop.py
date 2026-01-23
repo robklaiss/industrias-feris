@@ -1000,8 +1000,7 @@ def main() -> int:
             print(f"📝 Fix summary saved: {fix_summary_file.name}")
         except Exception as e:
             print(f"⚠️  Warning: Could not write fix summary: {e}")
-
-                continue  # Siguiente iteración
+            continue  # Siguiente iteración
         else:
             # Fixes existentes por mensaje específico
             try:
