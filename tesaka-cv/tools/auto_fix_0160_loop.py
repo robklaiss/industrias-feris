@@ -843,6 +843,7 @@ def main() -> int:
                 "--bump-doc", "1",
                 "--dump-http",
                 "--artifacts-dir", str(artifacts_dir),
+                "--iteration", str(i),
             ],
             cwd=REPO_ROOT,
         )

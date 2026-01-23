@@ -49,6 +49,45 @@ XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
 XSI_NS_URI = "http://www.w3.org/2001/XMLSchema-instance"  # Alias para consistencia
 NS = {"s": SIFEN_NS}
 
+
+def _normalize_schema_location(value: str, *, ns: str = SIFEN_NS) -> str:
+    """
+    Normaliza xsi:schemaLocation para SIFEN, devolviendo siempre "<ns> <archivo.xsd>".
+    """
+
+    def _basename(token: str) -> str:
+        token = (token or "").strip().strip('"').strip("'")
+        token = token.split("?")[0].split("#")[0]
+        if "/" in token:
+            token = token.rsplit("/", 1)[-1]
+        return token
+
+    try:
+        s = (value or "").strip().strip('"').strip("'")
+        if not s:
+            return f"{ns} siRecepDE_v150.xsd"
+
+        parts = s.split()
+
+        # Caso A: ya viene como par (ns, xsd)
+        if len(parts) >= 2:
+            return f"{ns} {_basename(parts[1]) or 'siRecepDE_v150.xsd'}"
+
+        token = parts[0]
+
+        # Caso B1: nombre directo del XSD
+        if token.lower().endswith(".xsd") and "/" not in token:
+            return f"{ns} {token}"
+
+        # Caso B2: URL/path que termina en .xsd
+        if token.lower().endswith(".xsd"):
+            return f"{ns} {_basename(token) or 'siRecepDE_v150.xsd'}"
+
+        # Caso B3: fallback conservador
+        return f"{ns} {_basename(token) or 'siRecepDE_v150.xsd'}"
+    except Exception:
+        return f"{ns} siRecepDE_v150.xsd"
+
 # --- Namespaces ---
 def _qn_sifen(local: str) -> str:
     """Crea un QName SIFEN: {http://ekuatia.set.gov.py/sifen/xsd}local"""
@@ -178,6 +217,38 @@ def _scan_xml_bytes_for_common_malformed(xml_bytes: bytes) -> Optional[str]:
             i += 1
     
     return None
+
+
+def _sanitize_rde_opening_tag_preserve_schema(tag_bytes: bytes) -> tuple[bytes, bool]:
+    """Remueve atributos del tag rDE pero preserva xsi:schemaLocation si existe."""
+
+    default_tag = f'<rDE xmlns="{SIFEN_NS}">'.encode("utf-8")
+    if not tag_bytes:
+        return default_tag, False
+
+    match = re.search(br"<rDE\b[^>]*>", tag_bytes)
+    if not match:
+        return default_tag, False
+
+    tag = match.group(0)
+    schema_match = re.search(rb'\bxsi:schemaLocation\s*=\s*"([^"]+)"', tag)
+    if not schema_match:
+        return default_tag, False
+
+    schema_val = schema_match.group(1)
+    schema_text = (
+        schema_val.decode("utf-8", errors="ignore")
+        if isinstance(schema_val, (bytes, bytearray))
+        else str(schema_val)
+    )
+    normalized_schema = _normalize_schema_location(schema_text)
+    schema_bytes = normalized_schema.encode("utf-8")
+    rebuilt_tag = (
+        f'<rDE xmlns="{SIFEN_NS}" '
+        f'xmlns:xsi="{XSI_NS}" '
+        f'xsi:schemaLocation="{normalized_schema}">' \
+    ).encode("utf-8")
+    return rebuilt_tag, True
 
 
 def ensure_rde_sifen(rde_el: etree._Element) -> etree._Element:
@@ -3554,29 +3625,83 @@ def build_and_sign_lote_from_xml(
     
     # FINAL SANITIZE: Eliminar TODOS los atributos de rDE (SIFEN requiere <rDE> sin atributos)
     # Esto debe hacerse ANTES de guardar artifacts y crear el ZIP
-    import re
     m_before = re.search(br"<rDE\b[^>]*>", lote_xml_bytes)
-    if debug_enabled and m_before:
+    if m_before:
         print(f"🔍 PRE_SANITIZE_rDE_TAG={m_before.group(0).decode('utf-8','replace')}")
-    
-    # <rDE ...> -> <rDE> (remover TODOS los atributos, namespace-agnostic)
-    lote_xml_bytes = re.sub(br"<rDE\b[^>]*>", b"<rDE>", lote_xml_bytes, count=1)
-    
-    # Hard-guard: verificar que rDE no tenga NINGÚN atributo
-    if re.search(br'<rDE\b[^>]*\s+\w+', lote_xml_bytes):
-        # Si falla, guardar debug y abortar
-        debug_file = Path("artifacts/debug_rde_attrs_failed.xml")
-        debug_file.write_bytes(lote_xml_bytes)
-        tag_encontrado = re.search(br'<rDE\b[^>]*>', lote_xml_bytes).group(0).decode('utf-8','replace')
-        raise RuntimeError(
-            f"❌ ERROR CRÍTICO: rDE aún contiene atributos post-sanitize. "
-            f"Ver {debug_file}. Tag encontrado: {tag_encontrado}"
-        )
-    
-    if debug_enabled:
-        m_after = re.search(br"<rDE\b[^>]*>", lote_xml_bytes)
-        print(f"🔍 POST_SANITIZE_rDE_TAG={m_after.group(0).decode('utf-8','replace') if m_after else 'NO_TAG'}")
+    else:
+        print("🔍 PRE_SANITIZE_rDE_TAG=NO_TAG")
+
+    # Sanitizar SOLO el opening tag de <rDE ...> y reemplazar solo la primera ocurrencia
+    sanitized_tag, preserved_schema = _sanitize_rde_opening_tag_preserve_schema(
+        m_before.group(0) if m_before else b"<rDE>"
+    )
+    if m_before:
+        lote_xml_bytes = lote_xml_bytes.replace(m_before.group(0), sanitized_tag, 1)
+
+    m_after = re.search(br"<rDE\b[^>]*>", lote_xml_bytes)
+    print(
+        f"🔍 POST_SANITIZE_rDE_TAG={m_after.group(0).decode('utf-8','replace') if m_after else 'NO_TAG'}"
+    )
+    if preserved_schema:
+        print("✓ Sanitizado final: rDE preservando xsi:schemaLocation")
+    else:
         print("✓ Sanitizado final: rDE sin atributos")
+
+    # Hard-guard: verificar atributos permitidos
+    if not m_after:
+        raise RuntimeError("❌ ERROR CRÍTICO: rDE no encontrado post-sanitize")
+
+    tag_bytes = m_after.group(0)
+    attr_pattern = re.compile(br'\s+([^\s=]+)\s*=\s*"([^"]*)"')
+    attrs = attr_pattern.findall(tag_bytes)
+    
+    if preserved_schema:
+        expected_attrs = {b"xmlns", b"xmlns:xsi", b"xsi:schemaLocation"}
+        names = {name for name, _ in attrs}
+        if names != expected_attrs or len(attrs) != 3:
+            debug_file = Path("artifacts/debug_rde_attrs_failed.xml")
+            debug_file.write_bytes(lote_xml_bytes)
+            raise RuntimeError(
+                "❌ ERROR CRÍTICO: rDE contiene atributos no permitidos junto a schemaLocation. "
+                f"Ver {debug_file}. Tag encontrado: {tag_bytes.decode('utf-8','replace')}"
+            )
+
+        schema_value = None
+        for name, value in attrs:
+            if name == b"xsi:schemaLocation":
+                schema_value = value.decode("utf-8", errors="replace")
+                break
+        if not schema_value:
+            raise RuntimeError("❌ ERROR CRÍTICO: schemaLocation no encontrado tras sanitize")
+
+        schema_tokens = schema_value.split()
+        if len(schema_tokens) != 2:
+            debug_file = Path("artifacts/debug_rde_attrs_failed_schema_tokens.txt")
+            debug_file.write_text(
+                f"schemaLocation='{schema_value}' tokens={schema_tokens}",
+                encoding="utf-8"
+            )
+            raise RuntimeError(
+                "❌ ERROR CRÍTICO: schemaLocation debe tener exactamente 2 tokens"
+            )
+        if schema_tokens[0] != SIFEN_NS:
+            raise RuntimeError(
+                "❌ ERROR CRÍTICO: schemaLocation token[0] no coincide con namespace SIFEN"
+            )
+        print(
+            "🔍 rDE schema guard: xmlns default + schemaLocation tokens OK"
+        )
+    else:
+        expected_attrs = {b"xmlns"}
+        names = {name for name, _ in attrs}
+        if names != expected_attrs or len(attrs) != 1:
+            debug_file = Path("artifacts/debug_rde_attrs_failed.xml")
+            debug_file.write_bytes(lote_xml_bytes)
+            raise RuntimeError(
+                "❌ ERROR CRÍTICO: rDE debe conservar solo xmlns default. "
+                f"Ver {debug_file}. Tag encontrado: {tag_bytes.decode('utf-8','replace')}"
+            )
+    
     
     # 11. Logs de diagnóstico (solo debug-soap)
     if debug_enabled:
@@ -3887,11 +4012,10 @@ def build_and_sign_lote_from_xml(
         last_lote_xml = artifacts_dir / "last_lote.xml"
         last_lote_xml.write_bytes(lote_xml_bytes)
         
-        # Guardar copia del lote.xml sanitizado que se envió (para debug)
+        # Guardar copia del lote.xml sanitizado que se envió
         last_sent_lote = artifacts_dir / "_last_sent_lote.xml"
         last_sent_lote.write_bytes(lote_xml_bytes)
         
-        # Guardar reporte de sanity del lote (debug)
         if debug_enabled:
             try:
                 # Parsear lote para obtener información estructural
@@ -5484,6 +5608,9 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
             if artifacts_dir:
                 artifacts_dir.mkdir(exist_ok=True)
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                # Add iteration number to timestamp if provided
+                if args.iteration is not None:
+                    timestamp = f"{timestamp}_iter{args.iteration}"
                 response_file = artifacts_dir / f"response_recepcion_{timestamp}.json"
                 
                 import json
@@ -5903,6 +6030,13 @@ Configuración requerida (variables de entorno):
         type=Path,
         default=None,
         help="Directorio para guardar respuestas (default: artifacts/)"
+    )
+    
+    parser.add_argument(
+        "--iteration",
+        type=int,
+        default=None,
+        help="Número de iteración (para naming de artifacts)"
     )
     
     args = parser.parse_args()
