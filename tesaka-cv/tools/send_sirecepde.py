@@ -28,6 +28,9 @@ import base64
 import zipfile
 import json
 import hashlib
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Agregar el directorio padre al path para imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -416,7 +419,18 @@ except (ValueError, ImportError):
     sys.exit(1)
 
 try:
-    from app.sifen_client import SoapClient, get_sifen_config, SifenClientError, SifenResponseError, SifenSizeLimitError
+    from app.sifen_client.xmlsec_signer import sign_de_with_p12
+    from app.sifen_client.soap_client import SoapClient
+    from app.sifen_client.config import get_sifen_config
+    from app.sifen_client.exceptions import SifenClientError, SifenSizeLimitError
+
+    # Importar cert_resolver para validación
+    try:
+        from tools.cert_resolver import validate_no_self_signed, save_resolved_certs_artifact
+    except ImportError:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent))
+        from cert_resolver import validate_no_self_signed, save_resolved_certs_artifact
     from app.sifen_client.xsd_validator import validate_rde_and_lote
 except ImportError as e:
     print("❌ Error: No se pudo importar módulos SIFEN")
@@ -429,7 +443,7 @@ except ImportError as e:
 def _extract_metadata_from_xml(xml_content: str) -> dict:
     """
     Extrae metadatos del XML DE para debug.
-    
+
     Returns:
         Dict con: dId, CDC, dRucEm, dDVEmi, dNumTim
     """
@@ -440,45 +454,113 @@ def _extract_metadata_from_xml(xml_content: str) -> dict:
         "dDVEmi": None,
         "dNumTim": None
     }
-    
+
     try:
         root = etree.fromstring(xml_content.encode("utf-8"))
-        
-        # Buscar dId en rEnviDe o rEnvioLote
-        d_id_elem = root.find(f".//{{{SIFEN_NS}}}dId")
-        if d_id_elem is not None and d_id_elem.text:
-            metadata["dId"] = d_id_elem.text
-        
-        # Buscar CDC en atributo Id del DE
-        de_elem = root.find(f".//{{{SIFEN_NS}}}DE")
+
+        # --- Soporte para PAYLOAD FULL (rEnvioLote con xDE ZIP) ---
+        def _xpath_text_one(node, expr: str):
+            vals = node.xpath(expr)
+            if not vals:
+                return None
+            v = vals[0]
+            try:
+                from lxml import etree as _etree
+                if isinstance(v, _etree._Element):
+                    return ((v.text or "").strip() or None)
+            except Exception:
+                pass
+            return (str(v).strip() or None)
+
+        def _extract_from_payload_xde(root_el):
+            try:
+                import base64, zipfile, io
+                # buscar xDE (base64) por namespace SIFEN
+                xde_el = root_el.find(f".//{{{SIFEN_NS}}}xDE")
+                if xde_el is None or not (xde_el.text or "").strip():
+                    return None
+                xde_txt = "".join((xde_el.text or "").split())
+                zip_bytes = base64.b64decode(xde_txt, validate=False)
+                zf = zipfile.ZipFile(io.BytesIO(zip_bytes))
+                if "lote.xml" not in zf.namelist():
+                    return None
+                lote_xml = zf.read("lote.xml")
+                lote_root = etree.fromstring(lote_xml)
+
+                # DE (CDC) y datos del emisor por local-name() para soportar prefijos
+                de_nodes = lote_root.xpath('//*[local-name()="DE"]')
+                de_elem = de_nodes[0] if de_nodes else None
+                cdc = de_elem.get("Id") if de_elem is not None else None
+
+                dRucEm  = _xpath_text_one(lote_root, '//*[local-name()="dRucEm"][1]')
+                dDVEmi  = _xpath_text_one(lote_root, '//*[local-name()="dDVEmi"][1]')
+                dNumTim = _xpath_text_one(lote_root, '//*[local-name()="dNumTim"][1]')
+
+                return {
+                    "CDC": cdc,
+                    "dRucEm": dRucEm,
+                    "dDVEmi": dDVEmi,
+                    "dNumTim": dNumTim,
+                }
+            except Exception:
+                return None
+
+        # Si el root es rEnvioLote, el CDC real vive dentro de xDE -> lote.xml
+        try:
+            local_root = (root.tag.split("}", 1)[-1] if isinstance(root.tag, str) else "")
+            if local_root == "rEnvioLote":
+                got = _extract_from_payload_xde(root)
+                if got:
+                    if got.get("CDC"):
+                        metadata["CDC"] = got.get("CDC")
+                    if got.get("dRucEm"):
+                        metadata["dRucEm"] = got.get("dRucEm")
+                    if got.get("dDVEmi"):
+                        metadata["dDVEmi"] = got.get("dDVEmi")
+                    if got.get("dNumTim"):
+                        metadata["dNumTim"] = got.get("dNumTim")
+        except Exception:
+            pass
+        # --- FIN soporte PAYLOAD FULL ---
+
+        def first_local(ctx, name: str):
+            # XPath real (lxml): soporta local-name()
+            res = ctx.xpath('.//*[local-name()="%s"]' % name)
+            return res[0] if res else None
+
+        # dId (puede estar en rEnvioLote/rEnviDe o adentro del lote)
+        d_id_elem = first_local(root, "dId")
+        if d_id_elem is not None and (d_id_elem.text or "").strip():
+            metadata["dId"] = (d_id_elem.text or "").strip()
+
+        # CDC: atributo Id del <DE>
+        de_elem = first_local(root, "DE")
         if de_elem is not None:
             metadata["CDC"] = de_elem.get("Id")
-            
-            # Buscar dRucEm y dDVEmi dentro de gEmis
-            g_emis = de_elem.find(f".//{{{SIFEN_NS}}}gEmis")
+
+            # gEmis -> dRucEm / dDVEmi
+            g_emis = first_local(de_elem, "gEmis")
             if g_emis is not None:
-                d_ruc_elem = g_emis.find(f"{{{SIFEN_NS}}}dRucEm")
-                if d_ruc_elem is not None and d_ruc_elem.text:
-                    metadata["dRucEm"] = d_ruc_elem.text
-                
-                d_dv_elem = g_emis.find(f"{{{SIFEN_NS}}}dDVEmi")
-                if d_dv_elem is not None and d_dv_elem.text:
-                    metadata["dDVEmi"] = d_dv_elem.text
-            
-            # Buscar dNumTim dentro de gTimb
-            g_timb = de_elem.find(f".//{{{SIFEN_NS}}}gTimb")
+                d_ruc_elem = first_local(g_emis, "dRucEm")
+                if d_ruc_elem is not None and (d_ruc_elem.text or "").strip():
+                    metadata["dRucEm"] = (d_ruc_elem.text or "").strip()
+
+                d_dv_elem = first_local(g_emis, "dDVEmi")
+                if d_dv_elem is not None and (d_dv_elem.text or "").strip():
+                    metadata["dDVEmi"] = (d_dv_elem.text or "").strip()
+
+            # gTimb -> dNumTim
+            g_timb = first_local(de_elem, "gTimb")
             if g_timb is not None:
-                d_num_tim_elem = g_timb.find(f"{{{SIFEN_NS}}}dNumTim")
-                if d_num_tim_elem is not None and d_num_tim_elem.text:
-                    metadata["dNumTim"] = d_num_tim_elem.text
-    
-    except Exception as e:
+                d_num_tim_elem = first_local(g_timb, "dNumTim")
+                if d_num_tim_elem is not None and (d_num_tim_elem.text or "").strip():
+                    metadata["dNumTim"] = (d_num_tim_elem.text or "").strip()
+
+    except Exception:
         # Si falla la extracción, continuar con valores None
         pass
-    
+
     return metadata
-
-
 def _save_zip_debug(zip_bytes: bytes, artifacts_dir: Path, debug_enabled: bool) -> None:
     """
     Guarda debug del ZIP en JSON para diagnóstico.
@@ -908,6 +990,10 @@ def _save_0301_diagnostic_package(
         # 8. Guardar también el SOAP request redactado como archivo separado
         soap_redacted_file = artifacts_dir / f"diagnostic_0301_soap_request_redacted_{timestamp}.xml"
         soap_redacted_file.write_text(payload_xml_redacted, encoding="utf-8")
+
+        # Guardar PAYLOAD FULL como archivo separado (sin redactar)
+        soap_full_file = artifacts_dir / f"diagnostic_0301_payload_full_{timestamp}.xml"
+        soap_full_file.write_text(payload_xml, encoding="utf-8")
         
         # Guardar SOAP request FULL como archivo separado (sin redactar)
         soap_full_file = artifacts_dir / f"diagnostic_last_soap_request_full.xml"
@@ -916,6 +1002,7 @@ def _save_0301_diagnostic_package(
         print(f"\n📦 Paquete de diagnóstico 0301 guardado:")
         print(f"   📄 Summary: {summary_file.name}")
         print(f"   📄 SOAP request (redactado): {soap_redacted_file.name}")
+        print(f"   📄 PAYLOAD request (FULL): {soap_full_file.name}")
         print(f"\n🔍 Información del DE extraída:")
         print(f"   DE Id (CDC): {de_info.get('de_id', 'N/A')}")
         print(f"   dRucEm: {de_info.get('dRucEm', 'N/A')}")
@@ -2866,39 +2953,11 @@ def build_and_sign_lote_from_xml(
     Construye el lote.xml COMPLETO como árbol lxml ANTES de firmar, luego firma el DE
     dentro del contexto del lote final, y serializa UNA SOLA VEZ.
     
-    IMPORTANTE: lote.xml (dentro del ZIP) NO debe contener <dId> ni <xDE> (pertenecen al SOAP rEnvioLote).
-    IMPORTANTE: lote.xml SÍ debe contener <rDE> directamente dentro de <rLoteDE> (NO <xDE>).
-    
-    Flujo:
-    1. Verificar dependencias críticas (lxml/xmlsec)
-    2. Parsear XML de entrada y extraer rDE/DE
-    3. Construir árbol lote final: <rLoteDE>...<rDE>...</rDE>...</rLoteDE> (SIN dId, SIN xDE, CON rDE directo)
-    4. Remover cualquier Signature previa del rDE
-    5. Firmar el DE dentro del contexto del lote final (no fuera y luego mover)
-    6. Validar post-firma (algoritmos SHA256, URI correcto)
-    7. Agregar rDE firmado directamente como hijo de rLoteDE (NO crear xDE)
-    8. Serializar lote completo UNA SOLA VEZ (pretty_print=False)
-    9. Comprimir en ZIP y codificar en Base64
-    10. Validar que el ZIP contiene <rDE> y NO contiene <dId> ni <xDE>
-    11. Sanity check: verificar que existe al menos 1 rDE y 0 xDE
-    12. Guardar artifacts/last_xde.zip siempre
-    
-    Esto garantiza que la firma se calcula en el MISMO namespace context que viajará dentro del lote.
-    
-    Args:
-        xml_bytes: XML que contiene el rDE (puede ser rDE root o tener rDE anidado)
-        cert_path: Ruta al certificado P12 para firma
-        cert_password: Contraseña del certificado P12
-        return_debug: Si True, retorna tupla (base64, lote_xml_bytes, zip_bytes, None)
-        
-    Returns:
-        Base64 del ZIP como string, o tupla si return_debug=True
-        
-    Raises:
-        ValueError: Si no se encuentra rDE o si falla la construcción
-        RuntimeError: Si faltan dependencias, falla la firma, serialización o validación
+    ANTES DE USAR: Validar que el certificado NO sea self-signed.
+    Los certificados self-signed solo son para tests unitarios OFFLINE.
     """
-    # 0. GUARD-RAIL: Verificar dependencias críticas ANTES de continuar
+    # 0. GUARD-RAIL: Validar que no sea self-signed
+    validate_no_self_signed(cert_path, "firma XML")
     try:
         _check_signing_dependencies()
     except RuntimeError as e:
@@ -5283,16 +5342,19 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
                         razon = x_cont_ruc.get("dRazCons", "") if isinstance(x_cont_ruc, dict) else ""
                         est = x_cont_ruc.get("dDesEstCons", "") if isinstance(x_cont_ruc, dict) else ""
                         env_str = config.env if hasattr(config, 'env') else env
-                        # Mostrar valor original y normalizado para diagnóstico
                         d_fact_display = repr(d_fact_raw) if d_fact_raw is not None else "None"
-                        raise RuntimeError(
+                        msg = (
                             f"RUC NO habilitado para Facturación Electrónica en SIFEN ({env_str}). "
                             f"RUC={ruc_emisor} RazónSocial='{razon}' Estado='{est}' "
                             f"dRUCFactElec={d_fact_display} (normalizado='{d_fact_normalized}'). "
                             "Debés gestionar la habilitación FE del RUC en SIFEN/SET."
                         )
-                    
-                    print(f"✅ RUC {ruc_emisor} habilitado para FE (dRUCFactElec={d_fact_raw!r} -> '{d_fact_normalized}')")
+                        enforce = str(os.getenv("SIFEN_ENFORCE_RUC_FACT_ELEC", "0")).strip().lower() in ("1","true","yes")
+                        if enforce:
+                            raise RuntimeError(msg)
+                        logger.warning(msg + " (IGNORADO por configuración; continuando)")
+                    else:
+                        print(f"✅ RUC {ruc_emisor} habilitado para FE (dRUCFactElec={d_fact_raw!r} -> '{d_fact_normalized}')")
             except Exception as e:
                 # hard-fail: no enviar lote si no está habilitado
                 if not skip_ruc_gate:

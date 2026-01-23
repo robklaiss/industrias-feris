@@ -21,6 +21,7 @@ Notas importantes:
 import os
 import logging
 import time
+import random
 from typing import Dict, Any, Optional, List, TYPE_CHECKING
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse
@@ -66,6 +67,15 @@ try:
 except ImportError:
     inspect_wsdl = None  # type: ignore
     save_wsdl_inspection = None  # type: ignore
+
+# Importar cert_resolver para validación de certificados
+try:
+    from tools.cert_resolver import validate_no_self_signed, save_resolved_certs_artifact
+except ImportError:
+    # Fallback si no está en PATH (ej: importado desde otro módulo)
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent / "tools"))
+    from cert_resolver import validate_no_self_signed, save_resolved_certs_artifact
 
 logger = logging.getLogger(__name__)
 
@@ -196,72 +206,107 @@ class SoapClient:
         Busca soap12:address/@location primero, luego soap:address/@location como fallback.
         Normaliza el WSDL URL y el endpoint resultante.
         """
-        try:
-            import lxml.etree as etree  # noqa: F401
+        import lxml.etree as etree  # noqa: F401
+        
+        # Normalizar WSDL URL antes del GET
+        wsdl_url_final = self._normalize_wsdl_url(wsdl_url)
+        logger.debug(f"WSDL URL normalizada: {wsdl_url} -> {wsdl_url_final}")
 
-            # Normalizar WSDL URL antes del GET
-            wsdl_url_final = self._normalize_wsdl_url(wsdl_url)
-            logger.debug(f"WSDL URL normalizada: {wsdl_url} -> {wsdl_url_final}")
-
-            session = (
-                self.transport.session if hasattr(self, "transport") else Session()
-            )
-            resp = session.get(
-                wsdl_url_final, timeout=(self.connect_timeout, self.read_timeout)
-            )
-
-            logger.debug(
-                f"WSDL GET: status={resp.status_code}, len={len(resp.content or b'')}"
-            )
-
-            if resp.status_code != 200 or not resp.content:
-                logger.warning(
-                    f"WSDL vacío o error HTTP al obtener WSDL: {wsdl_url_final} "
-                    f"(status={resp.status_code}, len={len(resp.content or b'')})"
+        session = (
+            self.transport.session if hasattr(self, "transport") else Session()
+        )
+        
+        # Implementar retries para WSDL GET con parámetros configurables
+        max_attempts = int(os.getenv("SIFEN_SOAP_MAX_RETRIES", "3")) + 1  # +1 para el intento inicial
+        base_delay = float(os.getenv("SIFEN_SOAP_BACKOFF_BASE", "0.6"))
+        max_delay = float(os.getenv("SIFEN_SOAP_BACKOFF_MAX", "8.0"))
+        
+        last_exception = None
+        resp = None
+        
+        for attempt in range(1, max_attempts + 1):
+            try:
+                logger.debug(f"Descargando WSDL (intento {attempt}/{max_attempts}): {wsdl_url_final}")
+                resp = session.get(
+                    wsdl_url_final, timeout=(self.connect_timeout, self.read_timeout)
                 )
-                return None
+                # Si llegamos aquí, el GET fue exitoso
+                break
+                
+            except (requests.exceptions.ConnectionError, 
+                    requests.exceptions.Timeout,
+                    requests.exceptions.HTTPError,
+                    ConnectionResetError) as e:
+                last_exception = e
+                
+                if attempt < max_attempts:
+                    # Calcular delay con backoff exponencial y jitter
+                    delay = min(base_delay * (2 ** (attempt - 1)), max_delay)
+                    jitter = delay * 0.25 * (random.random() * 2 - 1)
+                    final_delay = delay + jitter
+                    
+                    logger.warning(
+                        f"Error descargando WSDL (intento {attempt}/{max_attempts}): {e}. "
+                        f"Reintentando en {final_delay:.2f}s..."
+                    )
+                    time.sleep(final_delay)
+                else:
+                    logger.error(f"No se pudo descargar WSDL después de {max_attempts} intentos: {e}")
+                    
+        # Si todos los intentos fallaron
+        if resp is None:
+            logger.warning(
+                f"No se pudo extraer SOAP address desde WSDL después de {max_attempts} intentos: {last_exception}"
+            )
+            return None
 
-            wsdl_xml = etree.fromstring(resp.content)
+        logger.debug(
+            f"WSDL GET: status={resp.status_code}, len={len(resp.content or b'')}"
+        )
 
-            ns = {
-                "wsdl": "http://schemas.xmlsoap.org/wsdl/",
-                "soap12": "http://schemas.xmlsoap.org/wsdl/soap12/",
-                "soap": "http://schemas.xmlsoap.org/wsdl/soap/",
-            }
+        if resp.status_code != 200 or not resp.content:
+            logger.warning(
+                f"WSDL vacío o error HTTP al obtener WSDL: {wsdl_url_final} "
+                f"(status={resp.status_code}, len={len(resp.content or b'')})"
+            )
+            return None
 
-            location_raw = None
-            # Preferir soap12:address
-            addr = wsdl_xml.find(".//soap12:address", namespaces=ns)
+        wsdl_xml = etree.fromstring(resp.content)
+
+        ns = {
+            "wsdl": "http://schemas.xmlsoap.org/wsdl/",
+            "soap12": "http://schemas.xmlsoap.org/wsdl/soap12/",
+            "soap": "http://schemas.xmlsoap.org/wsdl/soap/",
+        }
+
+        location_raw = None
+        # Preferir soap12:address
+        addr = wsdl_xml.find(".//soap12:address", namespaces=ns)
+        if addr is not None:
+            location_raw = addr.get("location")
+        else:
+            # Fallback a soap:address
+            addr = wsdl_xml.find(".//soap:address", namespaces=ns)
             if addr is not None:
                 location_raw = addr.get("location")
+
+        if location_raw:
+            # En modo Roshka, NO normalizar el endpoint (usar exacto del WSDL)
+            if self.roshka_compat:
+                logger.debug(
+                    f"SOAP endpoint extraído (Roshka compat, sin normalizar): "
+                    f"{location_raw}"
+                )
+                return location_raw
             else:
-                # Fallback a soap:address
-                addr = wsdl_xml.find(".//soap:address", namespaces=ns)
-                if addr is not None:
-                    location_raw = addr.get("location")
+                endpoint_normalized = self._normalize_soap_endpoint(location_raw)
+                logger.debug(
+                    f"SOAP endpoint extraído: location_raw={location_raw}, "
+                    f"endpoint_normalized={endpoint_normalized}"
+                )
+                return endpoint_normalized
 
-            if location_raw:
-                # En modo Roshka, NO normalizar el endpoint (usar exacto del WSDL)
-                if self.roshka_compat:
-                    logger.debug(
-                        f"SOAP endpoint extraído (Roshka compat, sin normalizar): "
-                        f"{location_raw}"
-                    )
-                    return location_raw
-                else:
-                    endpoint_normalized = self._normalize_soap_endpoint(location_raw)
-                    logger.debug(
-                        f"SOAP endpoint extraído: location_raw={location_raw}, "
-                        f"endpoint_normalized={endpoint_normalized}"
-                    )
-                    return endpoint_normalized
-
-            return None
-        except Exception as e:
-            logger.debug(
-                f"No se pudo extraer SOAP address desde WSDL ({wsdl_url}): {e}"
-            )
-            return None
+        return None
 
     # ---------------------------------------------------------------------
     # Transport (mTLS)
@@ -273,10 +318,25 @@ class SoapClient:
         # Usar helper unificado get_mtls_config()
         cert_path, key_or_password, is_pem_mode = get_mtls_config()
         
+        # Validar que no sea self-signed
+        validate_no_self_signed(cert_path, "mTLS")
+        if is_pem_mode and key_or_password:
+            validate_no_self_signed(key_or_password, "mTLS")
+        
         if is_pem_mode:
             # Modo PEM: requests necesita (cert_path, key_path)
             session.cert = (cert_path, key_or_password)  # key_or_password es la key PEM
             self._temp_pem_files = None
+            # Guardar artifact con certificados resueltos
+            try:
+                save_resolved_certs_artifact(
+                    mtls_cert=cert_path,
+                    mtls_key=key_or_password,
+                    mtls_mode="PEM"
+                )
+            except Exception as e:
+                logger.warning(f"No se pudo guardar artifact de certificados: {e}")
+            
             logger.info(
                 f"Usando mTLS modo PEM: cert={Path(cert_path).name}, key={Path(key_or_password).name}"
             )
@@ -288,6 +348,15 @@ class SoapClient:
                 )
                 self._temp_pem_files = (cert_pem_path, key_pem_path)
                 session.cert = (cert_pem_path, key_pem_path)
+                
+                # Guardar artifact con certificados resueltos
+                try:
+                    save_resolved_certs_artifact(
+                        mtls_cert=cert_path,
+                        mtls_mode="P12"
+                    )
+                except Exception as e:
+                    logger.warning(f"No se pudo guardar artifact de certificados: {e}")
                 
                 # Debug: guardar paths si está habilitado
                 debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
@@ -1149,14 +1218,6 @@ class SoapClient:
             self._get_client(service_key)  # intenta poblar _soap_address
 
         if service_key not in self._soap_address:
-            wsdl_url = self._normalize_wsdl_url(
-                self.config.get_soap_service_url(service_key)
-            )
-            addr = self._extract_soap_address_from_wsdl(wsdl_url)
-            if addr:
-                self._soap_address[service_key] = addr
-
-        if service_key not in self._soap_address:
             raise SifenClientError(
                 f"No se encontró SOAP address para servicio '{service_key}'. Verifique que el WSDL se cargó correctamente."
             )
@@ -1173,23 +1234,72 @@ class SoapClient:
             }
         else:
             # Headers SOAP 1.2 estándar: action va en Content-Type
+            # Pero para recibe_lote, soapActionRequired=false, así que NO enviamos action
             # Determinar la acción según el servicio
             if service_key == "recibe_lote":
-                action = "rEnvioLote"
+                # WSDL indica soapAction="" y soapActionRequired="false"
+                # Por lo tanto, Content-Type sin action param
+                headers = {
+                    "Content-Type": "application/soap+xml; charset=utf-8",
+                }
             elif service_key == "consulta_lote":
                 action = "siConsLoteDE"
+                headers = {
+                    "Content-Type": f'application/soap+xml; charset=utf-8; action="{action}"',
+                }
             else:
                 action = "rEnviDe"  # default para "recibe"
-            headers = {
-                "Content-Type": f'application/soap+xml; charset=utf-8; action="{action}"',
-            }
+                headers = {
+                    "Content-Type": f'application/soap+xml; charset=utf-8; action="{action}"',
+                }
 
-        resp = session.post(
-            url,
-            data=soap_bytes,
-            headers=headers,
-            timeout=(self.connect_timeout, self.read_timeout),
-        )
+        # Implementar retries con backoff exponencial y jitter (configurable)
+        max_attempts = int(os.getenv("SIFEN_SOAP_MAX_RETRIES", "3")) + 1  # +1 para el intento inicial
+        base_delay = float(os.getenv("SIFEN_SOAP_BACKOFF_BASE", "0.6"))
+        max_delay = float(os.getenv("SIFEN_SOAP_BACKOFF_MAX", "8.0"))
+        
+        last_exception = None
+        resp = None
+        
+        for attempt in range(1, max_attempts + 1):
+            try:
+                logger.debug(f"Intento {attempt}/{max_attempts} para POST a {url}")
+                resp = session.post(
+                    url,
+                    data=soap_bytes,
+                    headers=headers,
+                    timeout=(self.connect_timeout, self.read_timeout),
+                )
+                
+                # Si llegamos aquí, el POST fue exitoso (no hubo error de conexión)
+                break
+                
+            except (requests.exceptions.ConnectionError, 
+                    requests.exceptions.Timeout,
+                    requests.exceptions.HTTPError,
+                    ConnectionResetError) as e:
+                last_exception = e
+                
+                if attempt < max_attempts:
+                    # Calcular delay con backoff exponencial y jitter
+                    delay = min(base_delay * (2 ** (attempt - 1)), max_delay)
+                    # Agregar jitter aleatorio (±25%)
+                    jitter = delay * 0.25 * (random.random() * 2 - 1)
+                    final_delay = delay + jitter
+                    
+                    logger.warning(
+                        f"Error de conexión (intento {attempt}/{max_attempts}): {e}. "
+                        f"Reintentando en {final_delay:.2f}s..."
+                    )
+                    time.sleep(final_delay)
+                else:
+                    logger.error(f"Todos los intentos fallaron. Último error: {e}")
+                    
+        # Si todos los intentos fallaron, lanzar excepción
+        if resp is None:
+            raise SifenClientError(
+                f"Error de conexión después de {max_attempts} intentos: {last_exception}"
+            ) from last_exception
         
         # Guardar JSON de routing para evidencia (solo para recibe_lote)
         if service_key == "recibe_lote":
@@ -1902,7 +2012,8 @@ class SoapClient:
         
         # Inspeccionar WSDL (con cache opcional)
         wsdl_info = None
-        wsdl_cache_path = Path("/tmp/recibe-lote.wsdl")
+        env_tag = (getattr(self.config, "env", None) or os.getenv("SIFEN_ENV", "test")).strip().lower()
+        wsdl_cache_path = Path(f"/tmp/recibe-lote_{env_tag}.wsdl")
         wsdl_inspected_path = Path("artifacts/wsdl_inspected.json")
         
         if inspect_wsdl is None:
@@ -2305,6 +2416,28 @@ class SoapClient:
                         raise SifenClientError(f"Error al parsear respuesta XML de SIFEN: {e}")
                 
                 response = self._parse_recepcion_response_from_xml(resp_root)
+                
+                # Add HTTP metadata to response
+                import hashlib
+                response_sha256 = hashlib.sha256(resp.content).hexdigest()
+                request_sha256 = hashlib.sha256(soap_bytes).hexdigest()
+                
+                response.update({
+                    "post_url": post_url,
+                    "wsdl_url": wsdl_url,
+                    "soap_version": soap_version,
+                    "content_type": headers_final.get("Content-Type"),
+                    "http_status": resp.status_code,
+                    "sent_headers": headers_final,
+                    "received_headers": dict(resp.headers),
+                    "request_bytes_len": len(soap_bytes),
+                    "request_sha256": request_sha256,
+                    "response_bytes_len": len(resp.content),
+                    "response_sha256": response_sha256,
+                    "response_dCodRes": response.get("codigo_respuesta"),
+                    "response_dMsgRes": response.get("mensaje"),
+                    "response_dProtConsLote": response.get("d_prot_cons_lote"),
+                })
                 
                 # 7. Resumen final para diagnóstico
                 try:
@@ -3859,7 +3992,7 @@ class SoapClient:
         # Headers SOAP 1.2 (application/soap+xml SIN action=)
         # SIFEN NO requiere action para consulta_ruc
         headers = {
-            "Content-Type": "application/soap+xml; charset=utf-8",
+            "Content-Type": "application/soap+xml; charset=utf-8; action=\"siConsRUC\"",
             "Accept": "application/soap+xml, text/xml, */*",
         }
         

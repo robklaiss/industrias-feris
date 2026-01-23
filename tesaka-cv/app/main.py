@@ -57,6 +57,7 @@ from .routes_remissions import register_remission_routes
 from .routes_sales_invoices import register_sales_invoice_routes
 from .routes_products import register_product_routes
 from .routes_sifen import register_sifen_routes
+from .routes_artifacts import register_artifacts_routes
 
 register_product_routes(app, jinja_env)
 register_contract_routes(app, jinja_env)
@@ -65,6 +66,7 @@ register_delivery_note_routes(app, jinja_env)
 register_remission_routes(app, jinja_env)
 register_sales_invoice_routes(app, jinja_env)
 register_sifen_routes(app, jinja_env)
+register_artifacts_routes(app, jinja_env)
 
 
 @app.get("/", response_class=HTMLResponse)

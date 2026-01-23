@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<rDE xmlns="http://ekuatia.set.gov.py/sifen/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ekuatia.set.gov.py/sifen/xsd siRecepDE_Ekuatiai_v150.xsd">
+    <dVerFor>150</dVerFor>
+    
+<DE Id="{{CDC}}">
+        <dDVId>2</dDVId>
+        <dFecFirma>{{dFecFirma}}</dFecFirma>
+        <dSisFact>2</dSisFact>
+        <gOpeDE>
+            <iTipEmi>1</iTipEmi>
+            <dDesTipEmi>Normal</dDesTipEmi>
+            <dCodSeg>{{dCodSeg}}</dCodSeg>
+        </gOpeDE>
+        <gTimb>
+            <iTiDE>1</iTiDE>
+            <dDesTiDE>Factura electrónica</dDesTiDE>
+            <dNumTim>{{dNumTim}}</dNumTim>
+            <dEst>{{dEst}}</dEst>
+            <dPunExp>{{dPunExp}}</dPunExp>
+            <dNumDoc>{{dNumDoc}}</dNumDoc>
+            <dFeIniT>{{dFeIniT}}</dFeIniT>
+        </gTimb>
+        <gDatGralOpe>
+            <dFeEmiDE>{{dFeEmiDE}}</dFeEmiDE>
+            <gOpeCom>
+                <iTipTra>1</iTipTra>
+                <dDesTipTra>Venta de mercadería</dDesTipTra>
+                <iTImp>1</iTImp>
+                <dDesTImp>IVA</dDesTImp>
+                <cMoneOpe>PYG</cMoneOpe>
+                <dDesMoneOpe>Guaraní</dDesMoneOpe>
+                <gOblAfe>
+                    <cOblAfe>211</cOblAfe>
+                    <dDesOblAfe>IMPUESTO AL VALOR AGREGADO - GRAVADAS Y EXONERADAS - EXPORTADORES</dDesOblAfe>
+                </gOblAfe>
+                <gOblAfe>
+                    <cOblAfe>700</cOblAfe>
+                    <dDesOblAfe>IMPUESTO A LA RENTA EMPRESARIAL - RÉGIMEN GENERAL</dDesOblAfe>
+                </gOblAfe>
+            </gOpeCom>
+            <gEmis>
+                <dRucEm>{{dRucEm}}</dRucEm>
+                <dDVEmi>{{dDVEmi}}</dDVEmi>
+                <iTipCont>1</iTipCont>
+                <dNomEmi>{{dNomEmi}}</dNomEmi>
+                <dDirEmi>{{dDirEmi}}</dDirEmi>
+                <dNumCas>0</dNumCas>
+                <cDepEmi>{{cDepEmi}}</cDepEmi>
+                <dDesDepEmi>{{dDesDepEmi}}</dDesDepEmi>
+                <cCiuEmi>{{cCiuEmi}}</cCiuEmi>
+                <dDesCiuEmi>{{dDesCiuEmi}}</dDesCiuEmi>
+                <dTelEmi>{{dTelEmi}}</dTelEmi>
+                <dEmailE>{{dEmailE}}</dEmailE>
+                <!-- Actividades económicas del emisor -->
+                {% for act_eco in gActEco %}
+                <gActEco>
+                    <cActEco>{{ act_eco.cActEco }}</cActEco>
+                    <dDesActEco>{{ act_eco.dDesActEco }}</dDesActEco>
+                </gActEco>
+                {% endfor %}
+            </gEmis>
+            <gDatRec>
+                <iNatRec>1</iNatRec>
+                <iTiOpe>2</iTiOpe>
+                <cPaisRec>PRY</cPaisRec>
+                <dDesPaisRe>Paraguay</dDesPaisRe>
+                <iTiContRec>1</iTiContRec>
+                <dRucRec>{{dRucRec}}</dRucRec>
+                <dDVRec>{{dDVRec}}</dDVRec>
+                <dNomRec>{{dNomRec}}</dNomRec>
+                {% if dDirRec %}
+                <dDirRec>{{dDirRec}}</dDirRec>
+                {% endif %}
+                {% if dNumCasRec %}
+                <dNumCasRec>{{dNumCasRec}}</dNumCasRec>
+                {% endif %}
+                {% if cDepRec %}
+                <cDepRec>{{cDepRec}}</cDepRec>
+                <dDesDepRec>{{dDesDepRec}}</dDesDepRec>
+                {% endif %}
+                {% if cCiuRec %}
+                <cCiuRec>{{cCiuRec}}</cCiuRec>
+                <dDesCiuRec>{{dDesCiuRec}}</dDesCiuRec>
+                {% endif %}
+                {% if dTelRec %}
+                <dTelRec>{{dTelRec}}</dTelRec>
+                {% endif %}
+                <dEmailRec>{{dEmailRec}}</dEmailRec>
+            </gDatRec>
+        </gDatGralOpe>
+        <gDtipDE>
+            <gCamFE>
+                <iIndPres>2</iIndPres>
+                <dDesIndPres>Operación electrónica</dDesIndPres>
+            </gCamFE>
+            <gCamCond>
+                <iCondOpe>1</iCondOpe>
+                <dDCondOpe>Contado</dDCondOpe>
+                {% if pagos %}
+                {% for pago in pagos %}
+                <gPaConEIni>
+                    <iTiPago>{{ pago.iTiPago }}</iTiPago>
+                    <dDesTiPag>{{ pago.dDesTiPag }}</dDesTiPag>
+                    <dMonTiPag>{{ pago.dMonTiPag }}</dMonTiPag>
+                    <cMoneTiPag>{{ pago.cMoneTiPag }}</cMoneTiPag>
+                    <dDMoneTiPag>{{ pago.dDMoneTiPag }}</dDMoneTiPag>
+                    {% if pago.dCheq %}
+                    <dCheq>{{ pago.dCheq }}</dCheq>
+                    {% endif %}
+                    {% if pago.dCtaBanc %}
+                    <dCtaBanc>{{ pago.dCtaBanc }}</dCtaBanc>
+                    {% endif %}
+                </gPaConEIni>
+                {% endfor %}
+                {% endif %}
+            </gCamCond>
+            <!-- Items de la factura -->
+            {% for item in items %}
+            <gCamItem>
+                <dDesProSer>{{ item.dDesProSer }}</dDesProSer>
+                <cUniMed>{{ item.cUniMed }}</cUniMed>
+                <dDesUniMed>{{ item.dDesUniMed }}</dDesUniMed>
+                <dCantProSer>{{ item.dCantProSer }}</dCantProSer>
+                {% if item.dCodIntProSer %}
+                <dCodIntProSer>{{ item.dCodIntProSer }}</dCodIntProSer>
+                {% endif %}
+                <gValorItem>
+                    <dPUniProSer>{{ item.dPUniProSer }}</dPUniProSer>
+                    <dTotBruOpeItem>{{ item.dTotBruOpeItem }}</dTotBruOpeItem>
+                    <gValorRestaItem>
+                        <dDescItem>{{ item.dDescItem }}</dDescItem>
+                        <dPorcDescItem>{{ item.dPorcDescItem }}</dPorcDescItem>
+                        <dTotOpeItem>{{ item.dTotOpeItem }}</dTotOpeItem>
+                    </gValorRestaItem>
+                </gValorItem>
+                <!-- Información de IVA del item -->
+                <gCamIVA>
+                    <iAfecIVA>{{ item.iAfecIVA }}</iAfecIVA>
+                    <dDesAfecIVA>{{ item.dDesAfecIVA }}</dDesAfecIVA>
+                    <dPropIVA>{{ item.dPropIVA }}</dPropIVA>
+                    <dTasaIVA>{{ item.dTasaIVA }}</dTasaIVA>
+                    <dBasGravIVA>{{ item.dBasGravIVA }}</dBasGravIVA>
+                    <dLiqIVAItem>{{ item.dLiqIVAItem }}</dLiqIVAItem>
+                    <dBasExe>{{ item.dBasExe }}</dBasExe>
+                </gCamIVA>
+            </gCamItem>
+            {% endfor %}
+        </gDtipDE>
+        <!-- Totales de la factura -->
+        <gTotSub>
+            <dSubExe>{{ totales.dSubExe }}</dSubExe>
+            <dSubExo>{{ totales.dSubExo }}</dSubExo>
+            <dSub5>{{ totales.dSub5 }}</dSub5>
+            <dSub10>{{ totales.dSub10 }}</dSub10>
+            <dTotOpe>{{ totales.dTotOpe }}</dTotOpe>
+            <dTotDesc>{{ totales.dTotDesc }}</dTotDesc>
+            <dTotDescGlotem>{{ totales.dTotDescGlotem }}</dTotDescGlotem>
+            <dTotAntItem>{{ totales.dTotAntItem }}</dTotAntItem>
+            <dTotAnt>{{ totales.dTotAnt }}</dTotAnt>
+            <dPorcDescTotal>{{ totales.dPorcDescTotal }}</dPorcDescTotal>
+            <dDescTotal>{{ totales.dDescTotal }}</dDescTotal>
+            <dAnticipo>{{ totales.dAnticipo }}</dAnticipo>
+            <dRedon>{{ totales.dRedon }}</dRedon>
+            <dTotGralOpe>{{ totales.dTotGralOpe }}</dTotGralOpe>
+            <dIVA5>{{ totales.dIVA5 }}</dIVA5>
+            <dIVA10>{{ totales.dIVA10 }}</dIVA10>
+            <dLiqTotIVA5>{{ totales.dLiqTotIVA5 }}</dLiqTotIVA5>
+            <dLiqTotIVA10>{{ totales.dLiqTotIVA10 }}</dLiqTotIVA10>
+            <dTotIVA>{{ totales.dTotIVA }}</dTotIVA>
+            <dBaseGrav5>{{ totales.dBaseGrav5 }}</dBaseGrav5>
+            <dBaseGrav10>{{ totales.dBaseGrav10 }}</dBaseGrav10>
+            <dTBasGraIVA>{{ totales.dTBasGraIVA }}</dTBasGraIVA>
+        </gTotSub>
+    </DE>
+</rDE>

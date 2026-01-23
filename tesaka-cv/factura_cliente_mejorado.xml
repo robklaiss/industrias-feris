@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<rDE xmlns="http://ekuatia.set.gov.py/sifen/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ekuatia.set.gov.py/sifen/xsd siRecepDE_Ekuatiai_v150.xsd">
+    <dVerFor>150</dVerFor>
+    
+<DE Id="01040090310001001000011912026011911890577982">
+        <dDVId>2</dDVId>
+        <dFecFirma>2026-01-19T11:57:10</dFecFirma>
+        <dSisFact>2</dSisFact>
+        <gOpeDE>
+            <iTipEmi>1</iTipEmi>
+            <dDesTipEmi>Normal</dDesTipEmi>
+            <dCodSeg>189057798</dCodSeg>
+        </gOpeDE>
+        <gTimb>
+            <iTiDE>1</iTiDE>
+            <dDesTiDE>Factura electrónica</dDesTiDE>
+            <dNumTim>18502837</dNumTim>
+            <dEst>001</dEst>
+            <dPunExp>001</dPunExp>
+            <dNumDoc>0000119</dNumDoc>
+            <dFeIniT>2025-12-06</dFeIniT>
+        </gTimb>
+        <gDatGralOpe>
+            <dFeEmiDE>2026-01-19T11:57:10</dFeEmiDE>
+            <gOpeCom>
+                <iTipTra>1</iTipTra>
+                <dDesTipTra>Venta de mercadería</dDesTipTra>
+                <iTImp>1</iTImp>
+                <dDesTImp>IVA</dDesTImp>
+                <cMoneOpe>PYG</cMoneOpe>
+                <dDesMoneOpe>Guaraní</dDesMoneOpe>
+                <gOblAfe>
+                    <cOblAfe>211</cOblAfe>
+                    <dDesOblAfe>IMPUESTO AL VALOR AGREGADO - GRAVADAS Y EXONERADAS - EXPORTADORES</dDesOblAfe>
+                </gOblAfe>
+                <gOblAfe>
+                    <cOblAfe>700</cOblAfe>
+                    <dDesOblAfe>IMPUESTO A LA RENTA EMPRESARIAL - RÉGIMEN GENERAL</dDesOblAfe>
+                </gOblAfe>
+            </gOpeCom>
+            <gEmis>
+                <dRucEm>80012345</dRucEm>
+                <dDVEmi>6</dDVEmi>
+                <iTipCont>1</iTipCont>
+                <dNomEmi>EMPRESA CLIENTE S.A.</dNomEmi>
+                <dDirEmi>AVENIDA PRINCIPAL 1234</dDirEmi>
+                <dNumCas>0</dNumCas>
+                <cDepEmi>12</cDepEmi>
+                <dDesDepEmi>CENTRAL</dDesDepEmi>
+                <cCiuEmi>165</cCiuEmi>
+                <dDesCiuEmi>ASUNCIÓN</dDesCiuEmi>
+                <dTelEmi>(021) 123456</dTelEmi>
+                <dEmailE>info@empresacliente.com.py</dEmailE>
+                <!-- Actividades económicas del emisor -->
+                
+                <gActEco>
+                    <cActEco>47211</cActEco>
+                    <dDesActEco>Comercio al por menor de frutas y verduras</dDesActEco>
+                </gActEco>
+                
+                <gActEco>
+                    <cActEco>47890</cActEco>
+                    <dDesActEco>Comercio al por menor de otros artículos en puestos de venta y mercados</dDesActEco>
+                </gActEco>
+                
+            </gEmis>
+            <gDatRec>
+                <iNatRec>1</iNatRec>
+                <iTiOpe>2</iTiOpe>
+                <cPaisRec>PRY</cPaisRec>
+                <dDesPaisRe>Paraguay</dDesPaisRe>
+                <iTiContRec>1</iTiContRec>
+                <dRucRec>1234567</dRucRec>
+                <dDVRec>9</dDVRec>
+                <dNomRec>CLIENTE DE EJEMPLO</dNomRec>
+                
+                
+                
+                
+                
+                <dEmailRec>cliente@ejemplo.com</dEmailRec>
+            </gDatRec>
+        </gDatGralOpe>
+        <gDtipDE>
+            <gCamFE>
+                <iIndPres>2</iIndPres>
+                <dDesIndPres>Operación electrónica</dDesIndPres>
+            </gCamFE>
+            <gCamCond>
+                <iCondOpe>1</iCondOpe>
+                <dDCondOpe>Contado</dDCondOpe>
+                
+                
+                <gPaConEIni>
+                    <iTiPago>1</iTiPago>
+                    <dDesTiPag>Efectivo</dDesTiPag>
+                    <dMonTiPag>250000</dMonTiPag>
+                    <cMoneTiPag>PYG</cMoneTiPag>
+                    <dDMoneTiPag>Guaraní</dDMoneTiPag>
+                    
+                    
+                </gPaConEIni>
+                
+                
+            </gCamCond>
+            <!-- Items de la factura -->
+            
+            <gCamItem>
+                <dDesProSer>SERVICIO DE CONSULTORÍA EN SISTEMAS</dDesProSer>
+                <cUniMed>77</cUniMed>
+                <dDesUniMed>HS</dDesUniMed>
+                <dCantProSer>1</dCantProSer>
+                
+                <gValorItem>
+                    <dPUniProSer>5000000</dPUniProSer>
+                    <dTotBruOpeItem>5000000</dTotBruOpeItem>
+                    <gValorRestaItem>
+                        <dDescItem>0</dDescItem>
+                        <dPorcDescItem>0</dPorcDescItem>
+                        <dTotOpeItem>5000000</dTotOpeItem>
+                    </gValorRestaItem>
+                </gValorItem>
+                <!-- Información de IVA del item -->
+                <gCamIVA>
+                    <iAfecIVA>1</iAfecIVA>
+                    <dDesAfecIVA>Gravado IVA</dDesAfecIVA>
+                    <dPropIVA>100</dPropIVA>
+                    <dTasaIVA>10</dTasaIVA>
+                    <dBasGravIVA>4545455</dBasGravIVA>
+                    <dLiqIVAItem>454545</dLiqIVAItem>
+                    <dBasExe>0</dBasExe>
+                </gCamIVA>
+            </gCamItem>
+            
+            <gCamItem>
+                <dDesProSer>LICENCIA DE SOFTWARE ANUAL</dDesProSer>
+                <cUniMed>77</cUniMed>
+                <dDesUniMed>MES</dDesUniMed>
+                <dCantProSer>12</dCantProSer>
+                
+                <gValorItem>
+                    <dPUniProSer>250000</dPUniProSer>
+                    <dTotBruOpeItem>3000000</dTotBruOpeItem>
+                    <gValorRestaItem>
+                        <dDescItem>0</dDescItem>
+                        <dPorcDescItem>0</dPorcDescItem>
+                        <dTotOpeItem>3000000</dTotOpeItem>
+                    </gValorRestaItem>
+                </gValorItem>
+                <!-- Información de IVA del item -->
+                <gCamIVA>
+                    <iAfecIVA>1</iAfecIVA>
+                    <dDesAfecIVA>Gravado IVA</dDesAfecIVA>
+                    <dPropIVA>100</dPropIVA>
+                    <dTasaIVA>10</dTasaIVA>
+                    <dBasGravIVA>2727273</dBasGravIVA>
+                    <dLiqIVAItem>272727</dLiqIVAItem>
+                    <dBasExe>0</dBasExe>
+                </gCamIVA>
+            </gCamItem>
+            
+        </gDtipDE>
+        <!-- Totales de la factura -->
+        <gTotSub>
+            <dSubExe>0</dSubExe>
+            <dSubExo>0</dSubExo>
+            <dSub5>0</dSub5>
+            <dSub10>8000000</dSub10>
+            <dTotOpe>8000000</dTotOpe>
+            <dTotDesc>0</dTotDesc>
+            <dTotDescGlotem>0</dTotDescGlotem>
+            <dTotAntItem>0</dTotAntItem>
+            <dTotAnt>0</dTotAnt>
+            <dPorcDescTotal>0</dPorcDescTotal>
+            <dDescTotal>0</dDescTotal>
+            <dAnticipo>0</dAnticipo>
+            <dRedon>0</dRedon>
+            <dTotGralOpe>8000000</dTotGralOpe>
+            <dIVA5>0</dIVA5>
+            <dIVA10>727272</dIVA10>
+            <dLiqTotIVA5>0</dLiqTotIVA5>
+            <dLiqTotIVA10>0</dLiqTotIVA10>
+            <dTotIVA>727272</dTotIVA>
+            <dBaseGrav5>0</dBaseGrav5>
+            <dBaseGrav10>7272728</dBaseGrav10>
+            <dTBasGraIVA>7272728</dTBasGraIVA>
+        </gTotSub>
+    </DE>
+</rDE>

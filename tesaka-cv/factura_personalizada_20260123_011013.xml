@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<rDE xmlns="http://ekuatia.set.gov.py/sifen/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ekuatia.set.gov.py/sifen/xsd siRecepDE_Ekuatiai_v150.xsd">
+    <dVerFor>150</dVerFor>
+    
+<DE Id="010412345679001001000000120260123182126093">
+        <dDVId>2</dDVId>
+        <dFecFirma>2026-01-23T01:10:13</dFecFirma>
+        <dSisFact>2</dSisFact>
+        <gOpeDE>
+            <iTipEmi>1</iTipEmi>
+            <dDesTipEmi>Normal</dDesTipEmi>
+            <dCodSeg>182126093</dCodSeg>
+        </gOpeDE>
+        <gTimb>
+            <iTiDE>1</iTiDE>
+            <dDesTiDE>Factura electrónica</dDesTiDE>
+            <dNumTim>12345678</dNumTim>
+            <dEst>001</dEst>
+            <dPunExp>001</dPunExp>
+            <dNumDoc>0000001</dNumDoc>
+            <dFeIniT>2025-01-01</dFeIniT>
+        </gTimb>
+        <gDatGralOpe>
+            <dFeEmiDE>2026-01-23T01:10:13</dFeEmiDE>
+            <gOpeCom>
+                <iTipTra>1</iTipTra>
+                <dDesTipTra>Venta de mercadería</dDesTipTra>
+                <iTImp>1</iTImp>
+                <dDesTImp>IVA</dDesTImp>
+                <cMoneOpe>PYG</cMoneOpe>
+                <dDesMoneOpe>Guaraní</dDesMoneOpe>
+                <gOblAfe>
+                    <cOblAfe>211</cOblAfe>
+                    <dDesOblAfe>IMPUESTO AL VALOR AGREGADO - GRAVADAS Y EXONERADAS - EXPORTADORES</dDesOblAfe>
+                </gOblAfe>
+                <gOblAfe>
+                    <cOblAfe>700</cOblAfe>
+                    <dDesOblAfe>IMPUESTO A LA RENTA EMPRESARIAL - RÉGIMEN GENERAL</dDesOblAfe>
+                </gOblAfe>
+            </gOpeCom>
+            <gEmis>
+                <dRucEm>1234567</dRucEm>
+                <dDVEmi>9</dDVEmi>
+                <iTipCont>1</iTipCont>
+                <dNomEmi>MI EMPRESA S.A.</dNomEmi>
+                <dDirEmi>AVENIDA PRINCIPAL 123</dDirEmi>
+                <dNumCas>0</dNumCas>
+                <cDepEmi>12</cDepEmi>
+                <dDesDepEmi>CENTRAL</dDesDepEmi>
+                <cCiuEmi>165</cCiuEmi>
+                <dDesCiuEmi>VILLA ELISA</dDesCiuEmi>
+                <dTelEmi>(021) 123456</dTelEmi>
+                <dEmailE>facturacion@miempresa.com.py</dEmailE>
+                <!-- Actividades económicas del emisor -->
+                
+                <gActEco>
+                    <cActEco>46611</cActEco>
+                    <dDesActEco>Venta por menor de alimentos en general</dDesActEco>
+                </gActEco>
+                
+                <gActEco>
+                    <cActEco>47191</cActEco>
+                    <dDesActEco>Venta por menor de otros productos nuevos</dDesActEco>
+                </gActEco>
+                
+            </gEmis>
+            <gDatRec>
+                <iNatRec>1</iNatRec>
+                <iTiOpe>2</iTiOpe>
+                <cPaisRec>PRY</cPaisRec>
+                <dDesPaisRe>Paraguay</dDesPaisRe>
+                <iTiContRec>1</iTiContRec>
+                <dRucRec>80000000</dRucRec>
+                <dDVRec>1</dDVRec>
+                <dNomRec>CLIENTE DE EJEMPLO S.A.</dNomRec>
+                
+                <dDirRec>CALLE SECUNDARIA 456</dDirRec>
+                
+                
+                
+                <cDepRec>12</cDepRec>
+                <dDesDepRec>CENTRAL</dDesDepRec>
+                
+                
+                <cCiuRec>165</cCiuRec>
+                <dDesCiuRec>VILLA ELISA</dDesCiuRec>
+                
+                
+                <dTelRec>(021) 654321</dTelRec>
+                
+                <dEmailRec>cliente@ejemplo.com.py</dEmailRec>
+            </gDatRec>
+        </gDatGralOpe>
+        <gDtipDE>
+            <gCamFE>
+                <iIndPres>2</iIndPres>
+                <dDesIndPres>Operación electrónica</dDesIndPres>
+            </gCamFE>
+            <gCamCond>
+                <iCondOpe>1</iCondOpe>
+                <dDCondOpe>Contado</dDCondOpe>
+                
+                
+                <gPaConEIni>
+                    <iTiPago>1</iTiPago>
+                    <dDesTiPag>Efectivo</dDesTiPag>
+                    <dMonTiPag>1200000</dMonTiPag>
+                    <cMoneTiPag>PYG</cMoneTiPag>
+                    <dDMoneTiPag>Guaraní</dDMoneTiPag>
+                    
+                    
+                </gPaConEIni>
+                
+                
+            </gCamCond>
+            <!-- Items de la factura -->
+            
+            <gCamItem>
+                <dDesProSer>PRODUCTO A - Descripción detallada del producto</dDesProSer>
+                <cUniMed>77</cUniMed>
+                <dDesUniMed>UNI</dDesUniMed>
+                <dCantProSer>10</dCantProSer>
+                
+                <gValorItem>
+                    <dPUniProSer>50000</dPUniProSer>
+                    <dTotBruOpeItem>500000</dTotBruOpeItem>
+                    <gValorRestaItem>
+                        <dDescItem>0</dDescItem>
+                        <dPorcDescItem>0</dPorcDescItem>
+                        <dTotOpeItem>500000</dTotOpeItem>
+                    </gValorRestaItem>
+                </gValorItem>
+                <!-- Información de IVA del item -->
+                <gCamIVA>
+                    <iAfecIVA>1</iAfecIVA>
+                    <dDesAfecIVA>Gravado IVA</dDesAfecIVA>
+                    <dPropIVA>100</dPropIVA>
+                    <dTasaIVA>10</dTasaIVA>
+                    <dBasGravIVA>454545</dBasGravIVA>
+                    <dLiqIVAItem>45455</dLiqIVAItem>
+                    <dBasExe>0</dBasExe>
+                </gCamIVA>
+            </gCamItem>
+            
+            <gCamItem>
+                <dDesProSer>SERVICIO B - Descripción del servicio prestado</dDesProSer>
+                <cUniMed>81</cUniMed>
+                <dDesUniMed>HOR</dDesUniMed>
+                <dCantProSer>5</dCantProSer>
+                
+                <gValorItem>
+                    <dPUniProSer>100000</dPUniProSer>
+                    <dTotBruOpeItem>500000</dTotBruOpeItem>
+                    <gValorRestaItem>
+                        <dDescItem>0</dDescItem>
+                        <dPorcDescItem>0</dPorcDescItem>
+                        <dTotOpeItem>500000</dTotOpeItem>
+                    </gValorRestaItem>
+                </gValorItem>
+                <!-- Información de IVA del item -->
+                <gCamIVA>
+                    <iAfecIVA>1</iAfecIVA>
+                    <dDesAfecIVA>Gravado IVA</dDesAfecIVA>
+                    <dPropIVA>100</dPropIVA>
+                    <dTasaIVA>10</dTasaIVA>
+                    <dBasGravIVA>454545</dBasGravIVA>
+                    <dLiqIVAItem>45455</dLiqIVAItem>
+                    <dBasExe>0</dBasExe>
+                </gCamIVA>
+            </gCamItem>
+            
+            <gCamItem>
+                <dDesProSer>PRODUCTO EXENTO - Medicina</dDesProSer>
+                <cUniMed>77</cUniMed>
+                <dDesUniMed>UNI</dDesUniMed>
+                <dCantProSer>2</dCantProSer>
+                
+                <gValorItem>
+                    <dPUniProSer>100000</dPUniProSer>
+                    <dTotBruOpeItem>200000</dTotBruOpeItem>
+                    <gValorRestaItem>
+                        <dDescItem>0</dDescItem>
+                        <dPorcDescItem>0</dPorcDescItem>
+                        <dTotOpeItem>200000</dTotOpeItem>
+                    </gValorRestaItem>
+                </gValorItem>
+                <!-- Información de IVA del item -->
+                <gCamIVA>
+                    <iAfecIVA>2</iAfecIVA>
+                    <dDesAfecIVA>Exento IVA</dDesAfecIVA>
+                    <dPropIVA>0</dPropIVA>
+                    <dTasaIVA>0</dTasaIVA>
+                    <dBasGravIVA>0</dBasGravIVA>
+                    <dLiqIVAItem>0</dLiqIVAItem>
+                    <dBasExe>200000</dBasExe>
+                </gCamIVA>
+            </gCamItem>
+            
+        </gDtipDE>
+        <!-- Totales de la factura -->
+        <gTotSub>
+            <dSubExe>0</dSubExe>
+            <dSubExo>0</dSubExo>
+            <dSub5>0</dSub5>
+            <dSub10>1000000</dSub10>
+            <dTotOpe>1200000</dTotOpe>
+            <dTotDesc>0</dTotDesc>
+            <dTotDescGlotem>0</dTotDescGlotem>
+            <dTotAntItem>0</dTotAntItem>
+            <dTotAnt>0</dTotAnt>
+            <dPorcDescTotal>0</dPorcDescTotal>
+            <dDescTotal>0</dDescTotal>
+            <dAnticipo>0</dAnticipo>
+            <dRedon>0</dRedon>
+            <dTotGralOpe>1200000</dTotGralOpe>
+            <dIVA5>0</dIVA5>
+            <dIVA10>90910</dIVA10>
+            <dLiqTotIVA5>0</dLiqTotIVA5>
+            <dLiqTotIVA10>0</dLiqTotIVA10>
+            <dTotIVA>90910</dTotIVA>
+            <dBaseGrav5>0</dBaseGrav5>
+            <dBaseGrav10>909090</dBaseGrav10>
+            <dTBasGraIVA>909090</dTBasGraIVA>
+        </gTotSub>
+    </DE>
+</rDE>

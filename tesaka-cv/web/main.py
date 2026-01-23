@@ -26,9 +26,10 @@ import os
 from pathlib import Path as FSPath
 from typing import Optional
 from fastapi import FastAPI, HTTPException, Request, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 
 # Cargar variables de entorno desde .env si existe
 try:
@@ -51,6 +52,16 @@ from . import db
 from . import lotes_db
 
 app = FastAPI(title="TESAKA-SIFEN", version="1.0.0")
+
+# Configurar CORS para desarrollo
+if os.getenv("TESAKA_DEV_MODE", "").lower() in ("1", "true", "yes"):
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:3000", "http://localhost:4200", "http://127.0.0.1:3000", "http://127.0.0.1:4200"],
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_headers=["*"],
+    )
 
 # Obtener ruta base del proyecto (directorio padre de web/)
 WEB_DIR = FSPath(__file__).parent
@@ -184,14 +195,16 @@ def _build_de_xml_with_items(
     punto_expedicion: str,
     numero_documento: str,
     items: list,
+    cliente: dict,
     fecha: Optional[str] = None,
     hora: Optional[str] = None
 ) -> str:
     """
-    Construye el XML DE con items dinámicos.
+    Construye el XML DE con items dinámicos y datos del cliente.
     
     Args:
         items: Lista de dicts con keys: codigo, descripcion, cantidad, precio, tasa_iva
+        cliente: Dict con keys: tipo_doc, ruc, nombre, direccion, nro_casa, departamento, ciudad
     """
     from datetime import datetime
     import importlib.util
@@ -295,6 +308,39 @@ def _build_de_xml_with_items(
     
     cod_seg = "123456789"
     
+    # Parsear RUC del cliente
+    cliente_ruc = cliente.get('ruc', '')
+    
+    # Siempre es tipo 1 = RUC
+    cliente_tipo_doc = '1'
+    
+    # Separar RUC y DV si viene con guión
+    if '-' in cliente_ruc:
+        ruc_parts = cliente_ruc.split('-', 1)
+        ruc_num = ruc_parts[0].strip()
+        dv_cliente = ruc_parts[1].strip()
+    else:
+        # Si no viene con guión, asumir que es inválido para SIFEN
+        raise ValueError("El RUC debe incluir el dígito verificador (ej: 80012345-7)")
+    
+    # Obtener descripciones del departamento y ciudad
+    deptos = {
+        '1': 'CAPITAL', '2': 'ALTO PARANÁ', '3': 'CENTRAL', '4': 'CAAGUAZÚ', '5': 'CAAZAPÁ',
+        '6': 'CANINDEYÚ', '7': 'CONCEPCIÓN', '8': 'CORDILLERA', '9': 'GUAIRÁ', '10': 'ITAPÚA',
+        '11': 'MISIONES', '12': 'ÑEEMBUCÚ', '13': 'PARAGUARÍ', '14': 'PRESIDENTE HAYES',
+        '15': 'AMAMBAY', '16': 'ALTO PARAGUAY', '17': 'BOQUERÓN'
+    }
+    
+    ciudades = {
+        '1': 'Asunción', '2': 'Ciudad del Este', '3': 'Encarnación', '4': 'San Lorenzo',
+        '5': 'Luque', '6': 'Capiatá', '7': 'Lambaré', '8': 'Ñemby', '9': 'Pedro Juan Caballero',
+        '10': 'Coronel Oviedo', '11': 'Villarrica', '12': 'Concepción', '13': 'Caaguazú',
+        '14': 'Hernandarias'
+    }
+    
+    depto_desc = deptos.get(cliente.get('departamento', '1'), 'CAPITAL')
+    ciudad_desc = ciudades.get(cliente.get('ciudad', '1'), 'Asunción')
+    
     # Construir XML
     items_xml_str = "\n".join(items_xml)
     
@@ -345,19 +391,19 @@ def _build_de_xml_with_items(
             </gActEco>
         </gEmis>
         <gDatRec>
-            <iNatRec>1</iNatRec>
+            <iNatRec>{cliente_tipo_doc}</iNatRec>
             <iTiOpe>1</iTiOpe>
             <cPaisRec>PRY</cPaisRec>
             <dDesPaisRec>Paraguay</dDesPaisRec>
-            <dRucRec>80012345</dRucRec>
-            <dDVRec>7</dDVRec>
-            <dNomRec>Cliente de Prueba</dNomRec>
-            <dDirRec>Asunción</dDirRec>
-            <dNumCasRec>5678</dNumCasRec>
-            <cDepRec>1</cDepRec>
-            <dDesDepRec>CAPITAL</dDesDepRec>
-            <cCiuRec>1</cCiuRec>
-            <dDesCiuRec>Asunción</dDesCiuRec>
+            <dRucRec>{ruc_num}</dRucRec>
+            <dDVRec>{dv_cliente if dv_cliente else '0'}</dDVRec>
+            <dNomRec>{cliente.get('nombre', '')}</dNomRec>
+            <dDirRec>{cliente.get('direccion', '')}</dDirRec>
+            <dNumCasRec>{cliente.get('nro_casa', '')}</dNumCasRec>
+            <cDepRec>{cliente.get('departamento', '1')}</cDepRec>
+            <dDesDepRec>{depto_desc}</dDesDepRec>
+            <cCiuRec>{cliente.get('ciudad', '1')}</cCiuRec>
+            <dDesCiuRec>{ciudad_desc}</dDesCiuRec>
         </gDatRec>
     </gDatGralOpe>
     <gDtipDE>
@@ -422,7 +468,14 @@ async def de_new_submit(
     timbrado: str = Form(...),
     establecimiento: str = Form("001"),
     punto_expedicion: str = Form("001"),
-    numero_documento: str = Form("0000001")
+    numero_documento: str = Form("0000001"),
+    # Datos del cliente (solo RUC)
+    cliente_ruc: str = Form(...),
+    cliente_nombre: str = Form(...),
+    cliente_direccion: str = Form(""),
+    cliente_nro_casa: str = Form(""),
+    cliente_departamento: str = Form("1"),
+    cliente_ciudad: str = Form("1")
 ):
     """Procesa el formulario y crea un nuevo DE"""
     # Validar SIFEN_EMISOR_RUC
@@ -517,10 +570,21 @@ async def de_new_submit(
     if not items:
         raise HTTPException(status_code=400, detail="Debe agregar al menos un item a la factura")
     
-    # Generar DE XML con items
+    # Generar DE XML con items y datos del cliente
     try:
         import sys
         sys.path.insert(0, str(FSPath(__file__).parent.parent))
+        
+        # Preparar datos del cliente (siempre tipo 1 = RUC)
+        cliente_data = {
+            'tipo_doc': '1',  # Siempre RUC
+            'ruc': cliente_ruc.strip(),
+            'nombre': cliente_nombre.strip(),
+            'direccion': cliente_direccion.strip(),
+            'nro_casa': cliente_nro_casa.strip(),
+            'departamento': cliente_departamento,
+            'ciudad': cliente_ciudad
+        }
         
         de_xml = _build_de_xml_with_items(
             ruc=emisor_ruc,
@@ -528,7 +592,8 @@ async def de_new_submit(
             establecimiento=establecimiento,
             punto_expedicion=punto_expedicion,
             numero_documento=numero_documento,
-            items=items
+            items=items,
+            cliente=cliente_data
         )
     except ImportError as e:
         raise HTTPException(
@@ -800,7 +865,9 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                     
                     logger.info("="*60)
                     
+                    debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
                     # Guardar artifact JSON si debug está habilitado
+                    # debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
                     if debug_enabled:
                         try:
                             artifacts_dir = FSPath("artifacts")
@@ -893,7 +960,7 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                 d_tpo_proces = response.get('d_tpo_proces')
                 
                 # Guardar artifact de debug si está habilitado
-                debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+                    # debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
                 if debug_enabled:
                     try:
                         artifacts_dir = FSPath("artifacts")
@@ -1359,3 +1426,59 @@ async def de_check_status(request: Request, doc_id: int):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+
+@app.get("/sifen-smoke", response_class=HTMLResponse)
+async def sifen_smoke_form(request: Request):
+    """Muestra el formulario de SIFEN Smoke"""
+    return templates.TemplateResponse("sifen_smoke.html", {"request": request})
+
+
+@app.post("/send-de")
+async def send_de_to_sifen(request: Request):
+    """Envía un DE a SIFEN via backend local"""
+    try:
+        import httpx
+        import json
+        
+        # Leer el body del request
+        body = await request.json()
+        env = body.get("env", "test")
+        payload = body.get("payload", {})
+        
+        # Enviar al backend local
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "http://127.0.0.1:8009/send-de",
+                json={"env": env, "payload": payload},
+                timeout=30.0
+            )
+        
+        # Devolver siempre JSON con content-type application/json
+        if response.headers.get("content-type", "").startswith("application/json"):
+            # El backend ya devolvió JSON
+            return JSONResponse(
+                content=response.json(),
+                status_code=response.status_code
+            )
+        else:
+            # El backend devolvió algo no JSON (no debería pasar)
+            return JSONResponse(
+                content={
+                    "error": "Backend devolvió respuesta no JSON",
+                    "status_code": response.status_code,
+                    "content": response.text[:500]  # Limitar tamaño
+                },
+                status_code=500
+            )
+        
+    except json.JSONDecodeError:
+        return JSONResponse(
+            content={"error": "Request body inválido: se espera JSON"},
+            status_code=400
+        )
+    except Exception as e:
+        return JSONResponse(
+            content={"error": f"Error al conectar con backend: {str(e)}"},
+            status_code=500
+        )

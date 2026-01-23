@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}SIFEN Smoke - TESAKA{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>SIFEN Smoke Test</h2>
+    <p>Enviar un DE a SIFEN via backend local</p>
+    
+    <form id="smokeForm">
+        <div class="form-group">
+            <label for="env">Ambiente:</label>
+            <select id="env" name="env" class="form-control" required>
+                <option value="test">Test</option>
+                <option value="prod">Producción</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="cdc">CDC:</label>
+            <input type="text" id="cdc" name="cdc" class="form-control" 
+                   placeholder="Ej: 12345678-90-ABC-12345678-012345678901" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="payload">Payload (JSON opcional):</label>
+            <textarea id="payload" name="payload" class="form-control" rows="10" 
+                      placeholder='{"campo": "valor"}'>{}</textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Enviar</button>
+    </form>
+    
+    <div id="result" style="margin-top: 20px; display: none;">
+        <h3>Resultado:</h3>
+        <pre id="resultContent" style="background: #f5f5f5; padding: 10px; border-radius: 5px;"></pre>
+    </div>
+    
+    <div id="error" style="margin-top: 20px; display: none;">
+        <h3 style="color: red;">Error:</h3>
+        <pre id="errorContent" style="background: #ffe6e6; padding: 10px; border-radius: 5px;"></pre>
+    </div>
+</div>
+
+<style>
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+</style>
+
+<script>
+document.getElementById('smokeForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const env = document.getElementById('env').value;
+    const cdc = document.getElementById('cdc').value;
+    let payload;
+    
+    try {
+        payload = JSON.parse(document.getElementById('payload').value || '{}');
+    } catch (e) {
+        document.getElementById('errorContent').textContent = 'JSON inválido: ' + e.message;
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('result').style.display = 'none';
+        return;
+    }
+    
+    // Agregar CDC al payload
+    payload.cdc = cdc;
+    
+    // Mostrar loading
+    document.getElementById('resultContent').textContent = 'Enviando...';
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('error').style.display = 'none';
+    
+    try {
+        const response = await fetch('/send-de', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ env, payload })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.status_code === 200) {
+            // Formatear respuesta para mostrar campos clave
+            const formatted = {
+                exit_code: result.body.exit_code,
+                meta: {
+                    dId: result.body.meta?.dId,
+                    response_dCodRes: result.body.meta?.response_dCodRes,
+                    response_dMsgRes: result.body.meta?.response_dMsgRes,
+                    connectivity_ok: result.body.meta?.connectivity_ok,
+                    biz_blocker: result.body.meta?.biz_blocker,
+                    meta_path: result.body.meta?.meta_path
+                },
+                full_response: result.body
+            };
+            
+            document.getElementById('resultContent').textContent = JSON.stringify(formatted, null, 2);
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+        } else {
+            document.getElementById('errorContent').textContent = 
+                `Status: ${result.status_code}\n${JSON.stringify(result.body, null, 2)}`;
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+        }
+    } catch (e) {
+        document.getElementById('errorContent').textContent = 'Error de conexión: ' + e.message;
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('result').style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

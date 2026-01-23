@@ -63,6 +63,89 @@
         </div>
     </div>
 
+    <h3>Datos del Cliente</h3>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label for="cliente_ruc">RUC *</label>
+            <input 
+                type="text" 
+                id="cliente_ruc" 
+                name="cliente_ruc" 
+                required 
+                placeholder="80012345-7"
+                title="Formato: 1234567-X o 80012345-7 para RUC"
+                pattern="[0-9]{6,8}-[0-9K]"
+            />
+            <small>Formato: 1234567-X (ej: 80012345-7)</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="cliente_nombre">Nombre/Razón Social *</label>
+            <input 
+                type="text" 
+                id="cliente_nombre" 
+                name="cliente_nombre" 
+                required 
+                placeholder="Juan Pérez o Empresa S.A."
+            />
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label for="cliente_direccion">Dirección</label>
+            <input 
+                type="text" 
+                id="cliente_direccion" 
+                name="cliente_direccion" 
+                placeholder="Av. Principal 123"
+            />
+        </div>
+        
+        <div class="form-group">
+            <label for="cliente_nro_casa">N° Casa/Dpto</label>
+            <input 
+                type="text" 
+                id="cliente_nro_casa" 
+                name="cliente_nro_casa" 
+                placeholder="123"
+            />
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group">
+            <label for="cliente_departamento">Departamento</label>
+            <select id="cliente_departamento" name="cliente_departamento" onchange="updateCiudades()">
+                <option value="1">1 - CAPITAL</option>
+                <option value="2">2 - ALTO PARANÁ</option>
+                <option value="3">3 - CENTRAL</option>
+                <option value="4">4 - CAAGUAZÚ</option>
+                <option value="5">5 - CAAZAPÁ</option>
+                <option value="6">6 - CANINDEYÚ</option>
+                <option value="7">7 - CONCEPCIÓN</option>
+                <option value="8">8 - CORDILLERA</option>
+                <option value="9">9 - GUAIRÁ</option>
+                <option value="10">10 - ITAPÚA</option>
+                <option value="11">11 - MISIONES</option>
+                <option value="12">12 - ÑEEMBUCÚ</option>
+                <option value="13">13 - PARAGUARÍ</option>
+                <option value="14">14 - PRESIDENTE HAYES</option>
+                <option value="15">15 - AMAMBAY</option>
+                <option value="16">16 - ALTO PARAGUAY</option>
+                <option value="17">17 - BOQUERÓN</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="cliente_ciudad">Ciudad</label>
+            <select id="cliente_ciudad" name="cliente_ciudad">
+                <option value="1">1 - Asunción</option>
+            </select>
+        </div>
+    </div>
+
     <h3>Items de la Factura</h3>
     <div id="items-container">
         <div class="item-row" data-item-index="0">
@@ -134,6 +217,45 @@
 
 <script>
 let itemIndex = 1;
+
+// Datos de ciudades por departamento
+const ciudades = {
+    '1': ['1 - Asunción'],
+    '2': ['1 - Ciudad del Este', '2 - Hernandarias', '3 - Minga Guazú', '4 - Presidente Franco'],
+    '3': ['1 - Areguá', '2 - Capiatá', '3 - Fernando de la Mora', '4 - Guarambaré', '5 - Itá', '6 - Lambaré', '7 - Luque', '8 - Mariano Roque Alonso', '9 - Ñemby', '10 - San Antonio', '11 - San Lorenzo', '12 - Villeta', '13 - Ypané'],
+    '4': ['1 - Caaguazú', '2 - Carayaó', '3 - Coronel Oviedo', '4 - General Higinio Morínigo', '5 - Mbuyapey', '6 - Nueva Londres', '7 - Tembiaporá', '8 - Yhú'],
+    '5': ['1 - Caazapá', '2 - Abaí', '3 - Buena Vista', '4 - Doctor Moisés Bertoni', '5 - Fulgencio Yegros', '6 - General Higinio Morínigo', '7 - Guayaibí', '8 - Itanará', '9 - José Félix López', '10 - Maciel', '11 - Moisés Bertoni', '12 - Paso Yobai', '13 - San Juan Nepomuceno', '14 - San Pedro de Ycuamandiyú', '15 - San Roque González de Santacruz', '16 - Yataity', '17 - Ybycuí', '18 - Ybytimí'],
+    '6': ['1 - Salto del Guairá', '2 - Curuguaty', '3 - Hernandarias', '4 - General Francisco Caballero Alvarez', '5 - Itanará', '6 - Mbuyapey', '7 - Nueva Londres', '8 - Paso Yobai', '9 - San Pedro de Ycuamandiyú', '10 - Villa Hayes', '11 - Yby Yaú', '12 - Yhú', '13 - Yataity'],
+    '7': ['1 - Concepción', '2 - Altos', '3 - Arquitecto Tomás Romero Pereira', '4 - Paso Yobai', '5 - San Lazaro', '6 - San Pedro de Ycuamandiyú', '7 - Trinidad', '8 - Yby Yaú', '9 - Horqueta', '10 - Trinidad', '11 - General Resquin', '12 - Yby Yaú'],
+    '8': ['1 - Caacupé', '2 - Arroyos y Esteros', '3 - Atirá', '4 - Carayaó', '5 - Emboscada', '6 - General Elizardo Aquino', '7 - Itacurubí de la Cordillera', '8 - Piribebuy', '9 - San José de los Arroyos', '10 - San Pedro de Ycuamandiyú', '11 - Tobatí', '12 - Valenzuela'],
+    '9': ['1 - Villarrica', '2 - Borja', '3 - Capitán Mauricio José Troche', '4 - Coronel Martínez', '5 - Dr. Bottrell', '6 - Félix Pérez Cardozo', '7 - General Eugenio A. Garay', '8 - Itapé', '9 - Iturbe', '10 - José A. Fassardi', '11 - Mbocayaty del Yhaguy', '12 - Natalio Talavera', '13 - Ngäry', '14 - Paso Yobai', '15 - San Salvador', '16 - Yataity', '17 - Villarrica del Espíritu Santo'],
+    '10': ['1 - Encarnación', '2 - Ayolas', '3 - Bella Vista', '4 - Cambyretá', '5 - Capitán Miranda', '6 - Carlos Antonio López', '7 - Carmen del Paraná', '8 - Coronel Bogado', '9 - Edelira', '10 - Fram', '11 - General Alvear', '12 - General Delgado', '13 - Hohenau', '14 - Jesús', '15 - Mayor Otaño', '16 - Natalio', '17 - Nueva Alborada', '18 - Oberá', '19 - Paso Yobai', '20 - Pirapó', '21 - Pilar', '22 - San Juan del Paraná', '23 - San Ignacio', '24 - San Miguel', '25 - San Pedro del Paraná', '26 - San Rafael del Paraná', '27 - Tomás Romero Pereira', '28 - Trinidad', '29 - Yabebyry', '30 - Yataity', '31 - Yatytay', '32 - Alberdi', '33 - Alto Verá', '34 - Bartolomé de las Casas', '35 - Campo Ramón', '36 - Campo Roa', '37 - Choré', '38 - Curuguaty', '39 - General Elizardo Aquino', '40 - Hohenau', '41 - Itanará', '42 - Los Cedrales', '43 - Mcal. Estigarribia', '44 - Naranjal', '45 - Nueva Londres', '46 - Paloma', '47 - Puerto Casado', '48 - Río Ipané', '49 - San Antonio', '50 - San Cosme y Damián', '51 - San Juan Bautista', '52 - San Lorenzo', '53 - San Pedro de Ycuamandiyú', '54 - Santa Rita', '55 - Santa Rosa del Aguaray', '56 - Santiago', '57 - Tacuatí', '58 - Villa del Rosario', '59 - Villa Hayes', '60 - Yasy Cañy', '61 - Yataity', '62 - Yby Pytá', '63 - Yby Yaú', '64 - Yhú', '65 - Ypane', '66 - Yuquyry'],
+    '11': ['1 - San Estanislao', '2 - Ayolas', '3 - Bella Vista', '4 - Cambyretá', '5 - Capitán Bado', '6 - Capitán Miranda', '7 - Carlos Antonio López', '8 - Carmen del Paraná', '9 - Coronel Bogado', '10 - Dr. Moisés S. Bertoni', '11 - Fram', '12 - General Alvear', '13 - General Delgado', '14 - Hohenau', '15 - Itapúa', '16 - Iturbe', '17 - José Félix López', '18 - Mcal. Estigarribia', '19 - Naranjal', '20 - Natalio', '21 - Paso Yobai', '22 - Pirapó', '23 - San Ignacio', '24 - San Juan Bautista', '25 - San Miguel', '26 - San Pedro de Ycuamandiyú', '27 - San Rafael del Paraná', '28 - Santa Rita', '29 - Santiago', '30 - Tacuatí', '31 - Yabebyry', '32 - Yataity', '33 - Yatytay', '34 - Yby Pytá', '35 - Yby Yaú', '36 - Yhú', '37 - Ypane', '38 - Yuquyry'],
+    '12': ['1 - Pilar', '2 - Alberdi', '3 - Capiatá', '4 - General Elizardo Aquino', '5 - Guarambaré', '6 - Itá', '7 - Lambaré', '8 - Luque', '9 - Mariano Roque Alonso', '10 - Ñemby', '11 - Nueva Italia', '12 - San Antonio', '13 - San Estanislao', '14 - San Lorenzo', '15 - San Pedro de Ycuamandiyú', '16 - Villa Elisa', '17 - Villarrica', '18 - Yaguarón', '19 - Ypané', '20 - Ybycuí'],
+    '13': ['1 - Paraguarí', '2 - Areguá', '3 - Arroyos y Esteros', '4 - Atirá', '5 - Caacupé', '6 - Carayaó', '7 - Coronel Oviedo', '8 - Dr. Bottrell', '9 - Emboscada', '10 - Eusebio Ayala', '11 - Félix Pérez Cardozo', '12 - Fray Luis de Bolaños', '13 - General Higinio Morínigo', '14 - General José Eduvigis Díaz', '15 - Guarambaré', '16 - Itá', '17 - Itapé', '18 - Iturbe', '19 - José Félix López', '20 - Mbuyapey', '21 - Nueva Londres', '22 - Paso Yobai', '23 - Piribebuy', '24 - Quyquyhó', '25 - San Antonio', '26 - San José de los Arroyos', '27 - San Lorenzo', '28 - San Pedro de Ycuamandiyú', '29 - San Roque González de Santacruz', '30 - Sapucái', '31 - Tacuatí', '32 - Yaguarón', '33 - Yataity', '34 - Ybycuí', '35 - Ybytimí', '36 - Ypacaraí', '37 - Ypané', '38 - Pirayú', '39 - Caaguazú', '40 - Carayaó', '41 - Coronel Oviedo', '42 - General Higinio Morínigo', '43 - Mbuyapey', '44 - Nueva Londres', '45 - Paso Yobai', '46 - San Pedro de Ycuamandiyú', '47 - Tembiaporá', '48 - Yhú'],
+    '14': ['1 - Villa Hayes', '2 - Benjamín Aceval', '3 - Doctor Pedro P. Peña', '4 - General Elizardo Aquino', '5 - Nanawa', '6 - Puerto Casado', '7 - Puerto Pinasco', '8 - Teniente Esteban Martínez', '9 - Zanja Pytá'],
+    '15': ['1 - Pedro Juan Caballero', '2 - Bella Vista', '3 - Capitán Bado', '4 - Dr. Moisés S. Bertoni', '5 - General Elizardo Aquino', '6 - Itanará', '7 - Pedro Juan Caballero', '8 - Puerto Casado', '9 - Salto del Guairá', '10 - San Estanislao', '11 - San Pedro de Ycuamandiyú', '12 - Tacuatí', '13 - Yby Yaú', '14 - Yhú', '15 - Zanja Pytá'],
+    '16': ['1 - Fuerte Olimpo', '2 - Bahía Negra', '3 - Capitán Carmelo Peralta', '4 - Fuerte Olimpo', '5 - General Elizardo Aquino', '6 - Puerto Casado', '7 - Puerto Pinasco', '8 - Teniente Esteban Martínez', '9 - Yby Yaú', '10 - Zanja Pytá'],
+    '17': ['1 - Filadelfia', '2 - Boquerón', '3 - Doctor Pedro P. Peña', '4 - General Elizardo Aquino', '5 - Loma Plata', '6 - Mariscal Estigarribia', '7 - Puerto Casado', '8 - Puerto Pinasco', '9 - Teniente Esteban Martínez', '10 - Yby Yaú']
+};
+
+function updateCiudades() {
+    const deptoSelect = document.getElementById('cliente_departamento');
+    const ciudadSelect = document.getElementById('cliente_ciudad');
+    const deptoId = deptoSelect.value;
+    
+    // Limpiar ciudades actuales
+    ciudadSelect.innerHTML = '';
+    
+    // Agregar ciudades del departamento seleccionado
+    const ciudadesList = ciudades[deptoId] || [];
+    ciudadesList.forEach((ciudad, index) => {
+        const option = document.createElement('option');
+        option.value = (index + 1).toString();
+        option.textContent = ciudad;
+        ciudadSelect.appendChild(option);
+    });
+}
 
 function addItem() {
     const container = document.getElementById('items-container');
@@ -242,6 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     calculateTotals();
     updateRemoveButtons();
+    updateCiudades();
 });
 </script>
 {% endblock %}
