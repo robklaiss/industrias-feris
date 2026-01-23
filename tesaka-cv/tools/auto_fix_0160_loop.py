@@ -1001,25 +1001,38 @@ def main() -> int:
         
         # Generate fix summary markdown (PIPELINE_CONTRACT section 8)
         fix_summary_file = artifacts_dir / f"fix_summary_{i}.md"
+        
+        # Include gTotSub order info if available
+        gtotsub_info = ""
+        if hasattr(st, 'gtotsub_order') and st.gtotsub_order:
+            gtotsub_info = f"\n## gTotSub Order:\n{st.gtotsub_order}"
+        
         fix_summary_content = f"""# Fix Summary - Iteration {i}
 
 ## Applied Fixes:
-{chr(10).join(f"- {fx}" for fx in fixes_applied)}
+{chr(10).join(f"- {fx}" for fx in fixes_applied) if fixes_applied else "- No fixes applied"}
 
 ## Files:
 - Input: {current_xml.name}
 - Output: {out_xml.name}
-
+- Artifacts Dir: {artifacts_dir.name}
+{gtotsub_info}
 ## Status:
 - dCodRes: {st.de_cod or 'N/A'}
 - Message: {st.de_msg[:200] + '...' if st.de_msg and len(st.de_msg) > 200 else st.de_msg or 'N/A'}
+
+## Expected vs Found:
+- Expected: Success (dCodRes null/accepted)
+- Found: {st.de_cod or 'null'} {'✅' if not st.de_cod else '❌'}
 """
         try:
             fix_summary_file.write_text(fix_summary_content, encoding="utf-8")
             print(f"📝 Fix summary saved: {fix_summary_file.name}")
         except Exception as e:
             print(f"⚠️  Warning: Could not write fix summary: {e}")
-            continue  # Siguiente iteración
+            # Don't continue - this is important for traceability
+            print("❌ Fix summary generation failed - aborting for traceability")
+            return 1
         else:
             # Fixes existentes por mensaje específico
             try:
