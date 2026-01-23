@@ -31,7 +31,7 @@ def mock_certificate_and_key():
     )
     
     # Crear certificado autofirmado (solo para testing)
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
     
     subject = issuer = x509.Name([
         x509.NameAttribute(x509.NameOID.COUNTRY_NAME, "PY"),
@@ -49,9 +49,9 @@ def mock_certificate_and_key():
     ).serial_number(
         x509.random_serial_number()
     ).not_valid_before(
-        datetime.utcnow()
+        datetime.now(timezone.utc)
     ).not_valid_after(
-        datetime.utcnow() + timedelta(days=365)
+        datetime.now(timezone.utc) + timedelta(days=365)
     ).add_extension(
         x509.SubjectAlternativeName([
             x509.DNSName("test.sifen.py"),
