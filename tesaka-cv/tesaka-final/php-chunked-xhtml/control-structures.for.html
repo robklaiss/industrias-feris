@@ -1,0 +1,245 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>for</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="control-structures.do.while.html" class="navbar__link">« do-while</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="control-structures.foreach.html" class="navbar__link">foreach »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="language.control-structures.html">Control Structures</a></li>
+        <li>for</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="control-structures.for" class="sect1">
+ <h2 class="title">for</h2>
+ <p class="verinfo">(PHP 4, PHP 5, PHP 7, PHP 8)</p>
+ <p class="para">
+  <code class="literal">for</code> loops are the most complex loops in PHP.
+  They behave like their C counterparts.  The syntax of a
+  <code class="literal">for</code> loop is:
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="cdata"><pre>
+for (expr1; expr2; expr3)
+    statement
+</pre></div>
+   </div>
+
+  </div>
+ </p>
+ <p class="simpara">
+  The first expression (<var class="varname">expr1</var>) is
+  evaluated (executed) once unconditionally at the beginning of the
+  loop.
+ </p>
+ <p class="simpara">
+  In the beginning of each iteration,
+  <var class="varname">expr2</var> is evaluated.  If it evaluates to
+  <strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong>, the loop continues and the nested
+  statement(s) are executed.  If it evaluates to
+  <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong>, the execution of the loop ends.
+ </p>
+ <p class="simpara">
+  At the end of each iteration, <var class="varname">expr3</var> is
+  evaluated (executed).
+ </p>
+ <p class="simpara">
+  Each of the expressions can be empty or contain multiple
+  expressions separated by commas. In <var class="varname">expr2</var>, all
+  expressions separated by a comma are evaluated but the result is taken
+  from the last part.
+  <var class="varname">expr2</var> being empty means the loop should
+  be run indefinitely (PHP implicitly considers it as
+  <strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong>, like C).  This may not be as useless as
+  you might think, since often you&#039;d want to end the loop using a
+  conditional <a href="control-structures.break.html" class="link"><code class="literal">break</code></a>
+  statement instead of using the <code class="literal">for</code> truth
+  expression.
+ </p>
+ <p class="para">
+  Consider the following examples.  All of them display the numbers
+  1 through 10:
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/* example 1 */<br /><br /></span><span style="color: #007700">for (</span><span style="color: #0000BB">$i </span><span style="color: #007700">= </span><span style="color: #0000BB">1</span><span style="color: #007700">; </span><span style="color: #0000BB">$i </span><span style="color: #007700">&lt;= </span><span style="color: #0000BB">10</span><span style="color: #007700">; </span><span style="color: #0000BB">$i</span><span style="color: #007700">++) {<br />    echo </span><span style="color: #0000BB">$i</span><span style="color: #007700">;<br />}<br /><br /></span><span style="color: #FF8000">/* example 2 */<br /><br /></span><span style="color: #007700">for (</span><span style="color: #0000BB">$i </span><span style="color: #007700">= </span><span style="color: #0000BB">1</span><span style="color: #007700">; ; </span><span style="color: #0000BB">$i</span><span style="color: #007700">++) {<br />    if (</span><span style="color: #0000BB">$i </span><span style="color: #007700">&gt; </span><span style="color: #0000BB">10</span><span style="color: #007700">) {<br />        break;<br />    }<br />    echo </span><span style="color: #0000BB">$i</span><span style="color: #007700">;<br />}<br /><br /></span><span style="color: #FF8000">/* example 3 */<br /><br /></span><span style="color: #0000BB">$i </span><span style="color: #007700">= </span><span style="color: #0000BB">1</span><span style="color: #007700">;<br />for (; ; ) {<br />    if (</span><span style="color: #0000BB">$i </span><span style="color: #007700">&gt; </span><span style="color: #0000BB">10</span><span style="color: #007700">) {<br />        break;<br />    }<br />    echo </span><span style="color: #0000BB">$i</span><span style="color: #007700">;<br />    </span><span style="color: #0000BB">$i</span><span style="color: #007700">++;<br />}<br /><br /></span><span style="color: #FF8000">/* example 4 */<br /><br /></span><span style="color: #007700">for (</span><span style="color: #0000BB">$i </span><span style="color: #007700">= </span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">$j </span><span style="color: #007700">= </span><span style="color: #0000BB">0</span><span style="color: #007700">; </span><span style="color: #0000BB">$i </span><span style="color: #007700">&lt;= </span><span style="color: #0000BB">10</span><span style="color: #007700">; </span><span style="color: #0000BB">$j </span><span style="color: #007700">+= </span><span style="color: #0000BB">$i</span><span style="color: #007700">, print </span><span style="color: #0000BB">$i</span><span style="color: #007700">, </span><span style="color: #0000BB">$i</span><span style="color: #007700">++);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+ <p class="simpara">
+  Of course, the first example appears to be the nicest one (or
+  perhaps the fourth), but you may find that being able to use empty
+  expressions in <code class="literal">for</code> loops comes in handy in many
+  occasions.
+ </p>
+ <p class="para">
+  PHP also supports the alternate &quot;colon syntax&quot; for
+  <code class="literal">for</code> loops.
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="cdata"><pre>
+for (expr1; expr2; expr3):
+    statement
+    ...
+endfor;
+</pre></div>
+   </div>
+
+  </div>
+ </p>
+ <p class="simpara">
+  It&#039;s a common thing to many users to iterate through arrays like in the
+  example below.
+ </p>
+ <p class="para">
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/*<br /> * This is an array with some data we want to modify<br /> * when running through the for loop.<br /> */<br /></span><span style="color: #0000BB">$people </span><span style="color: #007700">= array(<br />    array(</span><span style="color: #DD0000">'name' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'Kalle'</span><span style="color: #007700">, </span><span style="color: #DD0000">'salt' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">856412</span><span style="color: #007700">),<br />    array(</span><span style="color: #DD0000">'name' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'Pierre'</span><span style="color: #007700">, </span><span style="color: #DD0000">'salt' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">215863</span><span style="color: #007700">)<br />);<br /><br />for(</span><span style="color: #0000BB">$i </span><span style="color: #007700">= </span><span style="color: #0000BB">0</span><span style="color: #007700">; </span><span style="color: #0000BB">$i </span><span style="color: #007700">&lt; </span><span style="color: #0000BB">count</span><span style="color: #007700">(</span><span style="color: #0000BB">$people</span><span style="color: #007700">); ++</span><span style="color: #0000BB">$i</span><span style="color: #007700">) {<br />    </span><span style="color: #0000BB">$people</span><span style="color: #007700">[</span><span style="color: #0000BB">$i</span><span style="color: #007700">][</span><span style="color: #DD0000">'salt'</span><span style="color: #007700">] = </span><span style="color: #0000BB">mt_rand</span><span style="color: #007700">(</span><span style="color: #0000BB">000000</span><span style="color: #007700">, </span><span style="color: #0000BB">999999</span><span style="color: #007700">);<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+ <p class="simpara">
+  The above code can be slow, because the array size is fetched on
+  every iteration. Since the size never changes, the loop be easily
+  optimized by using an intermediate variable to store the size instead
+  of repeatedly calling <span class="function"><a href="function.count.html" class="function">count()</a></span>:
+ </p>
+ <p class="para">
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$people </span><span style="color: #007700">= array(<br />    array(</span><span style="color: #DD0000">'name' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'Kalle'</span><span style="color: #007700">, </span><span style="color: #DD0000">'salt' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">856412</span><span style="color: #007700">),<br />    array(</span><span style="color: #DD0000">'name' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'Pierre'</span><span style="color: #007700">, </span><span style="color: #DD0000">'salt' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">215863</span><span style="color: #007700">)<br />);<br /><br />for(</span><span style="color: #0000BB">$i </span><span style="color: #007700">= </span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">$size </span><span style="color: #007700">= </span><span style="color: #0000BB">count</span><span style="color: #007700">(</span><span style="color: #0000BB">$people</span><span style="color: #007700">); </span><span style="color: #0000BB">$i </span><span style="color: #007700">&lt; </span><span style="color: #0000BB">$size</span><span style="color: #007700">; ++</span><span style="color: #0000BB">$i</span><span style="color: #007700">) {<br />    </span><span style="color: #0000BB">$people</span><span style="color: #007700">[</span><span style="color: #0000BB">$i</span><span style="color: #007700">][</span><span style="color: #DD0000">'salt'</span><span style="color: #007700">] = </span><span style="color: #0000BB">mt_rand</span><span style="color: #007700">(</span><span style="color: #0000BB">000000</span><span style="color: #007700">, </span><span style="color: #0000BB">999999</span><span style="color: #007700">);<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

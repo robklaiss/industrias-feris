@@ -1,0 +1,308 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Predefined Constants</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="mbstring.configuration.html" class="navbar__link">« Runtime Configuration</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="mbstring.encodings.html" class="navbar__link">Summaries of supported encodings »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.mbstring.html">Multibyte String</a></li>
+        <li>Predefined Constants</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="mbstring.constants" class="appendix">
+ <h1 class="title">Predefined Constants</h1>
+
+ <p class="simpara">
+The constants below are defined by this extension, and
+will only be available when the extension has either
+been compiled into PHP or dynamically loaded at runtime.
+</p>
+ <dl>
+  
+   <dt id="constant.mb-overload-mail">
+    <strong><code><a href="mbstring.constants.html#constant.mb-overload-mail">MB_OVERLOAD_MAIL</a></code></strong> 
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Removed as of PHP 8.0.0.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.mb-overload-string">
+    <strong><code><a href="mbstring.constants.html#constant.mb-overload-string">MB_OVERLOAD_STRING</a></code></strong> 
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Removed as of PHP 8.0.0.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.mb-overload-regex">
+    <strong><code><a href="mbstring.constants.html#constant.mb-overload-regex">MB_OVERLOAD_REGEX</a></code></strong> 
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Removed as of PHP 8.0.0.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.mb-case-upper">
+    <strong><code><a href="mbstring.constants.html#constant.mb-case-upper">MB_CASE_UPPER</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Performs a full upper-case folding.
+     This may change the length of the string.
+     This is the mode used by mb_strtoupper().
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.mb-case-lower">
+    <strong><code><a href="mbstring.constants.html#constant.mb-case-lower">MB_CASE_LOWER</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Performs a full lower-case folding.
+     This may change the length of the string.
+     This is the mode used by mb_strtolower().
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.mb-case-title">
+    <strong><code><a href="mbstring.constants.html#constant.mb-case-title">MB_CASE_TITLE</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Performs a full title-case conversion based on the Cased and CaseIgnorable
+     derived Unicode properties.
+     In particular this improves handling of quotes and apostrophes.
+     This may change the length of the string.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.mb-case-fold">
+    <strong><code><a href="mbstring.constants.html#constant.mb-case-fold">MB_CASE_FOLD</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Performs a full case fold conversion which removes case distinctions
+     present in the string.
+     This is used for caseless matching.
+     This may change the length of the string.
+     Available since PHP 7.3.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.mb-case-lower-simple">
+    <strong><code><a href="mbstring.constants.html#constant.mb-case-lower-simple">MB_CASE_LOWER_SIMPLE</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Performs a simple lower-case fold conversion.
+     This does not change the length of the string.
+     Available as of PHP 7.3.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.mb-case-upper-simple">
+    <strong><code><a href="mbstring.constants.html#constant.mb-case-upper-simple">MB_CASE_UPPER_SIMPLE</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Performs simple upper-case fold conversion.
+     This does not change the length of the string.
+     Available as of PHP 7.3.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.mb-case-title-simple">
+    <strong><code><a href="mbstring.constants.html#constant.mb-case-title-simple">MB_CASE_TITLE_SIMPLE</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Performs simple title-case fold conversion.
+     This does not change the length of the string.
+     Available as of PHP 7.3.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.mb-case-fold-simple">
+    <strong><code><a href="mbstring.constants.html#constant.mb-case-fold-simple">MB_CASE_FOLD_SIMPLE</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Performs a simple case fold conversion which removes case distinctions
+     present in the string.
+     This is used for caseless matching.
+     This does not change the length of the string.
+     Used by case-insensitive operations internally by the MBString extension.
+     Available as of PHP 7.3.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.mb-oniguruma-version">
+    <strong><code><a href="mbstring.constants.html#constant.mb-oniguruma-version">MB_ONIGURUMA_VERSION</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     The Oniguruma version, e.g. <code class="literal">6.9.4</code>.
+     Available as of PHP 7.4.
+    </span>
+   </dd>
+  
+ </dl>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

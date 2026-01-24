@@ -4,7 +4,7 @@
 	targetNamespace="http://ekuatia.set.gov.py/sifen/xsd"
 	xmlns:xmime="http://www.w3.org/2005/05/xmlmime">
 
-	<xs:include schemaLocation= "https://ekuatia.set.gov.py/sifen/xsd/siConsultaDTE.xsd"/>
+	<xs:include schemaLocation="siConsultaDTE.xsd"/>
 
 	<xs:element name="rConsDteRequest">
 		<xs:complexType>

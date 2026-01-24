@@ -8,7 +8,7 @@
 
     <xs:import namespace="http://www.w3.org/2000/09/xmldsig#"
                schemaLocation="xmldsig-core-schema.xsd"/>
-    <xs:include schemaLocation="https://ekuatia.set.gov.py/sifen/xsd/Evento_Types_v141.xsd"/>
+    <xs:include schemaLocation="Evento_Types_v141.xsd"/>
     
     <xs:simpleType name="tdTiGDEInut">
         <xs:annotation>

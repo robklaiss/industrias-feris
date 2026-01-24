@@ -4,7 +4,7 @@
         elementFormDefault="qualified"
         xmlns="http://ekuatia.set.gov.py/sifen/xsd"
         targetNamespace="http://ekuatia.set.gov.py/sifen/xsd">
-    <xs:include schemaLocation= "https://ekuatia.set.gov.py/sifen/xsd/DE_v150.xsd"/>
+    <xs:include schemaLocation="DE_v150.xsd"/>
 
     <xs:element name="rDE" type="rDE"/>
 </xs:schema>

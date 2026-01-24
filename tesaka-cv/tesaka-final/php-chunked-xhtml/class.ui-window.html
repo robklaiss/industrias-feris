@@ -1,0 +1,365 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Window</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="ui-size.setwidth.html" class="navbar__link">« UI\Size::setWidth</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="ui-window.add.html" class="navbar__link">UI\Window::add »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.ui.html">UI</a></li>
+        <li>Window</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="class.ui-window" class="reference">
+
+ <h1 class="title">Window</h1>
+ 
+
+ <div class="partintro"><p class="verinfo">(UI 0.9.9)</p>
+
+
+  <div class="section" id="ui-window.intro">
+   <h2 class="title">Introduction</h2>
+   <p class="para">
+    Represents a UI Window
+   </p>
+  </div>
+
+
+  <div class="section" id="ui-window.synopsis">
+   <h2 class="title">Class synopsis</h2>
+
+
+   <div class="classsynopsis">
+    <span class="ooclass"><strong class="classname"></strong></span>
+
+
+    <div class="classsynopsisinfo">
+     <span class="ooclass">
+      <span class="modifier">class</span> <strong class="classname">UI\Window</strong>
+     </span>
+     
+     <span class="ooclass">
+      <span class="modifier">extends</span>
+       <a href="class.ui-control.html" class="classname">UI\Control</a>
+     </span>
+     {</div>
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Properties */</div>
+    <div class="fieldsynopsis">
+     <span class="modifier">protected</span>
+      <var class="varname"><a href="class.ui-window.html#ui-window.props.controls">$<var class="varname">controls</var></a></var>;</div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Constructor */</div>
+    <div class="constructorsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><a href="ui-window.construct.html" class="methodname">__construct</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$title</code></span>, <span class="methodparam"><span class="type">Size</span> <code class="parameter">$size</code></span>, <span class="methodparam"><span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span> <code class="parameter">$menu</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong></span></span>)</div>
+
+    
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Methods */</div>
+    <div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-window.add.html" class="methodname">add</a></span>(<span class="methodparam"><span class="type"><a href="class.ui-control.html" class="type UI\Control">UI\Control</a></span> <code class="parameter">$control</code></span>)</div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-window.error.html" class="methodname">error</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$title</code></span>, <span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$msg</code></span>)</div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-window.getsize.html" class="methodname">getSize</a></span>(): <span class="type"><a href="class.ui-size.html" class="type UI\Size">UI\Size</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-window.gettitle.html" class="methodname">getTitle</a></span>(): <span class="type"><a href="language.types.string.html" class="type string">string</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-window.hasborders.html" class="methodname">hasBorders</a></span>(): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-window.hasmargin.html" class="methodname">hasMargin</a></span>(): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-window.isfullscreen.html" class="methodname">isFullScreen</a></span>(): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-window.msg.html" class="methodname">msg</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$title</code></span>, <span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$msg</code></span>)</div>
+<div class="methodsynopsis dc-description"><span class="modifier">protected</span> <span class="methodname"><a href="ui-window.onclosing.html" class="methodname">onClosing</a></span>(): <span class="type"><a href="language.types.integer.html" class="type int">int</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-window.open.html" class="methodname">open</a></span>(): <span class="type"><a href="language.types.string.html" class="type string">string</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-window.save.html" class="methodname">save</a></span>(): <span class="type"><a href="language.types.string.html" class="type string">string</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-window.setborders.html" class="methodname">setBorders</a></span>(<span class="methodparam"><span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span> <code class="parameter">$borders</code></span>)</div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-window.setfullscreen.html" class="methodname">setFullScreen</a></span>(<span class="methodparam"><span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span> <code class="parameter">$full</code></span>)</div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-window.setmargin.html" class="methodname">setMargin</a></span>(<span class="methodparam"><span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span> <code class="parameter">$margin</code></span>)</div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-window.setsize.html" class="methodname">setSize</a></span>(<span class="methodparam"><span class="type"><a href="class.ui-size.html" class="type UI\Size">UI\Size</a></span> <code class="parameter">$size</code></span>)</div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-window.settitle.html" class="methodname">setTitle</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$title</code></span>)</div>
+
+    
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Inherited methods */</div>
+    <div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-control.destroy.html" class="methodname">UI\Control::destroy</a></span>()</div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-control.disable.html" class="methodname">UI\Control::disable</a></span>()</div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-control.enable.html" class="methodname">UI\Control::enable</a></span>()</div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-control.getparent.html" class="methodname">UI\Control::getParent</a></span>(): <span class="type"><a href="class.ui-control.html" class="type UI\Control">UI\Control</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-control.gettoplevel.html" class="methodname">UI\Control::getTopLevel</a></span>(): <span class="type"><a href="language.types.integer.html" class="type int">int</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-control.hide.html" class="methodname">UI\Control::hide</a></span>()</div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-control.isenabled.html" class="methodname">UI\Control::isEnabled</a></span>(): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-control.isvisible.html" class="methodname">UI\Control::isVisible</a></span>(): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-control.setparent.html" class="methodname">UI\Control::setParent</a></span>(<span class="methodparam"><span class="type"><a href="class.ui-control.html" class="type UI\Control">UI\Control</a></span> <code class="parameter">$parent</code></span>)</div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="ui-control.show.html" class="methodname">UI\Control::show</a></span>()</div>
+
+
+   }</div>
+
+
+  </div>
+
+
+  <div class="section" id="ui-window.props">
+   <h2 class="title">Properties</h2>
+   <dl>
+    
+     <dt id="ui-window.props.controls"><var class="varname">controls</var></dt>
+     <dd>
+      <p class="para">
+       Contains controls, should not be manipulated directly
+      </p>
+     </dd>
+    
+   </dl>
+  </div>
+
+
+ </div>
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="ui-window.add.html">UI\Window::add</a> — Add a Control</li><li><a href="ui-window.construct.html">UI\Window::__construct</a> — Construct a new Window</li><li><a href="ui-window.error.html">UI\Window::error</a> — Show Error Box</li><li><a href="ui-window.getsize.html">UI\Window::getSize</a> — Get Window Size</li><li><a href="ui-window.gettitle.html">UI\Window::getTitle</a> — Get Title</li><li><a href="ui-window.hasborders.html">UI\Window::hasBorders</a> — Border Detection</li><li><a href="ui-window.hasmargin.html">UI\Window::hasMargin</a> — Margin Detection</li><li><a href="ui-window.isfullscreen.html">UI\Window::isFullScreen</a> — Full Screen Detection</li><li><a href="ui-window.msg.html">UI\Window::msg</a> — Show Message Box</li><li><a href="ui-window.onclosing.html">UI\Window::onClosing</a> — Closing Callback</li><li><a href="ui-window.open.html">UI\Window::open</a> — Open Dialog</li><li><a href="ui-window.save.html">UI\Window::save</a> — Save Dialog</li><li><a href="ui-window.setborders.html">UI\Window::setBorders</a> — Border Use</li><li><a href="ui-window.setfullscreen.html">UI\Window::setFullScreen</a> — Full Screen Use</li><li><a href="ui-window.setmargin.html">UI\Window::setMargin</a> — Margin Use</li><li><a href="ui-window.setsize.html">UI\Window::setSize</a> — Set Size</li><li><a href="ui-window.settitle.html">UI\Window::setTitle</a> — Window Title</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

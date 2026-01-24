@@ -1,0 +1,284 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>New Classes, Enums, and Interfaces</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="migration84.new-features.html" class="navbar__link">« New Features</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="migration84.new-functions.html" class="navbar__link">New Functions »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="migration84.html">Migrating from PHP 8.3.x to PHP 8.4.x</a></li>
+        <li>New Classes, Enums, and Interfaces</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="migration84.new-classes" class="sect1">
+ <h2 class="title">New Classes, Enums, and Interfaces</h2>
+
+ <div class="sect2" id="migration84.new-classes.core">
+  <h3 class="title">Core</h3>
+  <ul class="simplelist">
+   <li><span class="classname"><a href="class.deprecated.html" class="classname">Deprecated</a></span></li>
+   <li><span class="classname"><a href="class.requestparsebodyexception.html" class="classname">RequestParseBodyException</a></span></li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration84.new-classes.bcmath">
+  <h3 class="title">BCMath</h3>
+  <ul class="simplelist">
+   <li><span class="classname"><a href="class.bcmath-number.html" class="classname">BcMath\Number</a></span></li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration84.new-classes.dba">
+  <h3 class="title">DBA</h3>
+  <ul class="simplelist">
+   <li><span class="classname"><a href="class.dba-connection.html" class="classname">Dba\Connection</a></span></li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration84.new-classes.dom">
+  <h3 class="title">DOM</h3>
+  <ul class="simplelist">
+   <li><span class="classname"><a href="class.dom-htmldocument.html" class="classname">Dom\HTMLDocument</a></span></li>
+   <li><span class="classname"><a href="class.dom-xmldocument.html" class="classname">Dom\XMLDocument</a></span></li>
+   <li><span class="classname"><a href="class.dom-document.html" class="classname">Dom\Document</a></span></li>
+   <li><span class="classname"><a href="class.dom-parentnode.html" class="classname">Dom\ParentNode</a></span></li>
+   <li><span class="classname"><a href="class.dom-childnode.html" class="classname">Dom\ChildNode</a></span></li>
+   <li><span class="classname"><a href="class.dom-implementation.html" class="classname">Dom\Implementation</a></span></li>
+   <li><span class="classname"><a href="class.dom-node.html" class="classname">Dom\Node</a></span></li>
+   <li><span class="classname"><a href="class.dom-nodelist.html" class="classname">Dom\NodeList</a></span></li>
+   <li><span class="classname"><a href="class.dom-namednodemap.html" class="classname">Dom\NamedNodeMap</a></span></li>
+   <li><span class="classname"><a href="class.dom-dtdnamednodemap.html" class="classname">Dom\DtdNamedNodeMap</a></span></li>
+   <li><span class="classname"><a href="class.dom-htmlcollection.html" class="classname">Dom\HTMLCollection</a></span></li>
+   <li><span class="classname"><a href="enum.dom-adjacentposition.html" class="classname">Dom\AdjacentPosition</a></span></li>
+   <li><span class="classname"><a href="class.dom-element.html" class="classname">Dom\Element</a></span></li>
+   <li><span class="classname"><a href="class.dom-htmlelement.html" class="classname">Dom\HTMLElement</a></span></li>
+   <li><span class="classname"><a href="class.dom-attr.html" class="classname">Dom\Attr</a></span></li>
+   <li><span class="classname"><a href="class.dom-characterdata.html" class="classname">Dom\CharacterData</a></span></li>
+   <li><span class="classname"><a href="class.dom-text.html" class="classname">Dom\Text</a></span></li>
+   <li><span class="classname"><a href="class.dom-cdatasection.html" class="classname">Dom\CDATASection</a></span></li>
+   <li><span class="classname"><a href="class.dom-processinginstruction.html" class="classname">Dom\ProcessingInstruction</a></span></li>
+   <li><span class="classname"><a href="class.dom-comment.html" class="classname">Dom\Comment</a></span></li>
+   <li><span class="classname"><a href="class.dom-documenttype.html" class="classname">Dom\DocumentType</a></span></li>
+   <li><span class="classname"><a href="class.dom-documentfragment.html" class="classname">Dom\DocumentFragment</a></span></li>
+   <li><span class="classname"><a href="class.dom-entity.html" class="classname">Dom\Entity</a></span></li>
+   <li><span class="classname"><a href="class.dom-entityreference.html" class="classname">Dom\EntityReference</a></span></li>
+   <li><span class="classname"><a href="class.dom-notation.html" class="classname">Dom\Notation</a></span></li>
+   <li><span class="classname"><a href="class.dom-tokenlist.html" class="classname">Dom\TokenList</a></span></li>
+   <li><span class="classname"><a href="class.dom-namespaceinfo.html" class="classname">Dom\NamespaceInfo</a></span></li>
+   <li><span class="classname"><a href="class.dom-xpath.html" class="classname">Dom\XPath</a></span></li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration84.new-classes.odbc">
+  <h3 class="title">ODBC</h3>
+  <ul class="simplelist">
+   <li><span class="classname"><strong class="classname">Odbc\Connection</strong></span></li>
+   <li><span class="classname"><strong class="classname">Odbc\Result</strong></span></li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration84.new-classes.pcntl">
+  <h3 class="title">PCNTL</h3>
+  <ul class="simplelist">
+   
+   <li><span class="classname"><a href="enum.pcntl-qosclass.html" class="classname">Pcntl\QosClass</a></span> (macOS only)</li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration84.new-classes.pdo-dblib">
+  <h3 class="title">PDO_DBLIB</h3>
+  <ul class="simplelist">
+   <li><span class="classname"><a href="class.pdo-dblib.html" class="classname">Pdo\DbLib</a></span></li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration84.new-classes.pdo-firebird">
+  <h3 class="title">PDO_FIREBIRD</h3>
+  <ul class="simplelist">
+   <li><span class="classname"><a href="class.pdo-firebird.html" class="classname">Pdo\Firebird</a></span></li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration84.new-classes.pdo-mysql">
+  <h3 class="title">PDO_MYSQL</h3>
+  <ul class="simplelist">
+   <li><span class="classname"><a href="class.pdo-mysql.html" class="classname">Pdo\Mysql</a></span></li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration84.new-classes.pdo-odbc">
+  <h3 class="title">PDO_ODBC</h3>
+  <ul class="simplelist">
+   <li><span class="classname"><a href="class.pdo-odbc.html" class="classname">Pdo\Odbc</a></span></li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration84.new-classes.pdo-pgsql">
+  <h3 class="title">PDO_PGSQL</h3>
+  <ul class="simplelist">
+   <li><span class="classname"><a href="class.pdo-pgsql.html" class="classname">Pdo\Pgsql</a></span></li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration84.new-classes.pdo-sqlite">
+  <h3 class="title">PDO_SQLITE</h3>
+  <ul class="simplelist">
+   <li><span class="classname"><a href="class.pdo-sqlite.html" class="classname">Pdo\Sqlite</a></span></li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration84.new-classes.reflection">
+  <h3 class="title">Reflection</h3>
+  <ul class="simplelist">
+   <li><span class="classname"><a href="class.reflectionconstant.html" class="classname">ReflectionConstant</a></span></li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration84.new-classes.soap">
+  <h3 class="title">SOAP</h3>
+  <ul class="simplelist">
+   <li><span class="classname"><strong class="classname">Soap\Url</strong></span></li>
+   <li><span class="classname"><strong class="classname">Soap\Sdl</strong></span></li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration84.new-classes.standard">
+  <h3 class="title">Standard</h3>
+
+  <ul class="simplelist">
+   
+   <li><span class="classname"><a href="enum.roundingmode.html" class="classname">RoundingMode</a></span></li>
+   <li><span class="classname"><strong class="classname">StreamBucket</strong></span></li>
+  </ul>
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

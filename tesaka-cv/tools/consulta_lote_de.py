@@ -12,6 +12,8 @@ Requiere:
 
 from __future__ import annotations
 
+# SOAP 1.2 action para Consulta Lote (confirmado desde artifacts)
+SIFEN_CONS_LOTE_ACTION = "siConsLoteDE"
 import argparse
 import getpass
 import json
@@ -20,13 +22,29 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, Optional, List, Tuple
 from urllib.parse import urljoin, urlparse
 
 # Agregar el directorio padre al path para imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Helper: asegurar bytes (evita write_bytes(_ensure_bytes(None)))
+def _ensure_bytes(x):
+    if x is None:
+        return b""
+    if isinstance(x, (bytes, bytearray)):
+        return bytes(x)
+    if isinstance(x, str):
+        return x.encode("utf-8", "ignore")
+    return str(x).encode("utf-8", "ignore")
+
+
+# dId requerido por SIFEN (15 dígitos tipo YYYYMMDDHHMMSSmmm)
+def _make_did() -> str:
+    return datetime.now().strftime('%Y%m%d%H%M%S%f')[:15]
 
 try:
     import lxml.etree as etree  # noqa: F401
@@ -52,16 +70,21 @@ except ImportError:
     sys.exit(1)
 
 try:
-    from app.sifen_client.config import get_sifen_config, get_mtls_cert_path_and_password
+    from app.sifen_client.config import (
+        get_sifen_config,
+        get_mtls_config,
+    )
     from app.sifen_client.exceptions import SifenClientError
     from app.sifen_client.pkcs12_utils import p12_to_temp_pem_files, PKCS12Error
 except ImportError as e:
     print(f"❌ Error: No se pudo importar módulos SIFEN: {e}", file=sys.stderr)
     print("   Asegúrate de que las dependencias estén instaladas:", file=sys.stderr)
+    print("   Instale con: pip install -r requirements.txt", file=sys.stderr)
     print("   pip install zeep lxml cryptography requests", file=sys.stderr)
     sys.exit(1)
 
 from requests import Session
+from requests.exceptions import ConnectionError, HTTPError
 from requests.adapters import HTTPAdapter
 try:
     from urllib3.util.retry import Retry
@@ -76,775 +99,96 @@ def resolve_p12_password(args: argparse.Namespace) -> str:
     
     Orden de búsqueda:
     1. Argumento CLI --p12-password (si está presente)
-    2. SIFEN_MTLS_P12_PASSWORD
-    3. SIFEN_CERT_PASSWORD
-    4. SIFEN_SIGN_P12_PASSWORD
-    5. MTLS_P12_PASSWORD (compatibilidad)
-    6. CERT_PASSWORD (compatibilidad)
-    7. Si hay TTY: pedir con getpass
-    8. Si no hay TTY: lanzar error claro
-    
-    Args:
-        args: Argumentos parseados (debe tener atributo p12_password opcional)
-        
-    Returns:
-        Contraseña como string
-        
-    Raises:
-        SystemExit: Si no se encuentra contraseña y no hay TTY
+    2. Variable de entorno SIFEN_CERT_PASSWORD
+    3. Prompt interactivo (solo si no hay nada)
     """
-    # 1) Argumento CLI
-    if hasattr(args, "p12_password") and args.p12_password:
-        pwd = str(args.p12_password).strip()
-        if pwd:
-            return pwd
+    # 1. Argumento CLI
+    if hasattr(args, 'p12_password') and args.p12_password:
+        return args.p12_password
     
-    # 2-6) Variables de entorno en orden de prioridad
-    env_vars = [
-        "SIFEN_MTLS_P12_PASSWORD",
-        "SIFEN_CERT_PASSWORD",
-        "SIFEN_SIGN_P12_PASSWORD",
-        "MTLS_P12_PASSWORD",
-        "CERT_PASSWORD",
-    ]
+    # 2. Variable de entorno
+    env_password = os.getenv('SIFEN_CERT_PASSWORD')
+    if env_password:
+        return env_password
     
-    for env_var in env_vars:
-        pwd = os.getenv(env_var, "").strip()
-        if pwd:
-            return pwd
-    
-    # 7) Si hay TTY, pedir interactivamente
-    if sys.stdin.isatty():
-        try:
-            pwd = getpass.getpass("🔐 Contraseña del certificado P12: ")
-            if pwd and pwd.strip():
-                return pwd.strip()
-        except (EOFError, KeyboardInterrupt):
-            print("\n❌ Operación cancelada.", file=sys.stderr)
-            sys.exit(1)
-    
-    # 8) No hay TTY y no se encontró contraseña
-    _die(
-        "Contraseña requerida: setear SIFEN_MTLS_P12_PASSWORD o SIFEN_CERT_PASSWORD "
-        "(o usar --p12-password en modo interactivo)"
-    )
-
-
-def cleanup_pem_files(cert_path=None, key_path=None):
-    """Limpia archivos PEM temporales (parámetros opcionales)."""
-    for p in (cert_path, key_path):
-        try:
-            if p and os.path.exists(p):
-                os.remove(p)
-        except Exception:
-            pass
-
-
-def _artifact_bytes_from(obj: Any) -> tuple[bytes, str]:
-    """
-    Convierte un objeto a bytes XML para guardar en artifacts.
-    
-    Retorna (payload_bytes, ext) donde ext es ".xml" si es XML real o ".txt" si es fallback.
-    
-    Args:
-        obj: Objeto a convertir (lxml Element/ElementTree, bytes, str, u otro)
-        
-    Returns:
-        Tupla (bytes, extensión)
-    """
-    if obj is None:
-        return (b"", ".txt")
-    
+    # 3. Prompt interactivo
     try:
-        from lxml import etree
-        
-        # lxml ElementTree / Element
-        if isinstance(obj, etree._ElementTree):
-            root = obj.getroot()
-            b = etree.tostring(root, xml_declaration=True, encoding="UTF-8", pretty_print=True)
-            return (b, ".xml")
-        
-        if isinstance(obj, etree._Element):
-            b = etree.tostring(obj, xml_declaration=True, encoding="UTF-8", pretty_print=True)
-            return (b, ".xml")
-        
-        # bytes / str
-        if isinstance(obj, (bytes, bytearray)):
-            bytes_obj = bytes(obj)
-            return (bytes_obj, ".xml" if b"<" in bytes_obj[:50] else ".txt")
-        
-        if isinstance(obj, str):
-            bb = obj.encode("utf-8", errors="replace")
-            return (bb, ".xml" if "<" in obj[:50] else ".txt")
-        
-        # fallback
-        return (repr(obj).encode("utf-8", errors="replace"), ".txt")
-    except Exception:
-        # Si falla cualquier conversión, usar repr como último recurso
-        return (repr(obj).encode("utf-8", errors="replace"), ".txt")
+        return getpass.getpass("Contraseña del certificado P12: ")
+    except (KeyboardInterrupt, EOFError):
+        print("\n❌ Error: Se requiere contraseña del certificado", file=sys.stderr)
+        sys.exit(1)
 
 
-def fetch_wsdl_to_file(wsdl_url: str, session: Session, artifacts_dir: Optional[Path], debug: bool = False) -> Path:
+def _die(msg: str, rc: int = 1) -> None:
+    """Imprime error y sale."""
+    print(f"❌ Error: {msg}", file=sys.stderr)
+    sys.exit(rc)
+
+
+def _artifact_bytes_from(obj: Any) -> Tuple[bytes, str]:
     """
-    Descarga el WSDL a un archivo local, evitando compresión que puede causar body vacío.
-    
-    Args:
-        wsdl_url: URL del WSDL
-        session: requests.Session con mTLS configurado
-        artifacts_dir: Directorio para guardar artifacts (None = usar /tmp)
-        debug: Si True, imprime información de debug
-        
-    Returns:
-        Path al archivo WSDL descargado
-        
-    Raises:
-        RuntimeError: Si el WSDL está vacío o no se puede descargar
+    Convierte un objeto (bytes, str, lxml element) a bytes para guardar en artifact.
+    Retorna (bytes, extension) donde extension es ".xml" o ".txt".
     """
-    # Configurar headers para evitar compresión
-    headers = {
-        "Accept": "text/xml,*/*",
-        "Accept-Encoding": "identity",
-        "User-Agent": "tesaka-cv consulta_lote_de"
-    }
-    
-    # Intentar descargar WSDL
-    try:
-        response = session.get(wsdl_url, headers=headers, timeout=30)
-    except Exception as e:
-        raise RuntimeError(f"Error al descargar WSDL desde {wsdl_url}: {e}") from e
-    
-    content = response.content
-    is_empty = not content or not content.strip()
-    
-    # Si está vacío, intentar URL alternativa
-    if is_empty:
-        alt_url = None
-        if "?wsdl" in wsdl_url:
-            alt_url = wsdl_url.replace("?wsdl", "")
-        else:
-            alt_url = wsdl_url + "?wsdl"
-        
-        if alt_url:
-            try:
-                print(f"⚠️  WSDL vacío desde {wsdl_url}, intentando alternativa: {alt_url}")
-                response = session.get(alt_url, headers=headers, timeout=30)
-                content = response.content
-                is_empty = not content or not content.strip()
-                wsdl_url = alt_url  # Usar la URL alternativa para mensajes de error
-            except Exception as e:
-                pass  # Continuar con el error original
-    
-    # Si sigue vacío, guardar artifacts de debug y fallar
-    if is_empty:
-        if artifacts_dir:
-            artifacts_dir.mkdir(exist_ok=True)
-            # Guardar headers
-            headers_file = artifacts_dir / "wsdl_fail.headers.txt"
-            with headers_file.open("w", encoding="utf-8") as f:
-                f.write(f"URL: {wsdl_url}\n")
-                f.write(f"Status Code: {response.status_code}\n")
-                f.write(f"Content-Length: {len(content)}\n")
-                f.write("\n--- Response Headers ---\n")
-                for key, value in response.headers.items():
-                    f.write(f"{key}: {value}\n")
-            
-            # Guardar body (aunque esté vacío)
-            body_file = artifacts_dir / "wsdl_fail.body.bin"
-            body_file.write_bytes(content)
-            
-            print(f"💾 Artifacts guardados: {headers_file.name}, {body_file.name}")
-        
-        content_encoding = response.headers.get("Content-Encoding", "none")
-        raise RuntimeError(
-            f"WSDL vacío (HTTP={response.status_code}, url={wsdl_url}, "
-            f"content-encoding={content_encoding}, content-length={len(content)})"
-        )
-    
-    # Guardar WSDL en archivo local
-    if artifacts_dir:
-        artifacts_dir.mkdir(exist_ok=True)
-        wsdl_file = artifacts_dir / "consulta-lote.wsdl.xml"
-    else:
-        # Usar archivo temporal
-        fd, temp_path = tempfile.mkstemp(suffix=".wsdl.xml", prefix="consulta_lote_", delete=False)
-        os.close(fd)
-        wsdl_file = Path(temp_path)
-    
-    wsdl_file.write_bytes(content)
-    
-    if debug:
-        print(f"💾 WSDL descargado a: {wsdl_file}")
-    
-    return wsdl_file
-
-
-def mtls_download(url: str, out_path: Path, cert_p12_path: str, cert_password: str, cache_dir: Path, debug: bool) -> None:
-    """
-    Descarga un archivo usando curl con mTLS (certificado P12).
-    
-    Args:
-        url: URL a descargar
-        out_path: Path donde guardar el archivo
-        cert_p12_path: Ruta al certificado P12
-        cert_password: Contraseña del certificado
-        cache_dir: Directorio para guardar logs de error
-        debug: Si True, imprime información de debug
-        
-    Raises:
-        RuntimeError: Si la descarga falla o el contenido está vacío
-    """
-    # Construir comando curl
-    cmd = [
-        "curl",
-        "-sS",  # Silent pero muestra errores
-        "-L",  # Follow redirects
-        "--http1.1",  # Forzar HTTP/1.1
-        "-H", "Accept-Encoding: identity",  # Sin compresión
-        "--cert-type", "P12",
-        "--cert", f"{cert_p12_path}:{cert_password}",
-        url
-    ]
-    
-    if debug:
-        print(f"🔽 Descargando: {url}")
-        print(f"   Comando: curl ... --cert {cert_p12_path}:***")
-    
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            timeout=60,
-            check=False  # No lanzar excepción automáticamente
-        )
-        
-        content = result.stdout
-        
-        # Si está vacío, guardar trace y headers
-        if not content or not content.strip():
-            cache_dir.mkdir(exist_ok=True)
-            headers_file = out_path.with_suffix(".headers.txt")
-            trace_file = out_path.with_suffix(".trace.txt")
-            
-            with headers_file.open("w", encoding="utf-8") as f:
-                f.write(f"URL: {url}\n")
-                f.write(f"Exit Code: {result.returncode}\n")
-                f.write(f"Content Length: {len(content)}\n")
-                if result.stderr:
-                    f.write(f"\n--- stderr ---\n{result.stderr.decode('utf-8', errors='ignore')}\n")
-            
-            with trace_file.open("w", encoding="utf-8") as f:
-                f.write(f"Command: {' '.join(cmd[:6])} ... --cert ***\n")
-                f.write(f"Return Code: {result.returncode}\n")
-                f.write(f"stdout length: {len(content)}\n")
-                if result.stderr:
-                    f.write(f"\nstderr:\n{result.stderr.decode('utf-8', errors='ignore')}\n")
-            
-            print(f"💾 Artifacts guardados: {headers_file.name}, {trace_file.name}")
-            raise RuntimeError(f"WSDL vacío al descargar con mTLS (url={url}, exit_code={result.returncode})")
-        
-        # Guardar contenido
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_bytes(content)
-        
-        if debug:
-            print(f"✅ Descargado: {out_path} ({len(content)} bytes)")
-    
-    except subprocess.TimeoutExpired:
-        raise RuntimeError(f"Timeout al descargar {url} con curl")
-    except Exception as e:
-        raise RuntimeError(f"Error al descargar {url} con curl: {e}") from e
-
-
-def resolve_xsd_imports(wsdl_path: Path, wsdl_url: str, cache_dir: Path, cert_p12_path: str, cert_password: str, debug: bool) -> None:
-    """
-    Resuelve e descarga imports XSD relativos del WSDL.
-    
-    Args:
-        wsdl_path: Path al archivo WSDL local
-        wsdl_url: URL original del WSDL (para construir URLs absolutas)
-        cache_dir: Directorio donde guardar XSDs descargados
-        cert_p12_path: Ruta al certificado P12 para mTLS
-        cert_password: Contraseña del certificado
-        debug: Si True, imprime información de debug
-    """
-    try:
-        wsdl_content = wsdl_path.read_text(encoding="utf-8", errors="ignore")
-    except Exception as e:
-        if debug:
-            print(f"⚠️  No se pudo leer WSDL para resolver imports: {e}")
-        return
-    
-    # Buscar schemaLocation en imports e includes
-    # Patrones: schemaLocation="...", schemaLocation='...', xsd:schemaLocation="..."
-    pattern = r'(?:xsd:)?schemaLocation\s*=\s*["\']([^"\']+)["\']'
-    matches = re.findall(pattern, wsdl_content, re.IGNORECASE)
-    
-    if not matches:
-        if debug:
-            print("ℹ️  No se encontraron imports XSD en el WSDL")
-        return
-    
-    # Base URL para imports relativos
-    base_url = wsdl_url.rsplit("/", 1)[0] + "/"
-    
-    for schema_location in matches:
-        # Si es URL absoluta, saltarla (ya está en internet)
-        if schema_location.startswith(("http://", "https://")):
-            if debug:
-                print(f"⏭️  Saltando import absoluto: {schema_location}")
-            continue
-        
-        # Construir URL completa
-        full_url = urljoin(base_url, schema_location)
-        
-        # Nombre del archivo destino (basename del schemaLocation)
-        xsd_filename = os.path.basename(schema_location)
-        if not xsd_filename:
-            xsd_filename = "imported.xsd"
-        
-        # Agregar prefijo para evitar colisiones
-        target_path = cache_dir / f"consulta-lote.wsdl.{xsd_filename}"
-        
-        # Si ya existe y no está vacío, saltarlo
-        if target_path.exists() and target_path.stat().st_size > 0:
-            if debug:
-                print(f"✅ XSD ya existe en cache: {target_path.name}")
-            continue
-        
-        # Descargar XSD
-        try:
-            if debug:
-                print(f"📥 Descargando XSD: {schema_location} -> {target_path.name}")
-            mtls_download(full_url, target_path, cert_p12_path, cert_password, cache_dir, debug)
-        except Exception as e:
-            if debug:
-                print(f"⚠️  No se pudo descargar XSD {schema_location}: {e}")
-            # Continuar con otros imports aunque uno falle
-
-
-def load_wsdl_source(wsdl_url: str, cache_dir: Path, wsdl_file: Optional[Path], cert_p12_path: str, cert_password: str, debug: bool) -> Path:
-    """
-    Resuelve el origen del WSDL: archivo provisto, cache, o descarga remota.
-    
-    Args:
-        wsdl_url: URL del WSDL (para descarga si es necesario)
-        cache_dir: Directorio de cache
-        wsdl_file: Archivo WSDL provisto por usuario (opcional)
-        cert_p12_path: Ruta al certificado P12 para mTLS
-        cert_password: Contraseña del certificado
-        debug: Si True, imprime información de debug
-        
-    Returns:
-        Path al archivo WSDL local
-        
-    Raises:
-        RuntimeError: Si el archivo no existe o está vacío
-    """
-    # Caso 1: Archivo provisto explícitamente
-    if wsdl_file:
-        wsdl_path = Path(wsdl_file)
-        if not wsdl_path.exists():
-            raise RuntimeError(f"Archivo WSDL no encontrado: {wsdl_path}")
-        if wsdl_path.stat().st_size == 0:
-            raise RuntimeError(f"Archivo WSDL está vacío: {wsdl_path}")
-        if debug:
-            print(f"📂 Usando WSDL provisto: {wsdl_path}")
-        return wsdl_path
-    
-    # Caso 2: Verificar cache
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    cached = cache_dir / "consulta-lote.wsdl.xml"
-    
-    if cached.exists() and cached.stat().st_size > 0:
-        if debug:
-            print(f"💾 Usando WSDL en cache: {cached}")
-        return cached
-    
-    # Caso 3: Descargar desde remoto
-    if debug:
-        print(f"🌐 Descargando WSDL desde: {wsdl_url}")
-    
-    try:
-        mtls_download(wsdl_url, cached, cert_p12_path, cert_password, cache_dir, debug)
-    except Exception as e:
-        raise RuntimeError(f"Error al descargar WSDL: {e}") from e
-    
-    # Resolver imports XSD relativos
-    resolve_xsd_imports(cached, wsdl_url, cache_dir, cert_p12_path, cert_password, debug)
-    
-    return cached
-
-
-def _die(msg: str, code: int = 2) -> None:
-    """Imprime mensaje de error y termina el programa."""
-    print(f"❌ {msg}", file=sys.stderr)
-    raise SystemExit(code)
-
-
-def force_env_from_args(env: str) -> None:
-    """
-    Fuerza el ambiente desde los argumentos CLI.
-    
-    Esta función asegura que si el usuario pasa --env, este siempre mande
-    sobre cualquier SIFEN_ENV heredado del shell. Esto previene la regresión
-    donde SIFEN_ENV=prod + --env test => error 0160.
-    
-    Args:
-        env: Ambiente desde args.env ('test' o 'prod')
-    """
-    if env:
-        os.environ["SIFEN_ENV"] = str(env)
-
-
-def get_cdcs_for_lote(dprot_cons_lote: str, artifacts_dir: Path, debug: bool = False) -> List[str]:
-    """
-    Obtiene los CDCs (Códigos de Control) de un lote desde múltiples fuentes.
-    
-    Prioridad:
-    1. Base de datos (si existe tabla de lotes/documentos)
-    2. JSON guardado en artifacts/ (consulta_lote_*.json o lote_enviado_*.json)
-    3. Si no hay nada, retorna lista vacía
-    
-    Args:
-        dprot_cons_lote: dProtConsLote (número de lote)
-        artifacts_dir: Directorio de artifacts
-        debug: Si True, imprime información de debug
-        
-    Returns:
-        Lista de CDCs (strings)
-    """
-    cdcs = []
-    
-    # 1. Intentar desde base de datos (si existe)
-    try:
-        # Buscar módulo de base de datos
-        sys.path.insert(0, str(Path(__file__).parent.parent))
-        try:
-            from web import db
-            if hasattr(db, 'get_cdcs_for_lote'):
-                cdcs = db.get_cdcs_for_lote(dprot_cons_lote)
-                if cdcs and debug:
-                    print(f"📊 CDCs obtenidos desde BD: {len(cdcs)}")
-                if cdcs:
-                    return cdcs
-        except (ImportError, AttributeError):
-            pass  # No hay BD o no tiene el método
-    except Exception as e:
-        if debug:
-            print(f"⚠️  Error al buscar CDCs en BD: {e}")
-    
-    # 2. Intentar desde JSON en artifacts
-    artifacts_dir.mkdir(exist_ok=True)
-    
-    # Buscar archivos JSON relacionados con el lote
-    json_patterns = [
-        f"consulta_lote_*.json",
-        f"lote_enviado_*.json",
-        f"*lote*{dprot_cons_lote}*.json",
-    ]
-    
-    for pattern in json_patterns:
-        json_files = list(artifacts_dir.glob(pattern))
-        # Ordenar por mtime (más reciente primero)
-        json_files.sort(key=lambda p: p.stat().st_mtime, reverse=True)
-        
-        for json_file in json_files[:5]:  # Revisar solo los 5 más recientes
-            try:
-                data = json.loads(json_file.read_text(encoding="utf-8"))
-                
-                # Buscar CDCs en diferentes estructuras posibles
-                # Estructura 1: gResProcLote con id
-                if "gResProcLote" in data:
-                    g_res = data["gResProcLote"]
-                    if isinstance(g_res, list):
-                        for item in g_res:
-                            if isinstance(item, dict):
-                                cdc = item.get("id") or item.get("dId") or item.get("Id") or item.get("cdc") or item.get("CDC")
-                                if cdc and cdc not in cdcs:
-                                    cdcs.append(str(cdc))
-                
-                # Estructura 2: response_dict con gResProcLote
-                if "response_dict" in data:
-                    resp_dict = data["response_dict"]
-                    if isinstance(resp_dict, dict) and "gResProcLote" in resp_dict:
-                        g_res = resp_dict["gResProcLote"]
-                        if isinstance(g_res, list):
-                            for item in g_res:
-                                if isinstance(item, dict):
-                                    cdc = item.get("id") or item.get("dId") or item.get("Id") or item.get("cdc") or item.get("CDC")
-                                    if cdc and cdc not in cdcs:
-                                        cdcs.append(str(cdc))
-                
-                # Estructura 3: cdcs directo en el JSON
-                if "cdcs" in data:
-                    cdcs_list = data["cdcs"]
-                    if isinstance(cdcs_list, list):
-                        for cdc in cdcs_list:
-                            if cdc and str(cdc) not in cdcs:
-                                cdcs.append(str(cdc))
-                
-                # Estructura 4: documentos con Id
-                if "documentos" in data:
-                    docs = data["documentos"]
-                    if isinstance(docs, list):
-                        for doc in docs:
-                            if isinstance(doc, dict):
-                                cdc = doc.get("id") or doc.get("dId") or doc.get("Id") or doc.get("cdc") or doc.get("CDC")
-                                if cdc and cdc not in cdcs:
-                                    cdcs.append(str(cdc))
-                
-                if cdcs and debug:
-                    print(f"📄 CDCs obtenidos desde {json_file.name}: {len(cdcs)}")
-                    break
-                    
-            except Exception as e:
-                if debug:
-                    print(f"⚠️  Error al leer {json_file.name}: {e}")
-                continue
-        
-        if cdcs:
-            break
-    
-    return cdcs
-
-
-def resolve_wsdl(env: str, wsdl_arg: Optional[str]) -> str:
-    """
-    Resuelve la URL del WSDL para consulta_lote según prioridad.
-    
-    Prioridad:
-    1. wsdl_arg (si viene por CLI)
-    2. SIFEN_WSDL_CONSULTA_LOTE (env var)
-    3. Default según ambiente
-    
-    Args:
-        env: Ambiente ('test' o 'prod')
-        wsdl_arg: URL WSDL desde CLI (opcional)
-        
-    Returns:
-        URL del WSDL
-    """
-    # Prioridad 1: CLI argument
-    if wsdl_arg:
-        return wsdl_arg.strip()
-    
-    # Prioridad 2: Env var
-    env_wsdl = os.getenv("SIFEN_WSDL_CONSULTA_LOTE")
-    if env_wsdl:
-        return env_wsdl.strip()
-    
-    # Prioridad 3: Default según ambiente
-    if env == "test":
-        return "https://sifen-test.set.gov.py/de/ws/consultas/consulta-lote.wsdl?wsdl"
-    else:
-        return "https://sifen.set.gov.py/de/ws/consultas/consulta-lote.wsdl?wsdl"
-
-
-class LoggingTransport(Transport):
-    """
-    Transport personalizado que imprime respuestas HTTP crudas antes de que zeep las parsee.
-    """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-    
-    def post(self, address, message, headers):
-        """
-        Sobrescribe el método post para imprimir la respuesta HTTP cruda.
-        """
-        try:
-            # Obtener información de la sesión antes del POST
-            session = self.session if hasattr(self, 'session') else None
-            timeout = getattr(self, 'timeout', 'N/A')
-            
-            # Determinar env desde la URL
-            env = 'test' if 'sifen-test' in address.lower() else ('prod' if 'sifen.set.gov.py' in address.lower() else 'unknown')
-            
-            # Verificar si se está usando certificado cliente
-            has_cert = False
-            if session and hasattr(session, 'cert'):
-                cert = session.cert
-                if cert:
-                    has_cert = True
-            
-            # Verificar verify
-            verify = getattr(session, 'verify', 'N/A') if session else 'N/A'
-            
-            # Imprimir información antes del POST
-            print(f"[SIFEN DEBUG] PRE-POST: url={address} env={env} timeout={timeout} verify={verify} cert={'YES' if has_cert else 'NO'}")
-            
-            response = super().post(address, message, headers)
-            
-            # Imprimir respuesta HTTP cruda para diagnóstico
-            if hasattr(response, 'status_code') and hasattr(response, 'headers') and hasattr(response, 'content'):
-                status_code = response.status_code
-                content_type = response.headers.get('Content-Type', 'N/A')
-                content_length = response.headers.get('Content-Length', 'N/A')
-                
-                # Obtener preview del body (primeros 200 caracteres)
-                try:
-                    if response.content:
-                        # Intentar decodificar como texto
-                        try:
-                            body_preview = response.text[:200]
-                        except (UnicodeDecodeError, AttributeError):
-                            # Si no se puede decodificar, mostrar como bytes
-                            body_preview = str(response.content[:200])
-                    else:
-                        body_preview = "<EMPTY>"
-                except Exception as e:
-                    body_preview = f"<ERROR al leer body: {e}>"
-                
-                # URL final (puede ser diferente a address si hubo redirect)
-                final_url = getattr(response, 'url', address)
-                
-                # Imprimir información después del POST
-                print(f"[SIFEN DEBUG] POST-RESPONSE: url={final_url} status={status_code} "
-                      f"ct={content_type} len={content_length} body_preview={body_preview}")
-            
-            return response
-        except Exception as e:
-            # Si falla, intentar obtener información de la respuesta si está disponible
-            error_type = type(e).__name__
-            error_msg = str(e)
-            
-            if hasattr(e, 'response') and e.response is not None:
-                resp = e.response
-                status_code = getattr(resp, 'status_code', 'N/A')
-                content_type = resp.headers.get('Content-Type', 'N/A') if hasattr(resp, 'headers') else 'N/A'
-                content_length = resp.headers.get('Content-Length', 'N/A') if hasattr(resp, 'headers') else 'N/A'
-                
-                try:
-                    if resp.content:
-                        try:
-                            body_preview = resp.text[:200]
-                        except (UnicodeDecodeError, AttributeError):
-                            body_preview = str(resp.content[:200])
-                    else:
-                        body_preview = "<EMPTY>"
-                except Exception:
-                    body_preview = "<ERROR al leer body>"
-                
-                final_url = getattr(resp, 'url', address)
-                
-                print(f"[SIFEN DEBUG] POST-ERROR (con response): url={final_url} status={status_code} "
-                      f"ct={content_type} len={content_length} body_preview={body_preview} "
-                      f"error_type={error_type} error_msg={error_msg[:100]}")
-            else:
-                # Error sin response (ej: timeout, conexión)
-                print(f"[SIFEN DEBUG] POST-ERROR (sin response): url={address} "
-                      f"error_type={error_type} error_msg={error_msg[:200]}")
-            
-            raise
-
-
-def _http_consulta_lote_manual(
-    endpoint_url: str,
-    cert_path: str,
-    cert_password: str,
-    prot: str,
-    env: str
-) -> str:
-    """
-    Hace un POST manual al endpoint SOAP real (NO al ?wsdl) para diagnóstico.
-    
-    Args:
-        endpoint_url: URL del endpoint SOAP real (sin ?wsdl)
-        cert_path: Ruta al certificado P12
-        cert_password: Contraseña del certificado
-        prot: dProtConsLote (número de lote)
-        env: Ambiente ('test' o 'prod')
-        
-    Returns:
-        XML de respuesta como string
-        
-    Raises:
-        RuntimeError: Si la respuesta no es XML válido o está vacía
-    """
-    from app.sifen_client.pkcs12_utils import p12_to_temp_pem_files
-    
-    # Convertir P12 a PEM temporales
-    cert_pem_path, key_pem_path = p12_to_temp_pem_files(cert_path, cert_password)
-    
-    # Crear sesión con mTLS (sin Connection: close para mantener Keep-Alive)
-    session = Session()
-    session.cert = (cert_pem_path, key_pem_path)
-    session.verify = True
-    # NO setear "Connection: close" - dejar Keep-Alive
-    
-    # Construir SOAP envelope manualmente
-    # Namespace según Manual Técnico SIFEN V150
-    sifen_ns = "http://ekuatia.set.gov.py/sifen/xsd"
-    
-    soap_body = f"""<?xml version="1.0" encoding="UTF-8"?>
-<soap12:Envelope xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
-    <soap12:Body>
-        <rEnviConsLoteDe xmlns="{sifen_ns}">
-            <dId>1</dId>
-            <dProtConsLote>{prot}</dProtConsLote>
-        </rEnviConsLoteDe>
-    </soap12:Body>
-</soap12:Envelope>"""
-    
-    # Headers para SOAP 1.2
-    # SOAP 1.2 usa Content-Type: application/soap+xml; charset=utf-8 (no text/xml)
-    # NO setear "Connection: close" - dejar Keep-Alive
-    headers = {
-        "Content-Type": "application/soap+xml; charset=utf-8"
-    }
-    
-    timeout = (10, 30)
-    
-    print(f"[SIFEN HTTP] post_url={endpoint_url}")
-    print(f"[SIFEN HTTP] cert={'YES' if session.cert else 'NO'} verify={session.verify} timeout={timeout}")
-    
-    try:
-        # Hacer POST manual
-        response = session.post(
-            endpoint_url,
-            data=soap_body.encode('utf-8'),
-            headers=headers,
-            timeout=timeout
-        )
-        
-        # Loguear respuesta
-        status_code = response.status_code
-        content_type = response.headers.get('Content-Type', 'N/A')
-        content_length = response.headers.get('Content-Length', 'N/A')
-        
-        # Obtener preview del body
-        try:
-            if response.content:
-                try:
-                    body_preview = response.text[:300]
-                except (UnicodeDecodeError, AttributeError):
-                    body_preview = str(response.content[:300])
-            else:
-                body_preview = "<EMPTY>"
-        except Exception as e:
-            body_preview = f"<ERROR al leer body: {e}>"
-        
-        print(f"[SIFEN HTTP] status={status_code} ct={content_type} len={content_length} body_preview={body_preview}")
-        
-        # Validar que la respuesta es XML válido
-        if not response.content:
-            raise RuntimeError(f"Respuesta vacía del servidor (status={status_code})")
-        
+    if isinstance(obj, bytes):
+        return obj, ".xml"
+    if isinstance(obj, str):
         # Intentar parsear como XML para validar
         try:
             import xml.etree.ElementTree as ET
-            ET.fromstring(response.content)
-        except ET.ParseError as e:
-            raise RuntimeError(f"Respuesta no es XML válido (status={status_code}): {str(e)[:200]}")
-        
-        # Retornar respuesta como texto
-        return response.text
-        
-    except Exception as e:
-        print(f"[SIFEN HTTP] EXC {type(e).__name__}: {str(e)[:200]}")
-        raise
+            ET.fromstring(obj)
+            return obj.encode("utf-8"), ".xml"
+        except ET.ParseError:
+            # No es XML válido, guardar como texto
+            return repr(obj).encode("utf-8"), ".txt"
+    # Objeto XML (lxml)
+    if hasattr(obj, 'tag'):
+        try:
+            xml_bytes = etree.tostring(obj, encoding="utf-8", pretty_print=True)
+            return xml_bytes, ".xml"
+        except Exception:
+            # Fallback a repr
+            return repr(obj).encode("utf-8"), ".txt"
+    # Cualquier otro objeto
+    return repr(obj).encode("utf-8"), ".txt"
 
 
-def create_zeep_transport(cert_path: str, cert_password: str) -> Transport:
+def cleanup_pem_files(*paths: Optional[str]) -> None:
+    """Elimina archivos PEM temporales si existen."""
+    for p in paths:
+        if p and os.path.exists(p):
+            try:
+                os.unlink(p)
+            except Exception:
+                pass
+
+
+def _resolve_mtls(cert_path: Optional[str] = None, key_or_password: Optional[str] = None, is_pem_mode: Optional[bool] = None):
+    """Centraliza resolución de certificados para PEM o P12.
+
+    Si se pasan valores explícitos (como resultado de get_mtls_config) los usa,
+    en caso contrario invoca get_mtls_config() internamente.
+    Devuelve tuple (cert_tuple, temp_files, resolved_mode) donde:
+      - cert_tuple: (cert, key) listo para session.cert
+      - temp_files: (cert, key) temporales si se generaron (para cleanup)
+      - resolved_mode: 'PEM' o 'P12'
+    """
+
+    if cert_path is None or key_or_password is None or is_pem_mode is None:
+        cert_path, key_or_password, is_pem_mode = get_mtls_config()
+
+    temp_files: Optional[Tuple[str, str]] = None
+
+    if is_pem_mode:
+        cert_tuple = (cert_path, key_or_password)
+        return cert_tuple, temp_files, "PEM"
+
+    cert_pem_path, key_pem_path = p12_to_temp_pem_files(cert_path, str(key_or_password))
+    temp_files = (cert_pem_path, key_pem_path)
+    return (cert_pem_path, key_pem_path), temp_files, "P12"
+
+
+def create_zeep_transport(cert_path: str, cert_password: Optional[str], *, is_pem_mode: bool = False) -> Transport:
     """
     Crea un Transport de zeep con mTLS configurado.
     
@@ -857,16 +201,22 @@ def create_zeep_transport(cert_path: str, cert_password: str) -> Transport:
     """
     session = Session()
     
-    # Convertir P12 a PEM temporales
     try:
-        cert_pem_path, key_pem_path = p12_to_temp_pem_files(cert_path, cert_password)
-        
-        # Debug: verificar que los archivos PEM existen
-        import os
-        print(f"[SIFEN DEBUG] create_zeep_transport: cert_pem={os.path.basename(cert_pem_path)} exists={os.path.exists(cert_pem_path)}")
-        print(f"[SIFEN DEBUG] create_zeep_transport: key_pem={os.path.basename(key_pem_path)} exists={os.path.exists(key_pem_path)}")
-        
-        session.cert = (cert_pem_path, key_pem_path)
+        cert_tuple, temp_files, mode = _resolve_mtls(
+            cert_path=cert_path,
+            key_or_password=cert_password,
+            is_pem_mode=is_pem_mode,
+        )
+        if temp_files:
+            cert_pem_path, key_pem_path = temp_files
+            import os
+            print(
+                f"[SIFEN DEBUG] create_zeep_transport: cert_pem={os.path.basename(cert_pem_path)} exists={os.path.exists(cert_pem_path)}"
+            )
+            print(
+                f"[SIFEN DEBUG] create_zeep_transport: key_pem={os.path.basename(key_pem_path)} exists={os.path.exists(key_pem_path)}"
+            )
+        session.cert = cert_tuple
     except PKCS12Error as e:
         raise SifenClientError(f"Error al convertir certificado P12 a PEM: {e}") from e
     
@@ -898,7 +248,7 @@ def create_zeep_transport(cert_path: str, cert_password: str) -> Transport:
     # Crear cache para WSDL/XSD
     cache = InMemoryCache()
     
-    return LoggingTransport(
+    return Transport(
         session=session,
         timeout=timeout,  # connect 10s, read 30s
         operation_timeout=30,
@@ -906,950 +256,337 @@ def create_zeep_transport(cert_path: str, cert_password: str) -> Transport:
     )
 
 
-def call_consulta_lote_raw(
-    session: Any,
-    env: str,
+def call_consulta_lote_http(
     prot: str,
-    timeout: int = 30,
+    env: str,
+    artifacts_dir: Path,
+    cert_tuple: Tuple[str, str],
+    timeout: Tuple[int, int] = (10, 60),
     did: Optional[str] = None,
-    artifacts_dir: Optional[Path] = None,
-) -> str:
+) -> Dict[str, Any]:
     """
-    Consulta el estado de un lote usando request directo estilo "try08" (sin Zeep).
-    
-    Esta función es usada por lote_checker.py y otros módulos internos.
+    Función principal HTTP manual para consultar lote (golden path).
     
     Args:
-        session: requests.Session con mTLS configurado (puede ser None, se creará uno nuevo)
-        env: Ambiente ('test' o 'prod')
         prot: dProtConsLote (número de lote)
-        timeout: Timeout en segundos
+        env: Ambiente ('test' o 'prod')
+        artifacts_dir: Directorio donde guardar artifacts
+        cert_tuple: Tuple de certificados (cert_path, key_path)
+        timeout: Timeout en segundos (connect, read)
+        did: dId opcional (se genera si no se provee)
         
     Returns:
-        XML de respuesta como string
+        Dict con resultado de la consulta
     """
-    import datetime as _dt
-    import os
-    import random
-    import requests
-    from app.sifen_client.config import get_mtls_config, get_sifen_config
-    from app.sifen_client.pkcs12_utils import p12_to_temp_pem_files
+    import xml.etree.ElementTree as ET
     
-    # Validación mínima (dProtConsLote debe ser numérico)
+    # Validar prot
     prot = str(prot or "").strip()
     if not prot.isdigit():
         raise ValueError(f"dProtConsLote debe ser solo dígitos. Valor recibido: '{prot}'")
-
-    # dId recomendado: 15 dígitos (YYYYMMDDHHMMSS + 1 dígito random)
-    did = str(did or "").strip()
-    if not re.fullmatch(r"\d{15}", did):
-        base = _dt.datetime.now().strftime("%Y%m%d%H%M%S")  # 14 dígitos
-        did = base + str(random.randint(0, 9))
-
-    # Resolver artifacts_dir (si no se pasa, usar tesaka-cv/artifacts)
-    if artifacts_dir is None:
-        artifacts_dir = Path(__file__).resolve().parents[1] / "artifacts"
-    artifacts_dir.mkdir(parents=True, exist_ok=True)
-
-    # Obtener configuración y certificado mTLS
-    config = get_sifen_config(env=env)
-    cert_path, key_or_password, is_pem_mode = get_mtls_config()
-    if not cert_path:
-        cert_path = config.cert_path
-    if not key_or_password and not is_pem_mode:
-        key_or_password = config.cert_password
-    if not cert_path or (not is_pem_mode and not key_or_password):
-        raise SifenClientError("Falta certificado mTLS para consulta lote (PEM o P12)")
     
-    # Convertir P12 a PEM temporales (si aplica)
-    cert_pem_path: Optional[str] = None
-    key_pem_path: Optional[str] = None
-    cert_tuple: Optional[tuple[str, str]] = None
-    if is_pem_mode:
-        cert_tuple = (cert_path, str(key_or_password))
+    # Generar did si no se provee
+    if not did:
+        did = _make_did()
+    
+    # Endpoint correcto (con .wsdl según funciona)
+    if env == "prod":
+        endpoint_url = "https://sifen.set.gov.py/de/ws/consultas/consulta-lote.wsdl"
     else:
-        try:
-            cert_pem_path, key_pem_path = p12_to_temp_pem_files(cert_path, str(key_or_password))
-            cert_tuple = (cert_pem_path, key_pem_path)
-            print(
-                f"[SIFEN DEBUG] call_consulta_lote_raw: cert_pem={os.path.basename(cert_pem_path)} "
-                f"key_pem={os.path.basename(key_pem_path)}"
-            )
-        except Exception as e:
-            raise SifenClientError(f"Error al convertir certificado P12 a PEM: {e}") from e
+        endpoint_url = "https://sifen-test.set.gov.py/de/ws/consultas/consulta-lote.wsdl"
+    
+    # Namespace SIFEN
+    sifen_ns = "http://ekuatia.set.gov.py/sifen/xsd"
+    
+    # Construir SOAP 1.2 envelope
+    soap_body = f'''<?xml version="1.0" encoding="UTF-8"?>
+<soap12:Envelope xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
+    <soap12:Body>
+        <rEnviConsLoteDe xmlns="{sifen_ns}">
+            <dId>{did}</dId>
+            <dProtConsLote>{prot}</dProtConsLote>
+        </rEnviConsLoteDe>
+    </soap12:Body>
+</soap12:Envelope>'''
+    
+    # Headers SOAP 1.2
+    headers = {
+        "Content-Type": f'application/soap+xml; charset=utf-8; action="{SIFEN_CONS_LOTE_ACTION}"',
+        "Accept": "application/soap+xml, text/xml, */*",
+        "Connection": "close",
+    }
+    
+    # Timestamp para artifacts
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    # Paths para artifacts
+    req_path = artifacts_dir / f"consulta_lote_sent_{ts}.xml"
+    resp_path = artifacts_dir / f"consulta_lote_response_{ts}.xml"
+    meta_path = artifacts_dir / f"consulta_lote_headers_sent_{ts}.json"
+    raw_path = artifacts_dir / f"consulta_lote_headers_sent_{ts}.raw_response.xml"
+    
+    # Guardar request SIEMPRE
+    try:
+        req_path.write_bytes(_ensure_bytes(soap_body))
+        meta_path.write_text(
+            json.dumps(
+                {
+                    "timestamp": datetime.now().isoformat(),
+                    "env": env,
+                    "endpoint": endpoint_url,
+                    "timeout": timeout,
+                    "sent_headers": headers,
+                    "dId": did,
+                    "dProtConsLote": prot,
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+    except Exception as e:
+        print(f"⚠️  Error guardando artifacts de request: {e}")
+    
+    # Crear sesión y hacer request
+    session = Session()
+    session.cert = cert_tuple
+    session.verify = True
+    
+    result = {
+        "ok": False,
+        "dProtConsLote": prot,
+        "http_status": None,
+        "endpoint": endpoint_url,
+        "sent_headers": headers,
+        "raw_xml": None,
+        "error_type": None,
+        "error_message": None,
+    }
     
     try:
-        # Endpoint (NO ?wsdl)
-        if env == "prod":
-            endpoint = "https://sifen.set.gov.py/de/ws/consultas/consulta-lote.wsdl"
-        else:
-            endpoint = "https://sifen-test.set.gov.py/de/ws/consultas/consulta-lote.wsdl"
+        print(f"[SIFEN HTTP] Enviando consulta a {endpoint_url}")
+        print(f"[SIFEN HTTP] dProtConsLote={prot} dId={did}")
         
-        print(f"[SIFEN DEBUG] call_consulta_lote_raw: endpoint={endpoint} env={env} prot={prot}")
+        response = session.post(
+            endpoint_url,
+            data=soap_body.encode('utf-8'),
+            headers=headers,
+            timeout=timeout
+        )
         
-        # SOAP 1.2 (WSDL-driven): Body contiene rEnviConsLoteDe DIRECTO (sin wrapper)
-        # WSDL local observado: operación rEnviConsLoteDe, soapAction="" (vacío)
-        soap = f"""<?xml version='1.0' encoding='utf-8'?>
-<soap-env:Envelope xmlns:soap-env="http://www.w3.org/2003/05/soap-envelope">
-  <soap-env:Body>
-    <ns0:rEnviConsLoteDe xmlns:ns0="http://ekuatia.set.gov.py/sifen/xsd">
-      <ns0:dId>{did}</ns0:dId>
-      <ns0:dProtConsLote>{prot}</ns0:dProtConsLote>
-    </ns0:rEnviConsLoteDe>
-  </soap-env:Body>
-</soap-env:Envelope>
-""".encode("utf-8")
-        
-        headers = {
-            # SOAP 1.2: NO usar header SOAPAction separado; action va en Content-Type (y aquí es vacío según WSDL)
-            "Content-Type": 'application/soap+xml; charset=utf-8; action=""',
-            "Accept": "application/soap+xml",
-        }
-
-        # Guardar request/headers SIEMPRE en artifacts (nombres únicos)
-        ts = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
-        req_path = artifacts_dir / f"soap_consulta_lote_req_{prot}_{env}_{ts}.xml"
-        resp_path = artifacts_dir / f"soap_consulta_lote_resp_{prot}_{env}_{ts}.xml"
-        meta_path = artifacts_dir / f"soap_consulta_lote_http_{prot}_{env}_{ts}.json"
+        # Guardar respuesta cruda SIEMPRE
+        response_bytes = response.content or b""
         try:
-            req_path.write_bytes(soap)
-            meta_path.write_text(
-                json.dumps(
-                    {
-                        "timestamp": _dt.datetime.now().isoformat(),
-                        "env": env,
-                        "endpoint": endpoint,
-                        "timeout": timeout,
-                        "sent_headers": headers,
-                        "dId": did,
-                        "dProtConsLote": prot,
-                    },
-                    ensure_ascii=False,
-                    indent=2,
-                ),
-                encoding="utf-8",
-            )
+            resp_path.write_bytes(response_bytes)
+            raw_path.write_bytes(response_bytes)
         except Exception as e:
-            print(f"[SIFEN DEBUG] call_consulta_lote_raw: no se pudo guardar request/meta: {e}")
+            print(f"⚠️  Error guardando response: {e}")
         
-        # Usar session existente si está disponible, o crear una nueva
-        if session and hasattr(session, 'cert') and session.cert:
-            # Reutilizar session existente con mTLS ya configurado
-            print(f"[SIFEN DEBUG] call_consulta_lote_raw: reutilizando session existente con cert")
-        else:
-            # Crear nueva session con mTLS
-            session = requests.Session()
-            session.verify = True
-            session.cert = cert_tuple
-            if cert_tuple:
-                print(
-                    f"[SIFEN DEBUG] call_consulta_lote_raw: nueva session con cert={os.path.basename(cert_tuple[0])} "
-                    f"key={os.path.basename(cert_tuple[1])}"
-                )
-        
-        r = session.post(endpoint, data=soap, headers=headers, timeout=timeout)
-        
-        resp_status = r.status_code
-        ct = r.headers.get('Content-Type', 'N/A')
-        cl = r.headers.get('Content-Length', 'N/A')
-        text = r.text or ""
-        body_preview = text[:300] if text else "<EMPTY>"
-        
-        print(f"[SIFEN HTTP] status={resp_status} ct={ct} len={cl} body_preview={body_preview}")
-
-        # Guardar response SIEMPRE en artifacts (aunque HTTP != 200)
+        # Actualizar metadata con headers de respuesta
         try:
-            resp_path.write_bytes(r.content or b"")
-            # Actualizar meta con status y headers de respuesta
             meta = json.loads(meta_path.read_text(encoding="utf-8"))
-            meta.update(
-                {
-                    "http_status": resp_status,
-                    "received_headers": dict(r.headers),
-                }
-            )
+            meta.update({
+                "http_status": response.status_code,
+                "received_headers": dict(response.headers),
+            })
             meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
-        except Exception as e:
-            print(f"[SIFEN DEBUG] call_consulta_lote_raw: no se pudo guardar response/meta: {e}")
+        except Exception:
+            pass
         
-        # IMPORTANTE: aunque venga 400, si el body es XML lo devolvemos igual
-        if text.lstrip().startswith("<"):
-            return text
+        # Procesar respuesta
+        result["http_status"] = response.status_code
         
-        raise RuntimeError(f"Consulta lote sin XML. HTTP={resp_status} ct={ct} body_preview={body_preview}")
+        if not response_bytes:
+            raise RuntimeError("Respuesta vacía del servidor")
         
-    finally:
-        # Limpiar archivos PEM temporales
-        if not is_pem_mode:
-            cleanup_pem_files(cert_pem_path, key_pem_path)
+        # Parsear XML
+        try:
+            root = ET.fromstring(response_bytes)
+            result["raw_xml"] = response_bytes.decode('utf-8', errors='ignore')
+            
+            # Extraer namespace dinámicamente
+            # El response usa ns2 como prefijo para el namespace SIFEN
+            ns = {}
+            for key, value in root.attrib.items():
+                if key.startswith('xmlns:'):
+                    ns[key.split(':')[1]] = value
+            
+            # Asegurar namespace por defecto
+            if 'ns2' not in ns:
+                ns['ns2'] = sifen_ns
+            if 'env' not in ns:
+                ns['env'] = 'http://www.w3.org/2003/05/soap-envelope'
+            if 's' not in ns:
+                ns['s'] = sifen_ns
+            
+            # Buscar respuesta en el Body
+            response_elem = root.find('.//env:Body', ns)
+            if response_elem is not None:
+                # Buscar rResEnviConsLoteDe o rRetEnviDe (con cualquier prefijo)
+                res_elem = None
+                response_type = None
+                
+                for prefix in ['ns2', 's']:
+                    res_elem = response_elem.find(f'.//{prefix}:rResEnviConsLoteDe', ns)
+                    if res_elem is not None:
+                        response_type = 'consulta_lote'
+                        break
+                    
+                    # También puede venir rRetEnviDe en algunos casos
+                    res_elem = response_elem.find(f'.//{prefix}:rRetEnviDe', ns)
+                    if res_elem is not None:
+                        response_type = 'ret_envi_de'
+                        break
+                
+                if res_elem is not None:
+                    # Extraer campos principales según el tipo de respuesta
+                    d_fec_proc = res_elem.findtext('.//ns2:dFecProc', namespaces=ns) or res_elem.findtext('.//s:dFecProc', namespaces=ns)
+                    
+                    if response_type == 'consulta_lote':
+                        d_cod_res_lot = res_elem.findtext('.//ns2:dCodResLot', namespaces=ns) or res_elem.findtext('.//s:dCodResLot', namespaces=ns)
+                        d_msg_res_lot = res_elem.findtext('.//ns2:dMsgResLot', namespaces=ns) or res_elem.findtext('.//s:dMsgResLot', namespaces=ns)
+                        
+                        result.update({
+                            "dFecProc": d_fec_proc,
+                            "dCodResLot": d_cod_res_lot,
+                            "dMsgResLot": d_msg_res_lot,
+                        })
+                        
+                        # Extraer gResProcLote si existe
+                        g_res_proc = None
+                        for prefix in ['ns2', 's']:
+                            g_res_proc = res_elem.find(f'.//{prefix}:gResProcLote', ns)
+                            if g_res_proc is not None:
+                                break
+                        
+                        if g_res_proc is not None:
+                            documentos = []
+                            
+                            # Buscar documentos
+                            for prefix in ['ns2', 's']:
+                                for doc in g_res_proc.findall(f'.//{prefix}:id', ns):
+                                    doc_id = doc.text
+                                    doc_est = g_res_proc.findtext(f'{prefix}:dEstRes[{doc_id}]', ns) or "N/A"
+                                    documentos.append({
+                                        "id": doc_id,
+                                        "estado": doc_est
+                                    })
+                                if documentos:
+                                    break
+                            
+                            result["documentos"] = documentos
+                            
+                            # Extraer resultado del lote
+                            lot_id = None
+                            lot_est = None
+                            for prefix in ['ns2', 's']:
+                                lot_id = g_res_proc.findtext(f'{prefix}:id', namespaces=ns)
+                                lot_est = g_res_proc.findtext(f'{prefix}:dEstRes', namespaces=ns)
+                                if lot_id or lot_est:
+                                    break
+                            
+                            if lot_id:
+                                result.update({
+                                    "lote_id": lot_id,
+                                    "dEstRes": lot_est,
+                                })
+                            
+                            # Buscar código/mensaje de rechazo si existe
+                            g_res_proc_inner = None
+                            for prefix in ['ns2', 's']:
+                                g_res_proc_inner = g_res_proc.find(f'.//{prefix}:gResProc', ns)
+                                if g_res_proc_inner is not None:
+                                    break
+                            
+                            if g_res_proc_inner is not None:
+                                d_cod_res = None
+                                d_msg_res = None
+                                for prefix in ['ns2', 's']:
+                                    d_cod_res = g_res_proc_inner.findtext(f'{prefix}:dCodRes', namespaces=ns)
+                                    d_msg_res = g_res_proc_inner.findtext(f'{prefix}:dMsgRes', namespaces=ns)
+                                    if d_cod_res or d_msg_res:
+                                        break
+                                result.update({
+                                    "dCodRes": d_cod_res,
+                                    "dMsgRes": d_msg_res,
+                                })
+                    
+                    elif response_type == 'ret_envi_de':
+                        # Respuesta de tipo rRetEnviDe (error general)
+                        result.update({
+                            "dFecProc": d_fec_proc,
+                            "dEstRes": res_elem.findtext('.//ns2:dEstRes', namespaces=ns) or res_elem.findtext('.//s:dEstRes', namespaces=ns),
+                        })
+                        
+                        # Buscar código/mensaje en gResProc
+                        g_res_proc = None
+                        for prefix in ['ns2', 's']:
+                            g_res_proc = res_elem.find(f'.//{prefix}:gResProc', ns)
+                            if g_res_proc is not None:
+                                break
+                        
+                        if g_res_proc is not None:
+                            d_cod_res = g_res_proc.findtext('.//ns2:dCodRes', namespaces=ns) or g_res_proc.findtext('.//s:dCodRes', namespaces=ns)
+                            d_msg_res = g_res_proc.findtext('.//ns2:dMsgRes', namespaces=ns) or g_res_proc.findtext('.//s:dMsgRes', namespaces=ns)
+                            
+                            result.update({
+                                "dCodRes": d_cod_res,
+                                "dMsgRes": d_msg_res,
+                            })
+                    
+                    result["ok"] = True
+                    
+        except ET.ParseError as e:
+            raise RuntimeError(f"XML mal formado: {e}")
+        
+    except Exception as e:
+        result["error_type"] = type(e).__name__
+        result["error_message"] = str(e)
+        print(f"❌ Error en consulta HTTP: {e}")
+    
+    return result
 
 
-def consulta_ruc_cli(args: argparse.Namespace) -> int:
-    """Subcomando CLI para consultar RUC."""
-    from app.sifen_client.soap_client import SoapClient
+def consulta_lote_cli(args: argparse.Namespace) -> int:
+    """Subcomando CLI para consultar lote."""
+    from app.sifen_client.config import get_sifen_config
     
     # Forzar ambiente desde args (anti-regresión 0160)
     force_env_from_args(args.env)
     
     env = args.env
-    ruc = args.ruc
-    dump_http = args.dump_http
+    prot = args.prot
+    out = args.out
     debug = args.debug
-    
-    print(f"🔍 Consultando RUC: {ruc} (ambiente: {env})")
-    print()
-    
-    # Resolver password P12
-    p12_password = resolve_p12_password(args)
+    artifacts_dir = Path(args.artifacts_dir) if args.artifacts_dir else Path(__file__).parent.parent / "artifacts"
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
     
     # Obtener configuración
     config = get_sifen_config(env=env)
-    config.cert_path, config.cert_password = get_mtls_cert_path_and_password()
-    if not config.cert_password:
-        config.cert_password = p12_password
     
-    # Crear cliente SOAP
-    try:
-        with SoapClient(config) as client:
-            result = client.consulta_ruc_raw(ruc=ruc, dump_http=dump_http)
-            
-            http_status = result.get("http_status", 0)
-            raw_xml = result.get("raw_xml", "")
-            d_cod_res = result.get("dCodRes", "N/A")
-            d_msg_res = result.get("dMsgRes", "N/A")
-            x_cont_ruc = result.get("xContRUC", {})
-            
-            print("="*70)
-            print("RESULTADO DE CONSULTA RUC")
-            print("="*70)
-            print(f"HTTP Status: {http_status}")
-            print(f"Código: {d_cod_res}")
-            print(f"Mensaje: {d_msg_res}")
-            print()
-            
-            if x_cont_ruc:
-                print("📋 Información del Contribuyente:")
-                print(f"   RUC: {x_cont_ruc.get('dRUCCons', 'N/A')}")
-                print(f"   Razón Social: {x_cont_ruc.get('dRazCons', 'N/A')}")
-                print(f"   Código Estado: {x_cont_ruc.get('dCodEstCons', 'N/A')}")
-                print(f"   Descripción Estado: {x_cont_ruc.get('dDesEstCons', 'N/A')}")
-                
-                ruc_fact_elec = x_cont_ruc.get('dRUCFactElec', 'N/A')
-                if ruc_fact_elec == "1":
-                    print(f"   ✅ Habilitado para Facturación Electrónica: SÍ")
-                elif ruc_fact_elec == "0":
-                    print(f"   ❌ Habilitado para Facturación Electrónica: NO")
-                else:
-                    print(f"   ⚠️  Habilitado para Facturación Electrónica: {ruc_fact_elec}")
-                print()
-            
-            # Interpretar códigos
-            if d_cod_res == "0502":
-                print("✅ RUC encontrado y válido")
-            elif d_cod_res == "0500":
-                print("❌ RUC inexistente")
-            elif d_cod_res == "0501":
-                print("❌ Sin permiso para consultar este RUC")
-            else:
-                print(f"⚠️  Código desconocido: {d_cod_res}")
-            
-            # Guardar artifacts si debug está activo
-            if debug:
-                artifacts_dir = Path(__file__).parent.parent / "artifacts"
-                artifacts_dir.mkdir(exist_ok=True)
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                
-                # Guardar respuesta XML
-                if raw_xml:
-                    resp_file = artifacts_dir / f"consulta_ruc_response_{timestamp}.xml"
-                    resp_file.write_text(raw_xml, encoding="utf-8")
-                    print(f"\n💾 Respuesta XML guardada: {resp_file.name}")
-                
-                # Guardar resultado JSON
-                result_json = {
-                    "ruc": ruc,
-                    "env": env,
-                    "timestamp": timestamp,
-                    "http_status": http_status,
-                    "dCodRes": d_cod_res,
-                    "dMsgRes": d_msg_res,
-                    "xContRUC": x_cont_ruc,
-                }
-                json_file = artifacts_dir / f"consulta_ruc_{timestamp}.json"
-                json_file.write_text(
-                    json.dumps(result_json, ensure_ascii=False, indent=2, default=str),
-                    encoding="utf-8"
-                )
-                print(f"💾 Resultado JSON guardado: {json_file.name}")
-            
-            return 0
-            
-    except Exception as e:
-        print(f"❌ Error al consultar RUC: {e}", file=sys.stderr)
-        if debug:
-            import traceback
-            traceback.print_exc()
-        return 1
-
-
-def main() -> int:
-    """Función principal del script."""
-    parser = argparse.ArgumentParser(
-        description="Consultar estado de lote SIFEN (dProtConsLote).",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+    # Resolver certificado mTLS
+    cert_path, cert_password, is_pem_mode = get_mtls_config()
+    if not cert_path:
+        cert_path = config.cert_path
+    if not cert_password and not is_pem_mode:
+        cert_password = config.cert_password
+    
+    cert_tuple, temp_files, mode = _resolve_mtls(cert_path, cert_password, is_pem_mode)
+    
+    # Llamar al método HTTP manual (golden path)
+    result = call_consulta_lote_http(
+        prot=prot,
+        env=env,
+        artifacts_dir=artifacts_dir,
+        cert_tuple=cert_tuple,
+        timeout=(10, 60)
     )
-    parser.add_argument(
-        "--env",
-        choices=["test", "prod"],
-        default="test",
-        help="Ambiente SIFEN (default: test)",
-    )
-    parser.add_argument(
-        "--prot",
-        required=False,
-        help="dProtConsLote devuelto por siRecepLoteDE (requerido si no se usa --ruc)",
-    )
-    parser.add_argument(
-        "--out",
-        default="",
-        help="Guardar respuesta en JSON (ruta). Si no se especifica, se guarda en artifacts/",
-    )
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        help="Logs extra de debug",
-    )
-    parser.add_argument(
-        "--wsdl",
-        default=None,
-        help="Override WSDL URL (opcional). Ej: https://sifen-test.set.gov.py/de/ws/async/recibe-lote.wsdl?wsdl",
-    )
-    parser.add_argument(
-        "--wsdl-file",
-        default=None,
-        type=str,
-        help="Usar archivo WSDL local (no descargar desde internet). Ej: artifacts/consulta-lote.wsdl.xml",
-    )
-    parser.add_argument(
-        "--wsdl-cache-dir",
-        default="artifacts",
-        type=str,
-        help="Directorio para cache de WSDL/XSD (default: artifacts)",
-    )
-    parser.add_argument(
-        "--p12-password",
-        default=None,
-        type=str,
-        help="Contraseña del certificado P12 (opcional, para debug interactivo). "
-             "Por defecto se busca en env vars o se pide interactivamente.",
-    )
-    parser.add_argument(
-        "--dump-http",
-        action="store_true",
-        help="Mostrar evidencia completa del HTTP request/response (headers, SOAP envelope, body). "
-             "Incluye validaciones automáticas de SOAP 1.2.",
-    )
-    parser.add_argument(
-        "--ruc",
-        type=str,
-        help="Consultar RUC en lugar de lote. Proporciona el RUC (puede incluir DV como 'RUC-DV', ej: --ruc 4554737-8 o --ruc 80012345)",
-    )
-    args = parser.parse_args()
-    
-    # Si se proporciona --ruc, ejecutar consulta de RUC
-    if args.ruc:
-        return consulta_ruc_cli(args)
-    
-    # Validar que --prot esté presente si no se usa --ruc
-    if not args.prot:
-        _die("Se requiere --prot (dProtConsLote) o --ruc para consultar.")
-    
-    # después de: args = ap.parse_args()
-    debug_enabled = bool(getattr(args, "debug", False)) or os.getenv("SIFEN_DEBUG_SOAP", "").strip() in ("1", "true", "TRUE", "yes", "YES")
-    
-    # Validar prot
-    prot = str(args.prot).strip()
-    if not prot or not prot.isdigit():
-        _die("dProtConsLote debe ser un número (solo dígitos).")
-    
-    # Obtener certificado desde env
-    p12_path = os.getenv("SIFEN_CERT_PATH", "").strip()
-    if not p12_path:
-        _die("Falta SIFEN_CERT_PATH en el entorno.")
-    
-    p12_path_obj = Path(p12_path)
-    if not p12_path_obj.exists():
-        _die(f"Certificado no encontrado: {p12_path}")
-    
-    # Obtener password usando función robusta
-    p12_password = resolve_p12_password(args)
-    
-    # Preparar cache_dir para WSDL/XSD
-    cache_dir = Path(args.wsdl_cache_dir)
-    if not cache_dir.is_absolute():
-        cache_dir = Path(__file__).parent.parent / cache_dir
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Preparar artifacts_dir para guardar archivos de respuesta
-    artifacts_dir = Path(__file__).parent.parent / "artifacts"
-    artifacts_dir.mkdir(exist_ok=True)
-    
-    # Si --dump-http está activo, usar consulta_lote_raw() directamente (sin zeep)
-    if args.dump_http:
-        try:
-            from app.sifen_client.soap_client import SoapClient
-            from app.sifen_client.config import get_sifen_config
-            
-            config = get_sifen_config(env=args.env)
-            client = SoapClient(config)
-            
-            print("\n" + "="*70)
-            print("VERIFICADOR E2E: rEnviConsLoteDe (SOAP 1.2, sin wrapper)")
-            print("="*70)
-            
-            # Llamar consulta_lote_raw con dump_http=True
-            result = client.consulta_lote_raw(prot, did=1, dump_http=True)
-            
-            # 1. Headers HTTP enviados
-            print("\n1️⃣  HEADERS HTTP ENVIADOS:")
-            print("-" * 70)
-            sent_headers = result.get("sent_headers", {})
-            for key, value in sorted(sent_headers.items()):
-                print(f"   {key}: {value}")
-            
-            # Validación: Content-Type debe ser application/soap+xml
-            content_type = sent_headers.get("Content-Type", "")
-            if "application/soap+xml" not in content_type:
-                print(f"\n❌ VALIDACIÓN FALLIDA: Content-Type debe contener 'application/soap+xml'")
-                print(f"   Encontrado: {content_type}")
-                cleanup_pem_files()
-                sys.exit(1)
-            else:
-                print(f"\n   ✅ Content-Type correcto: {content_type}")
-            
-            # Validación: NO debe haber SOAPAction header separado
-            if "SOAPAction" in sent_headers:
-                print(f"\n❌ VALIDACIÓN FALLIDA: NO debe existir header 'SOAPAction' en SOAP 1.2")
-                print(f"   Encontrado: SOAPAction = {sent_headers['SOAPAction']}")
-                cleanup_pem_files()
-                sys.exit(1)
-            else:
-                print(f"   ✅ NO hay header 'SOAPAction' (correcto para SOAP 1.2)")
-            
-            # Validación opcional: si action= está presente en Content-Type, es recomendado
-            if 'action="rEnviConsLoteDe"' in content_type:
-                print(f"   ✅ Recomendado: Content-Type incluye action=\"rEnviConsLoteDe\" (ayuda al enrutamiento)")
-            elif 'action=' in content_type:
-                print(f"   ℹ️  Content-Type incluye action= (permitido en SOAP 1.2)")
-            
-            # 2. SOAP Envelope enviado
-            print("\n2️⃣  SOAP ENVELOPE ENVIADO:")
-            print("-" * 70)
-            sent_xml = result.get("sent_xml", "")
-            if sent_xml:
-                xml_lines = sent_xml.split("\n")
-                if len(xml_lines) > 80:
-                    print("\n".join(xml_lines[:80]))
-                    print(f"\n... (truncado, total {len(xml_lines)} líneas)")
-                else:
-                    print(sent_xml)
-                
-                # Validaciones del XML
-                print("\n   Validaciones del XML:")
-                # Validar namespace SOAP 1.2
-                if "http://www.w3.org/2003/05/soap-envelope" not in sent_xml:
-                    print(f"   ❌ VALIDACIÓN FALLIDA: Envelope debe usar namespace SOAP 1.2")
-                    print(f"      Esperado: http://www.w3.org/2003/05/soap-envelope")
-                    cleanup_pem_files()
-                    sys.exit(1)
-                else:
-                    print(f"   ✅ Namespace SOAP 1.2 correcto")
-                
-                # Validar rEnviConsLoteDe directamente en Body (sin wrapper)
-                if "<sifen:rEnviConsLoteDe" not in sent_xml and "<rEnviConsLoteDe" not in sent_xml:
-                    print(f"   ❌ VALIDACIÓN FALLIDA: Debe existir 'rEnviConsLoteDe' en el Body")
-                    cleanup_pem_files()
-                    sys.exit(1)
-                else:
-                    print(f"   ✅ 'rEnviConsLoteDe' encontrado en Body")
-                
-                # Validar que NO hay wrapper (rEnviConsLoteDe debe estar directamente en Body)
-                if "<sifen:siResultLoteDE" in sent_xml or "<siResultLoteDE" in sent_xml:
-                    print(f"   ⚠️  ADVERTENCIA: Se encontró wrapper 'siResultLoteDE' (no debería estar presente)")
-                else:
-                    print(f"   ✅ NO hay wrapper (rEnviConsLoteDe está directamente en Body)")
-            else:
-                print("   ⚠️  No se pudo obtener XML enviado")
-            
-            # 3. Status code HTTP y headers recibidos
-            print("\n3️⃣  STATUS CODE HTTP Y HEADERS RECIBIDOS:")
-            print("-" * 70)
-            http_status = result.get("http_status", 0)
-            print(f"   Status Code: {http_status}")
-            
-            received_headers = result.get("received_headers", {})
-            if received_headers:
-                print("\n   Headers recibidos:")
-                for key, value in sorted(received_headers.items()):
-                    print(f"      {key}: {value}")
-            else:
-                print("   ⚠️  No se pudieron obtener headers recibidos")
-            
-            # 4. Body recibido
-            print("\n4️⃣  BODY RECIBIDO:")
-            print("-" * 70)
-            received_body = result.get("received_body_preview", "")
-            if received_body:
-                body_lines = received_body.split("\n")
-                if len(body_lines) > 120:
-                    print("\n".join(body_lines[:120]))
-                    print(f"\n... (truncado, total {len(body_lines)} líneas)")
-                else:
-                    print(received_body)
-                
-                # Detectar SOAP Fault
-                if "<soap:Fault" in received_body or "<soap12:Fault" in received_body or "<Fault" in received_body:
-                    print("\n   ⚠️  SOAP FAULT DETECTADO en la respuesta")
-                    # Intentar extraer código y mensaje del fault
-                    try:
-                        from lxml import etree
-                        fault_root = etree.fromstring(result.get("raw_xml", "").encode("utf-8"))
-                        fault_code = fault_root.find(".//{http://www.w3.org/2003/05/soap-envelope}Code")
-                        fault_reason = fault_root.find(".//{http://www.w3.org/2003/05/soap-envelope}Reason")
-                        if fault_code is not None:
-                            print(f"      Fault Code: {etree.tostring(fault_code, encoding='unicode')}")
-                        if fault_reason is not None:
-                            print(f"      Fault Reason: {etree.tostring(fault_reason, encoding='unicode')}")
-                    except Exception:
-                        pass
-                else:
-                    print("\n   ✅ No se detectó SOAP Fault")
-            else:
-                print("   ⚠️  No se pudo obtener body recibido")
-            
-            print("\n" + "="*70)
-            print("✅ VERIFICACIÓN COMPLETA")
-            print("="*70 + "\n")
-            
-            cleanup_pem_files()
-            return 0
-            
-        except SystemExit:
-            raise
-        except Exception as e:
-            cleanup_pem_files()
-            _die(f"Error en verificador E2E: {e}")
-    
-    # Resolver WSDL según prioridad
-    wsdl_url = resolve_wsdl(args.env, args.wsdl)
-    
-    # Resolver archivo WSDL (proveído, cache, o descarga)
-    wsdl_file_arg = Path(args.wsdl_file) if args.wsdl_file else None
-    
-    # Mostrar información
-    print(f"🔧 Ambiente: {args.env}")
-    print(f"🌐 WSDL URL: {wsdl_url}")
-    if wsdl_file_arg:
-        print(f"📂 WSDL File: {wsdl_file_arg}")
-    print(f"💾 Cache Dir: {cache_dir}")
-    print(f"🔎 dProtConsLote: {prot}")
-    if args.debug:
-        print(f"🔐 Cert: {p12_path}")
-    
-    # Cargar WSDL (desde archivo, cache, o descarga)
-    try:
-        wsdl_path = load_wsdl_source(
-            wsdl_url=wsdl_url,
-            cache_dir=cache_dir,
-            wsdl_file=wsdl_file_arg,
-            cert_p12_path=p12_path,
-            cert_password=p12_password,
-            debug=debug_enabled
-        )
-        if debug_enabled:
-            print(f"✅ WSDL cargado: {wsdl_path}")
-    except Exception as e:
-        cleanup_pem_files()
-        _die(f"Error al cargar WSDL: {e}")
-    
-    # Crear transporte con mTLS
-    try:
-        transport = create_zeep_transport(p12_path, p12_password)
-    except Exception as e:
-        cleanup_pem_files()
-        _die(f"Error al crear transporte mTLS: {e}")
-    
-    # Crear cliente zeep con history plugin (siempre, para debug en errores)
-    history = HistoryPlugin()
-    settings = Settings(strict=False, xml_huge_tree=True)
-    
-    try:
-        client = Client(
-            wsdl=str(wsdl_path),
-            transport=transport,
-            settings=settings,
-            plugins=[history]
-        )
-    except Exception as e:
-        cleanup_pem_files()
-        _die(f"Error al cargar WSDL desde archivo: {e}")
-    
-    # Listar servicios/puertos/operaciones en modo debug
-    if debug_enabled:
-        print("\n📋 Servicios disponibles en WSDL:")
-        for svc_name, svc in client.wsdl.services.items():
-            print(f"   Servicio: {svc_name}")
-            for port_name, port in svc.ports.items():
-                ops = sorted(port.binding._operations.keys())
-                print(f"      Puerto: {port_name}")
-                print(f"      Operaciones: {', '.join(ops)}")
-    
-    # Forzar binding/port SOAP 1.2 específico del servicio de consulta lote
-    svc_name_selected = "de-ws-consultas-consuta-loteService"
-    port_name_selected = "de-ws-consultas-consuta-loteSoap12"
-    op_name = "rEnviConsLoteDe"
-    
-    # Verificar que el servicio y puerto existan
-    if svc_name_selected not in client.wsdl.services:
-        available_services = list(client.wsdl.services.keys())
-        cleanup_pem_files()
-        _die(f"Servicio '{svc_name_selected}' no encontrado en WSDL. Servicios disponibles: {available_services}")
-    
-    svc = client.wsdl.services[svc_name_selected]
-    if port_name_selected not in svc.ports:
-        available_ports = list(svc.ports.keys())
-        cleanup_pem_files()
-        _die(f"Puerto '{port_name_selected}' no encontrado en servicio '{svc_name_selected}'. Puertos disponibles: {available_ports}")
-    
-    port = svc.ports[port_name_selected]
-    available_ops = sorted(port.binding._operations.keys())
-    
-    if op_name not in available_ops:
-        cleanup_pem_files()
-        _die(f"Operación '{op_name}' no encontrada en puerto '{port_name_selected}'. Operaciones disponibles: {available_ops}")
-    
-    print(f"✅ Usando operación: {op_name} (servicio: {svc_name_selected}, puerto: {port_name_selected})")
-    
-    # --- Extraer endpoint SIEMPRE desde soap12:address/@location del WSDL local ---
-    try:
-        from lxml import etree
-        
-        # Extraer endpoint desde el WSDL local (wsdl_path es el Path real del archivo cargado)
-        wsdl_root = etree.parse(str(wsdl_path)).getroot()
-        ns = {"soap12": "http://schemas.xmlsoap.org/wsdl/soap12/"}
-        hits = wsdl_root.xpath("//soap12:address/@location", namespaces=ns)
-        if not hits:
-            cleanup_pem_files()
-            raise RuntimeError("No encontré soap12:address/@location en el WSDL local.")
-        
-        address = hits[0].strip()
-        print(f"🌐 Endpoint efectivo (desde WSDL): {address}")
-        
-        # Crear service apuntando al endpoint extraído del WSDL
-        service_def = client.wsdl.services[svc_name_selected]
-        port_def = service_def.ports[port_name_selected]
-        binding_qname = port_def.binding.name  # OJO: .name (QName), NO .qname
-        
-        service = client.create_service(binding_qname, address)
-    except Exception as e:
-        cleanup_pem_files()
-        _die(f"Error al crear servicio: {e}")
-    
-    # Llamar operación rEnviConsLoteDe con parámetros directos
-    try:
-        # Intentar primero con keywords
-        try:
-            resp = service.rEnviConsLoteDe(dId=1, dProtConsLote=prot, dCDC=None)
-        except (TypeError, Fault):
-            # Si falla, intentar posicional
-            resp = service.rEnviConsLoteDe(1, prot, None)
-    except (Fault, Exception) as e:
-        # En caso de error, si está en debug, imprimir request/response SOAP crudos
-        if debug_enabled:
-            print("\n❌ Error en llamada SOAP. Request/Response SOAP crudos:")
-            try:
-                if hasattr(history, 'last_sent') and history.last_sent:
-                    request_envelope = history.last_sent.get("envelope", None)
-                    if request_envelope is not None:
-                        # Si es un elemento XML, serializarlo
-                        if hasattr(request_envelope, 'tag'):
-                            from lxml import etree
-                            print("\n--- REQUEST SOAP ---")
-                            print(etree.tostring(request_envelope, pretty_print=True, encoding="unicode"))
-                        elif isinstance(request_envelope, bytes):
-                            print("\n--- REQUEST SOAP ---")
-                            print(request_envelope.decode("utf-8", errors="ignore"))
-                        else:
-                            print("\n--- REQUEST SOAP ---")
-                            print(str(request_envelope))
-            except Exception as ex:
-                if debug_enabled:
-                    print(f"⚠️  Error al serializar request: {ex}")
-            
-            try:
-                if hasattr(history, 'last_received') and history.last_received:
-                    response_envelope = history.last_received.get("envelope", None)
-                    if response_envelope is not None:
-                        # Si es un elemento XML, serializarlo
-                        if hasattr(response_envelope, 'tag'):
-                            from lxml import etree
-                            print("\n--- RESPONSE SOAP ---")
-                            print(etree.tostring(response_envelope, pretty_print=True, encoding="unicode"))
-                        elif isinstance(response_envelope, bytes):
-                            print("\n--- RESPONSE SOAP ---")
-                            print(response_envelope.decode("utf-8", errors="ignore"))
-                        else:
-                            print("\n--- RESPONSE SOAP ---")
-                            print(str(response_envelope))
-            except Exception as ex:
-                if debug_enabled:
-                    print(f"⚠️  Error al serializar response: {ex}")
-        
-        cleanup_pem_files()
-        _die(f"Error al llamar operación {op_name}: {e}")
-    
-    # Preparar timestamp para guardar archivos
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    
-    # Parsear respuesta
-    try:
-        # Convertir respuesta a dict
-        resp_dict = {}
-        try:
-            resp_dict = serialize_object(resp)
-        except Exception:
-            pass
-        
-        if not resp_dict:
-            if hasattr(resp, '__dict__'):
-                resp_dict = resp.__dict__
-            elif isinstance(resp, dict):
-                resp_dict = resp
-            else:
-                resp_dict = {"response": str(resp)}
-        
-        # Extraer campos principales
-        result: Dict[str, Any] = {
-            "success": False,
-            "dProtConsLote": prot,
-            "response_dict": resp_dict,
-        }
-        
-        # Buscar código y mensaje en la respuesta (diferentes posibles nombres)
-        codigo_respuesta = None
-        mensaje = None
-        
-        # Buscar en diferentes campos posibles
-        for key in ["dCodResLot", "dCodRes", "codigo", "code"]:
-            if key in resp_dict:
-                codigo_respuesta = str(resp_dict[key])
-                break
-        
-        for key in ["dMsgResLot", "dMsgRes", "mensaje", "message", "msg"]:
-            if key in resp_dict:
-                mensaje = str(resp_dict[key])
-                break
-        
-        # Si no se encontró, buscar recursivamente
-        def find_in_dict(d: Any, key: str) -> Optional[Any]:
-            if isinstance(d, dict):
-                if key in d:
-                    return d[key]
-                for v in d.values():
-                    result = find_in_dict(v, key)
-                    if result is not None:
-                        return result
-            elif isinstance(d, list):
-                for item in d:
-                    result = find_in_dict(item, key)
-                    if result is not None:
-                        return result
-            return None
-        
-        if not codigo_respuesta:
-            codigo_respuesta = find_in_dict(resp_dict, "dCodResLot") or find_in_dict(resp_dict, "dCodRes")
-        if not mensaje:
-            mensaje = find_in_dict(resp_dict, "dMsgResLot") or find_in_dict(resp_dict, "dMsgRes")
-        
-        if codigo_respuesta:
-            result["dCodResLot"] = str(codigo_respuesta)
-        if mensaje:
-            result["dMsgResLot"] = str(mensaje)
-        
-        # Determinar éxito según códigos SIFEN
-        if codigo_respuesta in ("0361", "0362"):
-            result["success"] = True
-            result["status"] = "ok"
-            print("✅ Consulta OK")
-        elif codigo_respuesta == "0364":
-            result["status"] = "requires_cdc"
-            result["sin_detalle_por_lote"] = True
-            print("⚠️  Lote fuera de ventana 48h, se requiere consulta por CDC")
-            
-            # FALLBACK AUTOMÁTICO: Consultar cada CDC individualmente
-            print("\n" + "="*70)
-            print("FALLBACK AUTOMÁTICO: Consultando DE por CDC")
-            print("="*70)
-            
-            # Obtener CDCs del lote
-            cdcs = get_cdcs_for_lote(prot, artifacts_dir, debug_enabled)
-            
-            if not cdcs:
-                print("\n❌ No se encontraron CDCs para el lote.")
-                print("   Instrucción: Guarda los CDCs al enviar el lote para habilitar el fallback automático.")
-                result["fallback_error"] = "No se encontraron CDCs para el lote"
-            else:
-                print(f"\n📋 CDCs encontrados: {len(cdcs)}")
-                
-                # Consultar cada CDC
-                from app.sifen_client.soap_client import SoapClient
-                from app.sifen_client.config import get_sifen_config
-                
-                config = get_sifen_config(env=args.env)
-                client = SoapClient(config)
-                
-                resultados_cdc = []
-                for idx, cdc in enumerate(cdcs, 1):
-                    print(f"\n🔍 Consultando CDC #{idx}/{len(cdcs)}: {cdc}")
-                    try:
-                        cdc_result = client.consulta_de_por_cdc_raw(cdc)
-                        cdc_status = cdc_result.get("http_status", 0)
-                        cdc_xml = cdc_result.get("raw_xml", "")
-                        
-                        # Parsear respuesta
-                        cdc_cod_res = cdc_result.get("dCodRes", "N/A")
-                        cdc_msg_res = cdc_result.get("dMsgRes", "N/A")
-                        cdc_prot_aut = cdc_result.get("dProtAut", None)
-                        
-                        # Determinar estado
-                        if cdc_cod_res in ("0200", "0300"):
-                            estado = "Aprobado"
-                        elif cdc_cod_res in ("0201", "0301"):
-                            estado = "Rechazado"
-                        else:
-                            estado = "En proceso"
-                        
-                        resultado_cdc = {
-                            "cdc": cdc,
-                            "estado": estado,
-                            "codigo": cdc_cod_res,
-                            "mensaje": cdc_msg_res,
-                            "dProtAut": cdc_prot_aut,
-                            "http_status": cdc_status,
-                        }
-                        resultados_cdc.append(resultado_cdc)
-                        
-                        print(f"   Estado: {estado}")
-                        print(f"   Código: {cdc_cod_res}")
-                        print(f"   Mensaje: {cdc_msg_res}")
-                        if cdc_prot_aut:
-                            print(f"   dProtAut: {cdc_prot_aut}")
-                        
-                    except Exception as e:
-                        print(f"   ❌ Error al consultar CDC {cdc}: {e}")
-                        resultados_cdc.append({
-                            "cdc": cdc,
-                            "estado": "Error",
-                            "codigo": "ERROR",
-                            "mensaje": str(e),
-                            "dProtAut": None,
-                            "http_status": 0,
-                        })
-                
-                # Guardar resumen
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                resumen_file = artifacts_dir / f"consulta_lote_0364_fallback_{timestamp}.json"
-                resumen_data = {
-                    "dProtConsLote": prot,
-                    "codigo_respuesta": codigo_respuesta,
-                    "mensaje": mensaje,
-                    "cdcs_consultados": len(cdcs),
-                    "resultados": resultados_cdc,
-                }
-                resumen_file.write_text(
-                    json.dumps(resumen_data, ensure_ascii=False, indent=2, default=str),
-                    encoding="utf-8"
-                )
-                print(f"\n💾 Resumen guardado en: {resumen_file.name}")
-                
-                # Imprimir tabla resumen
-                print("\n" + "="*70)
-                print("RESUMEN POR CDC")
-                print("="*70)
-                print(f"{'CDC':<44} | {'Estado':<12} | {'Código':<8} | {'Mensaje':<30} | {'dProtAut'}")
-                print("-" * 120)
-                for r in resultados_cdc:
-                    cdc_short = r["cdc"][:44] if len(r["cdc"]) > 44 else r["cdc"]
-                    estado_short = r["estado"][:12] if len(r["estado"]) > 12 else r["estado"]
-                    codigo_short = r["codigo"][:8] if len(r["codigo"]) > 8 else r["codigo"]
-                    mensaje_short = r["mensaje"][:30] if len(r["mensaje"]) > 30 else r["mensaje"]
-                    prot_aut = r["dProtAut"] or "N/A"
-                    print(f"{cdc_short:<44} | {estado_short:<12} | {codigo_short:<8} | {mensaje_short:<30} | {prot_aut}")
-                
-                result["fallback_resultados"] = resultados_cdc
-                result["fallback_resumen_file"] = str(resumen_file)
-        else:
-            result["status"] = "error"
-            print("❌ Error en consulta")
-        
-        if codigo_respuesta:
-            print(f"   Código: {codigo_respuesta}")
-        if mensaje:
-            print(f"   Mensaje: {mensaje}")
-        
-        # Buscar gResProcLote en la respuesta
-        g_res_proc_lote = find_in_dict(resp_dict, "gResProcLote")
-        if g_res_proc_lote and isinstance(g_res_proc_lote, list):
-            print(f"\n   Documentos en lote: {len(g_res_proc_lote)}")
-            for idx, de_res in enumerate(g_res_proc_lote, 1):
-                if isinstance(de_res, dict):
-                    de_id = de_res.get("dId", "N/A")
-                    de_est_res = de_res.get("dEstRes", "N/A")
-                    de_cod_res = de_res.get("dCodRes", "N/A")
-                    de_msg_res = de_res.get("dMsgRes", "N/A")
-                    print(f"   DE #{idx}: id={de_id}, estado={de_est_res}, código={de_cod_res}")
-                    if de_msg_res and de_msg_res != "N/A":
-                        print(f"      mensaje: {de_msg_res}")
-            result["gResProcLote"] = g_res_proc_lote
-        
-        # Guardar artifacts de respuesta (raw SOAP/XML) en artifacts/
-        
-        # Guardar XML de respuesta si está disponible (desde history plugin)
-        if debug_enabled:
-            if hasattr(history, 'last_received') and history.last_received:
-                response_envelope = history.last_received.get('envelope', None)
-                if response_envelope:
-                    payload, ext = _artifact_bytes_from(response_envelope)
-                    fname = artifacts_dir / f"consulta_lote_response_{timestamp}{ext}"
-                    fname.write_bytes(payload)
-                    print(f"💾 Artifact guardado: {fname.name}")
-                    if ext != ".xml":
-                        print("⚠️  Respuesta no era XML serializable; guardada como texto (repr).")
-        
-        # Guardar request XML si está disponible
-        if debug_enabled:
-            if hasattr(history, 'last_sent') and history.last_sent:
-                request_envelope = history.last_sent.get('envelope', None)
-                if request_envelope:
-                    payload, ext = _artifact_bytes_from(request_envelope)
-                    fname = artifacts_dir / f"consulta_lote_request_{timestamp}{ext}"
-                    fname.write_bytes(payload)
-                    print(f"💾 Artifact guardado: {fname.name}")
-                    if ext != ".xml":
-                        print("⚠️  Request no era XML serializable; guardada como texto (repr).")
-        
-    except Exception as e:
-        cleanup_pem_files()
-        _die(f"Error al parsear respuesta: {e}")
-    finally:
-        transport.session.close()
-        cleanup_pem_files()
     
     # Guardar respuesta JSON
-    if args.out:
-        out_path = Path(args.out)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    if out:
+        out_path = Path(out)
     else:
-        # Guardar en artifacts/ con timestamp
         out_path = artifacts_dir / f"consulta_lote_{timestamp}.json"
     
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1857,27 +594,109 @@ def main() -> int:
         json.dumps(result, ensure_ascii=False, indent=2, default=str),
         encoding="utf-8",
     )
-    print(f"\n💾 Respuesta JSON guardada en: {out_path}")
-
+    print(f"\n💾 Respuesta guardada en: {out_path}")
+    
+    # Cleanup
+    if mode == "P12" and temp_files:
+        cleanup_pem_files(temp_files[0], temp_files[1])
+    
     return 0
 
 
+def force_env_from_args(env: str) -> None:
+    """Fuerza variables de entorno según args.env (anti-regresión 0160)."""
+    if env not in ("test", "prod"):
+        raise ValueError(f"Ambiente inválido: {env}. Debe ser 'test' o 'prod'.")
+    
+    # Forzar variables de entorno
+    os.environ["SIFEN_ENV"] = env
+    
+    # Cargar config del ambiente específico
+    config_file = Path(__file__).parent.parent / "config" / f"sifen_{env}.env"
+    if config_file.exists():
+        with open(config_file, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ[key.strip()] = value.strip()
+    
+    print(f"📍 Ambiente forzado a: {env}")
+    print(f"   Config cargada de: {config_file}")
+
+
+def main() -> int:
+    """Punto de entrada principal."""
+    parser = argparse.ArgumentParser(
+        description="Consultar estado de lote en SIFEN",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ejemplos:
+  %(prog)s --env test --prot 47353168697315928
+  %(prog)s --env prod --prot 12345678901234567 --out response.json
+  %(prog)s --env test --prot 47353168697315928 --debug --artifacts-dir /tmp/artifacts
+        """
+    )
+    
+    parser.add_argument(
+        "--env",
+        required=True,
+        choices=["test", "prod"],
+        help="Ambiente de SIFEN (test o prod)"
+    )
+    
+    parser.add_argument(
+        "--prot",
+        required=True,
+        help="Número de protocolo del lote (dProtConsLote)"
+    )
+    
+    parser.add_argument(
+        "--out",
+        default=None,
+        help="Archivo JSON de salida (default: artifacts/consulta_lote_YYYYMMDD_HHMMSS.json)"
+    )
+    
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Activar modo debug (verbose)"
+    )
+    
+    parser.add_argument(
+        "--artifacts-dir",
+        default=None,
+        help="Directorio para guardar artifacts (default: ./artifacts)"
+    )
+    
+    parser.add_argument(
+        "--p12-password",
+        default=None,
+        help="Contraseña del certificado P12 (alternativa a SIFEN_CERT_PASSWORD)"
+    )
+    
+    # Legacy arguments for compatibility (ignored)
+    parser.add_argument(
+        "--wsdl-file",
+        default=None,
+        help=argparse.SUPPRESS  # Oculto, solo para compatibilidad
+    )
+    
+    parser.add_argument(
+        "--wsdl-cache-dir",
+        default=None,
+        help=argparse.SUPPRESS  # Oculto, solo para compatibilidad
+    )
+    
+    args = parser.parse_args()
+    
+    # Configurar logging si debug
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
+    
+    # Ejecutar subcomando
+    return consulta_lote_cli(args)
+
+
 if __name__ == "__main__":
-    raise SystemExit(main())
-
-
-# USAGE
-# =====
-# # Configurar certificado
-# export SIFEN_CERT_PATH="/ruta/al/certificado.p12"
-#
-# # Opción 1: Password desde env var
-# export SIFEN_CERT_PASSWORD="tu_password"
-# python -m tools.consulta_lote_de --env test --prot 47353168697315928
-#
-# # Opción 2: Password interactivo (más seguro)
-# python -m tools.consulta_lote_de --env test --prot 47353168697315928
-# # (se pedirá la contraseña sin mostrarla)
-#
-# # Con debug y output personalizado
-# python -m tools.consulta_lote_de --env test --prot 47353168697315928 --debug --out /tmp/respuesta.json
+    sys.exit(main())

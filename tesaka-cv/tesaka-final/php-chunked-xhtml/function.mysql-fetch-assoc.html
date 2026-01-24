@@ -1,0 +1,251 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Fetch a result row as an associative array</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.mysql-fetch-array.html" class="navbar__link">« mysql_fetch_array</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.mysql-fetch-field.html" class="navbar__link">mysql_fetch_field »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ref.mysql.html">MySQL Functions</a></li>
+        <li>Fetch a result row as an associative array</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="function.mysql-fetch-assoc" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">mysql_fetch_assoc</h1>
+  <p class="verinfo">(PHP 4 &gt;= 4.0.3, PHP 5)</p><p class="refpurpose"><span class="refname">mysql_fetch_assoc</span> &mdash; <span class="dc-title">Fetch a result row as an associative array</span></p>
+
+ </div>
+
+ <div id="function.mysql-fetch-assoc-refsynopsisdiv">
+  <div class="warning"><strong class="warning">Warning</strong>
+   <p class="para">This extension was deprecated in PHP 5.5.0, and it was removed in PHP 7.0.0.
+Instead, the <a href="book.mysqli.html" class="link">MySQLi</a> or <a href="ref.pdo-mysql.html" class="link">PDO_MySQL</a> extension should be used.
+See also <a href="mysqlinfo.api.choosing.html" class="link">MySQL: choosing an API</a> guide.
+Alternatives to this function include:</p>
+   <ul class="simplelist">
+    <li><span class="function"><a href="mysqli-result.fetch-assoc.html" class="function">mysqli_fetch_assoc()</a></span></li>
+    <li>
+     <span class="methodname"><a href="pdostatement.fetch.html" class="methodname">PDOStatement::fetch()</a></span>
+     with <code class="parameter">mode</code> as <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-assoc">PDO::FETCH_ASSOC</a></code></strong>
+    </li>
+   </ul>
+  </div>
+ </div>
+
+ <div class="refsect1 description" id="refsect1-function.mysql-fetch-assoc-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="methodname"><strong>mysql_fetch_assoc</strong></span>(<span class="methodparam"><span class="type"><a href="language.types.resource.html" class="type resource">resource</a></span> <code class="parameter">$result</code></span>): <span class="type"><a href="language.types.array.html" class="type array">array</a></span></div>
+
+  <p class="simpara">
+   Returns an associative array that corresponds to the fetched row
+   and moves the internal data pointer ahead.
+   <span class="function"><strong>mysql_fetch_assoc()</strong></span> is equivalent to calling
+   <span class="function"><a href="function.mysql-fetch-array.html" class="function">mysql_fetch_array()</a></span> with MYSQL_ASSOC for the
+   optional second parameter. It only returns an associative array.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-function.mysql-fetch-assoc-parameters">
+  <h3 class="title">Parameters</h3>
+  <dl>
+   <dt>
+<code class="parameter">result</code></dt><dd><p class="para">The result <span class="type"><a href="language.types.resource.html" class="type resource">resource</a></span> that
+is being evaluated. This result comes from a call to
+<span class="function"><a href="function.mysql-query.html" class="function">mysql_query()</a></span>.</p></dd>
+  </dl>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-function.mysql-fetch-assoc-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="simpara">
+   Returns an associative array of strings that corresponds to the fetched row, or
+   <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong> if there are no more rows.
+  </p>
+  <p class="simpara">
+   If two or more columns of the result have the same field names,
+   the last column will take precedence. To access the other
+   column(s) of the same name, you either need to access the
+   result with numeric indices by using
+   <span class="function"><a href="function.mysql-fetch-row.html" class="function">mysql_fetch_row()</a></span> or add alias names.
+   See the example at the <span class="function"><a href="function.mysql-fetch-array.html" class="function">mysql_fetch_array()</a></span>
+   description about aliases.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-function.mysql-fetch-assoc-examples">
+  <h3 class="title">Examples</h3>
+  <div class="example" id="example-1">
+   <p><strong>Example #1 An expanded <span class="function"><strong>mysql_fetch_assoc()</strong></span> example</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br />$conn </span><span style="color: #007700">= </span><span style="color: #0000BB">mysql_connect</span><span style="color: #007700">(</span><span style="color: #DD0000">"localhost"</span><span style="color: #007700">, </span><span style="color: #DD0000">"mysql_user"</span><span style="color: #007700">, </span><span style="color: #DD0000">"mysql_password"</span><span style="color: #007700">);<br /><br />if (!</span><span style="color: #0000BB">$conn</span><span style="color: #007700">) {<br />    echo </span><span style="color: #DD0000">"Unable to connect to DB: " </span><span style="color: #007700">. </span><span style="color: #0000BB">mysql_error</span><span style="color: #007700">();<br />    exit;<br />}<br /><br />if (!</span><span style="color: #0000BB">mysql_select_db</span><span style="color: #007700">(</span><span style="color: #DD0000">"mydbname"</span><span style="color: #007700">)) {<br />    echo </span><span style="color: #DD0000">"Unable to select mydbname: " </span><span style="color: #007700">. </span><span style="color: #0000BB">mysql_error</span><span style="color: #007700">();<br />    exit;<br />}<br /><br /></span><span style="color: #0000BB">$sql </span><span style="color: #007700">= </span><span style="color: #DD0000">"SELECT id as userid, fullname, userstatus<br />        FROM   sometable<br />        WHERE  userstatus = 1"</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">mysql_query</span><span style="color: #007700">(</span><span style="color: #0000BB">$sql</span><span style="color: #007700">);<br /><br />if (!</span><span style="color: #0000BB">$result</span><span style="color: #007700">) {<br />    echo </span><span style="color: #DD0000">"Could not successfully run query (</span><span style="color: #0000BB">$sql</span><span style="color: #DD0000">) from DB: " </span><span style="color: #007700">. </span><span style="color: #0000BB">mysql_error</span><span style="color: #007700">();<br />    exit;<br />}<br /><br />if (</span><span style="color: #0000BB">mysql_num_rows</span><span style="color: #007700">(</span><span style="color: #0000BB">$result</span><span style="color: #007700">) == </span><span style="color: #0000BB">0</span><span style="color: #007700">) {<br />    echo </span><span style="color: #DD0000">"No rows found, nothing to print so am exiting"</span><span style="color: #007700">;<br />    exit;<br />}<br /><br /></span><span style="color: #FF8000">// While a row of data exists, put that row in $row as an associative array<br />// Note: If you're expecting just one row, no need to use a loop<br />// Note: If you put extract($row); inside the following loop, you'll<br />//       then create $userid, $fullname, and $userstatus<br /></span><span style="color: #007700">while (</span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">mysql_fetch_assoc</span><span style="color: #007700">(</span><span style="color: #0000BB">$result</span><span style="color: #007700">)) {<br />    echo </span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #DD0000">"userid"</span><span style="color: #007700">];<br />    echo </span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #DD0000">"fullname"</span><span style="color: #007700">];<br />    echo </span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #DD0000">"userstatus"</span><span style="color: #007700">];<br />}<br /><br /></span><span style="color: #0000BB">mysql_free_result</span><span style="color: #007700">(</span><span style="color: #0000BB">$result</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </div>
+
+
+ <div class="refsect1 notes" id="refsect1-function.mysql-fetch-assoc-notes">
+  <h3 class="title">Notes</h3>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <strong>Performance</strong><br />
+   <span class="simpara">
+    An important thing to note is that using
+    <span class="function"><strong>mysql_fetch_assoc()</strong></span> is <em>not
+    significantly</em> slower than using
+    <span class="function"><a href="function.mysql-fetch-row.html" class="function">mysql_fetch_row()</a></span>, while it
+    provides a significant added value.
+   </span>
+  </p></blockquote>
+  <blockquote class="note"><p><strong class="note">Note</strong>: <span class="simpara">Field names returned by this function
+are <em>case-sensitive</em>.</span></p></blockquote>
+  <blockquote class="note"><p><strong class="note">Note</strong>: <span class="simpara">This function sets NULL fields to
+the PHP <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong> value.</span></p></blockquote>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-function.mysql-fetch-assoc-seealso">
+  <h3 class="title">See Also</h3>
+  <ul class="simplelist">
+   <li><span class="function"><a href="function.mysql-fetch-row.html" class="function" rel="rdfs-seeAlso">mysql_fetch_row()</a> - Get a result row as an enumerated array</span></li>
+   <li><span class="function"><a href="function.mysql-fetch-array.html" class="function" rel="rdfs-seeAlso">mysql_fetch_array()</a> - Fetch a result row as an associative array, a numeric array, or both</span></li>
+   <li><span class="function"><a href="function.mysql-data-seek.html" class="function" rel="rdfs-seeAlso">mysql_data_seek()</a> - Move internal result pointer</span></li>
+   <li><span class="function"><a href="function.mysql-query.html" class="function" rel="rdfs-seeAlso">mysql_query()</a> - Send a MySQL query</span></li>
+   <li><span class="function"><a href="function.mysql-error.html" class="function" rel="rdfs-seeAlso">mysql_error()</a> - Returns the text of the error message from previous MySQL operation</span></li>
+  </ul>
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

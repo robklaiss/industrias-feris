@@ -1,0 +1,228 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>The com class</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="com.examples.arrays.html" class="navbar__link">« Arrays and Array-style COM properties</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="com.construct.html" class="navbar__link">com::__construct »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.com.html">COM</a></li>
+        <li>The com class</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="class.com" class="reference">
+ 
+ <h1 class="title">The com class</h1>
+ <div class="partintro"><p class="verinfo">(PHP 4 &gt;= 4.1.0, PHP 5, PHP 7, PHP 8)</p>
+
+
+  <div class="section" id="com.intro">
+   <h2 class="title">Introduction</h2>
+   <p class="para">
+    The com class allows you to instantiate an OLE compatible COM object and
+    call its methods and access its properties.
+   </p>
+  </div>
+
+
+  <div class="section" id="com.synopsis">
+   <h2 class="title">Class synopsis</h2>
+
+
+   <div class="classsynopsis"><div class="classsynopsisinfo">
+    
+     <span class="modifier">class</span> <strong class="classname"><strong class="classname">com</strong></strong>
+    
+
+    
+     <span class="modifier">extends</span>
+      <a href="class.variant.html" class="classname">variant</a>
+     {</div>
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Methods */</div>
+    <div class="constructorsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><a href="com.construct.html" class="methodname">__construct</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$module_name</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.string.html" class="type string">string</a></span>|<span class="type"><a href="language.types.null.html" class="type null">null</a></span></span> <code class="parameter">$server_name</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$codepage</code><span class="initializer"> = <strong><code><a href="com.constants.html#constant.cp-acp">CP_ACP</a></code></strong></span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$typelib</code><span class="initializer"> = &quot;&quot;</span></span><br>)</div>
+
+   }</div>
+
+
+  </div>
+
+  <div class="section" id="class.com.overloadedmethods">
+   <h2 class="title">Overloaded Methods</h2>
+   <p class="para">
+    The returned object is an overloaded object, which means that PHP does
+    not see any fixed methods as it does with regular classes; instead, any
+    property or method accesses are passed through to COM.
+   </p>
+   <p class="para">
+    PHP will automatically detect methods that accept
+    parameters by reference, and will automatically convert regular PHP
+    variables to a form that can be passed by reference.  This means that you
+    can call the method very naturally; you needn&#039;t go to any extra effort in
+    your code.
+   </p>
+  </div>
+
+  <div class="section" id="class.com.examples">
+   <h2 class="title">com examples</h2>
+   <p class="para">
+    <div class="example" id="example.com1">
+     <p><strong>Example #1 com example (1)</strong></p>
+     <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">// starting word<br /></span><span style="color: #0000BB">$word </span><span style="color: #007700">= new </span><span style="color: #0000BB">com</span><span style="color: #007700">(</span><span style="color: #DD0000">"word.application"</span><span style="color: #007700">) or die(</span><span style="color: #DD0000">"Unable to instantiate Word"</span><span style="color: #007700">);<br />echo </span><span style="color: #DD0000">"Loaded Word, version </span><span style="color: #007700">{</span><span style="color: #0000BB">$word</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Version</span><span style="color: #007700">}</span><span style="color: #DD0000">\n"</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">//bring it to front<br /></span><span style="color: #0000BB">$word</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Visible </span><span style="color: #007700">= </span><span style="color: #0000BB">1</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">//open an empty document<br /></span><span style="color: #0000BB">$word</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Documents</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Add</span><span style="color: #007700">();<br /><br /></span><span style="color: #FF8000">//do some weird stuff<br /></span><span style="color: #0000BB">$word</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Selection</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">TypeText</span><span style="color: #007700">(</span><span style="color: #DD0000">"This is a test..."</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$word</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Documents</span><span style="color: #007700">[</span><span style="color: #0000BB">1</span><span style="color: #007700">]-&gt;</span><span style="color: #0000BB">SaveAs</span><span style="color: #007700">(</span><span style="color: #DD0000">"Useless test.doc"</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">//closing word<br /></span><span style="color: #0000BB">$word</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Quit</span><span style="color: #007700">();<br /><br /></span><span style="color: #FF8000">//free the object<br /></span><span style="color: #0000BB">$word </span><span style="color: #007700">= </span><span style="color: #0000BB">null</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    </div>
+   </p>
+   <p class="para">
+    <div class="example" id="example.com2">
+     <p><strong>Example #2 com example (2)</strong></p>
+     <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br />$conn </span><span style="color: #007700">= new </span><span style="color: #0000BB">com</span><span style="color: #007700">(</span><span style="color: #DD0000">"ADODB.Connection"</span><span style="color: #007700">) or die(</span><span style="color: #DD0000">"Cannot start ADO"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$conn</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Open</span><span style="color: #007700">(</span><span style="color: #DD0000">"Provider=SQLOLEDB; Data Source=localhost;<br />Initial Catalog=database; User ID=user; Password=password"</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$rs </span><span style="color: #007700">= </span><span style="color: #0000BB">$conn</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Execute</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT * FROM sometable"</span><span style="color: #007700">);    </span><span style="color: #FF8000">// Recordset<br /><br /></span><span style="color: #0000BB">$num_columns </span><span style="color: #007700">= </span><span style="color: #0000BB">$rs</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Fields</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Count</span><span style="color: #007700">();<br />echo </span><span style="color: #0000BB">$num_columns </span><span style="color: #007700">. </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br /><br />for (</span><span style="color: #0000BB">$i</span><span style="color: #007700">=</span><span style="color: #0000BB">0</span><span style="color: #007700">; </span><span style="color: #0000BB">$i </span><span style="color: #007700">&lt; </span><span style="color: #0000BB">$num_columns</span><span style="color: #007700">; </span><span style="color: #0000BB">$i</span><span style="color: #007700">++) {<br />    </span><span style="color: #0000BB">$fld</span><span style="color: #007700">[</span><span style="color: #0000BB">$i</span><span style="color: #007700">] = </span><span style="color: #0000BB">$rs</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Fields</span><span style="color: #007700">(</span><span style="color: #0000BB">$i</span><span style="color: #007700">);<br />}<br /><br /></span><span style="color: #0000BB">$rowcount </span><span style="color: #007700">= </span><span style="color: #0000BB">0</span><span style="color: #007700">;<br />while (!</span><span style="color: #0000BB">$rs</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">EOF</span><span style="color: #007700">) {<br />    for (</span><span style="color: #0000BB">$i</span><span style="color: #007700">=</span><span style="color: #0000BB">0</span><span style="color: #007700">; </span><span style="color: #0000BB">$i </span><span style="color: #007700">&lt; </span><span style="color: #0000BB">$num_columns</span><span style="color: #007700">; </span><span style="color: #0000BB">$i</span><span style="color: #007700">++) {<br />        echo </span><span style="color: #0000BB">$fld</span><span style="color: #007700">[</span><span style="color: #0000BB">$i</span><span style="color: #007700">]-&gt;</span><span style="color: #0000BB">value </span><span style="color: #007700">. </span><span style="color: #DD0000">"\t"</span><span style="color: #007700">;<br />    }<br />    echo </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />    </span><span style="color: #0000BB">$rowcount</span><span style="color: #007700">++;            </span><span style="color: #FF8000">// increments rowcount<br />    </span><span style="color: #0000BB">$rs</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">MoveNext</span><span style="color: #007700">();<br />}<br /><br /></span><span style="color: #0000BB">$rs</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Close</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">$conn</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Close</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">$rs </span><span style="color: #007700">= </span><span style="color: #0000BB">null</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$conn </span><span style="color: #007700">= </span><span style="color: #0000BB">null</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+     </div>
+
+    </div>
+   </p>
+  </div>
+
+ </div>
+
+ 
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="com.construct.html">com::__construct</a> — com class constructor</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

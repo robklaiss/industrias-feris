@@ -1,0 +1,25 @@
+{
+  "consulta": {
+    "cabecera": {
+      "dFecProc": "2026-01-23T12:00:00"
+    },
+    "gResProcLote": {
+      "primero": {
+        "id": "0101",
+        "dEstRes": "Aprobado",
+        "gResProc": {
+          "dCodRes": "0200",
+          "dMsgRes": "Aprobado"
+        }
+      },
+      "segundo": {
+        "cdc": "0102",
+        "gResProc": {
+          "dCodRes": "0301",
+          "dMsgRes": "Rechazado"
+        },
+        "dEstRes": "Rechazado"
+      }
+    }
+  }
+}

@@ -1,0 +1,172 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Image Processing and Generation</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.recode-string.html" class="navbar__link">« recode_string</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="book.exif.html" class="navbar__link">Exif »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="funcref.html">Function Reference</a></li>
+        <li>Image Processing and Generation</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="refs.utilspec.image" class="set">
+   <h1 class="title">Image Processing and Generation</h1>
+   
+
+
+
+
+   
+
+ 
+
+
+
+
+
+   
+
+
+
+
+
+   
+
+
+ 
+
+
+
+
+
+  <ul class="chunklist chunklist_set"><li><a href="book.exif.html">Exif</a> — Exchangeable image information<ul class="chunklist chunklist_set chunklist_children"><li><a href="intro.exif.html">Introduction</a></li><li><a href="exif.setup.html">Installing/Configuring</a></li><li><a href="exif.constants.html">Predefined Constants</a></li><li><a href="ref.exif.html">Exif Functions</a></li></ul></li><li><a href="book.image.html">GD</a> — Image Processing and GD<ul class="chunklist chunklist_set chunklist_children"><li><a href="intro.image.html">Introduction</a></li><li><a href="image.setup.html">Installing/Configuring</a></li><li><a href="image.constants.html">Predefined Constants</a></li><li><a href="image.examples.html">Examples</a></li><li><a href="ref.image.html">GD and Image Functions</a></li><li><a href="class.gdimage.html">GdImage</a> — The GdImage class</li><li><a href="class.gdfont.html">GdFont</a> — The GdFont class</li></ul></li><li><a href="book.gmagick.html">Gmagick</a><ul class="chunklist chunklist_set chunklist_children"><li><a href="intro.gmagick.html">Introduction</a></li><li><a href="gmagick.setup.html">Installing/Configuring</a></li><li><a href="gmagick.constants.html">Predefined Constants</a></li><li><a href="gmagick.examples.html">Examples</a></li><li><a href="class.gmagick.html">Gmagick</a> — The Gmagick class</li><li><a href="class.gmagickdraw.html">GmagickDraw</a> — The GmagickDraw class</li><li><a href="class.gmagickpixel.html">GmagickPixel</a> — The GmagickPixel class</li></ul></li><li><a href="book.imagick.html">ImageMagick</a> — Image Processing (ImageMagick)<ul class="chunklist chunklist_set chunklist_children"><li><a href="intro.imagick.html">Introduction</a></li><li><a href="imagick.setup.html">Installing/Configuring</a></li><li><a href="imagick.constants.html">Predefined Constants</a></li><li><a href="imagick.examples.html">Examples</a></li><li><a href="class.imagick.html">Imagick</a> — The Imagick class</li><li><a href="class.imagickdraw.html">ImagickDraw</a> — The ImagickDraw class</li><li><a href="class.imagickdrawexception.html">ImagickDrawException</a> — The ImagickDrawException class</li><li><a href="class.imagickexception.html">ImagickException</a> — The ImagickException class</li><li><a href="class.imagickkernel.html">ImagickKernel</a> — The ImagickKernel class</li><li><a href="class.imagickkernelexception.html">ImagickKernelException</a> — The ImagickKernelException class</li><li><a href="class.imagickpixel.html">ImagickPixel</a> — The ImagickPixel class</li><li><a href="class.imagickpixelexception.html">ImagickPixelException</a> — The ImagickPixelException class</li><li><a href="class.imagickpixeliterator.html">ImagickPixelIterator</a> — The ImagickPixelIterator class</li><li><a href="class.imagickpixeliteratorexception.html">ImagickPixelIteratorException</a> — The ImagickPixelIteratorException class</li></ul></li></ul></div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

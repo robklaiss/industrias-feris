@@ -1,0 +1,166 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Examples</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="yaz.installation.html" class="navbar__link">« Installation</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="ref.yaz.html" class="navbar__link">YAZ Functions »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.yaz.html">YAZ</a></li>
+        <li>Examples</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="yaz.examples" class="chapter">
+ <h1 class="title">Examples</h1>
+
+ <p class="para">
+  PHP/YAZ keeps track of connections with targets
+  (Z-Associations). A resource represents a connection to a
+  target.
+ </p>
+ <p class="para">
+  The script below demonstrates the parallel searching feature of
+  the API. When invoked with no arguments it prints a query form; else
+  (arguments are supplied) it searches the targets as given in array
+  <code class="literal">host</code>.
+ </p>
+ <p class="para">
+  <div class="example" id="example-1">
+   <p><strong>Example #1 Parallel searching using Yaz</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$host</span><span style="color: #007700">=</span><span style="color: #0000BB">$_REQUEST</span><span style="color: #007700">[</span><span style="color: #0000BB">host</span><span style="color: #007700">];<br /></span><span style="color: #0000BB">$query</span><span style="color: #007700">=</span><span style="color: #0000BB">$_REQUEST</span><span style="color: #007700">[</span><span style="color: #0000BB">query</span><span style="color: #007700">];<br /></span><span style="color: #0000BB">$num_hosts </span><span style="color: #007700">= </span><span style="color: #0000BB">count</span><span style="color: #007700">(</span><span style="color: #0000BB">$host</span><span style="color: #007700">);<br />if (empty(</span><span style="color: #0000BB">$query</span><span style="color: #007700">) || </span><span style="color: #0000BB">count</span><span style="color: #007700">(</span><span style="color: #0000BB">$host</span><span style="color: #007700">) == </span><span style="color: #0000BB">0</span><span style="color: #007700">) {<br />    echo </span><span style="color: #DD0000">'&lt;form method="get"&gt;<br />    &lt;input type="checkbox"<br />    name="host[]" value="bagel.indexdata.dk/gils" /&gt;<br />        GILS test<br />    &lt;input type="checkbox"<br />    name="host[]" value="localhost:9999/Default" /&gt;<br />        local test<br />    &lt;input type="checkbox" checked="checked"<br />    name="host[]" value="z3950.loc.gov:7090/voyager" /&gt;<br />        Library of Congress<br />    &lt;br /&gt;<br />    RPN Query:<br />    &lt;input type="text" size="30" name="query" /&gt;<br />    &lt;input type="submit" name="action" value="Search" /&gt;<br />    &lt;/form&gt;<br />    '</span><span style="color: #007700">;        <br />} else {<br />    echo </span><span style="color: #DD0000">'You searched for ' </span><span style="color: #007700">. </span><span style="color: #0000BB">htmlspecialchars</span><span style="color: #007700">(</span><span style="color: #0000BB">$query</span><span style="color: #007700">) . </span><span style="color: #DD0000">'&lt;br /&gt;'</span><span style="color: #007700">;<br />    for (</span><span style="color: #0000BB">$i </span><span style="color: #007700">= </span><span style="color: #0000BB">0</span><span style="color: #007700">; </span><span style="color: #0000BB">$i </span><span style="color: #007700">&lt; </span><span style="color: #0000BB">$num_hosts</span><span style="color: #007700">; </span><span style="color: #0000BB">$i</span><span style="color: #007700">++) {<br />        </span><span style="color: #0000BB">$id</span><span style="color: #007700">[] = </span><span style="color: #0000BB">yaz_connect</span><span style="color: #007700">(</span><span style="color: #0000BB">$host</span><span style="color: #007700">[</span><span style="color: #0000BB">$i</span><span style="color: #007700">]);<br />        </span><span style="color: #0000BB">yaz_syntax</span><span style="color: #007700">(</span><span style="color: #0000BB">$id</span><span style="color: #007700">[</span><span style="color: #0000BB">$i</span><span style="color: #007700">], </span><span style="color: #DD0000">"usmarc"</span><span style="color: #007700">);<br />        </span><span style="color: #0000BB">yaz_range</span><span style="color: #007700">(</span><span style="color: #0000BB">$id</span><span style="color: #007700">[</span><span style="color: #0000BB">$i</span><span style="color: #007700">], </span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">10</span><span style="color: #007700">);<br />        </span><span style="color: #0000BB">yaz_search</span><span style="color: #007700">(</span><span style="color: #0000BB">$id</span><span style="color: #007700">[</span><span style="color: #0000BB">$i</span><span style="color: #007700">], </span><span style="color: #DD0000">"rpn"</span><span style="color: #007700">, </span><span style="color: #0000BB">$query</span><span style="color: #007700">);<br />    }<br />    </span><span style="color: #0000BB">yaz_wait</span><span style="color: #007700">();<br />    for (</span><span style="color: #0000BB">$i </span><span style="color: #007700">= </span><span style="color: #0000BB">0</span><span style="color: #007700">; </span><span style="color: #0000BB">$i </span><span style="color: #007700">&lt; </span><span style="color: #0000BB">$num_hosts</span><span style="color: #007700">; </span><span style="color: #0000BB">$i</span><span style="color: #007700">++) {<br />        echo </span><span style="color: #DD0000">'&lt;hr /&gt;' </span><span style="color: #007700">. </span><span style="color: #0000BB">$host</span><span style="color: #007700">[</span><span style="color: #0000BB">$i</span><span style="color: #007700">] . </span><span style="color: #DD0000">':'</span><span style="color: #007700">;<br />        </span><span style="color: #0000BB">$error </span><span style="color: #007700">= </span><span style="color: #0000BB">yaz_error</span><span style="color: #007700">(</span><span style="color: #0000BB">$id</span><span style="color: #007700">[</span><span style="color: #0000BB">$i</span><span style="color: #007700">]);<br />        if (!empty(</span><span style="color: #0000BB">$error</span><span style="color: #007700">)) {<br />            echo </span><span style="color: #DD0000">"Error: </span><span style="color: #0000BB">$error</span><span style="color: #DD0000">"</span><span style="color: #007700">;<br />        } else {<br />            </span><span style="color: #0000BB">$hits </span><span style="color: #007700">= </span><span style="color: #0000BB">yaz_hits</span><span style="color: #007700">(</span><span style="color: #0000BB">$id</span><span style="color: #007700">[</span><span style="color: #0000BB">$i</span><span style="color: #007700">]);<br />            echo </span><span style="color: #DD0000">"Result Count </span><span style="color: #0000BB">$hits</span><span style="color: #DD0000">"</span><span style="color: #007700">;<br />        }<br />        echo </span><span style="color: #DD0000">'&lt;dl&gt;'</span><span style="color: #007700">;<br />        for (</span><span style="color: #0000BB">$p </span><span style="color: #007700">= </span><span style="color: #0000BB">1</span><span style="color: #007700">; </span><span style="color: #0000BB">$p </span><span style="color: #007700">&lt;= </span><span style="color: #0000BB">10</span><span style="color: #007700">; </span><span style="color: #0000BB">$p</span><span style="color: #007700">++) {<br />            </span><span style="color: #0000BB">$rec </span><span style="color: #007700">= </span><span style="color: #0000BB">yaz_record</span><span style="color: #007700">(</span><span style="color: #0000BB">$id</span><span style="color: #007700">[</span><span style="color: #0000BB">$i</span><span style="color: #007700">], </span><span style="color: #0000BB">$p</span><span style="color: #007700">, </span><span style="color: #DD0000">"string"</span><span style="color: #007700">);<br />            if (empty(</span><span style="color: #0000BB">$rec</span><span style="color: #007700">)) continue;<br />            echo </span><span style="color: #DD0000">"&lt;dt&gt;&lt;b&gt;</span><span style="color: #0000BB">$p</span><span style="color: #DD0000">&lt;/b&gt;&lt;/dt&gt;&lt;dd&gt;"</span><span style="color: #007700">;<br />            echo </span><span style="color: #0000BB">nl2br</span><span style="color: #007700">(</span><span style="color: #0000BB">$rec</span><span style="color: #007700">);<br />            echo </span><span style="color: #DD0000">"&lt;/dd&gt;"</span><span style="color: #007700">;<br />        }<br />        echo </span><span style="color: #DD0000">'&lt;/dl&gt;'</span><span style="color: #007700">;<br />    }<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

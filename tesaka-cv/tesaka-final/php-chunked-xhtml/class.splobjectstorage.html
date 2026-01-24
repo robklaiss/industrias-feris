@@ -1,0 +1,399 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>The SplObjectStorage class</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="arrayobject.unserialize.html" class="navbar__link">« ArrayObject::unserialize</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="splobjectstorage.addall.html" class="navbar__link">SplObjectStorage::addAll »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="spl.datastructures.html">Datastructures</a></li>
+        <li>The SplObjectStorage class</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="class.splobjectstorage" class="reference">
+
+ <h1 class="title">The SplObjectStorage class</h1>
+ 
+
+ <div class="partintro"><p class="verinfo">(PHP 5 &gt;= 5.1.0, PHP 7, PHP 8)</p>
+
+
+  <div class="section" id="splobjectstorage.intro">
+   <h2 class="title">Introduction</h2>
+   <p class="para">
+    The SplObjectStorage class provides a map from objects to data or, by
+    ignoring data, an object set. This dual purpose can be useful in many
+    cases involving the need to uniquely identify objects.
+   </p>
+  </div>
+
+
+  <div class="section" id="splobjectstorage.synopsis">
+   <h2 class="title">Class synopsis</h2>
+
+
+   <div class="classsynopsis"><div class="classsynopsisinfo">
+    
+     <span class="modifier">class</span> <strong class="classname"><strong class="classname">SplObjectStorage</strong></strong>
+    
+
+    
+     <span class="modifier">implements</span>
+      <a href="class.countable.html" class="interfacename">Countable</a>,
+
+     <a href="class.seekableiterator.html" class="interfacename">SeekableIterator</a>,
+
+     <a href="class.serializable.html" class="interfacename">Serializable</a>,
+
+     <a href="class.arrayaccess.html" class="interfacename">ArrayAccess</a> {</div>
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Methods */</div>
+    <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.addall.html" class="methodname">addAll</a></span>(<span class="methodparam"><span class="type"><a href="class.splobjectstorage.html" class="type SplObjectStorage">SplObjectStorage</a></span> <code class="parameter">$storage</code></span>): <span class="type"><a href="language.types.integer.html" class="type int">int</a></span></div>
+<div class="methodsynopsis dc-description"><span class="attribute"><a href="class.deprecated.html">#[\Deprecated]</a> </span><br>
+   <span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.attach.html" class="methodname">attach</a></span>(<span class="methodparam"><span class="type"><a href="language.types.object.html" class="type object">object</a></span> <code class="parameter">$object</code></span>, <span class="methodparam"><span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$info</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="attribute"><a href="class.deprecated.html">#[\Deprecated]</a> </span><br>
+   <span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.contains.html" class="methodname">contains</a></span>(<span class="methodparam"><span class="type"><a href="language.types.object.html" class="type object">object</a></span> <code class="parameter">$object</code></span>): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.count.html" class="methodname">count</a></span>(<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$mode</code><span class="initializer"> = <strong><code><a href="array.constants.html#constant.count-normal">COUNT_NORMAL</a></code></strong></span></span>): <span class="type"><a href="language.types.integer.html" class="type int">int</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.current.html" class="methodname">current</a></span>(): <span class="type"><a href="language.types.object.html" class="type object">object</a></span></div>
+<div class="methodsynopsis dc-description"><span class="attribute"><a href="class.deprecated.html">#[\Deprecated]</a> </span><br>
+   <span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.detach.html" class="methodname">detach</a></span>(<span class="methodparam"><span class="type"><a href="language.types.object.html" class="type object">object</a></span> <code class="parameter">$object</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.gethash.html" class="methodname">getHash</a></span>(<span class="methodparam"><span class="type"><a href="language.types.object.html" class="type object">object</a></span> <code class="parameter">$object</code></span>): <span class="type"><a href="language.types.string.html" class="type string">string</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.getinfo.html" class="methodname">getInfo</a></span>(): <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.key.html" class="methodname">key</a></span>(): <span class="type"><a href="language.types.integer.html" class="type int">int</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.next.html" class="methodname">next</a></span>(): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.offsetexists.html" class="methodname">offsetExists</a></span>(<span class="methodparam"><span class="type"><a href="language.types.object.html" class="type object">object</a></span> <code class="parameter">$object</code></span>): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.offsetget.html" class="methodname">offsetGet</a></span>(<span class="methodparam"><span class="type"><a href="language.types.object.html" class="type object">object</a></span> <code class="parameter">$object</code></span>): <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.offsetset.html" class="methodname">offsetSet</a></span>(<span class="methodparam"><span class="type"><a href="language.types.object.html" class="type object">object</a></span> <code class="parameter">$object</code></span>, <span class="methodparam"><span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$info</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.offsetunset.html" class="methodname">offsetUnset</a></span>(<span class="methodparam"><span class="type"><a href="language.types.object.html" class="type object">object</a></span> <code class="parameter">$object</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.removeall.html" class="methodname">removeAll</a></span>(<span class="methodparam"><span class="type"><a href="class.splobjectstorage.html" class="type SplObjectStorage">SplObjectStorage</a></span> <code class="parameter">$storage</code></span>): <span class="type"><a href="language.types.integer.html" class="type int">int</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.removeallexcept.html" class="methodname">removeAllExcept</a></span>(<span class="methodparam"><span class="type"><a href="class.splobjectstorage.html" class="type SplObjectStorage">SplObjectStorage</a></span> <code class="parameter">$storage</code></span>): <span class="type"><a href="language.types.integer.html" class="type int">int</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.rewind.html" class="methodname">rewind</a></span>(): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.seek.html" class="methodname">seek</a></span>(<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$offset</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.serialize.html" class="methodname">serialize</a></span>(): <span class="type"><a href="language.types.string.html" class="type string">string</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.setinfo.html" class="methodname">setInfo</a></span>(<span class="methodparam"><span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$info</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.unserialize.html" class="methodname">unserialize</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$data</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="splobjectstorage.valid.html" class="methodname">valid</a></span>(): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+
+   }</div>
+
+
+  </div>
+
+
+  <div class="section" id="splobjectstorage.examples">
+   <h2 class="title">Examples</h2>
+   <p class="para">
+    <div class="example" id="example-1">
+     <p><strong>Example #1 <span class="classname"><strong class="classname">SplObjectStorage</strong></span> as a set</strong></p>
+     <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">// As an object set<br /></span><span style="color: #0000BB">$s </span><span style="color: #007700">= new </span><span style="color: #0000BB">SplObjectStorage</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">$o1 </span><span style="color: #007700">= new </span><span style="color: #0000BB">stdClass</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$o2 </span><span style="color: #007700">= new </span><span style="color: #0000BB">stdClass</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$o3 </span><span style="color: #007700">= new </span><span style="color: #0000BB">stdClass</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">attach</span><span style="color: #007700">(</span><span style="color: #0000BB">$o1</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">attach</span><span style="color: #007700">(</span><span style="color: #0000BB">$o2</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">contains</span><span style="color: #007700">(</span><span style="color: #0000BB">$o1</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">contains</span><span style="color: #007700">(</span><span style="color: #0000BB">$o2</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">contains</span><span style="color: #007700">(</span><span style="color: #0000BB">$o3</span><span style="color: #007700">));<br /><br /></span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">detach</span><span style="color: #007700">(</span><span style="color: #0000BB">$o2</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">contains</span><span style="color: #007700">(</span><span style="color: #0000BB">$o1</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">contains</span><span style="color: #007700">(</span><span style="color: #0000BB">$o2</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">contains</span><span style="color: #007700">(</span><span style="color: #0000BB">$o3</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output:</p></div>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+bool(true)
+bool(true)
+bool(false)
+bool(true)
+bool(false)
+bool(false)
+</pre></div>
+     </div>
+    </div>
+    <div class="example" id="example-2">
+     <p><strong>Example #2 <span class="classname"><strong class="classname">SplObjectStorage</strong></span> as a map</strong></p>
+     <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">// As a map from objects to data<br /></span><span style="color: #0000BB">$s </span><span style="color: #007700">= new </span><span style="color: #0000BB">SplObjectStorage</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">$o1 </span><span style="color: #007700">= new </span><span style="color: #0000BB">stdClass</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$o2 </span><span style="color: #007700">= new </span><span style="color: #0000BB">stdClass</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$o3 </span><span style="color: #007700">= new </span><span style="color: #0000BB">stdClass</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$s</span><span style="color: #007700">[</span><span style="color: #0000BB">$o1</span><span style="color: #007700">] = </span><span style="color: #DD0000">"data for object 1"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$s</span><span style="color: #007700">[</span><span style="color: #0000BB">$o2</span><span style="color: #007700">] = array(</span><span style="color: #0000BB">1</span><span style="color: #007700">,</span><span style="color: #0000BB">2</span><span style="color: #007700">,</span><span style="color: #0000BB">3</span><span style="color: #007700">);<br /><br />if (isset(</span><span style="color: #0000BB">$s</span><span style="color: #007700">[</span><span style="color: #0000BB">$o2</span><span style="color: #007700">])) {<br />    </span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$s</span><span style="color: #007700">[</span><span style="color: #0000BB">$o2</span><span style="color: #007700">]);<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output:</p></div>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+array(3) {
+  [0]=&gt;
+  int(1)
+  [1]=&gt;
+  int(2)
+  [2]=&gt;
+  int(3)
+}
+</pre></div>
+     </div>
+    </div>
+   </p>
+  </div>
+
+
+  <div class="section">
+   <h2 class="title">Changelog</h2>
+   <table class="doctable informaltable">
+    
+     <thead>
+      <tr>
+       <th>Version</th>
+       <th>Description</th>
+      </tr>
+
+     </thead>
+
+     <tbody class="tbody">
+      <tr>
+       <td>8.4.0</td>
+       <td>
+        Implement <span class="interfacename"><a href="class.seekableiterator.html" class="interfacename">SeekableIterator</a></span>, previously
+        only <span class="interfacename"><a href="class.iterator.html" class="interfacename">Iterator</a></span> was implemented.
+       </td>
+      </tr>
+
+     </tbody>
+    
+   </table>
+
+  </div>
+
+ </div>
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="splobjectstorage.addall.html">SplObjectStorage::addAll</a> — Adds all objects from another storage</li><li><a href="splobjectstorage.attach.html">SplObjectStorage::attach</a> — Adds an object in the storage</li><li><a href="splobjectstorage.contains.html">SplObjectStorage::contains</a> — Checks if the storage contains a specific object</li><li><a href="splobjectstorage.count.html">SplObjectStorage::count</a> — Returns the number of objects in the storage</li><li><a href="splobjectstorage.current.html">SplObjectStorage::current</a> — Returns the current storage entry</li><li><a href="splobjectstorage.detach.html">SplObjectStorage::detach</a> — Removes an object from the storage</li><li><a href="splobjectstorage.gethash.html">SplObjectStorage::getHash</a> — Calculate a unique identifier for the contained objects</li><li><a href="splobjectstorage.getinfo.html">SplObjectStorage::getInfo</a> — Returns the data associated with the current iterator entry</li><li><a href="splobjectstorage.key.html">SplObjectStorage::key</a> — Returns the index at which the iterator currently is</li><li><a href="splobjectstorage.next.html">SplObjectStorage::next</a> — Move to the next entry</li><li><a href="splobjectstorage.offsetexists.html">SplObjectStorage::offsetExists</a> — Checks whether an object exists in the storage</li><li><a href="splobjectstorage.offsetget.html">SplObjectStorage::offsetGet</a> — Returns the data associated with an object</li><li><a href="splobjectstorage.offsetset.html">SplObjectStorage::offsetSet</a> — Associates data to an object in the storage</li><li><a href="splobjectstorage.offsetunset.html">SplObjectStorage::offsetUnset</a> — Removes an object from the storage</li><li><a href="splobjectstorage.removeall.html">SplObjectStorage::removeAll</a> — Removes objects contained in another storage from the current storage</li><li><a href="splobjectstorage.removeallexcept.html">SplObjectStorage::removeAllExcept</a> — Removes all objects except for those contained in another storage from the current storage</li><li><a href="splobjectstorage.rewind.html">SplObjectStorage::rewind</a> — Rewind the iterator to the first storage element</li><li><a href="splobjectstorage.seek.html">SplObjectStorage::seek</a> — Seeks iterator to a position</li><li><a href="splobjectstorage.serialize.html">SplObjectStorage::serialize</a> — Serializes the storage</li><li><a href="splobjectstorage.setinfo.html">SplObjectStorage::setInfo</a> — Sets the data associated with the current iterator entry</li><li><a href="splobjectstorage.unserialize.html">SplObjectStorage::unserialize</a> — Unserializes a storage from its string representation</li><li><a href="splobjectstorage.valid.html">SplObjectStorage::valid</a> — Returns if the current iterator entry is valid</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TESAKA-SIFEN{% endblock %}</title>
+    <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+    <header>
+        <h1>TESAKA-SIFEN - Documentos Electrónicos</h1>
+        <nav>
+            <a href="/">Inicio</a> |
+            <a href="/de/new">Nuevo DE</a> |
+            <a href="/sifen-smoke">SIFEN Smoke</a> |
+            <a href="/admin/sifen/lotes">Lotes SIFEN</a>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>Sistema de Facturación Electrónica - SIFEN Paraguay</p>
+    </footer>
+</body>
+</html>
+

@@ -1,0 +1,195 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Differences from objects</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="language.enumerations.expressions.html" class="navbar__link">« Enum values in constant expressions</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="language.enumerations.listing.html" class="navbar__link">Value listing »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="language.enumerations.html">Enumerations</a></li>
+        <li>Differences from objects</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="language.enumerations.object-differences" class="sect1">
+  <h2 class="title">Differences from objects</h2>
+
+  <p class="para">
+   Although Enums are built on classes and objects, they do not support all object-related functionality.
+   In particular, Enum cases are forbidden from having state.
+  </p>
+
+  <ul class="simplelist">
+   <li>Constructors and Destructors are forbidden.</li>
+   <li>Inheritance is not supported. Enums may not extend or be extended.</li>
+   <li>Static or object properties are not allowed.</li>
+   <li>Cloning an Enum case is not supported, as cases must be singleton instances.</li>
+   <li><a href="language.oop5.magic.html" class="link">Magic methods</a>, except for those listed below, are disallowed.</li>
+   <li>Enums must always be declared before they are used.</li>
+  </ul>
+
+  <p class="para">The following object functionality is available, and behaves just as it does on any other object:</p>
+
+  <ul class="simplelist">
+   <li>Public, private, and protected methods.</li>
+   <li>Public, private, and protected static methods.</li>
+   <li>Public, private, and protected constants.</li>
+   <li>Enums may implement any number of interfaces.</li>
+   <li>
+    Enums and cases may have <a href="language.attributes.html" class="link">attributes</a> attached
+    to them. The <strong><code>TARGET_CLASS</code></strong> target
+    filter includes Enums themselves. The <strong><code>TARGET_CLASS_CONST</code></strong> target filter
+    includes Enum Cases.
+   </li>
+   <li>
+    <a href="language.oop5.overloading.html#object.call" class="link">__call</a>, <a href="language.oop5.overloading.html#object.callstatic" class="link">__callStatic</a>,
+    and <a href="language.oop5.magic.html#object.invoke" class="link">__invoke</a> magic methods
+   </li>
+   <li><strong><code><a href="language.constants.magic.html#constant.class">__CLASS__</a></code></strong> and <strong><code><a href="language.constants.magic.html#constant.function">__FUNCTION__</a></code></strong> constants behave as normal</li>
+  </ul>
+
+  <p class="para">
+   The <code class="literal">::class</code> magic constant on an Enum type evaluates to the type
+   name including any namespace, exactly the same as an object. The <code class="literal">::class</code>
+   magic constant on a Case instance also evaluates to the Enum type, as it is an
+   instance of that type.
+  </p>
+
+  <p class="para">
+   Additionally, enum cases may not be instantiated directly with <code class="literal">new</code>, nor with
+   <span class="methodname"><a href="reflectionclass.newinstancewithoutconstructor.html" class="methodname">ReflectionClass::newInstanceWithoutConstructor()</a></span> in reflection. Both will result in an error.
+  </p>
+
+  <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br />$clovers </span><span style="color: #007700">= new </span><span style="color: #0000BB">Suit</span><span style="color: #007700">();<br /></span><span style="color: #FF8000">// Error: Cannot instantiate enum Suit<br /><br /></span><span style="color: #0000BB">$horseshoes </span><span style="color: #007700">= (new </span><span style="color: #0000BB">ReflectionClass</span><span style="color: #007700">(</span><span style="color: #0000BB">Suit</span><span style="color: #007700">::class))-&gt;</span><span style="color: #0000BB">newInstanceWithoutConstructor</span><span style="color: #007700">()<br /></span><span style="color: #FF8000">// Error: Cannot instantiate enum Suit<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+  </div>
+
+ </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

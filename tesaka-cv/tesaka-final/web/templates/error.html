@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Error - TESAKA-SIFEN{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="error-content">
+        <h2>⚠️ {{ error_title }}</h2>
+        <p class="error-message">{{ error_message }}</p>
+        {% if error_details %}
+        <div class="error-details">
+            <code>{{ error_details }}</code>
+        </div>
+        {% endif %}
+        {% if error_code %}
+        <p class="error-code">Código: {{ error_code }}</p>
+        {% endif %}
+        <div class="error-actions">
+            <a href="/" class="btn-primary">Intentar de nuevo</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

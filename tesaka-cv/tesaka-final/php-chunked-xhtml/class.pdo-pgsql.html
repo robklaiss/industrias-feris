@@ -1,0 +1,693 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>The Pdo\Pgsql class</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="pdo.pgsqllobunlink.html" class="navbar__link">« PDO::pgsqlLOBUnlink</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="pdo-pgsql.copyfromarray.html" class="navbar__link">Pdo\Pgsql::copyFromArray »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="pdo.drivers.html">PDO Drivers</a></li>
+        <li>The Pdo\Pgsql class</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="class.pdo-pgsql" class="reference">
+ <h1 class="title">The Pdo\Pgsql class</h1>
+ 
+
+ <div class="partintro"><p class="verinfo">(PHP 8 &gt;= 8.4.0)</p>
+
+  
+  <div class="section" id="pdo-pgsql.intro">
+   <h2 class="title">Introduction</h2>
+   <p class="simpara">
+    A <span class="classname"><a href="class.pdo.html" class="classname">PDO</a></span> subclass representing a connection using
+    the PostgreSQL PDO driver.
+   </p>
+   <p class="para">
+    This driver supports a dedicated SQL query parser for the PostgreSQL dialect.
+    It can handle the following:
+    <ul class="itemizedlist">
+     <li class="listitem">
+      <span class="simpara">
+       Single and double-quoted literals, with doubling as escaping mechanism
+      </span>
+     </li>
+     <li class="listitem">
+      <span class="simpara">
+       C-style “escape” string literals
+      </span>
+     </li>
+     <li class="listitem">
+      <span class="simpara">
+       Dollar-quoted string literals
+      </span>
+     </li>
+     <li class="listitem">
+      <span class="simpara">
+       Two-dashes and C-style comments (non-nested).
+      </span>
+     </li>
+     <li class="listitem">
+      <span class="simpara">
+       Support for <code class="literal">??</code> as escape sequence for the
+       <code class="literal">?</code> operator.
+      </span>
+     </li>
+    </ul>
+   </p>
+  </div>
+  
+
+  <div class="section" id="pdo-pgsql.synopsis">
+   <h2 class="title">Class synopsis</h2>
+
+   
+   <div class="classsynopsis"><div class="classsynopsisinfo">
+    
+     <span class="modifier">class</span> <strong class="classname"><strong class="classname">Pdo\Pgsql</strong></strong>
+    
+
+    
+     <span class="modifier">extends</span>
+      <a href="class.pdo.html" class="classname">PDO</a>
+     {</div>
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Inherited constants */</div>
+    <div class="fieldsynopsis">
+     <span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-null"><var class="varname">PDO::PARAM_NULL</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-bool"><var class="varname">PDO::PARAM_BOOL</var></a></var><span class="initializer"> = 5</span>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-int"><var class="varname">PDO::PARAM_INT</var></a></var><span class="initializer"> = 1</span>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-str"><var class="varname">PDO::PARAM_STR</var></a></var><span class="initializer"> = 2</span>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-lob"><var class="varname">PDO::PARAM_LOB</var></a></var><span class="initializer"> = 3</span>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-stmt"><var class="varname">PDO::PARAM_STMT</var></a></var><span class="initializer"> = 4</span>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-input-output"><var class="varname">PDO::PARAM_INPUT_OUTPUT</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-str-natl"><var class="varname">PDO::PARAM_STR_NATL</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-str-char"><var class="varname">PDO::PARAM_STR_CHAR</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-evt-alloc"><var class="varname">PDO::PARAM_EVT_ALLOC</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-evt-free"><var class="varname">PDO::PARAM_EVT_FREE</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-evt-exec-pre"><var class="varname">PDO::PARAM_EVT_EXEC_PRE</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-evt-exec-post"><var class="varname">PDO::PARAM_EVT_EXEC_POST</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-evt-fetch-pre"><var class="varname">PDO::PARAM_EVT_FETCH_PRE</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-evt-fetch-post"><var class="varname">PDO::PARAM_EVT_FETCH_POST</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.param-evt-normalize"><var class="varname">PDO::PARAM_EVT_NORMALIZE</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-default"><var class="varname">PDO::FETCH_DEFAULT</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-lazy"><var class="varname">PDO::FETCH_LAZY</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-assoc"><var class="varname">PDO::FETCH_ASSOC</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-num"><var class="varname">PDO::FETCH_NUM</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-both"><var class="varname">PDO::FETCH_BOTH</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-obj"><var class="varname">PDO::FETCH_OBJ</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-bound"><var class="varname">PDO::FETCH_BOUND</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-column"><var class="varname">PDO::FETCH_COLUMN</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-class"><var class="varname">PDO::FETCH_CLASS</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-into"><var class="varname">PDO::FETCH_INTO</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-func"><var class="varname">PDO::FETCH_FUNC</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-group"><var class="varname">PDO::FETCH_GROUP</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-unique"><var class="varname">PDO::FETCH_UNIQUE</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-key-pair"><var class="varname">PDO::FETCH_KEY_PAIR</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-classtype"><var class="varname">PDO::FETCH_CLASSTYPE</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-serialize"><var class="varname">PDO::FETCH_SERIALIZE</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-props-late"><var class="varname">PDO::FETCH_PROPS_LATE</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-named"><var class="varname">PDO::FETCH_NAMED</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-autocommit"><var class="varname">PDO::ATTR_AUTOCOMMIT</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-prefetch"><var class="varname">PDO::ATTR_PREFETCH</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-timeout"><var class="varname">PDO::ATTR_TIMEOUT</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-errmode"><var class="varname">PDO::ATTR_ERRMODE</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-server-version"><var class="varname">PDO::ATTR_SERVER_VERSION</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-client-version"><var class="varname">PDO::ATTR_CLIENT_VERSION</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-server-info"><var class="varname">PDO::ATTR_SERVER_INFO</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-connection-status"><var class="varname">PDO::ATTR_CONNECTION_STATUS</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-case"><var class="varname">PDO::ATTR_CASE</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-cursor-name"><var class="varname">PDO::ATTR_CURSOR_NAME</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-cursor"><var class="varname">PDO::ATTR_CURSOR</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-oracle-nulls"><var class="varname">PDO::ATTR_ORACLE_NULLS</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-persistent"><var class="varname">PDO::ATTR_PERSISTENT</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-statement-class"><var class="varname">PDO::ATTR_STATEMENT_CLASS</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-fetch-table-names"><var class="varname">PDO::ATTR_FETCH_TABLE_NAMES</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-fetch-catalog-names"><var class="varname">PDO::ATTR_FETCH_CATALOG_NAMES</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-driver-name"><var class="varname">PDO::ATTR_DRIVER_NAME</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-stringify-fetches"><var class="varname">PDO::ATTR_STRINGIFY_FETCHES</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-max-column-len"><var class="varname">PDO::ATTR_MAX_COLUMN_LEN</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-emulate-prepares"><var class="varname">PDO::ATTR_EMULATE_PREPARES</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-default-fetch-mode"><var class="varname">PDO::ATTR_DEFAULT_FETCH_MODE</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.attr-default-str-param"><var class="varname">PDO::ATTR_DEFAULT_STR_PARAM</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.errmode-silent"><var class="varname">PDO::ERRMODE_SILENT</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.errmode-warning"><var class="varname">PDO::ERRMODE_WARNING</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.errmode-exception"><var class="varname">PDO::ERRMODE_EXCEPTION</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.case-natural"><var class="varname">PDO::CASE_NATURAL</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.case-lower"><var class="varname">PDO::CASE_LOWER</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.case-upper"><var class="varname">PDO::CASE_UPPER</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.null-natural"><var class="varname">PDO::NULL_NATURAL</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.null-empty-string"><var class="varname">PDO::NULL_EMPTY_STRING</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.null-to-string"><var class="varname">PDO::NULL_TO_STRING</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.err-none"><var class="varname">PDO::ERR_NONE</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.fetch-ori-next"><var class="varname">PDO::FETCH_ORI_NEXT</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.fetch-ori-prior"><var class="varname">PDO::FETCH_ORI_PRIOR</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.fetch-ori-first"><var class="varname">PDO::FETCH_ORI_FIRST</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.fetch-ori-last"><var class="varname">PDO::FETCH_ORI_LAST</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.fetch-ori-abs"><var class="varname">PDO::FETCH_ORI_ABS</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.fetch-ori-rel"><var class="varname">PDO::FETCH_ORI_REL</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.cursor-fwdonly"><var class="varname">PDO::CURSOR_FWDONLY</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="pdo.constants.html#pdo.constants.cursor-scroll"><var class="varname">PDO::CURSOR_SCROLL</var></a></var>;</div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Constants */</div>
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="class.pdo-pgsql.html#pdo-pgsql.constants.attr-disable-prepares"><var class="varname">ATTR_DISABLE_PREPARES</var></a></var>;</div>
+
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="class.pdo-pgsql.html#pdo-pgsql.constants.attr-result-memory-size"><var class="varname">ATTR_RESULT_MEMORY_SIZE</var></a></var>;</div>
+
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="class.pdo-pgsql.html#pdo-pgsql.constants.transaction-idle"><var class="varname">TRANSACTION_IDLE</var></a></var>;</div>
+
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="class.pdo-pgsql.html#pdo-pgsql.constants.transaction-active"><var class="varname">TRANSACTION_ACTIVE</var></a></var>;</div>
+
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="class.pdo-pgsql.html#pdo-pgsql.constants.transaction-intrans"><var class="varname">TRANSACTION_INTRANS</var></a></var>;</div>
+
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="class.pdo-pgsql.html#pdo-pgsql.constants.transaction-inerror"><var class="varname">TRANSACTION_INERROR</var></a></var>;</div>
+
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="class.pdo-pgsql.html#pdo-pgsql.constants.transaction-unknown"><var class="varname">TRANSACTION_UNKNOWN</var></a></var>;</div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Methods */</div>
+    <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><a href="pdo-pgsql.copyfromarray.html" class="methodname">copyFromArray</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$tableName</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.array.html" class="type array">array</a></span> <code class="parameter">$rows</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$separator</code><span class="initializer"> = &quot;\t&quot;</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$nullAs</code><span class="initializer"> = &quot;\\\\N&quot;</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.string.html" class="type string">string</a></span></span> <code class="parameter">$fields</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span><br>): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo-pgsql.copyfromfile.html" class="methodname">copyFromFile</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$tableName</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$filename</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$separator</code><span class="initializer"> = &quot;\t&quot;</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$nullAs</code><span class="initializer"> = &quot;\\\\N&quot;</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.string.html" class="type string">string</a></span></span> <code class="parameter">$fields</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span><br>): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo-pgsql.copytoarray.html" class="methodname">copyToArray</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$tableName</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$separator</code><span class="initializer"> = &quot;\t&quot;</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$nullAs</code><span class="initializer"> = &quot;\\\\N&quot;</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.string.html" class="type string">string</a></span></span> <code class="parameter">$fields</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span><br>): <span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo-pgsql.copytofile.html" class="methodname">copyToFile</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$tableName</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$filename</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$separator</code><span class="initializer"> = &quot;\t&quot;</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$nullAs</code><span class="initializer"> = &quot;\\\\N&quot;</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.string.html" class="type string">string</a></span></span> <code class="parameter">$fields</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span><br>): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo-pgsql.escapeidentifier.html" class="methodname">escapeIdentifier</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$input</code></span>): <span class="type"><a href="language.types.string.html" class="type string">string</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo-pgsql.getnotify.html" class="methodname">getNotify</a></span>(<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$fetchMode</code><span class="initializer"> = <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-default">PDO::FETCH_DEFAULT</a></code></strong></span></span>, <span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$timeoutMilliseconds</code><span class="initializer"> = 0</span></span>): <span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo-pgsql.getpid.html" class="methodname">getPid</a></span>(): <span class="type"><a href="language.types.integer.html" class="type int">int</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo-pgsql.lobcreate.html" class="methodname">lobCreate</a></span>(): <span class="type"><span class="type"><a href="language.types.string.html" class="type string">string</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo-pgsql.lobopen.html" class="methodname">lobOpen</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$oid</code></span>, <span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$mode</code><span class="initializer"> = &quot;rb&quot;</span></span>): <span class="type"><span class="type"><a href="language.types.resource.html" class="type resource">resource</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo-pgsql.lobunlink.html" class="methodname">lobUnlink</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$oid</code></span>): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo-pgsql.setnoticecallback.html" class="methodname">setNoticeCallback</a></span>(<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.callable.html" class="type callable">callable</a></span></span> <code class="parameter">$callback</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Inherited methods */</div>
+    <div class="constructorsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.construct.html" class="methodname">PDO::__construct</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$dsn</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.string.html" class="type string">string</a></span></span> <code class="parameter">$username</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="attribute"><a href="class.sensitiveparameter.html">#[\SensitiveParameter]</a> </span><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.string.html" class="type string">string</a></span></span> <code class="parameter">$password</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.array.html" class="type array">array</a></span></span> <code class="parameter">$options</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span><br>)</div>
+
+    <div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.begintransaction.html" class="methodname">PDO::beginTransaction</a></span>(): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.commit.html" class="methodname">PDO::commit</a></span>(): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="modifier">static</span> <span class="methodname"><a href="pdo.connect.html" class="methodname">PDO::connect</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$dsn</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.string.html" class="type string">string</a></span></span> <code class="parameter">$username</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="attribute"><a href="class.sensitiveparameter.html">#[\SensitiveParameter]</a> </span><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.string.html" class="type string">string</a></span></span> <code class="parameter">$password</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.array.html" class="type array">array</a></span></span> <code class="parameter">$options</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span><br>): <span class="type">static</span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.errorcode.html" class="methodname">PDO::errorCode</a></span>(): <span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.string.html" class="type string">string</a></span></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.errorinfo.html" class="methodname">PDO::errorInfo</a></span>(): <span class="type"><a href="language.types.array.html" class="type array">array</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.exec.html" class="methodname">PDO::exec</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$statement</code></span>): <span class="type"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.getattribute.html" class="methodname">PDO::getAttribute</a></span>(<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$attribute</code></span>): <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="modifier">static</span> <span class="methodname"><a href="pdo.getavailabledrivers.html" class="methodname">PDO::getAvailableDrivers</a></span>(): <span class="type"><a href="language.types.array.html" class="type array">array</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.intransaction.html" class="methodname">PDO::inTransaction</a></span>(): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.lastinsertid.html" class="methodname">PDO::lastInsertId</a></span>(<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.string.html" class="type string">string</a></span></span> <code class="parameter">$name</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>): <span class="type"><span class="type"><a href="language.types.string.html" class="type string">string</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.prepare.html" class="methodname">PDO::prepare</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$query</code></span>, <span class="methodparam"><span class="type"><a href="language.types.array.html" class="type array">array</a></span> <code class="parameter">$options</code><span class="initializer"> = []</span></span>): <span class="type"><span class="type"><a href="class.pdostatement.html" class="type PDOStatement">PDOStatement</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.query.html" class="methodname">PDO::query</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$query</code></span>, <span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.integer.html" class="type int">int</a></span></span> <code class="parameter">$fetchMode</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>): <span class="type"><span class="type"><a href="class.pdostatement.html" class="type PDOStatement">PDOStatement</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.query.html" class="methodname">PDO::query</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$query</code></span>, <span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.integer.html" class="type int">int</a></span></span> <code class="parameter">$fetchMode</code><span class="initializer"> = PDO::FETCH_COLUMN</span></span>, <span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$colno</code></span>): <span class="type"><span class="type"><a href="class.pdostatement.html" class="type PDOStatement">PDOStatement</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.query.html" class="methodname">PDO::query</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$query</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.integer.html" class="type int">int</a></span></span> <code class="parameter">$fetchMode</code><span class="initializer"> = PDO::FETCH_CLASS</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$classname</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.array.html" class="type array">array</a></span> <code class="parameter">$constructorArgs</code></span><br>): <span class="type"><span class="type"><a href="class.pdostatement.html" class="type PDOStatement">PDOStatement</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.query.html" class="methodname">PDO::query</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$query</code></span>, <span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.integer.html" class="type int">int</a></span></span> <code class="parameter">$fetchMode</code><span class="initializer"> = PDO::FETCH_INTO</span></span>, <span class="methodparam"><span class="type"><a href="language.types.object.html" class="type object">object</a></span> <code class="parameter">$object</code></span>): <span class="type"><span class="type"><a href="class.pdostatement.html" class="type PDOStatement">PDOStatement</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.quote.html" class="methodname">PDO::quote</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$string</code></span>, <span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$type</code><span class="initializer"> = <strong><code><a href="pdo.constants.html#pdo.constants.param-str">PDO::PARAM_STR</a></code></strong></span></span>): <span class="type"><span class="type"><a href="language.types.string.html" class="type string">string</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.rollback.html" class="methodname">PDO::rollBack</a></span>(): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="pdo.setattribute.html" class="methodname">PDO::setAttribute</a></span>(<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$attribute</code></span>, <span class="methodparam"><span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$value</code></span>): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+
+   }</div>
+   
+
+  </div>
+
+  <div class="section" id="pdo-pgsql.constants">
+   <h2 class="title">Predefined Constants</h2>
+   <dl>
+    
+     <dt id="pdo-pgsql.constants.attr-disable-prepares"><strong><code><a href="class.pdo-pgsql.html#pdo-pgsql.constants.attr-disable-prepares">Pdo\Pgsql::ATTR_DISABLE_PREPARES</a></code></strong></dt>
+     <dd>
+      <span class="simpara">
+       Send the query and the parameters to the server together in a single
+       call, avoiding the need to create a named prepared statement separately.
+       If the query is only going to be executed once this can reduce latency by
+       avoiding an unnecessary server round-trip.
+      </span>
+     </dd>
+    
+    
+     <dt id="pdo-pgsql.constants.attr-result-memory-size"><strong><code><a href="class.pdo-pgsql.html#pdo-pgsql.constants.attr-result-memory-size">Pdo\Pgsql::ATTR_RESULT_MEMORY_SIZE</a></code></strong></dt>
+     <dd>
+      <span class="simpara">
+       Returns the amount of memory, in bytes, allocated to the specified
+       query result <span class="classname"><a href="class.pdostatement.html" class="classname">PDOStatement</a></span> instance,
+       or <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong> if no results exist before the query is executed.
+      </span>
+     </dd>
+    
+    
+     <dt id="pdo-pgsql.constants.transaction-idle"><strong><code><a href="class.pdo-pgsql.html#pdo-pgsql.constants.transaction-idle">Pdo\Pgsql::TRANSACTION_IDLE</a></code></strong></dt>
+     <dd>
+      <span class="simpara">
+      </span>
+     </dd>
+    
+    
+     <dt id="pdo-pgsql.constants.transaction-active"><strong><code><a href="class.pdo-pgsql.html#pdo-pgsql.constants.transaction-active">Pdo\Pgsql::TRANSACTION_ACTIVE</a></code></strong></dt>
+     <dd>
+      <span class="simpara">
+      </span>
+     </dd>
+    
+    
+     <dt id="pdo-pgsql.constants.transaction-intrans"><strong><code><a href="class.pdo-pgsql.html#pdo-pgsql.constants.transaction-intrans">Pdo\Pgsql::TRANSACTION_INTRANS</a></code></strong></dt>
+     <dd>
+      <span class="simpara">
+      </span>
+     </dd>
+    
+    
+     <dt id="pdo-pgsql.constants.transaction-inerror"><strong><code><a href="class.pdo-pgsql.html#pdo-pgsql.constants.transaction-inerror">Pdo\Pgsql::TRANSACTION_INERROR</a></code></strong></dt>
+     <dd>
+      <span class="simpara">
+      </span>
+     </dd>
+    
+    
+     <dt id="pdo-pgsql.constants.transaction-unknown"><strong><code><a href="class.pdo-pgsql.html#pdo-pgsql.constants.transaction-unknown">Pdo\Pgsql::TRANSACTION_UNKNOWN</a></code></strong></dt>
+     <dd>
+      <span class="simpara">
+      </span>
+     </dd>
+    
+   </dl>
+  </div>
+ </div>
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="pdo-pgsql.copyfromarray.html">Pdo\Pgsql::copyFromArray</a> — Copy data from a PHP array into a table</li><li><a href="pdo-pgsql.copyfromfile.html">Pdo\Pgsql::copyFromFile</a> — Copy data from file into table</li><li><a href="pdo-pgsql.copytoarray.html">Pdo\Pgsql::copyToArray</a> — Copy data from database table into PHP array</li><li><a href="pdo-pgsql.copytofile.html">Pdo\Pgsql::copyToFile</a> — Copy data from table into file</li><li><a href="pdo-pgsql.escapeidentifier.html">Pdo\Pgsql::escapeIdentifier</a> — Escapes a string for use as an SQL identifier</li><li><a href="pdo-pgsql.getnotify.html">Pdo\Pgsql::getNotify</a> — Get asynchronous notification</li><li><a href="pdo-pgsql.getpid.html">Pdo\Pgsql::getPid</a> — Get the PID of the backend process handling this connection</li><li><a href="pdo-pgsql.lobcreate.html">Pdo\Pgsql::lobCreate</a> — Creates a new large object</li><li><a href="pdo-pgsql.lobopen.html">Pdo\Pgsql::lobOpen</a> — Opens an existing large object stream</li><li><a href="pdo-pgsql.lobunlink.html">Pdo\Pgsql::lobUnlink</a> — Deletes the large object</li><li><a href="pdo-pgsql.setnoticecallback.html">Pdo\Pgsql::setNoticeCallback</a> — Set a callback to handle notice and warning messages generated by the backend</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

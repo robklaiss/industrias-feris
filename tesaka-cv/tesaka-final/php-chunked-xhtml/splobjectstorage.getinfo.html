@@ -1,0 +1,214 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Returns the data associated with the current iterator entry</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="splobjectstorage.gethash.html" class="navbar__link">« SplObjectStorage::getHash</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="splobjectstorage.key.html" class="navbar__link">SplObjectStorage::key »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="class.splobjectstorage.html">SplObjectStorage</a></li>
+        <li>Returns the data associated with the current iterator entry</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="splobjectstorage.getinfo" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">SplObjectStorage::getInfo</h1>
+  <p class="verinfo">(PHP 5 &gt;= 5.3.0, PHP 7, PHP 8)</p><p class="refpurpose"><span class="refname">SplObjectStorage::getInfo</span> &mdash; <span class="dc-title">Returns the data associated with the current iterator entry</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-splobjectstorage.getinfo-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><strong>SplObjectStorage::getInfo</strong></span>(): <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span></div>
+
+  <p class="para rdfs-comment">
+   Returns the data, or info, associated with the object pointed by the current iterator position.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-splobjectstorage.getinfo-parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">This function has no parameters.</p>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-splobjectstorage.getinfo-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   The data associated with the current iterator position.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-splobjectstorage.getinfo-examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   <div class="example" id="example-1">
+    <p><strong>Example #1 <span class="function"><strong>SplObjectStorage::getInfo()</strong></span> example</strong></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$s </span><span style="color: #007700">= new </span><span style="color: #0000BB">SplObjectStorage</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">$o1 </span><span style="color: #007700">= new </span><span style="color: #0000BB">stdClass</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$o2 </span><span style="color: #007700">= new </span><span style="color: #0000BB">stdClass</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">attach</span><span style="color: #007700">(</span><span style="color: #0000BB">$o1</span><span style="color: #007700">, </span><span style="color: #DD0000">"d1"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">attach</span><span style="color: #007700">(</span><span style="color: #0000BB">$o2</span><span style="color: #007700">, </span><span style="color: #DD0000">"d2"</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">rewind</span><span style="color: #007700">();<br />while(</span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">valid</span><span style="color: #007700">()) {<br />    </span><span style="color: #0000BB">$index  </span><span style="color: #007700">= </span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">key</span><span style="color: #007700">();<br />    </span><span style="color: #0000BB">$object </span><span style="color: #007700">= </span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">current</span><span style="color: #007700">(); </span><span style="color: #FF8000">// similar to current($s)<br />    </span><span style="color: #0000BB">$data   </span><span style="color: #007700">= </span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getInfo</span><span style="color: #007700">();<br /><br />    </span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$object</span><span style="color: #007700">);<br />    </span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$data</span><span style="color: #007700">);<br />    </span><span style="color: #0000BB">$s</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">next</span><span style="color: #007700">();<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+    <div class="example-contents screen">
+<div class="examplescode"><pre class="examplescode">object(stdClass)#2 (0) {
+}
+string(2) &quot;d1&quot;
+object(stdClass)#3 (0) {
+}
+string(2) &quot;d2&quot;</pre>
+</div>
+    </div>
+   </div>
+  </p>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-splobjectstorage.getinfo-seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li><span class="methodname"><a href="splobjectstorage.current.html" class="methodname" rel="rdfs-seeAlso">SplObjectStorage::current()</a> - Returns the current storage entry</span></li>
+    <li><span class="methodname"><a href="splobjectstorage.rewind.html" class="methodname" rel="rdfs-seeAlso">SplObjectStorage::rewind()</a> - Rewind the iterator to the first storage element</span></li>
+    <li><span class="methodname"><a href="splobjectstorage.key.html" class="methodname" rel="rdfs-seeAlso">SplObjectStorage::key()</a> - Returns the index at which the iterator currently is</span></li>
+    <li><span class="methodname"><a href="splobjectstorage.next.html" class="methodname" rel="rdfs-seeAlso">SplObjectStorage::next()</a> - Move to the next entry</span></li>
+    <li><span class="methodname"><a href="splobjectstorage.valid.html" class="methodname" rel="rdfs-seeAlso">SplObjectStorage::valid()</a> - Returns if the current iterator entry is valid</span></li>
+    <li><span class="methodname"><a href="splobjectstorage.setinfo.html" class="methodname" rel="rdfs-seeAlso">SplObjectStorage::setInfo()</a> - Sets the data associated with the current iterator entry</span></li>
+   </ul>
+  </p>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

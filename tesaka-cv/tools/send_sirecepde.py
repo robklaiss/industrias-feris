@@ -2,6 +2,12 @@
 """
 CLI para enviar XML siRecepLoteDE (rEnvioLote) al servicio SOAP de Recepción Lote DE (async) de SIFEN
 
+try:
+    SifenResponseError
+except NameError:
+    class SifenResponseError(Exception):
+        pass
+
 Este script usa SoapClient del módulo sifen_client para enviar documentos
 electrónicos a SIFEN usando mTLS con certificados P12/PFX.
 
@@ -34,6 +40,9 @@ logger = logging.getLogger(__name__)
 
 # Agregar el directorio padre al path para imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Excepción real (NO en docstring)
+from app.sifen_client.exceptions import SifenResponseError
 
 from dotenv import load_dotenv
 
@@ -6040,6 +6049,7 @@ Configuración requerida (variables de entorno):
     )
     
     args = parser.parse_args()
+    globals()["args"] = args  # make args visible to helpers
     
 
     # Exportar bump-doc a env para que el pipeline lo aplique

@@ -1,0 +1,254 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Run the sub-connections of the current cURL handle</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.curl-multi-errno.html" class="navbar__link">« curl_multi_errno</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.curl-multi-getcontent.html" class="navbar__link">curl_multi_getcontent »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ref.curl.html">cURL Functions</a></li>
+        <li>Run the sub-connections of the current cURL handle</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="function.curl-multi-exec" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">curl_multi_exec</h1>
+  <p class="verinfo">(PHP 5, PHP 7, PHP 8)</p><p class="refpurpose"><span class="refname">curl_multi_exec</span> &mdash; <span class="dc-title">Run the sub-connections of the current cURL handle</span></p>
+
+ </div>
+ 
+ <div class="refsect1 description" id="refsect1-function.curl-multi-exec-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="methodname"><strong>curl_multi_exec</strong></span>(<span class="methodparam"><span class="type"><a href="class.curlmultihandle.html" class="type CurlMultiHandle">CurlMultiHandle</a></span> <code class="parameter">$multi_handle</code></span>, <span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter reference">&$still_running</code></span>): <span class="type"><a href="language.types.integer.html" class="type int">int</a></span></div>
+
+  <p class="para rdfs-comment">
+   Processes each of the handles in the stack.  This method can be called whether or not a handle
+   needs to read or write data.
+  </p> 
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-function.curl-multi-exec-parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+    <dt><code class="parameter">multi_handle</code>
+</dt><dd><p class="para">A cURL multi handle returned by
+<span class="function"><a href="function.curl-multi-init.html" class="function">curl_multi_init()</a></span>.</p></dd>
+    
+     <dt><code class="parameter">still_running</code></dt>
+     <dd>
+      <p class="para">
+       A reference to a flag to tell whether the operations are still running.
+      </p>
+     </dd>
+    
+   </dl>
+  </p>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-function.curl-multi-exec-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   A cURL code defined in the cURL <a href="curl.constants.html" class="link">Predefined Constants</a>.
+  </p>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <p class="para">
+    This only returns errors regarding the whole multi stack. There might still have 
+    occurred problems on individual transfers even when this function returns 
+    <strong><code><a href="curl.constants.html#constant.curlm-ok">CURLM_OK</a></code></strong>.
+   </p>
+  </p></blockquote>
+ </div>
+
+ 
+ <div class="refsect1 changelog" id="refsect1-function.curl-multi-exec-changelog">
+  <h3 class="title">Changelog</h3>
+  <table class="doctable informaltable">
+   
+    <thead>
+     <tr>
+      <th>Version</th>
+      <th>Description</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+ <td>8.0.0</td>
+ <td>
+  <code class="parameter">multi_handle</code> expects a <span class="classname"><a href="class.curlmultihandle.html" class="classname">CurlMultiHandle</a></span>
+  instance now; previously, a <span class="type"><a href="language.types.resource.html" class="type resource">resource</a></span> was expected.
+ </td>
+</tr>
+
+    </tbody>
+   
+  </table>
+
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-function.curl-multi-exec-examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   <div class="example" id="example-1">
+    <p><strong>Example #1 <span class="function"><strong>curl_multi_exec()</strong></span> example</strong></p>
+    <div class="example-contents"><p>
+     This example will create curl handles for a list of URLs, add them to a multi
+     handle, and process them asynchronously.
+    </p></div>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br />$urls </span><span style="color: #007700">= [<br />    </span><span style="color: #DD0000">"https://www.php.net/"</span><span style="color: #007700">,<br />    </span><span style="color: #DD0000">"https://www.example.com/"</span><span style="color: #007700">,<br />];<br /><br /></span><span style="color: #0000BB">$mh </span><span style="color: #007700">= </span><span style="color: #0000BB">curl_multi_init</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">$map </span><span style="color: #007700">= new </span><span style="color: #0000BB">WeakMap</span><span style="color: #007700">();<br /><br />foreach (</span><span style="color: #0000BB">$urls </span><span style="color: #007700">as </span><span style="color: #0000BB">$url</span><span style="color: #007700">) {<br />    </span><span style="color: #0000BB">$ch </span><span style="color: #007700">= </span><span style="color: #0000BB">curl_init</span><span style="color: #007700">(</span><span style="color: #0000BB">$url</span><span style="color: #007700">);<br />    </span><span style="color: #0000BB">curl_setopt</span><span style="color: #007700">(</span><span style="color: #0000BB">$ch</span><span style="color: #007700">, </span><span style="color: #0000BB">CURLOPT_RETURNTRANSFER</span><span style="color: #007700">, </span><span style="color: #0000BB">1</span><span style="color: #007700">);<br />    </span><span style="color: #0000BB">curl_multi_add_handle</span><span style="color: #007700">(</span><span style="color: #0000BB">$mh</span><span style="color: #007700">, </span><span style="color: #0000BB">$ch</span><span style="color: #007700">);<br />    </span><span style="color: #0000BB">$map</span><span style="color: #007700">[</span><span style="color: #0000BB">$ch</span><span style="color: #007700">] = </span><span style="color: #0000BB">$url</span><span style="color: #007700">;<br />}<br /><br />do {<br />    </span><span style="color: #0000BB">$status </span><span style="color: #007700">= </span><span style="color: #0000BB">curl_multi_exec</span><span style="color: #007700">(</span><span style="color: #0000BB">$mh</span><span style="color: #007700">, </span><span style="color: #0000BB">$unfinishedHandles</span><span style="color: #007700">);<br />    if (</span><span style="color: #0000BB">$status </span><span style="color: #007700">!== </span><span style="color: #0000BB">CURLM_OK</span><span style="color: #007700">) {<br />        throw new </span><span style="color: #0000BB">\Exception</span><span style="color: #007700">(</span><span style="color: #0000BB">curl_multi_strerror</span><span style="color: #007700">(</span><span style="color: #0000BB">curl_multi_errno</span><span style="color: #007700">(</span><span style="color: #0000BB">$mh</span><span style="color: #007700">)));<br />    }<br /><br />    while ((</span><span style="color: #0000BB">$info </span><span style="color: #007700">= </span><span style="color: #0000BB">curl_multi_info_read</span><span style="color: #007700">(</span><span style="color: #0000BB">$mh</span><span style="color: #007700">)) !== </span><span style="color: #0000BB">false</span><span style="color: #007700">) {<br />        if (</span><span style="color: #0000BB">$info</span><span style="color: #007700">[</span><span style="color: #DD0000">'msg'</span><span style="color: #007700">] === </span><span style="color: #0000BB">CURLMSG_DONE</span><span style="color: #007700">) {<br />            </span><span style="color: #0000BB">$handle </span><span style="color: #007700">= </span><span style="color: #0000BB">$info</span><span style="color: #007700">[</span><span style="color: #DD0000">'handle'</span><span style="color: #007700">];<br />            </span><span style="color: #0000BB">curl_multi_remove_handle</span><span style="color: #007700">(</span><span style="color: #0000BB">$mh</span><span style="color: #007700">, </span><span style="color: #0000BB">$handle</span><span style="color: #007700">);<br />            </span><span style="color: #0000BB">$url </span><span style="color: #007700">= </span><span style="color: #0000BB">$map</span><span style="color: #007700">[</span><span style="color: #0000BB">$handle</span><span style="color: #007700">];<br /><br />            if (</span><span style="color: #0000BB">$info</span><span style="color: #007700">[</span><span style="color: #DD0000">'result'</span><span style="color: #007700">] === </span><span style="color: #0000BB">CURLE_OK</span><span style="color: #007700">) {<br />                </span><span style="color: #0000BB">$statusCode </span><span style="color: #007700">= </span><span style="color: #0000BB">curl_getinfo</span><span style="color: #007700">(</span><span style="color: #0000BB">$handle</span><span style="color: #007700">, </span><span style="color: #0000BB">CURLINFO_HTTP_CODE</span><span style="color: #007700">);<br /><br />                echo </span><span style="color: #DD0000">"Request to </span><span style="color: #007700">{</span><span style="color: #0000BB">$url</span><span style="color: #007700">}</span><span style="color: #DD0000"> finished with HTTP status </span><span style="color: #007700">{</span><span style="color: #0000BB">$statusCode</span><span style="color: #007700">}</span><span style="color: #DD0000">:"</span><span style="color: #007700">, </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />                echo </span><span style="color: #0000BB">curl_multi_getcontent</span><span style="color: #007700">(</span><span style="color: #0000BB">$handle</span><span style="color: #007700">);<br />                echo </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">, </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />            } else {<br />                echo </span><span style="color: #DD0000">"Request to </span><span style="color: #007700">{</span><span style="color: #0000BB">$url</span><span style="color: #007700">}</span><span style="color: #DD0000"> failed with error: "</span><span style="color: #007700">, </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />                echo </span><span style="color: #0000BB">curl_strerror</span><span style="color: #007700">(</span><span style="color: #0000BB">$info</span><span style="color: #007700">[</span><span style="color: #DD0000">'result'</span><span style="color: #007700">]);<br />                echo </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">, </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />            }<br />        }<br />    }<br /><br />    if (</span><span style="color: #0000BB">$unfinishedHandles</span><span style="color: #007700">) {<br />        if ((</span><span style="color: #0000BB">$updatedHandles </span><span style="color: #007700">= </span><span style="color: #0000BB">curl_multi_select</span><span style="color: #007700">(</span><span style="color: #0000BB">$mh</span><span style="color: #007700">)) === -</span><span style="color: #0000BB">1</span><span style="color: #007700">) {<br />            throw new </span><span style="color: #0000BB">\Exception</span><span style="color: #007700">(</span><span style="color: #0000BB">curl_multi_strerror</span><span style="color: #007700">(</span><span style="color: #0000BB">curl_multi_errno</span><span style="color: #007700">(</span><span style="color: #0000BB">$mh</span><span style="color: #007700">)));<br />        }<br />    }<br />} while (</span><span style="color: #0000BB">$unfinishedHandles</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">curl_multi_close</span><span style="color: #007700">(</span><span style="color: #0000BB">$mh</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+   </div>
+  </p>
+ </div>
+
+ 
+ <div class="refsect1 seealso" id="refsect1-function.curl-multi-exec-seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li><span class="function"><a href="function.curl-multi-init.html" class="function" rel="rdfs-seeAlso">curl_multi_init()</a> - Returns a new cURL multi handle</span></li>
+    <li><span class="function"><a href="function.curl-multi-select.html" class="function" rel="rdfs-seeAlso">curl_multi_select()</a> - Wait until reading or writing is possible for any cURL multi handle connection</span></li>
+    <li><span class="function"><a href="function.curl-exec.html" class="function" rel="rdfs-seeAlso">curl_exec()</a> - Perform a cURL session</span></li>
+   </ul>
+  </p>
+ </div>
+
+ 
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

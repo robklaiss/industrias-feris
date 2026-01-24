@@ -1,0 +1,212 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Set callback for connection close</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="eventhttpconnection.makerequest.html" class="navbar__link">« EventHttpConnection::makeRequest</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="eventhttpconnection.setlocaladdress.html" class="navbar__link">EventHttpConnection::setLocalAddress »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="class.eventhttpconnection.html">EventHttpConnection</a></li>
+        <li>Set callback for connection close</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="eventhttpconnection.setclosecallback" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">EventHttpConnection::setCloseCallback</h1>
+  <p class="verinfo">(PECL event &gt;= 1.8.0)</p><p class="refpurpose"><span class="refname">EventHttpConnection::setCloseCallback</span> &mdash; <span class="dc-title">Set callback for connection close</span></p>
+
+ </div>
+ <div class="refsect1 description" id="refsect1-eventhttpconnection.setclosecallback-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span>
+   <span class="methodname"><strong>EventHttpConnection::setCloseCallback</strong></span>(<span class="methodparam">
+    
+    <span class="type"><a href="language.types.callable.html" class="type callable">callable</a></span> <code class="parameter">$callback</code>
+   </span>, <span class="methodparam">
+    
+    <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$data</code>
+   <span class="initializer"> = ?</span></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+  <p class="para rdfs-comment">
+   Sets callback for connection close.
+  </p>
+ </div>
+
+ <div class="refsect1 parameters" id="refsect1-eventhttpconnection.setclosecallback-parameters">
+  <h3 class="title">Parameters</h3>
+  <dl>
+   
+    <dt>
+     <code class="parameter">callback</code>
+    </dt>
+    <dd>
+     <p class="para">
+      Callback which is called when connection is closed. Should match the
+      following prototype:
+     </p>
+     <div class="methodsynopsis dc-description">
+      <span class="methodname"><strong>callback</strong></span>(<span class="methodparam">
+       
+       <span class="type"><a href="class.eventhttpconnection.html" class="type EventHttpConnection">EventHttpConnection</a></span> <code class="parameter">$conn</code>
+       <span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span>
+      </span>, <span class="methodparam">
+       
+       <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$arg</code>
+       <span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span>
+      </span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+    </dd>
+   
+  </dl>
+ </div>
+
+ <div class="refsect1 returnvalues" id="refsect1-eventhttpconnection.setclosecallback-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   No value is returned.
+  </p>
+ </div>
+
+ <div class="refsect1 examples" id="refsect1-eventhttpconnection.setclosecallback-examples">
+  <h3 class="title">Examples</h3>
+  <div class="example" id="example-1">
+   <p><strong>Example #1 
+    <span class="methodname"><strong>EventHttpConnection::setCloseCallback()</strong></span> example</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/*<br /> * Setting up close-connection callback<br /> *<br /> * The script handles closed connections using HTTP API.<br /> *<br /> * Usage:<br /> * 1) Launch the server:<br /> * $ php examples/http_closecb.php 4242<br /> *<br /> * 2) Launch a client in another terminal. Telnet-like<br /> * session should look like the following:<br /> *<br /> * $ nc -t 127.0.0.1 4242<br /> * GET / HTTP/1.0<br /> * Connection: close<br /> *<br /> * The server will output something similar to the following:<br /> *<br /> * HTTP/1.0 200 OK<br /> * Content-Type: multipart/x-mixed-replace;boundary=boundarydonotcross<br /> * Connection: close<br /> *<br /> * &lt;html&gt;<br /> *<br /> * 3) Terminate the client connection abruptly,<br /> * i.e. kill the process, or just press Ctrl-C.<br /> *<br /> * 4) Check if the server called _close_callback.<br /> * The script should output "_close_callback" string to standard output.<br /> *<br /> * 5) Check if the server's process has no orphaned connections,<br /> * e.g. with `lsof` utility.<br /> */<br /><br /></span><span style="color: #007700">function </span><span style="color: #0000BB">_close_callback</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn</span><span style="color: #007700">)<br />{<br />    echo </span><span style="color: #0000BB">__FUNCTION__</span><span style="color: #007700">, </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />}<br /><br />function </span><span style="color: #0000BB">_http_default</span><span style="color: #007700">(</span><span style="color: #0000BB">$req</span><span style="color: #007700">, </span><span style="color: #0000BB">$dummy</span><span style="color: #007700">)<br />{<br />    </span><span style="color: #0000BB">$conn </span><span style="color: #007700">= </span><span style="color: #0000BB">$req</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getConnection</span><span style="color: #007700">();<br />    </span><span style="color: #0000BB">$conn</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">setCloseCallback</span><span style="color: #007700">(</span><span style="color: #DD0000">'_close_callback'</span><span style="color: #007700">, </span><span style="color: #0000BB">NULL</span><span style="color: #007700">);<br /><br />    </span><span style="color: #FF8000">/*<br />    By enabling Event::READ we protect the server against unclosed conections.<br />    This is a peculiarity of Libevent. The library disables Event::READ events<br />     on this connection, and the server is not notified about terminated<br />    connections.<br /><br />    So each time client terminates connection abruptly, we get an orphaned<br />    connection. For instance, the following is a part of `lsof -p $PID | grep TCP`<br />    command after client has terminated connection:<br /><br />    57-php     15057 ruslan  6u  unix 0xffff8802fb59c780   0t0  125187 socket<br />    58:php     15057 ruslan  7u  IPv4             125189   0t0     TCP *:4242 (LISTEN)<br />    59:php     15057 ruslan  8u  IPv4             124342   0t0     TCP localhost:4242-&gt;localhost:37375 (CLOSE_WAIT)<br /><br />    where $PID is our process ID.<br /><br />    The following block of code fixes such kind of orphaned connections.<br />     */<br />    </span><span style="color: #0000BB">$bev </span><span style="color: #007700">= </span><span style="color: #0000BB">$req</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getBufferEvent</span><span style="color: #007700">();<br />    </span><span style="color: #0000BB">$bev</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">enable</span><span style="color: #007700">(</span><span style="color: #0000BB">Event</span><span style="color: #007700">::</span><span style="color: #0000BB">READ</span><span style="color: #007700">);<br /><br />    </span><span style="color: #FF8000">// We have to free it explicitly. See EventHttpRequest::getConnection<br />    </span><span style="color: #0000BB">$bev</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">free</span><span style="color: #007700">(); </span><span style="color: #FF8000">// we have to free it explicitly<br /><br />    </span><span style="color: #0000BB">$req</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">addHeader</span><span style="color: #007700">(<br />        </span><span style="color: #DD0000">'Content-Type'</span><span style="color: #007700">,<br />        </span><span style="color: #DD0000">'multipart/x-mixed-replace;boundary=boundarydonotcross'</span><span style="color: #007700">,<br />        </span><span style="color: #0000BB">EventHttpRequest</span><span style="color: #007700">::</span><span style="color: #0000BB">OUTPUT_HEADER<br />    </span><span style="color: #007700">);<br /><br />    </span><span style="color: #0000BB">$buf </span><span style="color: #007700">= new </span><span style="color: #0000BB">EventBuffer</span><span style="color: #007700">();<br />    </span><span style="color: #0000BB">$buf</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">(</span><span style="color: #DD0000">'&lt;html&gt;'</span><span style="color: #007700">);<br /><br />    </span><span style="color: #0000BB">$req</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">sendReply</span><span style="color: #007700">(</span><span style="color: #0000BB">200</span><span style="color: #007700">, </span><span style="color: #DD0000">"OK"</span><span style="color: #007700">);<br />    </span><span style="color: #0000BB">$req</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">sendReplyChunk</span><span style="color: #007700">(</span><span style="color: #0000BB">$buf</span><span style="color: #007700">);<br />}<br /><br /></span><span style="color: #0000BB">$port </span><span style="color: #007700">= </span><span style="color: #0000BB">4242</span><span style="color: #007700">;<br />if (</span><span style="color: #0000BB">$argc </span><span style="color: #007700">&gt; </span><span style="color: #0000BB">1</span><span style="color: #007700">) {<br />    </span><span style="color: #0000BB">$port </span><span style="color: #007700">= (int) </span><span style="color: #0000BB">$argv</span><span style="color: #007700">[</span><span style="color: #0000BB">1</span><span style="color: #007700">];<br />}<br />if (</span><span style="color: #0000BB">$port </span><span style="color: #007700">&lt;= </span><span style="color: #0000BB">0 </span><span style="color: #007700">|| </span><span style="color: #0000BB">$port </span><span style="color: #007700">&gt; </span><span style="color: #0000BB">65535</span><span style="color: #007700">) {<br />    exit(</span><span style="color: #DD0000">"Invalid port"</span><span style="color: #007700">);<br />}<br /><br /></span><span style="color: #0000BB">$base </span><span style="color: #007700">= new </span><span style="color: #0000BB">EventBase</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">$http </span><span style="color: #007700">= new </span><span style="color: #0000BB">EventHttp</span><span style="color: #007700">(</span><span style="color: #0000BB">$base</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$http</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">setDefaultCallback</span><span style="color: #007700">(</span><span style="color: #DD0000">"_http_default"</span><span style="color: #007700">, </span><span style="color: #0000BB">NULL</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$http</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">bind</span><span style="color: #007700">(</span><span style="color: #DD0000">"0.0.0.0"</span><span style="color: #007700">, </span><span style="color: #0000BB">$port</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$base</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">loop</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

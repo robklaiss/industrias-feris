@@ -1,0 +1,259 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>The WeakReference class</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="fiber.getcurrent.html" class="navbar__link">« Fiber::getCurrent</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="weakreference.construct.html" class="navbar__link">WeakReference::__construct »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="reserved.interfaces.html">Predefined Interfaces and Classes</a></li>
+        <li>The WeakReference class</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="class.weakreference" class="reference">
+
+ <h1 class="title">The WeakReference class</h1>
+ 
+
+ <div class="partintro"><p class="verinfo">(PHP 7 &gt;= 7.4.0, PHP 8)</p>
+
+
+  <div class="section" id="weakreference.intro">
+   <h2 class="title">Introduction</h2>
+   <p class="para">
+    Weak references allow the programmer to retain a reference to an object which does not prevent
+    the object from being destroyed. They are useful for implementing cache like structures.
+    If the original object has been destroyed, <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong> will be returned
+    when calling the <span class="methodname"><a href="weakreference.get.html" class="methodname">WeakReference::get()</a></span> method.
+    The original object will be destroyed when the
+    <a href="features.gc.refcounting-basics.html" class="link">refcount</a> for it drops to zero;
+    creating weak references does not increase the <code class="literal">refcount</code> of the object being referenced.
+   </p>
+   <p class="para">
+    <span class="classname"><strong class="classname">WeakReference</strong></span>s cannot be serialized.
+   </p>
+  </div>
+
+
+  <div class="section" id="weakreference.synopsis">
+   <h2 class="title">Class synopsis</h2>
+
+
+   <div class="classsynopsis"><div class="classsynopsisinfo">
+    
+     <span class="modifier">final</span>
+     <span class="modifier">class</span> <strong class="classname"><strong class="classname">WeakReference</strong></strong>
+     {</div>
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Methods */</div>
+    <div class="constructorsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><a href="weakreference.construct.html" class="methodname">__construct</a></span>()</div>
+
+    <div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="modifier">static</span> <span class="methodname"><a href="weakreference.create.html" class="methodname">create</a></span>(<span class="methodparam"><span class="type"><a href="language.types.object.html" class="type object">object</a></span> <code class="parameter">$object</code></span>): <span class="type"><a href="class.weakreference.html" class="type WeakReference">WeakReference</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="weakreference.get.html" class="methodname">get</a></span>(): <span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.object.html" class="type object">object</a></span></span></div>
+
+   }</div>
+
+
+  </div>
+
+  <div class="section" id="weakreference.examples">
+   <h2 class="title">WeakReference Examples</h2>
+   <p class="para">
+    <div class="example" id="weakreference.basic-example">
+     <p><strong>Example #1 Basic WeakReference Usage</strong></p>
+     <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br />$obj </span><span style="color: #007700">= new </span><span style="color: #0000BB">stdClass</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">$weakref </span><span style="color: #007700">= </span><span style="color: #0000BB">WeakReference</span><span style="color: #007700">::</span><span style="color: #0000BB">create</span><span style="color: #007700">(</span><span style="color: #0000BB">$obj</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$weakref</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">get</span><span style="color: #007700">());<br /><br />unset(</span><span style="color: #0000BB">$obj</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$weakref</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">get</span><span style="color: #007700">());<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+     </div>
+
+     <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+     <div class="example-contents screen">
+<div class="cdata"><pre>
+object(stdClass)#1 (0) {
+}
+NULL
+</pre></div>
+     </div>
+    </div>
+   </p>
+  </div>
+
+  <div class="section">
+   <h2 class="title">Changelog</h2>
+   <table class="doctable informaltable">
+    
+     <thead>
+      <tr>
+       <th>Version</th>
+       <th>Description</th>
+      </tr>
+
+     </thead>
+
+     <tbody class="tbody">
+      <tr>
+       <td>8.4.0</td>
+       <td>
+        The output of <span class="methodname"><strong>WeakReference::__debugInfo()</strong></span> now includes
+        the referenced object, or <code class="literal">NULL</code> if the reference is no longer
+        valid.
+       </td>
+      </tr>
+
+     </tbody>
+    
+   </table>
+
+  </div>
+
+ </div>
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="weakreference.construct.html">WeakReference::__construct</a> — Constructor that disallows instantiation</li><li><a href="weakreference.create.html">WeakReference::create</a> — Create a new weak reference</li><li><a href="weakreference.get.html">WeakReference::get</a> — Get a weakly referenced Object</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

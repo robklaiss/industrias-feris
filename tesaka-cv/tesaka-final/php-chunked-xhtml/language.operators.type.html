@@ -1,0 +1,312 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Type Operators</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="language.operators.array.html" class="navbar__link">« Array</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="language.operators.functional.html" class="navbar__link">Functional »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="language.operators.html">Operators</a></li>
+        <li>Type Operators</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="language.operators.type" class="sect1">
+ <h2 class="title">Type Operators</h2>
+ 
+ <p class="para">
+  <code class="literal">instanceof</code> is used to determine whether a PHP variable
+  is an instantiated object of a certain
+  <a href="language.oop5.basic.html#language.oop5.basic.class" class="link">class</a>:
+  <div class="example" id="example-1">
+   <p><strong>Example #1 Using <code class="literal">instanceof</code> with classes</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class </span><span style="color: #0000BB">MyClass<br /></span><span style="color: #007700">{<br />}<br /><br />class </span><span style="color: #0000BB">NotMyClass<br /></span><span style="color: #007700">{<br />}<br /></span><span style="color: #0000BB">$a </span><span style="color: #007700">= new </span><span style="color: #0000BB">MyClass</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a </span><span style="color: #007700">instanceof </span><span style="color: #0000BB">MyClass</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a </span><span style="color: #007700">instanceof </span><span style="color: #0000BB">NotMyClass</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+bool(true)
+bool(false)
+</pre></div>
+   </div>
+  </div>
+ </p>
+ <p class="para">
+  <code class="literal">instanceof</code> can also be used to determine whether a variable
+  is an instantiated object of a class that inherits from a parent class:
+  <div class="example" id="example-2">
+   <p><strong>Example #2 Using <code class="literal">instanceof</code> with inherited classes</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class </span><span style="color: #0000BB">ParentClass<br /></span><span style="color: #007700">{<br />}<br /><br />class </span><span style="color: #0000BB">MyClass </span><span style="color: #007700">extends </span><span style="color: #0000BB">ParentClass<br /></span><span style="color: #007700">{<br />}<br /><br /></span><span style="color: #0000BB">$a </span><span style="color: #007700">= new </span><span style="color: #0000BB">MyClass</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a </span><span style="color: #007700">instanceof </span><span style="color: #0000BB">MyClass</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a </span><span style="color: #007700">instanceof </span><span style="color: #0000BB">ParentClass</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+bool(true)
+bool(true)
+</pre></div>
+   </div>
+  </div>
+ </p>
+ <p class="para">
+  To check if an object is <em>not</em> an instanceof a class, the
+  <a href="language.operators.logical.html" class="link">logical <code class="literal">not</code>
+   operator</a> can be used.
+  <div class="example" id="example-3">
+   <p><strong>Example #3 Using <code class="literal">instanceof</code> to check if object is <em>not</em> an
+    instanceof a class</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class </span><span style="color: #0000BB">MyClass<br /></span><span style="color: #007700">{<br />}<br /><br /></span><span style="color: #0000BB">$a </span><span style="color: #007700">= new </span><span style="color: #0000BB">MyClass</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(!(</span><span style="color: #0000BB">$a </span><span style="color: #007700">instanceof </span><span style="color: #0000BB">stdClass</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+bool(true)
+</pre></div>
+   </div>
+  </div>
+ </p>
+ <p class="para">
+  Lastly, <code class="literal">instanceof</code> can also be used to determine whether
+  a variable is an instantiated object of a class that implements an
+  <a href="language.oop5.interfaces.html" class="link">interface</a>:
+  <div class="example" id="example-4">
+   <p><strong>Example #4 Using <code class="literal">instanceof</code> with interfaces</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">interface </span><span style="color: #0000BB">MyInterface<br /></span><span style="color: #007700">{<br />}<br /><br />class </span><span style="color: #0000BB">MyClass </span><span style="color: #007700">implements </span><span style="color: #0000BB">MyInterface<br /></span><span style="color: #007700">{<br />}<br /><br /></span><span style="color: #0000BB">$a </span><span style="color: #007700">= new </span><span style="color: #0000BB">MyClass</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a </span><span style="color: #007700">instanceof </span><span style="color: #0000BB">MyClass</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a </span><span style="color: #007700">instanceof </span><span style="color: #0000BB">MyInterface</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+bool(true)
+bool(true)
+</pre></div>
+   </div>
+  </div>
+ </p>
+ <p class="para">
+  Although <code class="literal">instanceof</code> is usually used with a literal classname,
+  it can also be used with another object or a string variable:
+  <div class="example" id="example-5">
+   <p><strong>Example #5 Using <code class="literal">instanceof</code> with other variables</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">interface </span><span style="color: #0000BB">MyInterface<br /></span><span style="color: #007700">{<br />}<br /><br />class </span><span style="color: #0000BB">MyClass </span><span style="color: #007700">implements </span><span style="color: #0000BB">MyInterface<br /></span><span style="color: #007700">{<br />}<br /><br /></span><span style="color: #0000BB">$a </span><span style="color: #007700">= new </span><span style="color: #0000BB">MyClass</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$b </span><span style="color: #007700">= new </span><span style="color: #0000BB">MyClass</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$c </span><span style="color: #007700">= </span><span style="color: #DD0000">'MyClass'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$d </span><span style="color: #007700">= </span><span style="color: #DD0000">'NotMyClass'</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a </span><span style="color: #007700">instanceof </span><span style="color: #0000BB">$b</span><span style="color: #007700">); </span><span style="color: #FF8000">// $b is an object of class MyClass<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a </span><span style="color: #007700">instanceof </span><span style="color: #0000BB">$c</span><span style="color: #007700">); </span><span style="color: #FF8000">// $c is a string 'MyClass'<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a </span><span style="color: #007700">instanceof </span><span style="color: #0000BB">$d</span><span style="color: #007700">); </span><span style="color: #FF8000">// $d is a string 'NotMyClass'<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+bool(true)
+bool(true)
+bool(false)
+</pre></div>
+   </div>
+  </div>
+ </p>
+ <p class="para">
+  instanceof does not throw any error if the variable being tested is not
+  an object, it simply returns <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong>. Constants, however, were not allowed
+  prior to PHP 7.3.0.
+  <div class="example" id="example-6">
+   <p><strong>Example #6 Using <code class="literal">instanceof</code> to test other variables</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$a </span><span style="color: #007700">= </span><span style="color: #0000BB">1</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$b </span><span style="color: #007700">= </span><span style="color: #0000BB">NULL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$c </span><span style="color: #007700">= </span><span style="color: #0000BB">fopen</span><span style="color: #007700">(</span><span style="color: #DD0000">'/tmp/'</span><span style="color: #007700">, </span><span style="color: #DD0000">'r'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a </span><span style="color: #007700">instanceof </span><span style="color: #0000BB">stdClass</span><span style="color: #007700">); </span><span style="color: #FF8000">// $a is an integer<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$b </span><span style="color: #007700">instanceof </span><span style="color: #0000BB">stdClass</span><span style="color: #007700">); </span><span style="color: #FF8000">// $b is NULL<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$c </span><span style="color: #007700">instanceof </span><span style="color: #0000BB">stdClass</span><span style="color: #007700">); </span><span style="color: #FF8000">// $c is a resource<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">FALSE </span><span style="color: #007700">instanceof </span><span style="color: #0000BB">stdClass</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+bool(false)
+bool(false)
+bool(false)
+PHP Fatal error:  instanceof expects an object instance, constant given
+</pre></div>
+   </div>
+  </div>
+ </p>
+ <p class="para">
+  As of PHP 7.3.0, constants are allowed on the left-hand-side of the
+  <code class="literal">instanceof</code> operator.
+  <div class="example" id="example-7">
+   <p><strong>Example #7 Using <code class="literal">instanceof</code> to test constants</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">FALSE </span><span style="color: #007700">instanceof </span><span style="color: #0000BB">stdClass</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>Output of the above example in PHP 7.3:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+bool(false)
+</pre></div>
+   </div>
+  </div>
+ </p>
+ <p class="para">
+  As of PHP 8.0.0, <code class="literal">instanceof</code> can now be used with arbitrary expressions.
+  The expression must be wrapped in parentheses and produce a <span class="type"><a href="language.types.string.html" class="type string">string</a></span>.
+  
+  <div class="example" id="example-8">
+   <p><strong>Example #8 Using <code class="literal">instanceof</code> with an arbitrary expression</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #007700">class </span><span style="color: #0000BB">ClassA </span><span style="color: #007700">extends </span><span style="color: #0000BB">\stdClass </span><span style="color: #007700">{}<br />class </span><span style="color: #0000BB">ClassB </span><span style="color: #007700">extends </span><span style="color: #0000BB">\stdClass </span><span style="color: #007700">{}<br />class </span><span style="color: #0000BB">ClassC </span><span style="color: #007700">extends </span><span style="color: #0000BB">ClassB </span><span style="color: #007700">{}<br />class </span><span style="color: #0000BB">ClassD </span><span style="color: #007700">extends </span><span style="color: #0000BB">ClassA </span><span style="color: #007700">{}<br /><br />function </span><span style="color: #0000BB">getSomeClass</span><span style="color: #007700">(): </span><span style="color: #0000BB">string<br /></span><span style="color: #007700">{<br />    return </span><span style="color: #0000BB">ClassA</span><span style="color: #007700">::class;<br />}<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(new </span><span style="color: #0000BB">ClassA </span><span style="color: #007700">instanceof (</span><span style="color: #DD0000">'std' </span><span style="color: #007700">. </span><span style="color: #DD0000">'Class'</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(new </span><span style="color: #0000BB">ClassB </span><span style="color: #007700">instanceof (</span><span style="color: #DD0000">'Class' </span><span style="color: #007700">. </span><span style="color: #DD0000">'B'</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(new </span><span style="color: #0000BB">ClassC </span><span style="color: #007700">instanceof (</span><span style="color: #DD0000">'Class' </span><span style="color: #007700">. </span><span style="color: #DD0000">'A'</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(new </span><span style="color: #0000BB">ClassD </span><span style="color: #007700">instanceof (</span><span style="color: #0000BB">getSomeClass</span><span style="color: #007700">()));<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>Output of the above example in PHP 8:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+bool(true)
+bool(true)
+bool(false)
+bool(true)
+</pre></div>
+   </div>
+  </div>
+ </p>
+ <p class="simpara">
+  The <code class="literal">instanceof</code> operator has a functional variant
+  with the <span class="function"><a href="function.is-a.html" class="function">is_a()</a></span> function.
+ </p>
+
+ <div class="sect2">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li><span class="function"><a href="function.get-class.html" class="function">get_class()</a></span></li>
+    <li><span class="function"><a href="function.is-a.html" class="function">is_a()</a></span></li>
+   </ul>
+  </p>
+ </div>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

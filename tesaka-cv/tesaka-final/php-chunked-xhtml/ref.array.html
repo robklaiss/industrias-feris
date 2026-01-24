@@ -1,0 +1,640 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Array Functions</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="array.sorting.html" class="navbar__link">« Sorting Arrays</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.array.html" class="navbar__link">array »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.array.html">Arrays</a></li>
+        <li>Array Functions</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="ref.array" class="reference">
+ <h1 class="title">Array Functions</h1>
+ <div class="partintro">
+   <h1 class="title">See Also</h1>
+   <p class="para">
+    See also <span class="function"><a href="function.is-array.html" class="function">is_array()</a></span>, <span class="function"><a href="function.explode.html" class="function">explode()</a></span>,
+    <span class="function"><a href="function.implode.html" class="function">implode()</a></span>,
+    <span class="function"><a href="function.preg-split.html" class="function">preg_split()</a></span>, and <span class="function"><a href="function.unset.html" class="function">unset()</a></span>.
+   </p>
+ </div>
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="function.array.html">array</a> — Create an array</li><li><a href="function.array-all.html">array_all</a> — Checks if all array elements satisfy a callback function</li><li><a href="function.array-any.html">array_any</a> — Checks if at least one array element satisfies a callback function</li><li><a href="function.array-change-key-case.html">array_change_key_case</a> — Changes the case of all keys in an array</li><li><a href="function.array-chunk.html">array_chunk</a> — Split an array into chunks</li><li><a href="function.array-column.html">array_column</a> — Return the values from a single column in the input array</li><li><a href="function.array-combine.html">array_combine</a> — Creates an array by using one array for keys and another for its values</li><li><a href="function.array-count-values.html">array_count_values</a> — Counts the occurrences of each distinct value in an array</li><li><a href="function.array-diff.html">array_diff</a> — Computes the difference of arrays</li><li><a href="function.array-diff-assoc.html">array_diff_assoc</a> — Computes the difference of arrays with additional index check</li><li><a href="function.array-diff-key.html">array_diff_key</a> — Computes the difference of arrays using keys for comparison</li><li><a href="function.array-diff-uassoc.html">array_diff_uassoc</a> — Computes the difference of arrays with additional index check which is performed by a user supplied callback function</li><li><a href="function.array-diff-ukey.html">array_diff_ukey</a> — Computes the difference of arrays using a callback function on the keys for comparison</li><li><a href="function.array-fill.html">array_fill</a> — Fill an array with values</li><li><a href="function.array-fill-keys.html">array_fill_keys</a> — Fill an array with values, specifying keys</li><li><a href="function.array-filter.html">array_filter</a> — Filters elements of an array using a callback function</li><li><a href="function.array-find.html">array_find</a> — Returns the first element satisfying a callback function</li><li><a href="function.array-find-key.html">array_find_key</a> — Returns the key of the first element satisfying a callback function</li><li><a href="function.array-first.html">array_first</a> — Gets the first value of an array</li><li><a href="function.array-flip.html">array_flip</a> — Exchanges all keys with their associated values in an array</li><li><a href="function.array-intersect.html">array_intersect</a> — Computes the intersection of arrays</li><li><a href="function.array-intersect-assoc.html">array_intersect_assoc</a> — Computes the intersection of arrays with additional index check</li><li><a href="function.array-intersect-key.html">array_intersect_key</a> — Computes the intersection of arrays using keys for comparison</li><li><a href="function.array-intersect-uassoc.html">array_intersect_uassoc</a> — Computes the intersection of arrays with additional index check, compares indexes by a callback function</li><li><a href="function.array-intersect-ukey.html">array_intersect_ukey</a> — Computes the intersection of arrays using a callback function on the keys for comparison</li><li><a href="function.array-is-list.html">array_is_list</a> — Checks whether a given array is a list</li><li><a href="function.array-key-exists.html">array_key_exists</a> — Checks if the given key or index exists in the array</li><li><a href="function.array-key-first.html">array_key_first</a> — Gets the first key of an array</li><li><a href="function.array-key-last.html">array_key_last</a> — Gets the last key of an array</li><li><a href="function.array-keys.html">array_keys</a> — Return all the keys or a subset of the keys of an array</li><li><a href="function.array-last.html">array_last</a> — Gets the last value of an array</li><li><a href="function.array-map.html">array_map</a> — Applies the callback to the elements of the given arrays</li><li><a href="function.array-merge.html">array_merge</a> — Merge one or more arrays</li><li><a href="function.array-merge-recursive.html">array_merge_recursive</a> — Merge one or more arrays recursively</li><li><a href="function.array-multisort.html">array_multisort</a> — Sort multiple or multi-dimensional arrays</li><li><a href="function.array-pad.html">array_pad</a> — Pad array to the specified length with a value</li><li><a href="function.array-pop.html">array_pop</a> — Pop the element off the end of array</li><li><a href="function.array-product.html">array_product</a> — Calculate the product of values in an array</li><li><a href="function.array-push.html">array_push</a> — Push one or more elements onto the end of array</li><li><a href="function.array-rand.html">array_rand</a> — Pick one or more random keys out of an array</li><li><a href="function.array-reduce.html">array_reduce</a> — Iteratively reduce the array to a single value using a callback function</li><li><a href="function.array-replace.html">array_replace</a> — Replaces elements from passed arrays into the first array</li><li><a href="function.array-replace-recursive.html">array_replace_recursive</a> — Replaces elements from passed arrays into the first array recursively</li><li><a href="function.array-reverse.html">array_reverse</a> — Return an array with elements in reverse order</li><li><a href="function.array-search.html">array_search</a> — Searches the array for a given value and returns the first corresponding key if successful</li><li><a href="function.array-shift.html">array_shift</a> — Shift an element off the beginning of array</li><li><a href="function.array-slice.html">array_slice</a> — Extract a slice of the array</li><li><a href="function.array-splice.html">array_splice</a> — Remove a portion of the array and replace it with something else</li><li><a href="function.array-sum.html">array_sum</a> — Calculate the sum of values in an array</li><li><a href="function.array-udiff.html">array_udiff</a> — Computes the difference of arrays by using a callback function for data comparison</li><li><a href="function.array-udiff-assoc.html">array_udiff_assoc</a> — Computes the difference of arrays with additional index check, compares data by a callback function</li><li><a href="function.array-udiff-uassoc.html">array_udiff_uassoc</a> — Computes the difference of arrays with additional index check, compares data and indexes by a callback function</li><li><a href="function.array-uintersect.html">array_uintersect</a> — Computes the intersection of arrays, compares data by a callback function</li><li><a href="function.array-uintersect-assoc.html">array_uintersect_assoc</a> — Computes the intersection of arrays with additional index check, compares data by a callback function</li><li><a href="function.array-uintersect-uassoc.html">array_uintersect_uassoc</a> — Computes the intersection of arrays with additional index check, compares data and indexes by separate callback functions</li><li><a href="function.array-unique.html">array_unique</a> — Removes duplicate values from an array</li><li><a href="function.array-unshift.html">array_unshift</a> — Prepend one or more elements to the beginning of an array</li><li><a href="function.array-values.html">array_values</a> — Return all the values of an array</li><li><a href="function.array-walk.html">array_walk</a> — Apply a user supplied function to every member of an array</li><li><a href="function.array-walk-recursive.html">array_walk_recursive</a> — Apply a user function recursively to every member of an array</li><li><a href="function.arsort.html">arsort</a> — Sort an array in descending order and maintain index association</li><li><a href="function.asort.html">asort</a> — Sort an array in ascending order and maintain index association</li><li><a href="function.compact.html">compact</a> — Create array containing variables and their values</li><li><a href="function.count.html">count</a> — Counts all elements in an array or in a Countable object</li><li><a href="function.current.html">current</a> — Return the current element in an array</li><li><a href="function.each.html">each</a> — Return the current key and value pair from an array and advance the array cursor</li><li><a href="function.end.html">end</a> — Set the internal pointer of an array to its last element</li><li><a href="function.extract.html">extract</a> — Import variables into the current symbol table from an array</li><li><a href="function.in-array.html">in_array</a> — Checks if a value exists in an array</li><li><a href="function.key.html">key</a> — Fetch a key from an array</li><li><a href="function.key-exists.html">key_exists</a> — Alias of array_key_exists</li><li><a href="function.krsort.html">krsort</a> — Sort an array by key in descending order</li><li><a href="function.ksort.html">ksort</a> — Sort an array by key in ascending order</li><li><a href="function.list.html">list</a> — Assign variables as if they were an array</li><li><a href="function.natcasesort.html">natcasesort</a> — Sort an array using a case insensitive &quot;natural order&quot; algorithm</li><li><a href="function.natsort.html">natsort</a> — Sort an array using a &quot;natural order&quot; algorithm</li><li><a href="function.next.html">next</a> — Advance the internal pointer of an array</li><li><a href="function.pos.html">pos</a> — Alias of current</li><li><a href="function.prev.html">prev</a> — Rewind the internal array pointer</li><li><a href="function.range.html">range</a> — Create an array containing a range of elements</li><li><a href="function.reset.html">reset</a> — Set the internal pointer of an array to its first element</li><li><a href="function.rsort.html">rsort</a> — Sort an array in descending order</li><li><a href="function.shuffle.html">shuffle</a> — Shuffle an array</li><li><a href="function.sizeof.html">sizeof</a> — Alias of count</li><li><a href="function.sort.html">sort</a> — Sort an array in ascending order</li><li><a href="function.uasort.html">uasort</a> — Sort an array with a user-defined comparison function and maintain index association</li><li><a href="function.uksort.html">uksort</a> — Sort an array by keys using a user-defined comparison function</li><li><a href="function.usort.html">usort</a> — Sort an array by values using a user-defined comparison function</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

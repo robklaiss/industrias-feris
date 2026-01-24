@@ -1,0 +1,190 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>General considerations</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="security.intro.html" class="navbar__link">« Introduction</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="security.cgi-bin.html" class="navbar__link">Installed as CGI binary »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="security.html">Security</a></li>
+        <li>General considerations</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="security.general" class="chapter">
+   <h1 class="title">General considerations</h1>
+
+   <p class="simpara">
+    A completely secure system is a virtual impossibility, so an
+    approach often used in the security profession is one of balancing
+    risk and usability. If every variable submitted by a user required
+    two forms of biometric validation (such as a retinal scan and a
+    fingerprint), you would have an extremely high level of
+    accountability. It would also take half an hour to fill out a fairly
+    complex form, which would tend to encourage users to find ways of
+    bypassing the security.
+   </p>
+   <p class="simpara">
+    The best security is often unobtrusive enough to suit the
+    requirements without the user being prevented from accomplishing
+    their work, or over-burdening the code author with excessive
+    complexity. Indeed, some security attacks are merely exploits of
+    this kind of overly built security, which tends to erode over time.
+   </p>
+   <p class="simpara">
+    A phrase worth remembering: A system is only as good as the weakest
+    link in a chain. If all transactions are heavily logged based on
+    time, location, transaction type, etc. but the user is only
+    verified based on a single cookie, the validity of tying the users
+    to the transaction log is severely weakened.
+   </p>
+   <p class="simpara">
+    When testing, keep in mind that you will not be able to test all
+    possibilities for even the simplest of pages. The input you
+    may expect will be completely unrelated to the input given by
+    a disgruntled employee, a cracker with months of time on their
+    hands, or a housecat walking across the keyboard. This is why it&#039;s
+    best to look at the code from a logical perspective, to discern
+    where unexpected data can be introduced, and then follow how it is
+    modified, reduced, or amplified.
+   </p>
+   <p class="simpara">
+    The Internet is filled with people trying to make a name for
+    themselves by breaking your code, crashing your site, posting
+    inappropriate content, and otherwise making your day interesting.
+    It doesn&#039;t matter if you have a small or large site, you are
+    a target by simply being online, by having a server that can be
+    connected to. Many cracking programs do not discern by size, they
+    simply trawl massive IP blocks looking for victims. Try not to
+    become one.
+   </p>
+  </div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

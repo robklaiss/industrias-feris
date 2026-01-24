@@ -1,0 +1,272 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Late Static Bindings</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="language.oop5.object-comparison.html" class="navbar__link">« Comparing Objects</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="language.oop5.references.html" class="navbar__link">Objects and references »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="language.oop5.html">Classes and Objects</a></li>
+        <li>Late Static Bindings</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="language.oop5.late-static-bindings" class="sect1">
+  <h2 class="title">Late Static Bindings</h2>
+  <p class="para">
+   PHP implements a feature called late static bindings which
+   can be used to reference the called class in a context of static inheritance.
+  </p>
+
+  <p class="para">
+   More precisely, late static bindings work by storing the class named in the
+   last &quot;non-forwarding call&quot;. In case of static method calls, this is the
+   class explicitly named (usually the one on the left of the
+   <a href="language.oop5.paamayim-nekudotayim.html" class="link"><code class="literal">::</code></a>
+   operator); in case of non static method calls, it is the class of the object. A
+   &quot;forwarding call&quot; is a static one that is introduced by <code class="literal">self::</code>,
+   <code class="literal">parent::</code>, <code class="literal">static::</code>, or, if going
+   up in the class hierarchy, <span class="function"><a href="function.forward-static-call.html" class="function">forward_static_call()</a></span>.
+   
+   
+   The function <span class="function"><a href="function.get-called-class.html" class="function">get_called_class()</a></span> can be used to retrieve
+   a string with the name of the called class and <code class="literal">static::</code>
+   introduces its scope.
+  </p>
+  
+  <p class="para">
+   This feature was named &quot;late static bindings&quot; with an internal perspective in
+   mind. &quot;Late binding&quot; comes from the fact that <code class="literal">static::</code>
+   will not be resolved using the class where the method is defined but it will
+   rather be computed using runtime information.
+
+   It was also called a &quot;static binding&quot; as it can be used for (but is not
+   limited to) static method calls.
+  </p>
+
+  <div class="sect2" id="language.oop5.late-static-bindings.self">
+   <h3 class="title">Limitations of <code class="literal">self::</code></h3>
+   <p class="para">
+    Static references to the current class like <code class="literal">self::</code> or
+    <code class="literal">__CLASS__</code> are resolved using the class in which the
+    function belongs, as in where it was defined:
+   </p>
+   <div class="example" id="example-1">
+    <p><strong>Example #1 <code class="literal">self::</code> usage</strong></p>
+    <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #007700">class </span><span style="color: #0000BB">A<br /></span><span style="color: #007700">{<br />    public static function </span><span style="color: #0000BB">who</span><span style="color: #007700">()<br />    {<br />        echo </span><span style="color: #0000BB">__CLASS__</span><span style="color: #007700">;<br />    }<br /><br />    public static function </span><span style="color: #0000BB">test</span><span style="color: #007700">()<br />    {<br />        </span><span style="color: #0000BB">self</span><span style="color: #007700">::</span><span style="color: #0000BB">who</span><span style="color: #007700">();<br />    }<br />}<br /><br />class </span><span style="color: #0000BB">B </span><span style="color: #007700">extends </span><span style="color: #0000BB">A<br /></span><span style="color: #007700">{<br />    public static function </span><span style="color: #0000BB">who</span><span style="color: #007700">()<br />    {<br />        echo </span><span style="color: #0000BB">__CLASS__</span><span style="color: #007700">;<br />    }<br />}<br /><br /></span><span style="color: #0000BB">B</span><span style="color: #007700">::</span><span style="color: #0000BB">test</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output:</p></div>
+    <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+A
+</pre></div>
+    </div>
+   </div>
+
+  </div>
+
+  <div class="sect2" id="language.oop5.late-static-bindings.usage">
+   <h3 class="title">Late Static Bindings&#039; usage</h3>
+
+   <p class="para">
+    Late static bindings tries to solve that limitation by introducing a
+    keyword that references the class that was initially called at runtime.
+    Basically, a keyword that would allow referencing
+    <code class="literal">B</code> from <code class="literal">test()</code> in the previous
+    example. It was decided not to introduce a new keyword but rather use
+    <code class="literal">static</code> that was already reserved.
+   </p>
+
+   <div class="example" id="example-2">
+    <p><strong>Example #2 <code class="literal">static::</code> simple usage</strong></p>
+    <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #007700">class </span><span style="color: #0000BB">A<br /></span><span style="color: #007700">{<br />    public static function </span><span style="color: #0000BB">who</span><span style="color: #007700">()<br />    {<br />        echo </span><span style="color: #0000BB">__CLASS__</span><span style="color: #007700">;<br />    }<br /><br />    public static function </span><span style="color: #0000BB">test</span><span style="color: #007700">()<br />    {<br />        static::</span><span style="color: #0000BB">who</span><span style="color: #007700">(); </span><span style="color: #FF8000">// Here comes Late Static Bindings<br />    </span><span style="color: #007700">}<br />}<br /><br />class </span><span style="color: #0000BB">B </span><span style="color: #007700">extends </span><span style="color: #0000BB">A<br /></span><span style="color: #007700">{<br />    public static function </span><span style="color: #0000BB">who</span><span style="color: #007700">()<br />    {<br />        echo </span><span style="color: #0000BB">__CLASS__</span><span style="color: #007700">;<br />    }<br />}<br /><br /></span><span style="color: #0000BB">B</span><span style="color: #007700">::</span><span style="color: #0000BB">test</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output:</p></div>
+    <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+B
+</pre></div>
+    </div>
+   </div>
+   <blockquote class="note"><p><strong class="note">Note</strong>: 
+    <p class="para">
+     In non-static contexts, the called class will be the class of the object
+     instance. Since <code class="literal">$this-&gt;</code> will try to call private
+     methods from the same scope, using <code class="literal">static::</code> may give
+     different results. Another difference is that <code class="literal">static::</code>
+     can only refer to static properties.
+    </p>
+   </p></blockquote>
+   <div class="example" id="example-3">
+    <p><strong>Example #3 <code class="literal">static::</code> usage in a non-static context</strong></p>
+    <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #007700">class </span><span style="color: #0000BB">A<br /></span><span style="color: #007700">{<br />    private function </span><span style="color: #0000BB">foo</span><span style="color: #007700">()<br />    {<br />        echo </span><span style="color: #DD0000">"Success!\n"</span><span style="color: #007700">;<br />    }<br /><br />    public function </span><span style="color: #0000BB">test</span><span style="color: #007700">()<br />    {<br />        </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">foo</span><span style="color: #007700">();<br />        static::</span><span style="color: #0000BB">foo</span><span style="color: #007700">();<br />    }<br />}<br /><br />class </span><span style="color: #0000BB">B </span><span style="color: #007700">extends </span><span style="color: #0000BB">A<br /></span><span style="color: #007700">{<br />    </span><span style="color: #FF8000">/* foo() will be copied to B, hence its scope will still be A and<br />    * the call be successful */<br /></span><span style="color: #007700">}<br /><br />class </span><span style="color: #0000BB">C </span><span style="color: #007700">extends </span><span style="color: #0000BB">A<br /></span><span style="color: #007700">{<br />    private function </span><span style="color: #0000BB">foo</span><span style="color: #007700">()<br />    {<br />        </span><span style="color: #FF8000">/* Original method is replaced; the scope of the new one is C */<br />    </span><span style="color: #007700">}<br />}<br /><br /></span><span style="color: #0000BB">$b </span><span style="color: #007700">= new </span><span style="color: #0000BB">B</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">$b</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">test</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">$c </span><span style="color: #007700">= new </span><span style="color: #0000BB">C</span><span style="color: #007700">();<br />try {<br />    </span><span style="color: #0000BB">$c</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">test</span><span style="color: #007700">();<br />} catch (</span><span style="color: #0000BB">Error $e</span><span style="color: #007700">) {<br />    echo </span><span style="color: #0000BB">$e</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getMessage</span><span style="color: #007700">();<br />}<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output:</p></div>
+    <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+Success!
+Success!
+Success!
+Call to private method C::foo() from scope A
+</pre></div>
+    </div>
+   </div>
+   <blockquote class="note"><p><strong class="note">Note</strong>: 
+    <p class="para">
+     Late static bindings&#039; resolution will stop at a fully resolved static call
+     with no fallback. On the other hand, static calls using keywords like
+     <code class="literal">parent::</code> or <code class="literal">self::</code> will forward the
+     calling information.
+    </p>
+    <div class="example" id="example-4">
+     <p><strong>Example #4 Forwarding and non-forwarding calls</strong></p>
+     <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #007700">class </span><span style="color: #0000BB">A<br /></span><span style="color: #007700">{<br />    public static function </span><span style="color: #0000BB">foo</span><span style="color: #007700">()<br />    {<br />        static::</span><span style="color: #0000BB">who</span><span style="color: #007700">();<br />    }<br /><br />    public static function </span><span style="color: #0000BB">who</span><span style="color: #007700">()<br />    {<br />        echo </span><span style="color: #0000BB">__CLASS__ </span><span style="color: #007700">. </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />    }<br />}<br /><br />class </span><span style="color: #0000BB">B </span><span style="color: #007700">extends </span><span style="color: #0000BB">A<br /></span><span style="color: #007700">{<br />    public static function </span><span style="color: #0000BB">test</span><span style="color: #007700">()<br />    {<br />        </span><span style="color: #0000BB">A</span><span style="color: #007700">::</span><span style="color: #0000BB">foo</span><span style="color: #007700">();<br />        </span><span style="color: #0000BB">parent</span><span style="color: #007700">::</span><span style="color: #0000BB">foo</span><span style="color: #007700">();<br />        </span><span style="color: #0000BB">self</span><span style="color: #007700">::</span><span style="color: #0000BB">foo</span><span style="color: #007700">();<br />    }<br /><br />    public static function </span><span style="color: #0000BB">who</span><span style="color: #007700">()<br />    {<br />        echo </span><span style="color: #0000BB">__CLASS__ </span><span style="color: #007700">. </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />    }<br />}<br /><br />class </span><span style="color: #0000BB">C </span><span style="color: #007700">extends </span><span style="color: #0000BB">B<br /></span><span style="color: #007700">{<br />    public static function </span><span style="color: #0000BB">who</span><span style="color: #007700">()<br />    {<br />        echo </span><span style="color: #0000BB">__CLASS__ </span><span style="color: #007700">. </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />    }<br />}<br /><br /></span><span style="color: #0000BB">C</span><span style="color: #007700">::</span><span style="color: #0000BB">test</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+     </div>
+
+     <div class="example-contents"><p>The above example will output:</p></div>
+     <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+A
+C
+C
+</pre></div>
+     </div>
+    </div>
+   </p></blockquote>
+  </div>
+ </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

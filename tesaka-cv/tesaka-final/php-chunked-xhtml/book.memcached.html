@@ -1,0 +1,200 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Memcached</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.memcache-debug.html" class="navbar__link">« memcache_debug</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="intro.memcached.html" class="navbar__link">Introduction »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="refs.remote.other.html">Other Services</a></li>
+        <li>Memcached</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="book.memcached" class="book">
+ 
+ <h1 class="title">Memcached</h1>
+ 
+
+ 
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+<ul class="chunklist chunklist_book"><li><a href="intro.memcached.html">Introduction</a></li><li><a href="memcached.setup.html">Installing/Configuring</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="memcached.requirements.html">Requirements</a></li><li><a href="memcached.installation.html">Installation</a></li><li><a href="memcached.configuration.html">Runtime Configuration</a></li></ul></li><li><a href="memcached.constants.html">Predefined Constants</a></li><li><a href="memcached.expiration.html">Expiration Times</a></li><li><a href="memcached.callbacks.html">Callbacks</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="memcached.callbacks.result.html">Result callbacks</a></li><li><a href="memcached.callbacks.read-through.html">Read-through cache callbacks</a></li></ul></li><li><a href="memcached.sessions.html">Sessions support</a></li><li><a href="class.memcached.html">Memcached</a> — The Memcached class<ul class="chunklist chunklist_book chunklist_children"><li><a href="memcached.add.html">Memcached::add</a> — Add an item under a new key</li><li><a href="memcached.addbykey.html">Memcached::addByKey</a> — Add an item under a new key on a specific server</li><li><a href="memcached.addserver.html">Memcached::addServer</a> — Add a server to the server pool</li><li><a href="memcached.addservers.html">Memcached::addServers</a> — Add multiple servers to the server pool</li><li><a href="memcached.append.html">Memcached::append</a> — Append data to an existing item</li><li><a href="memcached.appendbykey.html">Memcached::appendByKey</a> — Append data to an existing item on a specific server</li><li><a href="memcached.cas.html">Memcached::cas</a> — Compare and swap an item</li><li><a href="memcached.casbykey.html">Memcached::casByKey</a> — Compare and swap an item on a specific server</li><li><a href="memcached.construct.html">Memcached::__construct</a> — Create a Memcached instance</li><li><a href="memcached.decrement.html">Memcached::decrement</a> — Decrement numeric item's value</li><li><a href="memcached.decrementbykey.html">Memcached::decrementByKey</a> — Decrement numeric item's value, stored on a specific server</li><li><a href="memcached.delete.html">Memcached::delete</a> — Delete an item</li><li><a href="memcached.deletebykey.html">Memcached::deleteByKey</a> — Delete an item from a specific server</li><li><a href="memcached.deletemulti.html">Memcached::deleteMulti</a> — Delete multiple items</li><li><a href="memcached.deletemultibykey.html">Memcached::deleteMultiByKey</a> — Delete multiple items from a specific server</li><li><a href="memcached.fetch.html">Memcached::fetch</a> — Fetch the next result</li><li><a href="memcached.fetchall.html">Memcached::fetchAll</a> — Fetch all the remaining results</li><li><a href="memcached.flush.html">Memcached::flush</a> — Invalidate all items in the cache</li><li><a href="memcached.get.html">Memcached::get</a> — Retrieve an item</li><li><a href="memcached.getallkeys.html">Memcached::getAllKeys</a> — Gets the keys stored on all the servers</li><li><a href="memcached.getbykey.html">Memcached::getByKey</a> — Retrieve an item from a specific server</li><li><a href="memcached.getdelayed.html">Memcached::getDelayed</a> — Request multiple items</li><li><a href="memcached.getdelayedbykey.html">Memcached::getDelayedByKey</a> — Request multiple items from a specific server</li><li><a href="memcached.getmulti.html">Memcached::getMulti</a> — Retrieve multiple items</li><li><a href="memcached.getmultibykey.html">Memcached::getMultiByKey</a> — Retrieve multiple items from a specific server</li><li><a href="memcached.getoption.html">Memcached::getOption</a> — Retrieve a Memcached option value</li><li><a href="memcached.getresultcode.html">Memcached::getResultCode</a> — Return the result code of the last operation</li><li><a href="memcached.getresultmessage.html">Memcached::getResultMessage</a> — Return the message describing the result of the last operation</li><li><a href="memcached.getserverbykey.html">Memcached::getServerByKey</a> — Map a key to a server</li><li><a href="memcached.getserverlist.html">Memcached::getServerList</a> — Get the list of the servers in the pool</li><li><a href="memcached.getstats.html">Memcached::getStats</a> — Get server pool statistics</li><li><a href="memcached.getversion.html">Memcached::getVersion</a> — Get server pool version info</li><li><a href="memcached.increment.html">Memcached::increment</a> — Increment numeric item's value</li><li><a href="memcached.incrementbykey.html">Memcached::incrementByKey</a> — Increment numeric item's value, stored on a specific server</li><li><a href="memcached.ispersistent.html">Memcached::isPersistent</a> — Check if a persitent connection to memcache is being used</li><li><a href="memcached.ispristine.html">Memcached::isPristine</a> — Check if the instance was recently created</li><li><a href="memcached.prepend.html">Memcached::prepend</a> — Prepend data to an existing item</li><li><a href="memcached.prependbykey.html">Memcached::prependByKey</a> — Prepend data to an existing item on a specific server</li><li><a href="memcached.quit.html">Memcached::quit</a> — Close any open connections</li><li><a href="memcached.replace.html">Memcached::replace</a> — Replace the item under an existing key</li><li><a href="memcached.replacebykey.html">Memcached::replaceByKey</a> — Replace the item under an existing key on a specific server</li><li><a href="memcached.resetserverlist.html">Memcached::resetServerList</a> — Clears all servers from the server list</li><li><a href="memcached.set.html">Memcached::set</a> — Store an item</li><li><a href="memcached.setbykey.html">Memcached::setByKey</a> — Store an item on a specific server</li><li><a href="memcached.setencodingkey.html">Memcached::setEncodingKey</a> — Set AES encryption key for data in Memcached</li><li><a href="memcached.setmulti.html">Memcached::setMulti</a> — Store multiple items</li><li><a href="memcached.setmultibykey.html">Memcached::setMultiByKey</a> — Store multiple items on a specific server</li><li><a href="memcached.setoption.html">Memcached::setOption</a> — Set a Memcached option</li><li><a href="memcached.setoptions.html">Memcached::setOptions</a> — Set Memcached options</li><li><a href="memcached.setsaslauthdata.html">Memcached::setSaslAuthData</a> — Set the credentials to use for authentication</li><li><a href="memcached.touch.html">Memcached::touch</a> — Set a new expiration on an item</li><li><a href="memcached.touchbykey.html">Memcached::touchByKey</a> — Set a new expiration on an item on a specific server</li></ul></li><li><a href="class.memcachedexception.html">MemcachedException</a> — The MemcachedException class</li></ul></div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

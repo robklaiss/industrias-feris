@@ -27,8 +27,8 @@ REQUIRED_FILES = {
 
 # Required CLI flags
 REQUIRED_FLAGS = {
-    "auto_fix_0160_loop.py": ["--poll-every", "--max-poll"],
-    "send_sirecepde.py": ["--env", "--xml", "--bump-doc", "--dump-http", "--artifacts-dir", "--iteration"],
+    "tools/auto_fix_0160_loop.py": ["--poll-every", "--max-poll"],
+    "tools/send_sirecepde.py": ["--env", "--xml", "--bump-doc", "--dump-http", "--artifacts-dir", "--iteration"],
 }
 
 

@@ -1,0 +1,227 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Prepare a SQL statement for execution</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.cubrid-pconnect-with-url.html" class="navbar__link">« cubrid_pconnect_with_url</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.cubrid-put.html" class="navbar__link">cubrid_put »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ref.cubrid.html">CUBRID Functions</a></li>
+        <li>Prepare a SQL statement for execution</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="function.cubrid-prepare" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">cubrid_prepare</h1>
+  <p class="verinfo">(PECL CUBRID &gt;= 8.3.0)</p><p class="refpurpose"><span class="refname">cubrid_prepare</span> &mdash; <span class="dc-title">Prepare a SQL statement for execution</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-function.cubrid-prepare-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="methodname"><strong>cubrid_prepare</strong></span>(<span class="methodparam"><span class="type"><a href="language.types.resource.html" class="type resource">resource</a></span> <code class="parameter">$conn_identifier</code></span>, <span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$prepare_stmt</code></span>, <span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$option</code><span class="initializer"> = 0</span></span>): <span class="type"><a href="language.types.resource.html" class="type resource">resource</a></span></div>
+
+  <p class="simpara">
+      The <span class="function"><strong>cubrid_prepare()</strong></span> function is a sort of API which represents SQL statements
+      compiled previously to a given connection handle. This pre-compiled SQL statement will be included
+      in the <span class="function"><strong>cubrid_prepare()</strong></span>.
+  </p>
+  <p class="simpara">
+      Accordingly, you can use this statement effectively to execute several times repeatedly or to
+      process long data. Only a single statement can be used and a parameter may put a question mark (?)
+      to appropriate area in the SQL statement. Add a parameter when you bind a value in the VALUES
+      clause of INSERT statement or in the WHERE clause. Note that it is allowed to bind a value to a
+      MARK(?) by using the <span class="function"><a href="function.cubrid-bind.html" class="function">cubrid_bind()</a></span> function only.
+  </p>
+ </div>
+
+
+<div class="refsect1 parameters" id="refsect1-function.cubrid-prepare-parameters">
+  <h3 class="title">Parameters</h3>
+  <dl>
+   
+ <dt><code class="parameter">conn_identifier</code></dt>
+ <dd><span class="simpara">Connection identifier.</span></dd>
+  
+  
+ <dt><code class="parameter">prepare_stmt</code></dt>
+ <dd><span class="simpara">Prepare query.</span></dd>
+  
+  
+ <dt><code class="parameter">option</code></dt>
+   <dd><span class="simpara">OID return option <strong><code>CUBRID_INCLUDE_OID</code></strong>.</span></dd>
+  
+ </dl>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-function.cubrid-prepare-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="simpara">
+    Request identifier, if process is successful, or <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong> on failure.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-function.cubrid-prepare-examples">
+  <h3 class="title">Examples</h3>
+  <div class="example" id="example-1">
+   <p><strong>Example #1 <span class="function"><strong>cubrid_prepare()</strong></span> example</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$conn </span><span style="color: #007700">= </span><span style="color: #0000BB">cubrid_connect</span><span style="color: #007700">(</span><span style="color: #DD0000">"localhost"</span><span style="color: #007700">, </span><span style="color: #0000BB">33000</span><span style="color: #007700">, </span><span style="color: #DD0000">"demodb"</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$sql </span><span style="color: #007700">= &lt;&lt;&lt;EOD<br /></span><span style="color: #DD0000">SELECT g.event_code, e.name<br />FROM game g<br />JOIN event e ON g.event_code=e.code<br />WHERE host_year = ? AND event_code NOT IN (SELECT event_code FROM game WHERE host_year=?) GROUP BY event_code;<br /></span><span style="color: #007700">EOD;<br /><br /></span><span style="color: #0000BB">$req </span><span style="color: #007700">= </span><span style="color: #0000BB">cubrid_prepare</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn</span><span style="color: #007700">, </span><span style="color: #0000BB">$sql</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">cubrid_bind</span><span style="color: #007700">(</span><span style="color: #0000BB">$req</span><span style="color: #007700">, </span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">2004</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">cubrid_bind</span><span style="color: #007700">(</span><span style="color: #0000BB">$req</span><span style="color: #007700">, </span><span style="color: #0000BB">2</span><span style="color: #007700">, </span><span style="color: #0000BB">2000</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">cubrid_execute</span><span style="color: #007700">(</span><span style="color: #0000BB">$req</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$row_num </span><span style="color: #007700">= </span><span style="color: #0000BB">cubrid_num_rows</span><span style="color: #007700">(</span><span style="color: #0000BB">$req</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">printf</span><span style="color: #007700">(</span><span style="color: #DD0000">"There are %d event that exits in 2004 olympic but not in 2000. For example:\n\n"</span><span style="color: #007700">, </span><span style="color: #0000BB">$row_num</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">printf</span><span style="color: #007700">(</span><span style="color: #DD0000">"%-15s %s\n"</span><span style="color: #007700">, </span><span style="color: #DD0000">"Event_code"</span><span style="color: #007700">, </span><span style="color: #DD0000">"Event_name"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">printf</span><span style="color: #007700">(</span><span style="color: #DD0000">"----------------------------\n"</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">cubrid_fetch_assoc</span><span style="color: #007700">(</span><span style="color: #0000BB">$req</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">printf</span><span style="color: #007700">(</span><span style="color: #DD0000">"%-15d %s\n"</span><span style="color: #007700">, </span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #DD0000">"event_code"</span><span style="color: #007700">], </span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #DD0000">"name"</span><span style="color: #007700">]);<br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">cubrid_fetch_assoc</span><span style="color: #007700">(</span><span style="color: #0000BB">$req</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">printf</span><span style="color: #007700">(</span><span style="color: #DD0000">"%-15d %s\n"</span><span style="color: #007700">, </span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #DD0000">"event_code"</span><span style="color: #007700">], </span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #DD0000">"name"</span><span style="color: #007700">]);<br /><br /></span><span style="color: #0000BB">cubrid_disconnect</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+    <div class="example-contents"><p>The above example will output:</p></div>
+    <div class="example-contents screen">
+<div class="examplescode"><pre class="examplescode">There are 27 event that exits in 2004 olympic but not in 2000. For example:
+
+Event_code      Event_name
+----------------------------
+20063           +91kg
+20070           64kg</pre>
+</div>
+   </div>
+  </div>
+ </div>
+
+
+  <div class="refsect1 seealso" id="refsect1-function.cubrid-prepare-seealso">
+  <h3 class="title">See Also</h3>
+  <ul class="simplelist">
+   <li><span class="function"><a href="function.cubrid-execute.html" class="function" rel="rdfs-seeAlso">cubrid_execute()</a> - Execute a prepared SQL statement</span></li>
+   <li><span class="function"><a href="function.cubrid-bind.html" class="function" rel="rdfs-seeAlso">cubrid_bind()</a> - Bind variables to a prepared statement as parameters</span></li>
+  </ul>
+  </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

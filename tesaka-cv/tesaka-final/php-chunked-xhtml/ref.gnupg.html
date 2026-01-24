@@ -1,0 +1,302 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>GnuPG Functions</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="gnupg.examples-clearsign.html" class="navbar__link">« Clearsign text</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.gnupg-adddecryptkey.html" class="navbar__link">gnupg_adddecryptkey »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.gnupg.html">GnuPG</a></li>
+        <li>GnuPG Functions</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="ref.gnupg" class="reference">
+ <h1 class="title">GnuPG Functions</h1>
+
+ <div class="partintro">
+   <h1 class="title">Notes</h1>
+   <p class="simpara">
+    This extension makes use of the keyring of the current user. This keyring
+    is normally located in ~./.gnupg/.
+    To specify a custom location, store the path to the keyring in the
+    environment variable GNUPGHOME. See <a href="function.putenv.html" class="link">putenv</a> for more information how to do
+    this.
+   </p>
+   <p class="simpara">
+    Some functions require the specification of a key. This specification can
+    be anything that refers to a unique key (userid, key-id, fingerprint,
+    ...).
+    This documentation uses the fingerprint in all examples.
+   </p>
+   <blockquote class="note"><p><strong class="note">Note</strong>: 
+    <span class="simpara">
+     As alternative to the explicitly documented functions using
+     <span class="type"><a href="language.types.resource.html" class="type resource">resource</a></span>s, you can also use an object-oriented style using
+     <span class="classname"><strong class="classname">gnupg</strong></span> objects.
+    </span>
+   </p></blockquote>
+  </div>
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="function.gnupg-adddecryptkey.html">gnupg_adddecryptkey</a> — Add a key for decryption</li><li><a href="function.gnupg-addencryptkey.html">gnupg_addencryptkey</a> — Add a key for encryption</li><li><a href="function.gnupg-addsignkey.html">gnupg_addsignkey</a> — Add a key for signing</li><li><a href="function.gnupg-cleardecryptkeys.html">gnupg_cleardecryptkeys</a> — Removes all keys which were set for decryption before</li><li><a href="function.gnupg-clearencryptkeys.html">gnupg_clearencryptkeys</a> — Removes all keys which were set for encryption before</li><li><a href="function.gnupg-clearsignkeys.html">gnupg_clearsignkeys</a> — Removes all keys which were set for signing before</li><li><a href="function.gnupg-decrypt.html">gnupg_decrypt</a> — Decrypts a given text</li><li><a href="function.gnupg-decryptverify.html">gnupg_decryptverify</a> — Decrypts and verifies a given text</li><li><a href="function.gnupg-deletekey.html">gnupg_deletekey</a> — Delete a key from the keyring</li><li><a href="function.gnupg-encrypt.html">gnupg_encrypt</a> — Encrypts a given text</li><li><a href="function.gnupg-encryptsign.html">gnupg_encryptsign</a> — Encrypts and signs a given text</li><li><a href="function.gnupg-export.html">gnupg_export</a> — Exports a key</li><li><a href="function.gnupg-getengineinfo.html">gnupg_getengineinfo</a> — Returns the engine info</li><li><a href="function.gnupg-geterror.html">gnupg_geterror</a> — Returns the errortext, if a function fails</li><li><a href="function.gnupg-geterrorinfo.html">gnupg_geterrorinfo</a> — Returns the error info</li><li><a href="function.gnupg-getprotocol.html">gnupg_getprotocol</a> — Returns the currently active protocol for all operations</li><li><a href="function.gnupg-gettrustlist.html">gnupg_gettrustlist</a> — Search the trust items</li><li><a href="function.gnupg-import.html">gnupg_import</a> — Imports a key</li><li><a href="function.gnupg-init.html">gnupg_init</a> — Initialize a connection</li><li><a href="function.gnupg-keyinfo.html">gnupg_keyinfo</a> — Returns an array with information about all keys that matches the given pattern</li><li><a href="function.gnupg-listsignatures.html">gnupg_listsignatures</a> — List key signatures</li><li><a href="function.gnupg-setarmor.html">gnupg_setarmor</a> — Toggle armored output</li><li><a href="function.gnupg-seterrormode.html">gnupg_seterrormode</a> — Sets the mode for error_reporting</li><li><a href="function.gnupg-setsignmode.html">gnupg_setsignmode</a> — Sets the mode for signing</li><li><a href="function.gnupg-sign.html">gnupg_sign</a> — Signs a given text</li><li><a href="function.gnupg-verify.html">gnupg_verify</a> — Verifies a signed text</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

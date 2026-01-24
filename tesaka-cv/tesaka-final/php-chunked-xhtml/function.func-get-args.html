@@ -1,0 +1,270 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Returns an array comprising a function's argument list</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.func-get-arg.html" class="navbar__link">« func_get_arg</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.func-num-args.html" class="navbar__link">func_num_args »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ref.funchand.html">Function handling Functions</a></li>
+        <li>Returns an array comprising a function's argument list</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="function.func-get-args" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">func_get_args</h1>
+  <p class="verinfo">(PHP 4, PHP 5, PHP 7, PHP 8)</p><p class="refpurpose"><span class="refname">func_get_args</span> &mdash; <span class="dc-title">Returns an array comprising a function&#039;s argument list</span></p>
+
+ </div>
+ 
+ <div class="refsect1 description" id="refsect1-function.func-get-args-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="methodname"><strong>func_get_args</strong></span>(): <span class="type"><a href="language.types.array.html" class="type array">array</a></span></div>
+
+  <p class="para rdfs-comment">
+   Gets an array of the function&#039;s argument list.
+  </p>
+  <p class="para">
+   This function may be used in conjunction with 
+   <span class="function"><a href="function.func-get-arg.html" class="function">func_get_arg()</a></span> and <span class="function"><a href="function.func-num-args.html" class="function">func_num_args()</a></span>
+   to allow user-defined functions to accept variable-length argument lists.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-function.func-get-args-parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">This function has no parameters.</p>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-function.func-get-args-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns an array in which each element is a copy of the corresponding
+   member of the current user-defined function&#039;s argument list. 
+  </p>
+ </div>
+
+
+ <div class="refsect1 errors" id="refsect1-function.func-get-args-errors">
+  <h3 class="title">Errors/Exceptions</h3>
+  <p class="para">
+   Generates a warning if called from outside of a user-defined function.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-function.func-get-args-examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   <div class="example" id="example-1">
+    <p><strong>Example #1 <span class="function"><strong>func_get_args()</strong></span> example</strong></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">function </span><span style="color: #0000BB">foo</span><span style="color: #007700">()<br />{<br />    </span><span style="color: #0000BB">$numargs </span><span style="color: #007700">= </span><span style="color: #0000BB">func_num_args</span><span style="color: #007700">();<br />    echo </span><span style="color: #DD0000">"Number of arguments: </span><span style="color: #0000BB">$numargs</span><span style="color: #DD0000"> \n"</span><span style="color: #007700">;<br />    if (</span><span style="color: #0000BB">$numargs </span><span style="color: #007700">&gt;= </span><span style="color: #0000BB">2</span><span style="color: #007700">) {<br />        echo </span><span style="color: #DD0000">"Second argument is: " </span><span style="color: #007700">. </span><span style="color: #0000BB">func_get_arg</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">) . </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />    }<br />    </span><span style="color: #0000BB">$arg_list </span><span style="color: #007700">= </span><span style="color: #0000BB">func_get_args</span><span style="color: #007700">();<br />    for (</span><span style="color: #0000BB">$i </span><span style="color: #007700">= </span><span style="color: #0000BB">0</span><span style="color: #007700">; </span><span style="color: #0000BB">$i </span><span style="color: #007700">&lt; </span><span style="color: #0000BB">$numargs</span><span style="color: #007700">; </span><span style="color: #0000BB">$i</span><span style="color: #007700">++) {<br />        echo </span><span style="color: #DD0000">"Argument </span><span style="color: #0000BB">$i</span><span style="color: #DD0000"> is: " </span><span style="color: #007700">. </span><span style="color: #0000BB">$arg_list</span><span style="color: #007700">[</span><span style="color: #0000BB">$i</span><span style="color: #007700">] . </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />    }<br />}<br /><br /></span><span style="color: #0000BB">foo</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">2</span><span style="color: #007700">, </span><span style="color: #0000BB">3</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output:</p></div>
+    <div class="example-contents screen">
+<div class="examplescode"><pre class="examplescode">Number of arguments: 3 
+Second argument is: 2
+Argument 0 is: 1
+Argument 1 is: 2
+Argument 2 is: 3</pre>
+</div>
+    </div>
+   </div>
+  </p>
+
+  <p class="para">
+   <div class="example" id="example-2">
+    <p><strong>Example #2 <span class="function"><strong>func_get_args()</strong></span> example of byref and byval arguments</strong></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">function </span><span style="color: #0000BB">byVal</span><span style="color: #007700">(</span><span style="color: #0000BB">$arg</span><span style="color: #007700">) {<br />    echo </span><span style="color: #DD0000">'As passed     : '</span><span style="color: #007700">, </span><span style="color: #0000BB">var_export</span><span style="color: #007700">(</span><span style="color: #0000BB">func_get_args</span><span style="color: #007700">()), </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />    </span><span style="color: #0000BB">$arg </span><span style="color: #007700">= </span><span style="color: #DD0000">'baz'</span><span style="color: #007700">;<br />    echo </span><span style="color: #DD0000">'After change  : '</span><span style="color: #007700">, </span><span style="color: #0000BB">var_export</span><span style="color: #007700">(</span><span style="color: #0000BB">func_get_args</span><span style="color: #007700">()), </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />}<br /><br />function </span><span style="color: #0000BB">byRef</span><span style="color: #007700">(&amp;</span><span style="color: #0000BB">$arg</span><span style="color: #007700">) {<br />    echo </span><span style="color: #DD0000">'As passed     : '</span><span style="color: #007700">, </span><span style="color: #0000BB">var_export</span><span style="color: #007700">(</span><span style="color: #0000BB">func_get_args</span><span style="color: #007700">()), </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />    </span><span style="color: #0000BB">$arg </span><span style="color: #007700">= </span><span style="color: #DD0000">'baz'</span><span style="color: #007700">;<br />    echo </span><span style="color: #DD0000">'After change  : '</span><span style="color: #007700">, </span><span style="color: #0000BB">var_export</span><span style="color: #007700">(</span><span style="color: #0000BB">func_get_args</span><span style="color: #007700">()), </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />}<br /><br /></span><span style="color: #0000BB">$arg </span><span style="color: #007700">= </span><span style="color: #DD0000">'bar'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">byVal</span><span style="color: #007700">(</span><span style="color: #0000BB">$arg</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">byRef</span><span style="color: #007700">(</span><span style="color: #0000BB">$arg</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output:</p></div>
+    <div class="example-contents screen"><br />
+As passed     : array (<br />
+  0 =&gt; &#039;bar&#039;,<br />
+)<br />
+After change  : array (<br />
+  0 =&gt; &#039;baz&#039;,<br />
+)<br />
+As passed     : array (<br />
+  0 =&gt; &#039;bar&#039;,<br />
+)<br />
+After change  : array (<br />
+  0 =&gt; &#039;baz&#039;,<br />
+)<br />
+    </div>
+   </div>
+  </p>
+
+ </div>
+
+
+ <div class="refsect1 notes" id="refsect1-function.func-get-args-notes">
+  <h3 class="title">Notes</h3>
+  <blockquote class="note"><p><strong class="note">Note</strong>: <p class="para">As of PHP 8.0.0, the func_*() family of
+functions is intended to be mostly transparent with regard to named arguments,
+by treating the arguments as if they were all passed positionally,
+and missing arguments are replaced with their defaults.
+This function ignores the collection of unknown named variadic arguments.
+Unknown named arguments which are collected can only be accessed through the variadic parameter.</p></p></blockquote>
+  <blockquote class="note"><p><strong class="note">Note</strong>: <p class="para">If the arguments are passed by reference,
+any changes to the arguments will be reflected in the values returned by this function. As of PHP 7
+the current values will also be returned if the arguments are passed by value.</p></p></blockquote>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <span class="simpara">
+    This function returns a copy of the passed arguments only, and does not
+    account for default (non-passed) arguments.
+   </span>
+  </p></blockquote>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-function.func-get-args-seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li><a href="functions.arguments.html#functions.variable-arg-list" class="link"><code class="literal">...</code> syntax</a></li>
+    <li><span class="function"><a href="function.func-get-arg.html" class="function" rel="rdfs-seeAlso">func_get_arg()</a> - Return an item from the argument list</span></li>
+    <li><span class="function"><a href="function.func-num-args.html" class="function" rel="rdfs-seeAlso">func_num_args()</a> - Returns the number of arguments passed to the function</span></li>
+    <li><span class="methodname"><a href="reflectionfunctionabstract.getparameters.html" class="methodname" rel="rdfs-seeAlso">ReflectionFunctionAbstract::getParameters()</a> - Gets parameters</span></li>
+   </ul>
+  </p>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

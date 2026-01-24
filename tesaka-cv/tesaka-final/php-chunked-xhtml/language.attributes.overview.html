@@ -1,0 +1,175 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Attributes overview</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="language.attributes.html" class="navbar__link">« Attributes</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="language.attributes.syntax.html" class="navbar__link">Attribute syntax »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="language.attributes.html">Attributes</a></li>
+        <li>Attributes overview</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="language.attributes.overview" class="sect1">
+   <h2 class="title">Attributes overview</h2>
+   <p class="verinfo">(PHP 8)</p>
+
+   <p class="para">
+    PHP attributes provide structured, machine-readable metadata for classes, methods,
+    functions, parameters, properties, and constants. They can be inspected at runtime
+    via the <a href="book.reflection.html" class="link">Reflection API</a>, enabling dynamic
+    behavior without modifying code. Attributes provide a declarative way to annotate
+    code with metadata.
+   </p>
+   <p class="para">
+    Attributes enable the decoupling of a feature&#039;s implementation from its usage. While
+    interfaces define structure by enforcing methods, attributes provide metadata across multiple 
+    elements, including methods, functions, properties, and constants. Unlike interfaces,
+    which enforce method implementations, attributes annotate code without altering its structure.
+   </p>
+   <p class="para">
+    Attributes can complement or replace optional interface methods by providing metadata instead of 
+    enforced structure. Consider an <code class="literal">ActionHandler</code> interface that represents an 
+    operation in an application. Some implementations may require a setup step while others do not. 
+    Instead of forcing all classes implementing <code class="literal">ActionHandler</code> to define a 
+    <code class="literal">setUp()</code> method, an attribute can indicate setup requirements. This approach
+    increases flexibility, allowing attributes to be applied multiple times when necessary.
+   </p>
+
+   <div class="example" id="example-1">
+    <p><strong>Example #1 Implementing optional methods of an interface with Attributes</strong></p>
+     <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">interface </span><span style="color: #0000BB">ActionHandler<br /></span><span style="color: #007700">{<br />    public function </span><span style="color: #0000BB">execute</span><span style="color: #007700">();<br />}<br /><br />#[</span><span style="color: #0000BB">Attribute</span><span style="color: #007700">]<br />class </span><span style="color: #0000BB">SetUp </span><span style="color: #007700">{}<br /><br />class </span><span style="color: #0000BB">CopyFile </span><span style="color: #007700">implements </span><span style="color: #0000BB">ActionHandler<br /></span><span style="color: #007700">{<br />    public </span><span style="color: #0000BB">string $fileName</span><span style="color: #007700">;<br />    public </span><span style="color: #0000BB">string $targetDirectory</span><span style="color: #007700">;<br /><br />    #[</span><span style="color: #0000BB">SetUp</span><span style="color: #007700">]<br />    public function </span><span style="color: #0000BB">fileExists</span><span style="color: #007700">()<br />    {<br />        if (!</span><span style="color: #0000BB">file_exists</span><span style="color: #007700">(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fileName</span><span style="color: #007700">)) {<br />            throw new </span><span style="color: #0000BB">RuntimeException</span><span style="color: #007700">(</span><span style="color: #DD0000">"File does not exist"</span><span style="color: #007700">);<br />        }<br />    }<br /><br />    #[</span><span style="color: #0000BB">SetUp</span><span style="color: #007700">]<br />    public function </span><span style="color: #0000BB">targetDirectoryExists</span><span style="color: #007700">()<br />    {<br />        if (!</span><span style="color: #0000BB">file_exists</span><span style="color: #007700">(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">targetDirectory</span><span style="color: #007700">)) {<br />            </span><span style="color: #0000BB">mkdir</span><span style="color: #007700">(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">targetDirectory</span><span style="color: #007700">);<br />        } elseif (!</span><span style="color: #0000BB">is_dir</span><span style="color: #007700">(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">targetDirectory</span><span style="color: #007700">)) {<br />            throw new </span><span style="color: #0000BB">RuntimeException</span><span style="color: #007700">(</span><span style="color: #DD0000">"Target directory </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">targetDirectory</span><span style="color: #DD0000"> is not a directory"</span><span style="color: #007700">);<br />        }<br />    }<br /><br />    public function </span><span style="color: #0000BB">execute</span><span style="color: #007700">()<br />    {<br />        </span><span style="color: #0000BB">copy</span><span style="color: #007700">(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fileName</span><span style="color: #007700">, </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">targetDirectory </span><span style="color: #007700">. </span><span style="color: #DD0000">'/' </span><span style="color: #007700">. </span><span style="color: #0000BB">basename</span><span style="color: #007700">(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fileName</span><span style="color: #007700">));<br />    }<br />}<br /><br />function </span><span style="color: #0000BB">executeAction</span><span style="color: #007700">(</span><span style="color: #0000BB">ActionHandler $actionHandler</span><span style="color: #007700">)<br />{<br />    </span><span style="color: #0000BB">$reflection </span><span style="color: #007700">= new </span><span style="color: #0000BB">ReflectionObject</span><span style="color: #007700">(</span><span style="color: #0000BB">$actionHandler</span><span style="color: #007700">);<br /><br />    foreach (</span><span style="color: #0000BB">$reflection</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getMethods</span><span style="color: #007700">() as </span><span style="color: #0000BB">$method</span><span style="color: #007700">) {<br />        </span><span style="color: #0000BB">$attributes </span><span style="color: #007700">= </span><span style="color: #0000BB">$method</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getAttributes</span><span style="color: #007700">(</span><span style="color: #0000BB">SetUp</span><span style="color: #007700">::class);<br /><br />        if (</span><span style="color: #0000BB">count</span><span style="color: #007700">(</span><span style="color: #0000BB">$attributes</span><span style="color: #007700">) &gt; </span><span style="color: #0000BB">0</span><span style="color: #007700">) {<br />            </span><span style="color: #0000BB">$methodName </span><span style="color: #007700">= </span><span style="color: #0000BB">$method</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getName</span><span style="color: #007700">();<br /><br />            </span><span style="color: #0000BB">$actionHandler</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">$methodName</span><span style="color: #007700">();<br />        }<br />    }<br /><br />    </span><span style="color: #0000BB">$actionHandler</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">execute</span><span style="color: #007700">();<br />}<br /><br /></span><span style="color: #0000BB">$copyAction </span><span style="color: #007700">= new </span><span style="color: #0000BB">CopyFile</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">$copyAction</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fileName </span><span style="color: #007700">= </span><span style="color: #DD0000">"/tmp/foo.jpg"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$copyAction</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">targetDirectory </span><span style="color: #007700">= </span><span style="color: #DD0000">"/home/user"</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">executeAction</span><span style="color: #007700">(</span><span style="color: #0000BB">$copyAction</span><span style="color: #007700">);</span></span></code></div>
+     </div>
+
+    </div>
+  </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

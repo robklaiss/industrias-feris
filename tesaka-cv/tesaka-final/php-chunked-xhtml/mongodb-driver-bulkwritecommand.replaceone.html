@@ -1,0 +1,322 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Add a replaceOne operation</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="mongodb-driver-bulkwritecommand.insertone.html" class="navbar__link">« MongoDB\Driver\BulkWriteCommand::insertOne</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="mongodb-driver-bulkwritecommand.updatemany.html" class="navbar__link">MongoDB\Driver\BulkWriteCommand::updateMany »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="class.mongodb-driver-bulkwritecommand.html">MongoDB\Driver\BulkWriteCommand</a></li>
+        <li>Add a replaceOne operation</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="mongodb-driver-bulkwritecommand.replaceone" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">MongoDB\Driver\BulkWriteCommand::replaceOne</h1>
+  <p class="verinfo">(mongodb &gt;=2.1.0)</p><p class="refpurpose"><span class="refname">MongoDB\Driver\BulkWriteCommand::replaceOne</span> &mdash; <span class="dc-title">Add a replaceOne operation</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-mongodb-driver-bulkwritecommand.replaceone-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><strong>MongoDB\Driver\BulkWriteCommand::replaceOne</strong></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$namespace</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span> <code class="parameter">$filter</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span> <code class="parameter">$replacement</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.array.html" class="type array">array</a></span></span> <code class="parameter">$options</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span><br>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+  <p class="para rdfs-comment">
+   Add a replaceOne operation to the
+   <span class="classname"><a href="class.mongodb-driver-bulkwritecommand.html" class="classname">MongoDB\Driver\BulkWriteCommand</a></span>. The first document
+   matching <code class="parameter">filter</code> in the collection identified by
+   <code class="parameter">namespace</code> will be replaced.
+  </p>
+
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-mongodb-driver-bulkwritecommand.replaceone-parameters">
+  <h3 class="title">Parameters</h3>
+  <dl>
+   
+   
+    <dt><code class="parameter">namespace</code> (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)</dt>
+    <dd>
+     <p class="para">
+      A fully qualified namespace (e.g. <code class="literal">&quot;databaseName.collectionName&quot;</code>).
+     </p>
+    </dd>
+   
+
+   
+   
+    <dt><code class="parameter">filter</code> (<span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span>)</dt>
+    <dd>
+     <p class="para">
+      The <a href="https://www.mongodb.com/docs/manual/tutorial/query-documents/" class="link external">&raquo;&nbsp;query predicate</a>.
+      An empty predicate will match all documents in the collection.
+     </p>
+     <blockquote class="note"><p><strong class="note">Note</strong>: 
+      <span class="simpara">
+       When evaluating query criteria, MongoDB compares types and values according to its own <a href="https://www.mongodb.com/docs/manual/reference/bson-type-comparison-order/" class="link external">&raquo;&nbsp;comparison rules for BSON types</a>, which differs from PHP&#039;s <a href="types.comparisons.html" class="link">comparison</a> and <a href="language.types.type-juggling.html" class="link">type juggling</a> rules. When matching a special BSON type the query criteria should use the respective <a href="mongodb.bson.html" class="link">BSON class</a> (e.g. use <span class="classname"><a href="class.mongodb-bson-objectid.html" class="classname">MongoDB\BSON\ObjectId</a></span> to match an <a href="https://www.mongodb.com/docs/manual/reference/bson-types/#objectid" class="link external">&raquo;&nbsp;ObjectId</a>).
+      </span>
+     </p></blockquote>
+    </dd>
+   
+
+   
+    <dt><code class="parameter">replacement</code> (<span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span>)</dt>
+    <dd>
+     <p class="para">
+      A replacement document.
+     </p>
+    </dd>
+   
+   
+    <dt><code class="parameter">options</code></dt>
+    <dd>
+     <p class="para">
+      <table class="doctable table">
+       <caption><strong>options</strong></caption>
+       
+        <thead>
+         <tr>
+          <th>Option</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+         </tr>
+
+        </thead>
+
+        <tbody class="tbody">
+         
+         <tr>
+          <td>collation</td>
+          <td><span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span></td>
+          <td>
+           <p class="para">
+            <a href="https://www.mongodb.com/docs/upcoming/reference/collation/" class="link external">&raquo;&nbsp;Collation</a> allows users to specify language-specific rules for string comparison, such as rules for lettercase and accent marks. When specifying collation, the <code class="literal">&quot;locale&quot;</code> field is mandatory; all other collation fields are optional. For descriptions of the fields, see <a href="https://www.mongodb.com/docs/upcoming/reference/collation/#collation-document" class="link external">&raquo;&nbsp;Collation Document</a>.
+           </p>
+           <p class="para">
+            If the collation is unspecified but the collection has a default collation, the operation uses the collation specified for the collection. If no collation is specified for the collection or for the operation, MongoDB uses the simple binary comparison used in prior versions for string comparisons.
+           </p>
+           <p class="para">
+            This option is available in MongoDB 3.4+ and will result in an exception at execution time if specified for an older server version.
+           </p>
+          </td>
+         </tr>
+
+
+         <tr>
+          <td>hint</td>
+          <td><span class="type"><span class="type"><a href="language.types.string.html" class="type string">string</a></span>|<span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span></td>
+          <td>
+           <p class="para">
+            Index specification. Specify either the index name as a string or
+            the index key pattern. If specified, then the query system will only
+            consider plans using the hinted index.
+           </p>
+          </td>
+         </tr>
+
+         <tr>
+          <td>sort</td>
+          <td><span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span></td>
+          <td>
+           <p class="para">
+            Specify which document the operation replaces if the query matches
+            multiple documents. The first document matched by the sort order
+            will be replaced.
+           </p>
+          </td>
+         </tr>
+
+         <tr>
+          <td>upsert</td>
+          <td><span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></td>
+          <td>
+           If <code class="parameter">filter</code> does not match an existing document,
+           insert a <em>single</em> document. The document will be
+           created from <code class="parameter">replacement</code>.
+          </td>
+          <td><strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong></td>
+         </tr>
+
+        </tbody>
+       
+      </table>
+
+     </p>
+    </dd>
+   
+  </dl>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-mongodb-driver-bulkwritecommand.replaceone-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   No value is returned.
+  </p>
+ </div>
+
+
+ <div class="refsect1 errors" id="refsect1-mongodb-driver-bulkwritecommand.replaceone-errors">
+  <h3 class="title">Errors/Exceptions</h3>
+  <ul class="simplelist">
+   <li>Throws <span class="classname"><a href="class.mongodb-driver-exception-invalidargumentexception.html" class="classname">MongoDB\Driver\Exception\InvalidArgumentException</a></span> on argument parsing errors.</li>
+  </ul>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-mongodb-driver-bulkwritecommand.replaceone-examples">
+  <h3 class="title">Examples</h3>
+  <div class="example" id="example-1">
+   <p><strong>Example #1 <span class="function"><strong>MongoDB\Driver\BulkWriteCommand::replaceOne()</strong></span> example</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br />$manager </span><span style="color: #007700">= new </span><span style="color: #0000BB">MongoDB\Driver\Manager</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$bulk </span><span style="color: #007700">= new </span><span style="color: #0000BB">MongoDB\Driver\BulkWriteCommand</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$bulk</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">replaceOne</span><span style="color: #007700">(</span><span style="color: #DD0000">'db.coll'</span><span style="color: #007700">, [</span><span style="color: #DD0000">'x' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">1</span><span style="color: #007700">], [</span><span style="color: #DD0000">'x' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #DD0000">'y' </span><span style="color: #007700">= </span><span style="color: #0000BB">2</span><span style="color: #007700">]);<br /><br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">$manager</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">executeBulkWriteCommand</span><span style="color: #007700">(</span><span style="color: #0000BB">$bulk</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-mongodb-driver-bulkwritecommand.replaceone-seealso">
+  <h3 class="title">See Also</h3>
+  <ul class="simplelist">
+   <li><span class="methodname"><a href="mongodb-driver-bulkwritecommand.updateone.html" class="methodname" rel="rdfs-seeAlso">MongoDB\Driver\BulkWriteCommand::updateOne()</a> - Add an updateOne operation</span></li>
+   <li><span class="methodname"><a href="mongodb-driver-bulkwritecommand.updatemany.html" class="methodname" rel="rdfs-seeAlso">MongoDB\Driver\BulkWriteCommand::updateMany()</a> - Add an updateMany operation</span></li>
+   <li><span class="methodname"><a href="mongodb-driver-manager.executebulkwritecommand.html" class="methodname" rel="rdfs-seeAlso">MongoDB\Driver\Manager::executeBulkWriteCommand()</a> - Execute write operations using the bulkWrite command</span></li>
+   <li><span class="classname"><a href="class.mongodb-driver-bulkwritecommandresult.html" class="classname">MongoDB\Driver\BulkWriteCommandResult</a></span></li>
+  </ul>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

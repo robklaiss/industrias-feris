@@ -1,0 +1,230 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Efficiently move the engine ahead multiple steps</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="random-engine-pcgoneseq128xslrr64.generate.html" class="navbar__link">« Random\Engine\PcgOneseq128XslRr64::generate</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="random-engine-pcgoneseq128xslrr64.serialize.html" class="navbar__link">Random\Engine\PcgOneseq128XslRr64::__serialize »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="class.random-engine-pcgoneseq128xslrr64.html">Random\Engine\PcgOneseq128XslRr64</a></li>
+        <li>Efficiently move the engine ahead multiple steps</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="random-engine-pcgoneseq128xslrr64.jump" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">Random\Engine\PcgOneseq128XslRr64::jump</h1>
+  <p class="verinfo">(PHP 8 &gt;= 8.2.0)</p><p class="refpurpose"><span class="refname">Random\Engine\PcgOneseq128XslRr64::jump</span> &mdash; <span class="dc-title">Efficiently move the engine ahead multiple steps</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-random-engine-pcgoneseq128xslrr64.jump-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><strong>Random\Engine\PcgOneseq128XslRr64::jump</strong></span>(<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$advance</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+  <p class="para rdfs-comment">
+   Moves the algorithm’s state ahead by the number of steps given by <code class="parameter">advance</code>, as if
+   <span class="function"><a href="random-engine-pcgoneseq128xslrr64.generate.html" class="function">Random\Engine\PcgOneseq128XslRr64::generate()</a></span> was called that many times.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-random-engine-pcgoneseq128xslrr64.jump-parameters">
+  <h3 class="title">Parameters</h3>
+  <dl>
+   
+    <dt><code class="parameter">advance</code></dt>
+    <dd>
+     <p class="para">
+      The number of steps to move ahead; must be <code class="literal">0</code> or greater.
+     </p>
+    </dd>
+   
+  </dl>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-random-engine-pcgoneseq128xslrr64.jump-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   No value is returned.
+  </p>
+ </div>
+
+
+ <div class="refsect1 errors" id="refsect1-random-engine-pcgoneseq128xslrr64.jump-errors">
+  <h3 class="title">Errors/Exceptions</h3>
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     If <code class="parameter">advance</code> is less than <code class="literal">0</code>,
+     a <span class="classname"><a href="class.valueerror.html" class="classname">ValueError</a></span> will be thrown.
+    </span>
+   </li>
+  </ul>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-random-engine-pcgoneseq128xslrr64.jump-examples">
+  <h3 class="title">Examples</h3>
+  <div class="example" id="example-1">
+   <p><strong>Example #1 <span class="function"><strong>Random\Engine\PcgOneseq128XslRr64::jump()</strong></span> example</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$a </span><span style="color: #007700">= new </span><span style="color: #0000BB">\Random\Engine\PcgOneseq128XslRr64</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$b </span><span style="color: #007700">= clone </span><span style="color: #0000BB">$a</span><span style="color: #007700">;<br /><br />for (</span><span style="color: #0000BB">$i </span><span style="color: #007700">= </span><span style="color: #0000BB">0</span><span style="color: #007700">; </span><span style="color: #0000BB">$i </span><span style="color: #007700">&lt; </span><span style="color: #0000BB">1_000</span><span style="color: #007700">; </span><span style="color: #0000BB">$i</span><span style="color: #007700">++) {<br />    </span><span style="color: #0000BB">$a</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">generate</span><span style="color: #007700">();<br />}<br /></span><span style="color: #0000BB">$b</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">jump</span><span style="color: #007700">(</span><span style="color: #0000BB">1_000</span><span style="color: #007700">);<br /><br />echo </span><span style="color: #DD0000">"A: "</span><span style="color: #007700">, </span><span style="color: #0000BB">bin2hex</span><span style="color: #007700">(</span><span style="color: #0000BB">$a</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">generate</span><span style="color: #007700">()), </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />echo </span><span style="color: #DD0000">"B: "</span><span style="color: #007700">, </span><span style="color: #0000BB">bin2hex</span><span style="color: #007700">(</span><span style="color: #0000BB">$b</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">generate</span><span style="color: #007700">()), </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive examplescode"><pre class="examplescode">A: e6d0d5813913a424
+B: e6d0d5813913a424</pre>
+</div>
+   </div>
+  </div>
+  <div class="example" id="example-2">
+   <p><strong>Example #2 Randomizer methods may call the engine more than once</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$a </span><span style="color: #007700">= new </span><span style="color: #0000BB">\Random\Randomizer</span><span style="color: #007700">(new </span><span style="color: #0000BB">\Random\Engine\PcgOneseq128XslRr64</span><span style="color: #007700">(</span><span style="color: #0000BB">42659</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">$b </span><span style="color: #007700">= new </span><span style="color: #0000BB">\Random\Randomizer</span><span style="color: #007700">(clone </span><span style="color: #0000BB">$a</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">engine</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$a</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getInt</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">1572864</span><span style="color: #007700">); </span><span style="color: #FF8000">// Performs two calls to generate().<br /></span><span style="color: #0000BB">$a</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getInt</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">1572864</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$b</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">engine</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">jump</span><span style="color: #007700">(</span><span style="color: #0000BB">2</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">// Because the first call to -&gt;getInt() called -&gt;generate() twice<br />// the engines do not match up after performing a -&gt;jump(2).<br /></span><span style="color: #007700">echo </span><span style="color: #DD0000">"A: "</span><span style="color: #007700">, </span><span style="color: #0000BB">bin2hex</span><span style="color: #007700">(</span><span style="color: #0000BB">$a</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">engine</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">generate</span><span style="color: #007700">()), </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />echo </span><span style="color: #DD0000">"B: "</span><span style="color: #007700">, </span><span style="color: #0000BB">bin2hex</span><span style="color: #007700">(</span><span style="color: #0000BB">$b</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">engine</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">generate</span><span style="color: #007700">()), </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">// Now the B engine matches the A engine.<br /></span><span style="color: #007700">echo </span><span style="color: #DD0000">"B: "</span><span style="color: #007700">, </span><span style="color: #0000BB">bin2hex</span><span style="color: #007700">(</span><span style="color: #0000BB">$b</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">engine</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">generate</span><span style="color: #007700">()), </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive examplescode"><pre class="examplescode">A: 1e9f3107d56653d0
+B: a156c0086dd79d44
+B: 1e9f3107d56653d0</pre>
+</div>
+   </div>
+  </div>
+ </div>
+
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

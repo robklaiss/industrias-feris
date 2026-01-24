@@ -1,0 +1,220 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>User Submitted Data</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="security.errors.html" class="navbar__link">« Error Reporting</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="security.hiding.html" class="navbar__link">Hiding PHP »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="security.html">Security</a></li>
+        <li>User Submitted Data</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="security.variables" class="chapter">
+ <h1 class="title">User Submitted Data</h1>
+
+ <p class="para">
+  The greatest weakness in many <abbr title="PHP: Hypertext Preprocessor">PHP</abbr> programs is not inherent in the
+  language itself, but merely an issue of code not being written with
+  security in mind. For this reason, you should always take the time
+  to consider the implications of a given piece of code, to ascertain
+  the possible damage if an unexpected variable is submitted to it.
+  <div class="example" id="example-1">
+   <p><strong>Example #1 Dangerous Variable Usage</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">// remove a file from the user's home directory... or maybe<br />// somebody else's?<br /></span><span style="color: #0000BB">unlink </span><span style="color: #007700">(</span><span style="color: #0000BB">$evil_var</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">// Write logging of their access... or maybe an /etc/passwd entry?<br /></span><span style="color: #0000BB">fwrite </span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">, </span><span style="color: #0000BB">$evil_var</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">// Execute something trivial.. or rm -rf *?<br /></span><span style="color: #0000BB">system </span><span style="color: #007700">(</span><span style="color: #0000BB">$evil_var</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">exec </span><span style="color: #007700">(</span><span style="color: #0000BB">$evil_var</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+ <p class="para">
+  You should always carefully examine your code to make sure that any
+  variables being submitted from a web browser are being properly
+  checked, and ask yourself the following questions:
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     Will this script only affect the intended files?
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     Can unusual or undesirable data be acted upon?
+    </span>
+   </li>
+   <li class="listitem">
+   <span class="simpara">
+     Can this script be used in unintended ways?
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     Can this be used in conjunction with other scripts in a negative
+     manner?
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     Will any transactions be adequately logged?
+    </span>
+   </li>
+  </ul>
+ </p>
+ <p class="para">
+  By adequately asking these questions while writing the script,
+  rather than later, you prevent an unfortunate re-write when you
+  need to increase your security. By starting out with this mindset,
+  you won&#039;t guarantee the security of your system, but you can help
+  improve it.
+ </p>
+ <p class="para">
+  Improve security by disabling convenience settings that obscure input
+  data&#039;s origin, validity, or integrity. Implicit variable creation and
+  unchecked input can lead to vulnerabilities like injection attacks and
+  data manipulation.
+ </p>
+ <p class="para">
+  Features like <code class="literal">register_globals</code> and
+  <code class="literal">magic_quotes</code> (both removed in PHP 5.4.0) once contributed
+  to these risks by automatically creating variables from user input and
+  escaping data inconsistently. While no longer in PHP, similar risks persist
+  if input handling is mismanaged.
+ </p>
+ <p class="para">
+  Enable <a href="function.error-reporting.html" class="link">error_reporting(E_ALL)</a> to
+  help detect uninitialized variables and validate input. Use strict types
+  (<a href="language.types.declarations.html#language.types.declarations.strict" class="link">declare(strict_types=1)</a>,
+  introduced in PHP 7) to enforce type safety, prevent unintended type conversions,
+  and improving overall security.
+ </p>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

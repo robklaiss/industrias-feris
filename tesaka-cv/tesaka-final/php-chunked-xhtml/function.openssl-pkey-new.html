@@ -1,0 +1,687 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Generates a new private key</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.openssl-pkey-get-public.html" class="navbar__link">« openssl_pkey_get_public</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.openssl-private-decrypt.html" class="navbar__link">openssl_private_decrypt »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ref.openssl.html">OpenSSL Functions</a></li>
+        <li>Generates a new private key</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="function.openssl-pkey-new" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">openssl_pkey_new</h1>
+  <p class="verinfo">(PHP 4 &gt;= 4.2.0, PHP 5, PHP 7, PHP 8)</p><p class="refpurpose"><span class="refname">openssl_pkey_new</span> &mdash; <span class="dc-title">Generates a new private key</span></p>
+
+ </div>
+ 
+ <div class="refsect1 description" id="refsect1-function.openssl-pkey-new-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="methodname"><strong>openssl_pkey_new</strong></span>(<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.array.html" class="type array">array</a></span></span> <code class="parameter">$options</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>): <span class="type"><span class="type"><a href="class.opensslasymmetrickey.html" class="type OpenSSLAsymmetricKey">OpenSSLAsymmetricKey</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+
+  <p class="para rdfs-comment">
+   <span class="function"><strong>openssl_pkey_new()</strong></span> generates a new private
+   key.
+   How to obtain the public component of the key is shown in an example below.
+  </p>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+ <span class="simpara">
+  You need to have a valid <var class="filename">openssl.cnf</var> installed for
+  this function to operate correctly.
+  See the notes under <a href="openssl.installation.html" class="link">the installation
+  section</a> for more information.
+ </span>
+</p></blockquote>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-function.openssl-pkey-new-parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+    
+     <dt><code class="parameter">options</code></dt>
+     <dd>
+      <p class="para">
+       It is possible to fine-tune the key generation (e.g. specifying the number of
+       bits or parameters) using the <code class="parameter">options</code> parameter.
+       These options can either be algorithm-specific parameters used for key generation,
+       or generic options used also in <abbr title="Certificate Signing Request">CSR</abbr>generation if not specified.
+       See <span class="function"><a href="function.openssl-csr-new.html" class="function">openssl_csr_new()</a></span> for more information
+       about how to use <code class="parameter">options</code> for a <abbr title="Certificate Signing Request">CSR</abbr>.
+       Among those options only <code class="literal">private_key_bits</code>,
+       <code class="literal">private_key_type</code>, <code class="literal">curve_name</code>,
+       and <code class="literal">config</code> are used for key generation.
+       Algorithm-specific options are used if the associative array includes one of the specific keys.
+       <ul class="itemizedlist">
+        <li class="listitem">
+         <span class="simpara">
+          <code class="literal">&quot;rsa&quot;</code> key for setting RSA parameters.
+         </span>
+         <table class="doctable informaltable">
+          
+           <thead>
+            <tr>
+             <th>options</th>
+             <th>type</th>
+             <th>format</th>
+             <th>required</th>
+             <th>description</th>
+            </tr>
+
+           </thead>
+
+           <tbody class="tbody">
+            <tr>
+             <td><code class="literal">&quot;n&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>yes</td>
+             <td>modulus</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;e&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>public exponent</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;d&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>yes</td>
+             <td>private exponent</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;p&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>prime 1</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;q&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>prime 2</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;dmp1&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>exponent1, d mod (p-1)</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;dmq1&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>exponent2, d mod (q-1)</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;iqmp&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>coefficient, (inverse of q) mod p</td>
+            </tr>
+
+           </tbody>
+          
+         </table>
+
+        </li>
+        <li class="listitem">
+         <span class="simpara">
+          <code class="literal">&quot;dsa&quot;</code> key for setting DSA parameters.
+         </span>
+         <table class="doctable informaltable">
+          
+           <thead>
+            <tr>
+             <th>options</th>
+             <th>type</th>
+             <th>format</th>
+             <th>required</th>
+             <th>description</th>
+            </tr>
+
+           </thead>
+
+           <tbody class="tbody">
+            <tr>
+             <td><code class="literal">&quot;p&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>prime number (public)</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;q&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>160-bit subprime, q | p-1 (public)</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;g&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>generator of subgroup (public)</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;priv_key&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>PEM key</td>
+             <td>no</td>
+             <td>private key x</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;pub_key&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>PEM key</td>
+             <td>no</td>
+             <td>public key y = g^x</td>
+            </tr>
+
+           </tbody>
+          
+         </table>
+
+        </li>
+        <li class="listitem">
+         <span class="simpara">
+          <code class="literal">&quot;dh&quot;</code> key for DH (Diffie–Hellman key exchange) parameters.
+         </span>
+         <table class="doctable informaltable">
+          
+           <thead>
+            <tr>
+             <th>Options</th>
+             <th>Type</th>
+             <th>Format</th>
+             <th>Required</th>
+             <th>Description</th>
+            </tr>
+
+           </thead>
+
+           <tbody class="tbody">
+            <tr>
+             <td><code class="literal">&quot;p&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>prime number (shared)</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;g&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>generator of Z_p (shared)</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;priv_key&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>PEM key</td>
+             <td>no</td>
+             <td>private DH value x</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;pub_key&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>PEM key</td>
+             <td>no</td>
+             <td>public DH value g^x</td>
+            </tr>
+
+           </tbody>
+          
+         </table>
+
+        </li>
+        <li class="listitem">
+         <span class="simpara">
+          <code class="literal">&quot;ec&quot;</code> key for Elliptic curve parameters
+         </span>
+         <table class="doctable informaltable">
+          
+           <thead>
+            <tr>
+             <th>Options</th>
+             <th>Type</th>
+             <th>Format</th>
+             <th>Required</th>
+             <th>Description</th>
+            </tr>
+
+           </thead>
+
+           <tbody class="tbody">
+            <tr>
+             <td><code class="literal">&quot;curve_name&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>name</td>
+             <td>no</td>
+             <td>name of curve, see <span class="function"><a href="function.openssl-get-curve-names.html" class="function">openssl_get_curve_names()</a></span></td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;p&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>prime of the field for curve over Fp</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;a&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>coofecient a of the curve for Fp: y^2 mod p = x^3 + ax + b mod p</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;b&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>coofecient b of the curve for Fp: y^2 mod p = x^3 + ax + b mod p</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;seed&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>optional random number seed used to generate coefficient b</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;generator&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary encoded point</td>
+             <td>no</td>
+             <td>curve generator point</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;g_x&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>curver generator point x coordinat</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;g_y&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>curver generator point y coordinat</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;cofactor&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>curve cofactor</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;order&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>curve order</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;x&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>x coordinate (public)</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;y&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>y coordinate (public)</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;d&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>binary number</td>
+             <td>no</td>
+             <td>private key</td>
+            </tr>
+
+           </tbody>
+          
+         </table>
+
+        </li>
+        <li class="listitem">
+         <span class="simpara">
+          <code class="literal">&quot;x25519&quot;</code>, <code class="literal">&quot;x448&quot;</code>,
+          <code class="literal">&quot;ed25519&quot;</code>, <code class="literal">&quot;ed448&quot;</code> keys for
+          Curve25519 and Curve448 parameters.
+         </span>
+         <table class="doctable informaltable">
+          
+           <thead>
+            <tr>
+             <th>Options</th>
+             <th>Type</th>
+             <th>Format</th>
+             <th>Required</th>
+             <th>Description</th>
+            </tr>
+
+           </thead>
+
+           <tbody class="tbody">
+             <tr>
+             <td><code class="literal">&quot;priv_key&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>PEM key</td>
+             <td>no</td>
+             <td>private key</td>
+            </tr>
+
+            <tr>
+             <td><code class="literal">&quot;pub_key&quot;</code></td>
+             <td><span class="type"><a href="language.types.string.html" class="type string">string</a></span></td>
+             <td>PEM key</td>
+             <td>no</td>
+             <td>public key</td>
+            </tr>
+
+           </tbody>
+          
+         </table>
+
+        </li>
+       </ul>
+      </p>
+     </dd>
+    
+   </dl>
+  </p>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-function.openssl-pkey-new-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns an <span class="classname"><a href="class.opensslasymmetrickey.html" class="classname">OpenSSLAsymmetricKey</a></span> instance for
+   the pkey on success, or <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong> on error.
+  </p>
+ </div>
+
+
+ <div class="refsect1 changelog" id="refsect1-function.openssl-pkey-new-changelog">
+  <h3 class="title">Changelog</h3>
+  <table class="doctable informaltable">
+   
+    <thead>
+     <tr>
+      <th>Version</th>
+      <th>Description</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+      <td>8.4.0</td>
+      <td>
+       Added support for Curve25519 and Curve448 based keys with the introduction of the
+       <code class="literal">x25519</code>, <code class="literal">ed25519</code>, <code class="literal">x448</code>,
+       and <code class="literal">ed448</code> fields.
+      </td>
+     </tr>
+
+     <tr>
+      <td>8.3.0</td>
+      <td>
+       Added support for generation EC keys with custom EC parameters.
+       Specifically with the introduction of the EC options:
+       <code class="literal">p</code>, <code class="literal">a</code>, <code class="literal">b</code>, <code class="literal">seed</code>,
+       <code class="literal">generator</code>, <code class="literal">g_x</code>, <code class="literal">g_y</code>,
+       <code class="literal">cofactor</code>, and <code class="literal">order</code>.
+      </td>
+     </tr>
+
+     <tr>
+      <td>8.0.0</td>
+      <td>
+       On success, this function returns an <span class="classname"><a href="class.opensslasymmetrickey.html" class="classname">OpenSSLAsymmetricKey</a></span> instance now;
+       previously, a <span class="type"><a href="language.types.resource.html" class="type resource">resource</a></span> of type <code class="literal">OpenSSL key</code> was returned.
+      </td>
+     </tr>
+
+     <tr>
+      <td>7.1.0</td>
+      <td>
+       The <code class="literal">curve_name</code> key of the <code class="parameter">options</code> parameter was
+       added to make it possible to create EC keys based on Elliptic Curve algorithms.
+      </td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-function.openssl-pkey-new-examples">
+  <h3 class="title">Examples</h3>
+  <div class="example" id="function.openssl-pkey-new.example.public-key">
+   <p><strong>Example #1 Obtain the public key from a private key</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br />$private_key </span><span style="color: #007700">= </span><span style="color: #0000BB">openssl_pkey_new</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">$public_key_pem </span><span style="color: #007700">= </span><span style="color: #0000BB">openssl_pkey_get_details</span><span style="color: #007700">(</span><span style="color: #0000BB">$private_key</span><span style="color: #007700">)[</span><span style="color: #DD0000">'key'</span><span style="color: #007700">];<br />echo </span><span style="color: #0000BB">$public_key_pem</span><span style="color: #007700">, </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$public_key </span><span style="color: #007700">= </span><span style="color: #0000BB">openssl_pkey_get_public</span><span style="color: #007700">(</span><span style="color: #0000BB">$public_key_pem</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$public_key</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+   <div class="example-contents screen">
+<div class="examplescode"><pre class="examplescode">// Output prior to PHP 8.0.0; note, the function returns a resource
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwknBFEherZe74BiRjTFA
+hqwZ1SK7brwq7C/afnLXKhRR7jnrpfM0ypC46q8xz5UZswenZakJ7kd5fls+r4Bv
+3P8XsKYLTh2m1GiWQhV1g77cNIN4qNWh70PiDO3fB2446o1LBgToQYuRZS5YQRfJ
+rVD0ysgtVcCU9tjaey28HlgApOpYFTaaKPj2MBmEYpMC+kG2HhL12GfpHUi2eiXI
+dXT2WskWHWvUrmQ7fJIfI92JlDokV62DH/q1oiedLs9OPNb0rL1aAmYdzaVN6XNH
+x/o4Lh125v2vAPV9E3fZCDc/HDEUaahpjanMiCQEgEDp5Hr+CRkvERT5/ydN+p08
+5wIDAQAB
+-----END PUBLIC KEY-----
+
+resource(6) of type (OpenSSL key)
+
+// Output as of PHP 8.0.0; note, the function returns an object
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwknBFEherZe74BiRjTFA
+hqwZ1SK7brwq7C/afnLXKhRR7jnrpfM0ypC46q8xz5UZswenZakJ7kd5fls+r4Bv
+3P8XsKYLTh2m1GiWQhV1g77cNIN4qNWh70PiDO3fB2446o1LBgToQYuRZS5YQRfJ
+rVD0ysgtVcCU9tjaey28HlgApOpYFTaaKPj2MBmEYpMC+kG2HhL12GfpHUi2eiXI
+dXT2WskWHWvUrmQ7fJIfI92JlDokV62DH/q1oiedLs9OPNb0rL1aAmYdzaVN6XNH
+x/o4Lh125v2vAPV9E3fZCDc/HDEUaahpjanMiCQEgEDp5Hr+CRkvERT5/ydN+p08
+5wIDAQAB
+-----END PUBLIC KEY-----
+
+object(OpenSSLAsymmetricKey)#2 (0) {
+}</pre>
+</div>
+   </div>
+  </div>
+
+  <div class="example" id="function.openssl-pkey-new.example.rsa-key">
+   <p><strong>Example #2 Generating RSA key from parameters</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br />$nhex </span><span style="color: #007700">= </span><span style="color: #DD0000">"BBF82F090682CE9C2338AC2B9DA871F7368D07EED41043A440D6B6F07454F51F" </span><span style="color: #007700">.<br />        </span><span style="color: #DD0000">"B8DFBAAF035C02AB61EA48CEEB6FCD4876ED520D60E1EC4619719D8A5B8B807F" </span><span style="color: #007700">.<br />        </span><span style="color: #DD0000">"AFB8E0A3DFC737723EE6B4B7D93A2584EE6A649D060953748834B2454598394E" </span><span style="color: #007700">.<br />        </span><span style="color: #DD0000">"E0AAB12D7B61A51F527A9A41F6C1687FE2537298CA2A8F5946F8E5FD091DBDCB"</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$ehex </span><span style="color: #007700">= </span><span style="color: #DD0000">"11"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$dhex </span><span style="color: #007700">= </span><span style="color: #DD0000">"A5DAFC5341FAF289C4B988DB30C1CDF83F31251E0668B42784813801579641B2" </span><span style="color: #007700">.<br />        </span><span style="color: #DD0000">"9410B3C7998D6BC465745E5C392669D6870DA2C082A939E37FDCB82EC93EDAC9" </span><span style="color: #007700">.<br />        </span><span style="color: #DD0000">"7FF3AD5950ACCFBC111C76F1A9529444E56AAF68C56C092CD38DC3BEF5D20A93" </span><span style="color: #007700">.<br />        </span><span style="color: #DD0000">"9926ED4F74A13EDDFBE1A1CECC4894AF9428C2B7B8883FE4463A4BC85B1CB3C1"</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$phex </span><span style="color: #007700">= </span><span style="color: #DD0000">"EECFAE81B1B9B3C908810B10A1B5600199EB9F44AEF4FDA493B81A9E3D84F632" </span><span style="color: #007700">.<br />        </span><span style="color: #DD0000">"124EF0236E5D1E3B7E28FAE7AA040A2D5B252176459D1F397541BA2A58FB6599"</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$qhex </span><span style="color: #007700">= </span><span style="color: #DD0000">"C97FB1F027F453F6341233EAAAD1D9353F6C42D08866B1D05A0F2035028B9D86" </span><span style="color: #007700">.<br />        </span><span style="color: #DD0000">"9840B41666B42E92EA0DA3B43204B5CFCE3352524D0416A5A441E700AF461503"</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$dphex </span><span style="color: #007700">= </span><span style="color: #DD0000">"11"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$dqhex </span><span style="color: #007700">= </span><span style="color: #DD0000">"11"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$qinvhex </span><span style="color: #007700">= </span><span style="color: #DD0000">"b06c4fdabb6301198d265bdbae9423b380f271f73453885093077fcd39e2119f" </span><span style="color: #007700">.<br />           </span><span style="color: #DD0000">"c98632154f5883b167a967bf402b4e9e2e0f9656e698ea3666edfb25798039f7"</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$rsa</span><span style="color: #007700">= </span><span style="color: #0000BB">openssl_pkey_new</span><span style="color: #007700">([<br />    </span><span style="color: #DD0000">'rsa' </span><span style="color: #007700">=&gt; [<br />        </span><span style="color: #DD0000">'n' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">hex2bin</span><span style="color: #007700">(</span><span style="color: #0000BB">$nhex</span><span style="color: #007700">),<br />        </span><span style="color: #DD0000">'e' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">hex2bin</span><span style="color: #007700">(</span><span style="color: #0000BB">$ehex</span><span style="color: #007700">),<br />        </span><span style="color: #DD0000">'d' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">hex2bin</span><span style="color: #007700">(</span><span style="color: #0000BB">$dhex</span><span style="color: #007700">),<br />        </span><span style="color: #DD0000">'p' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">hex2bin</span><span style="color: #007700">(</span><span style="color: #0000BB">$phex</span><span style="color: #007700">),<br />        </span><span style="color: #DD0000">'q' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">hex2bin</span><span style="color: #007700">(</span><span style="color: #0000BB">$qhex</span><span style="color: #007700">),<br />        </span><span style="color: #DD0000">'dmp1' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">hex2bin</span><span style="color: #007700">(</span><span style="color: #0000BB">$dphex</span><span style="color: #007700">),<br />        </span><span style="color: #DD0000">'dmq1' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">hex2bin</span><span style="color: #007700">(</span><span style="color: #0000BB">$dqhex</span><span style="color: #007700">),<br />        </span><span style="color: #DD0000">'iqmp' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">hex2bin</span><span style="color: #007700">(</span><span style="color: #0000BB">$qinvhex</span><span style="color: #007700">),<br />    ],<br />]);<br /></span><span style="color: #0000BB">$details </span><span style="color: #007700">= </span><span style="color: #0000BB">openssl_pkey_get_details</span><span style="color: #007700">(</span><span style="color: #0000BB">$rsa</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$details</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

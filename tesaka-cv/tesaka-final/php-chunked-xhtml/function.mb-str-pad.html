@@ -1,0 +1,247 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Pad a multibyte string to a certain length with another multibyte string</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.mb-split.html" class="navbar__link">« mb_split</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.mb-str-split.html" class="navbar__link">mb_str_split »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ref.mbstring.html">Multibyte String Functions</a></li>
+        <li>Pad a multibyte string to a certain length with another multibyte string</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="function.mb-str-pad" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">mb_str_pad</h1>
+  <p class="verinfo">(PHP 8 &gt;= PHP 8.3.0)</p><p class="refpurpose"><span class="refname">mb_str_pad</span> &mdash; <span class="dc-title">Pad a multibyte string to a certain length with another multibyte string</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-function.mb-str-pad-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="methodname"><strong>mb_str_pad</strong></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$string</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$length</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$pad_string</code><span class="initializer"> = &quot; &quot;</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$pad_type</code><span class="initializer"> = <strong><code><a href="string.constants.html#constant.str-pad-right">STR_PAD_RIGHT</a></code></strong></span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.string.html" class="type string">string</a></span></span> <code class="parameter">$encoding</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span><br>): <span class="type"><a href="language.types.string.html" class="type string">string</a></span></div>
+
+  <p class="para rdfs-comment">
+   This function returns the <code class="parameter">string</code>
+   padded on the left, the right, or both sides to the specified
+   padding length, where the length is measured in Unicode codepoints. If the optional argument
+   <code class="parameter">pad_string</code> is not supplied, the
+   <code class="parameter">string</code> is padded with spaces, otherwise it
+   is padded with characters from <code class="parameter">pad_string</code>
+   up to the limit.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-function.mb-str-pad-parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+    
+     <dt><code class="parameter">string</code></dt>
+     <dd>
+      <p class="para">
+       The input string.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">length</code></dt>
+     <dd>
+      <p class="para">
+       If the value of <code class="parameter">length</code> is negative,
+       less than, or equal to the length of the input string, no padding
+       takes place, and <code class="parameter">string</code> will be returned.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">pad_string</code></dt>
+     <dd>
+      <blockquote class="note"><p><strong class="note">Note</strong>: 
+       <p class="para">
+        The <code class="parameter">pad_string</code> may be truncated if the
+        required number of padding characters can&#039;t be evenly divided by the
+        <code class="parameter">pad_string</code>&#039;s length.
+       </p>
+      </p></blockquote>
+     </dd>
+    
+    
+     <dt><code class="parameter">pad_type</code></dt>
+     <dd>
+      <p class="para">
+       Optional argument <code class="parameter">pad_type</code> can be
+       <strong><code><a href="string.constants.html#constant.str-pad-right">STR_PAD_RIGHT</a></code></strong>, <strong><code><a href="string.constants.html#constant.str-pad-left">STR_PAD_LEFT</a></code></strong>,
+       or <strong><code><a href="string.constants.html#constant.str-pad-both">STR_PAD_BOTH</a></code></strong>.
+       By default <strong><code><a href="string.constants.html#constant.str-pad-right">STR_PAD_RIGHT</a></code></strong>.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">encoding</code></dt>
+     <dd>
+      <p class="para">The <code class="parameter">encoding</code>
+parameter is the character encoding. If it is omitted or <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong>, the internal character
+encoding value will be used.</p>
+     </dd>
+    
+   </dl>
+  </p>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-function.mb-str-pad-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns the padded string.
+  </p>
+ </div>
+
+
+
+ <div class="refsect1 examples" id="refsect1-function.mb-str-pad-examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   <div class="example" id="example-1">
+    <p><strong>Example #1 <span class="function"><strong>mb_str_pad()</strong></span> example</strong></p>
+    <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">mb_str_pad</span><span style="color: #007700">(</span><span style="color: #DD0000">'▶▶'</span><span style="color: #007700">, </span><span style="color: #0000BB">6</span><span style="color: #007700">, </span><span style="color: #DD0000">'❤❓❇'</span><span style="color: #007700">, </span><span style="color: #0000BB">STR_PAD_RIGHT</span><span style="color: #007700">)); </span><span style="color: #FF8000">// string(18) "▶▶❤❓❇❤"<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">mb_str_pad</span><span style="color: #007700">(</span><span style="color: #DD0000">'▶▶'</span><span style="color: #007700">, </span><span style="color: #0000BB">6</span><span style="color: #007700">, </span><span style="color: #DD0000">'❤❓❇'</span><span style="color: #007700">, </span><span style="color: #0000BB">STR_PAD_LEFT</span><span style="color: #007700">));  </span><span style="color: #FF8000">// string(18) "❤❓❇❤▶▶"<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">mb_str_pad</span><span style="color: #007700">(</span><span style="color: #DD0000">'▶▶'</span><span style="color: #007700">, </span><span style="color: #0000BB">6</span><span style="color: #007700">, </span><span style="color: #DD0000">'❤❓❇'</span><span style="color: #007700">, </span><span style="color: #0000BB">STR_PAD_BOTH</span><span style="color: #007700">));  </span><span style="color: #FF8000">// string(18) "❤❓▶▶❤❓"<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">mb_str_pad</span><span style="color: #007700">(</span><span style="color: #DD0000">"🎉"</span><span style="color: #007700">, </span><span style="color: #0000BB">3</span><span style="color: #007700">, </span><span style="color: #DD0000">"祝"</span><span style="color: #007700">, </span><span style="color: #0000BB">STR_PAD_LEFT</span><span style="color: #007700">));   </span><span style="color: #FF8000">// string(10) "祝祝🎉"<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+   </div>
+  </p>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

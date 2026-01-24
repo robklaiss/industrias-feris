@@ -1,0 +1,191 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Output Buffering Control</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.opcache-reset.html" class="navbar__link">« opcache_reset</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="intro.outcontrol.html" class="navbar__link">Introduction »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="refs.basic.php.html">Affecting PHP's Behaviour</a></li>
+        <li>Output Buffering Control</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="book.outcontrol" class="book">
+ 
+ <h1 class="title">Output Buffering Control</h1>
+ 
+
+ 
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+<ul class="chunklist chunklist_book"><li><a href="intro.outcontrol.html">Introduction</a></li><li><a href="outcontrol.setup.html">Installing/Configuring</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="outcontrol.configuration.html">Runtime Configuration</a></li></ul></li><li><a href="outcontrol.constants.html">Predefined Constants</a></li><li><a href="outcontrol.output-buffering.html">Output Buffering</a></li><li><a href="outcontrol.flushing-system-buffers.html">Flushing System Buffers</a></li><li><a href="outcontrol.user-level-output-buffers.html">User-Level Output Buffers</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="outcontrol.what-output-is-buffered.html">What Output Is Buffered?</a></li><li><a href="outcontrol.nesting-output-buffers.html">Nesting Output Buffers</a></li><li><a href="outcontrol.buffer-size.html">Buffer Size</a></li><li><a href="outcontrol.operations-on-buffers.html">Operations Allowed On Buffers</a></li><li><a href="outcontrol.output-handlers.html">Output Handlers</a></li><li><a href="outcontrol.working-with-output-handlers.html">Working With Output Handlers</a></li><li><a href="outcontrol.flags-passed-to-output-handlers.html">Flags Passed To Output Handlers</a></li><li><a href="outcontrol.output-handler-return-values.html">Output Handler Return Values</a></li></ul></li><li><a href="outcontrol.examples.html">Examples</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="outcontrol.examples.basic.html">Basic usage</a></li><li><a href="outcontrol.examples.rewrite.html">Output rewrite usage</a></li></ul></li><li><a href="ref.outcontrol.html">Output Control Functions</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="function.flush.html">flush</a> — Flush system output buffer</li><li><a href="function.ob-clean.html">ob_clean</a> — Clean (erase) the contents of the active output buffer</li><li><a href="function.ob-end-clean.html">ob_end_clean</a> — Clean (erase) the contents of the active output buffer and turn it off</li><li><a href="function.ob-end-flush.html">ob_end_flush</a> — Flush (send) the return value of the active output handler
+   and turn the active output buffer off</li><li><a href="function.ob-flush.html">ob_flush</a> — Flush (send) the return value of the active output handler</li><li><a href="function.ob-get-clean.html">ob_get_clean</a> — Get the contents of the active output buffer and turn it off</li><li><a href="function.ob-get-contents.html">ob_get_contents</a> — Return the contents of the output buffer</li><li><a href="function.ob-get-flush.html">ob_get_flush</a> — Flush (send) the return value of the active output handler,
+   return the contents of the active output buffer and turn it off</li><li><a href="function.ob-get-length.html">ob_get_length</a> — Return the length of the output buffer</li><li><a href="function.ob-get-level.html">ob_get_level</a> — Return the nesting level of the output buffering mechanism</li><li><a href="function.ob-get-status.html">ob_get_status</a> — Get status of output buffers</li><li><a href="function.ob-implicit-flush.html">ob_implicit_flush</a> — Turn implicit flush on/off</li><li><a href="function.ob-list-handlers.html">ob_list_handlers</a> — List all output handlers in use</li><li><a href="function.ob-start.html">ob_start</a> — Turn on output buffering</li><li><a href="function.output-add-rewrite-var.html">output_add_rewrite_var</a> — Add URL rewriter values</li><li><a href="function.output-reset-rewrite-vars.html">output_reset_rewrite_vars</a> — Reset URL rewriter values</li></ul></li></ul></div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

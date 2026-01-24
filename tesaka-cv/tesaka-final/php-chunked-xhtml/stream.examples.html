@@ -1,0 +1,177 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Examples</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="stream.errors.html" class="navbar__link">« Stream Errors</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="stream.streamwrapper.example-1.html" class="navbar__link">Example class registered as stream wrapper »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.stream.html">Streams</a></li>
+        <li>Examples</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="stream.examples" class="chapter">
+ <h1 class="title">Examples</h1>
+<h2>Table of Contents</h2><ul class="chunklist chunklist_chapter"><li><a href="stream.streamwrapper.example-1.html">Example class registered as stream wrapper</a></li></ul>
+
+ <p class="para">
+  <div class="example" id="example-1">
+   <p><strong>Example #1 Using <span class="function"><a href="function.file-get-contents.html" class="function">file_get_contents()</a></span>
+    to retrieve data from multiple sources</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/* Read local file from /home/bar */<br /></span><span style="color: #0000BB">$localfile </span><span style="color: #007700">= </span><span style="color: #0000BB">file_get_contents</span><span style="color: #007700">(</span><span style="color: #DD0000">"/home/bar/foo.txt"</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Identical to above, explicitly naming FILE scheme */<br /></span><span style="color: #0000BB">$localfile </span><span style="color: #007700">= </span><span style="color: #0000BB">file_get_contents</span><span style="color: #007700">(</span><span style="color: #DD0000">"file:///home/bar/foo.txt"</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Read remote file from www.example.com using HTTP */<br /></span><span style="color: #0000BB">$httpfile  </span><span style="color: #007700">= </span><span style="color: #0000BB">file_get_contents</span><span style="color: #007700">(</span><span style="color: #DD0000">"http://www.example.com/foo.txt"</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Read remote file from www.example.com using HTTPS */<br /></span><span style="color: #0000BB">$httpsfile </span><span style="color: #007700">= </span><span style="color: #0000BB">file_get_contents</span><span style="color: #007700">(</span><span style="color: #DD0000">"https://www.example.com/foo.txt"</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Read remote file from ftp.example.com using FTP */<br /></span><span style="color: #0000BB">$ftpfile   </span><span style="color: #007700">= </span><span style="color: #0000BB">file_get_contents</span><span style="color: #007700">(</span><span style="color: #DD0000">"ftp://user:pass@ftp.example.com/foo.txt"</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Read remote file from ftp.example.com using FTPS */<br /></span><span style="color: #0000BB">$ftpsfile  </span><span style="color: #007700">= </span><span style="color: #0000BB">file_get_contents</span><span style="color: #007700">(</span><span style="color: #DD0000">"ftps://user:pass@ftp.example.com/foo.txt"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+ <p class="para">
+  <div class="example" id="example-2">
+   <p><strong>Example #2 Making a POST request to an https server</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/* Send POST request to https://secure.example.com/form_action.php<br />* Include form elements named "foo" and "bar" with dummy values<br />*/<br /><br /></span><span style="color: #0000BB">$sock </span><span style="color: #007700">= </span><span style="color: #0000BB">fsockopen</span><span style="color: #007700">(</span><span style="color: #DD0000">"ssl://secure.example.com"</span><span style="color: #007700">, </span><span style="color: #0000BB">443</span><span style="color: #007700">, </span><span style="color: #0000BB">$errno</span><span style="color: #007700">, </span><span style="color: #0000BB">$errstr</span><span style="color: #007700">, </span><span style="color: #0000BB">30</span><span style="color: #007700">);<br />if (!</span><span style="color: #0000BB">$sock</span><span style="color: #007700">) die(</span><span style="color: #DD0000">"</span><span style="color: #0000BB">$errstr</span><span style="color: #DD0000"> (</span><span style="color: #0000BB">$errno</span><span style="color: #DD0000">)\n"</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$data </span><span style="color: #007700">= </span><span style="color: #DD0000">"foo=" </span><span style="color: #007700">. </span><span style="color: #0000BB">urlencode</span><span style="color: #007700">(</span><span style="color: #DD0000">"Value for Foo"</span><span style="color: #007700">) . </span><span style="color: #DD0000">"&amp;bar=" </span><span style="color: #007700">. </span><span style="color: #0000BB">urlencode</span><span style="color: #007700">(</span><span style="color: #DD0000">"Value for Bar"</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">fwrite</span><span style="color: #007700">(</span><span style="color: #0000BB">$sock</span><span style="color: #007700">, </span><span style="color: #DD0000">"POST /form_action.php HTTP/1.0\r\n"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">fwrite</span><span style="color: #007700">(</span><span style="color: #0000BB">$sock</span><span style="color: #007700">, </span><span style="color: #DD0000">"Host: secure.example.com\r\n"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">fwrite</span><span style="color: #007700">(</span><span style="color: #0000BB">$sock</span><span style="color: #007700">, </span><span style="color: #DD0000">"Content-type: application/x-www-form-urlencoded\r\n"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">fwrite</span><span style="color: #007700">(</span><span style="color: #0000BB">$sock</span><span style="color: #007700">, </span><span style="color: #DD0000">"Content-length: " </span><span style="color: #007700">. </span><span style="color: #0000BB">strlen</span><span style="color: #007700">(</span><span style="color: #0000BB">$data</span><span style="color: #007700">) . </span><span style="color: #DD0000">"\r\n"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">fwrite</span><span style="color: #007700">(</span><span style="color: #0000BB">$sock</span><span style="color: #007700">, </span><span style="color: #DD0000">"Accept: */*\r\n"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">fwrite</span><span style="color: #007700">(</span><span style="color: #0000BB">$sock</span><span style="color: #007700">, </span><span style="color: #DD0000">"\r\n"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">fwrite</span><span style="color: #007700">(</span><span style="color: #0000BB">$sock</span><span style="color: #007700">, </span><span style="color: #0000BB">$data</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$headers </span><span style="color: #007700">= </span><span style="color: #DD0000">""</span><span style="color: #007700">;<br />while (</span><span style="color: #0000BB">$str </span><span style="color: #007700">= </span><span style="color: #0000BB">trim</span><span style="color: #007700">(</span><span style="color: #0000BB">fgets</span><span style="color: #007700">(</span><span style="color: #0000BB">$sock</span><span style="color: #007700">, </span><span style="color: #0000BB">4096</span><span style="color: #007700">)))<br /></span><span style="color: #0000BB">$headers </span><span style="color: #007700">.= </span><span style="color: #DD0000">"</span><span style="color: #0000BB">$str</span><span style="color: #DD0000">\n"</span><span style="color: #007700">;<br /><br />echo </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$body </span><span style="color: #007700">= </span><span style="color: #DD0000">""</span><span style="color: #007700">;<br />while (!</span><span style="color: #0000BB">feof</span><span style="color: #007700">(</span><span style="color: #0000BB">$sock</span><span style="color: #007700">))<br /></span><span style="color: #0000BB">$body </span><span style="color: #007700">.= </span><span style="color: #0000BB">fgets</span><span style="color: #007700">(</span><span style="color: #0000BB">$sock</span><span style="color: #007700">, </span><span style="color: #0000BB">4096</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">fclose</span><span style="color: #007700">(</span><span style="color: #0000BB">$sock</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+ <p class="para">
+  <div class="example" id="example-3">
+   <p><strong>Example #3 Writing data to a compressed file</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/* Create a compressed file containing an arbitrary string<br />* File can be read back using compress.zlib stream or just<br />* decompressed from the command line using 'gzip -d foo-bar.txt.gz'<br />*/<br /></span><span style="color: #0000BB">$fp </span><span style="color: #007700">= </span><span style="color: #0000BB">fopen</span><span style="color: #007700">(</span><span style="color: #DD0000">"compress.zlib://foo-bar.txt.gz"</span><span style="color: #007700">, </span><span style="color: #DD0000">"wb"</span><span style="color: #007700">);<br />if (!</span><span style="color: #0000BB">$fp</span><span style="color: #007700">) die(</span><span style="color: #DD0000">"Unable to create file."</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">fwrite</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">, </span><span style="color: #DD0000">"This is a test.\n"</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">fclose</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+
+ 
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

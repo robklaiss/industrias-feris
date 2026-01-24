@@ -8,8 +8,8 @@
 
     <xs:import namespace="http://www.w3.org/2000/09/xmldsig#"
                schemaLocation="xmldsig-core-schema.xsd"/>
-    <xs:include schemaLocation= "https://ekuatia.set.gov.py/sifen/xsd/DE_Types_v150.xsd"/>
-    <xs:include schemaLocation= "https://ekuatia.set.gov.py/sifen/xsd/SIFEN_Types_v141.xsd"/>
+    <xs:include schemaLocation="DE_Types_v150.xsd"/>
+    <xs:include schemaLocation="SIFEN_Types_v141.xsd"/>
 
     <xs:simpleType name="tdId">
         <xs:annotation>

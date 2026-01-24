@@ -1,0 +1,277 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Prepares an SQL statement to be executed</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.db2-pconnect.html" class="navbar__link">« db2_pconnect</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.db2-primary-keys.html" class="navbar__link">db2_primary_keys »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ref.ibm-db2.html">IBM DB2 Functions</a></li>
+        <li>Prepares an SQL statement to be executed</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="function.db2-prepare" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">db2_prepare</h1>
+  <p class="verinfo">(PECL ibm_db2 &gt;= 1.0.0)</p><p class="refpurpose"><span class="refname">db2_prepare</span> &mdash; <span class="dc-title">
+   Prepares an SQL statement to be executed
+  </span></p>
+
+ </div>
+ <div class="refsect1 description" id="refsect1-function.db2-prepare-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="methodname"><strong>db2_prepare</strong></span>(<span class="methodparam"><span class="type"><a href="language.types.resource.html" class="type resource">resource</a></span> <code class="parameter">$connection</code></span>, <span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$statement</code></span>, <span class="methodparam"><span class="type"><a href="language.types.array.html" class="type array">array</a></span> <code class="parameter">$options</code><span class="initializer"> = []</span></span>): <span class="type"><span class="type"><a href="language.types.resource.html" class="type resource">resource</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+
+
+
+  <p class="simpara">
+   <span class="function"><strong>db2_prepare()</strong></span> creates a prepared SQL statement which can
+   include 0 or more parameter markers (<code class="literal">?</code> characters)
+   representing parameters for input, output, or input/output. You can pass
+   parameters to the prepared statement using
+   <span class="function"><a href="function.db2-bind-param.html" class="function">db2_bind_param()</a></span>, or for input values only, as an array
+   passed to <span class="function"><a href="function.db2-execute.html" class="function">db2_execute()</a></span>.
+  </p>
+  <p class="para">
+   There are three main advantages to using prepared statements in your
+   application:
+   <ul class="itemizedlist">
+    <li class="listitem">
+     <span class="simpara">
+      <em>Performance</em>: when you prepare a statement, the
+      database server creates an optimized access plan for retrieving data with
+      that statement. Subsequently issuing the prepared statement with
+      <span class="function"><a href="function.db2-execute.html" class="function">db2_execute()</a></span> enables the statements to reuse that
+      access plan and avoids the overhead of dynamically creating a new access
+      plan for every statement you issue.
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      <em>Security</em>: when you prepare a statement, you can
+      include parameter markers for input values. When you execute a prepared
+      statement with input values for placeholders, the database server checks
+      each input value to ensure that the type matches the column definition or
+      parameter definition.
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      <em>Advanced functionality</em>: Parameter markers not only
+      enable you to pass input values to prepared SQL statements, they also
+      enable you to retrieve OUT and INOUT parameters from stored procedures
+      using <span class="function"><a href="function.db2-bind-param.html" class="function">db2_bind_param()</a></span>.
+     </span>
+    </li>
+   </ul>
+  </p>
+
+ </div>
+
+ <div class="refsect1 parameters" id="refsect1-function.db2-prepare-parameters">
+  <h3 class="title">Parameters</h3>
+  <dl>
+   
+    <dt><code class="parameter">connection</code></dt>
+    <dd>
+     <span class="simpara">
+      A valid database connection resource variable as returned from
+      <span class="function"><a href="function.db2-connect.html" class="function">db2_connect()</a></span> or <span class="function"><a href="function.db2-pconnect.html" class="function">db2_pconnect()</a></span>.
+     </span>
+    </dd>
+   
+   
+    <dt><code class="parameter">statement</code></dt>
+    <dd>
+     <span class="simpara">
+      An SQL statement, optionally containing one or more parameter markers..
+     </span>
+    </dd>
+   
+   
+    <dt><code class="parameter">options</code></dt>
+    <dd>
+     <span class="simpara">
+      An associative array containing statement options. You can use this
+      parameter to request a scrollable cursor on database servers that
+      support this functionality.
+     </span>
+     <span class="simpara">
+      For a description of valid statement options, see
+      <span class="function"><a href="function.db2-set-option.html" class="function">db2_set_option()</a></span>.
+     </span>
+    </dd>
+   
+  </dl>
+ </div>
+
+ <div class="refsect1 returnvalues" id="refsect1-function.db2-prepare-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="simpara">
+   Returns a statement resource if the SQL statement was successfully parsed and
+   prepared by the database server. Returns <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong> if the database server
+   returned an error. You can determine which error was returned by calling
+   <span class="function"><a href="function.db2-stmt-error.html" class="function">db2_stmt_error()</a></span> or <span class="function"><a href="function.db2-stmt-errormsg.html" class="function">db2_stmt_errormsg()</a></span>.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-function.db2-prepare-examples">
+  <h3 class="title">Examples</h3>
+  <div class="example" id="example-1">
+   <p><strong>Example #1 Preparing and executing an SQL statement with parameter markers</strong></p>
+   <div class="example-contents"><p>
+    The following example prepares an INSERT statement that accepts four
+    parameter markers, then iterates over an array of arrays containing the
+    input values to be passed to <span class="function"><a href="function.db2-execute.html" class="function">db2_execute()</a></span>.
+   </p></div>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$animals </span><span style="color: #007700">= array(<br />    array(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #DD0000">'cat'</span><span style="color: #007700">, </span><span style="color: #DD0000">'Pook'</span><span style="color: #007700">, </span><span style="color: #0000BB">3.2</span><span style="color: #007700">),<br />    array(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #DD0000">'dog'</span><span style="color: #007700">, </span><span style="color: #DD0000">'Peaches'</span><span style="color: #007700">, </span><span style="color: #0000BB">12.3</span><span style="color: #007700">),<br />    array(</span><span style="color: #0000BB">2</span><span style="color: #007700">, </span><span style="color: #DD0000">'horse'</span><span style="color: #007700">, </span><span style="color: #DD0000">'Smarty'</span><span style="color: #007700">, </span><span style="color: #0000BB">350.0</span><span style="color: #007700">),<br />);<br /><br /></span><span style="color: #0000BB">$insert </span><span style="color: #007700">= </span><span style="color: #DD0000">'INSERT INTO animals (id, breed, name, weight)<br />    VALUES (?, ?, ?, ?)'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_prepare</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn</span><span style="color: #007700">, </span><span style="color: #0000BB">$insert</span><span style="color: #007700">);<br />if (</span><span style="color: #0000BB">$stmt</span><span style="color: #007700">) {<br />    foreach (</span><span style="color: #0000BB">$animals </span><span style="color: #007700">as </span><span style="color: #0000BB">$animal</span><span style="color: #007700">) {<br />        </span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_execute</span><span style="color: #007700">(</span><span style="color: #0000BB">$stmt</span><span style="color: #007700">, </span><span style="color: #0000BB">$animal</span><span style="color: #007700">);<br />    }<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-function.db2-prepare-seealso">
+  <h3 class="title">See Also</h3>
+  <ul class="simplelist">
+   <li><span class="function"><a href="function.db2-bind-param.html" class="function" rel="rdfs-seeAlso">db2_bind_param()</a> - Binds a PHP variable to an SQL statement parameter</span></li>
+   <li><span class="function"><a href="function.db2-execute.html" class="function" rel="rdfs-seeAlso">db2_execute()</a> - Executes a prepared SQL statement</span></li>
+   <li><span class="function"><a href="function.db2-stmt-error.html" class="function" rel="rdfs-seeAlso">db2_stmt_error()</a> - Returns a string containing the SQLSTATE returned by an SQL statement</span></li>
+   <li><span class="function"><a href="function.db2-stmt-errormsg.html" class="function" rel="rdfs-seeAlso">db2_stmt_errormsg()</a> - Returns a string containing the last SQL statement error message</span></li>
+  </ul>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

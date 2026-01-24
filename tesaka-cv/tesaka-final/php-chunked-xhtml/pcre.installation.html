@@ -1,0 +1,242 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Installation</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="pcre.setup.html" class="navbar__link">« Installing/Configuring</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="pcre.configuration.html" class="navbar__link">Runtime Configuration »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="pcre.setup.html">Installing/Configuring</a></li>
+        <li>Installation</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="pcre.installation" class="section">
+ <h2 class="title">Installation</h2>
+ <p class="para">
+  The PCRE extension is a core PHP extension, so it is always enabled.
+  By default, this extension is compiled using the bundled PCRE
+  library. Alternatively, an external PCRE library can be used by
+  passing in the <strong class="option configure">--with-pcre-regex=DIR</strong>
+  configuration option where <code class="literal">DIR</code> is the location of
+  PCRE&#039;s include and library files. It is recommended to use PCRE 8.10 or newer;
+  as of PHP 7.3.0, PCRE2 is required.
+ </p>
+ <p class="para">
+  PCRE&#039;s just-in-time compilation is supported by default, which
+  can be disabled with the <strong class="option configure">--without-pcre-jit</strong>
+  configuration option as of PHP 7.0.12.
+ </p>
+ <p class="simpara">The Windows version of PHP has built-in
+support for this extension. You do not need to load any additional
+extensions in order to use these functions.</p>
+ <p class="para">
+  PCRE is an active project and as it changes so does the PHP
+  functionality that relies upon it. It is possible that certain parts
+  of the PHP documentation is outdated, in that it may not cover the
+  newest features that PCRE provides. For a list of changes, see the
+  <a href="http://www.pcre.org/original/changelog.txt" class="link external">&raquo;&nbsp;PCRE library changelog</a>
+  and also the following bundled PCRE history:
+ </p>
+ <p class="para">
+  <table class="doctable table">
+   <caption><strong>Upgrade history of the bundled PCRE library</strong></caption>
+   
+    <thead>
+     <tr>
+      <th>PHP Version</th>
+      <th>Updated PCRE Version</th>
+      <th>Notes</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+      <td>8.2.0</td>
+      <td>10.40</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr>
+      <td>8.1.0</td>
+      <td>10.39</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr>
+      <td>7.4.12, 8.0.0</td>
+      <td>10.35</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr>
+      <td>7.4.6</td>
+      <td>10.34</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr>
+      <td>7.4.0</td>
+      <td>10.33</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr>
+      <td>7.3.0</td>
+      <td>10.32</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr>
+      <td>7.2.0</td>
+      <td>8.41</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr>
+      <td>7.0.3</td>
+      <td>8.38</td>
+      <td>See CVE-2015-8383, CVE-2015-8386, CVE-2015-8387, CVE-2015-8389, CVE-2015-8390, CVE-2015-8391, CVE-2015-8393, CVE-2015-8394</td>
+     </tr>
+
+     <tr>
+      <td>7.0.0</td>
+      <td>8.37</td>
+      <td>See CVE-2015-2325, CVE-2015-2326</td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+ </p>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

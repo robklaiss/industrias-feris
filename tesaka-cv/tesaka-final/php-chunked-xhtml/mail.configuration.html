@@ -1,0 +1,369 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Runtime Configuration</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="mail.requirements.html" class="navbar__link">« Requirements</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="ref.mail.html" class="navbar__link">Mail Functions »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="mail.setup.html">Installing/Configuring</a></li>
+        <li>Runtime Configuration</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="mail.configuration" class="section">
+ <h2 class="title">Runtime Configuration</h2>
+ <p class="simpara">
+The behaviour of these functions is affected by settings in <var class="filename">php.ini</var>.
+</p>
+ <p class="para">
+ <table class="doctable table">
+  <caption><strong>Mail configuration options</strong></caption>
+  
+   <thead>
+    <tr>
+     <th>Name</th>
+     <th>Default</th>
+     <th>Changeable</th>
+     <th>Changelog</th>
+    </tr>
+
+   </thead>
+
+   <tbody class="tbody">
+    <tr>
+     <td><a href="mail.configuration.html#ini.mail.add-x-header" class="link">mail.add_x_header</a></td>
+     <td>&quot;0&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-perdir">INI_PERDIR</a></code></strong></td>
+     <td class="empty">&nbsp;</td>
+    </tr>
+
+    <tr>
+     <td><a href="mail.configuration.html#ini.mail.mixed_lf_and_crlf" class="link">mail.mixed_lf_and_crlf</a></td>
+     <td>&quot;0&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong>|<strong><code><a href="info.constants.html#constant.ini-perdir">INI_PERDIR</a></code></strong></td>
+     <td>Added in PHP 8.2.4</td>
+    </tr>
+
+    <tr>
+     <td><a href="mail.configuration.html#ini.mail.log" class="link">mail.log</a></td>
+     <td>NULL</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong>|<strong><code><a href="info.constants.html#constant.ini-perdir">INI_PERDIR</a></code></strong></td>
+     <td class="empty">&nbsp;</td>
+    </tr>
+
+    <tr>
+     <td><a href="mail.configuration.html#ini.mail.force_extra_parameters" class="link">mail.force_extra_parameters</a></td>
+     <td>NULL</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td class="empty">&nbsp;</td>
+    </tr>
+
+    <tr>
+     <td><a href="mail.configuration.html#ini.smtp" class="link">SMTP</a></td>
+     <td>&quot;localhost&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-all">INI_ALL</a></code></strong></td>
+     <td class="empty">&nbsp;</td>
+    </tr>
+
+    <tr>
+     <td><a href="mail.configuration.html#ini.smtp-port" class="link">smtp_port</a></td>
+     <td>&quot;25&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-all">INI_ALL</a></code></strong></td>
+     <td class="empty">&nbsp;</td>
+    </tr>
+
+    <tr>
+     <td><a href="mail.configuration.html#ini.sendmail-from" class="link">sendmail_from</a></td>
+     <td>NULL</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-all">INI_ALL</a></code></strong></td>
+     <td class="empty">&nbsp;</td>
+    </tr>
+
+    <tr>
+     <td><a href="mail.configuration.html#ini.sendmail-path" class="link">sendmail_path</a></td>
+     <td>&quot;/usr/sbin/sendmail -t -i&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td class="empty">&nbsp;</td>
+    </tr>
+
+   </tbody>
+  
+ </table>
+
+ For further details and definitions of the
+INI_* modes, see the <a href="configuration.changes.modes.html" class="xref">Where a configuration setting may be set</a>.
+ </p>
+ 
+ <p class="para">Here&#039;s a short explanation of
+the configuration directives.</p>
+ 
+ <p class="para">
+ <dl>
+  
+   <dt id="ini.mail.add-x-header">
+    <code class="parameter">mail.add_x_header</code>
+    <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     Add <code class="literal">X-PHP-Originating-Script</code> that will include UID of
+     the script followed by the filename.
+    </p>
+   </dd>
+  
+
+  
+   <dt id="ini.mail.log">
+    <code class="parameter">mail.log</code>
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     The path to a log file that will log all <span class="function"><a href="function.mail.html" class="function">mail()</a></span> calls.
+     Log entries include the full path of the script, line number,
+     <code class="literal">To</code> address and headers.
+    </p>
+   </dd>
+  
+
+  
+   <dt id="ini.mail.mixed_lf_and_crlf">
+    <code class="parameter">mail.mixed_lf_and_crlf</code>
+    <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     Allows reverting the line separator for email headers and message bodies to LF (Line Feed),
+     mimicking the non-compliant behavior of PHP 7. It is provided as a compatibility measure
+     for certain non-compliant Mail Transfer Agents (MTAs) that fail to correctly process CRLF
+     (Carriage Return + Line Feed) as a line separator in email headers and message content.
+    </p>
+   </dd>
+  
+
+  
+   <dt id="ini.mail.force_extra_parameters">
+    <code class="parameter">mail.force_extra_parameters</code>
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     Force the addition of the specified parameters to be passed as extra
+     parameters to the sendmail binary. These parameters will always replace
+     the value of the 5th parameter to <span class="function"><a href="function.mail.html" class="function">mail()</a></span>.
+    </p>
+    <span class="simpara">
+     In addition to the default behavior for <strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong>,
+     this value can also be set with <code class="literal">php_value</code>
+     in <var class="filename">httpd.conf</var> (but this is not recommended).
+    </span>
+   </dd>
+  
+
+  
+   <dt id="ini.smtp">
+    <code class="parameter">SMTP</code>
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     Used under Windows only: host name or IP address of the SMTP server PHP
+     should use for mail sent with the <span class="function"><a href="function.mail.html" class="function">mail()</a></span> function.
+    </p>
+   </dd>
+  
+
+  
+   <dt id="ini.smtp-port">
+    <code class="parameter">smtp_port</code>
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     Used under Windows only: Number of the port to connect to the server
+     specified with the <code class="literal">SMTP</code> setting when sending mail
+     with <span class="function"><a href="function.mail.html" class="function">mail()</a></span>; defaults to 25.
+    </p>
+   </dd>
+  
+
+  
+   <dt id="ini.sendmail-from">
+    <code class="parameter">sendmail_from</code>
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     Which <code class="literal">&quot;From:&quot;</code> mail address should be used in mail sent
+     directly via SMTP (Windows only).
+     This directive also sets the <code class="literal">&quot;Return-Path:&quot;</code> header.
+    </p>
+   </dd>
+  
+
+  
+   <dt id="ini.sendmail-path">
+    <code class="parameter">sendmail_path</code>
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     Where the <strong class="command">sendmail</strong> program can be found,
+     usually <var class="filename">/usr/sbin/sendmail</var> or
+     <var class="filename">/usr/lib/sendmail</var>.
+     <strong class="command">configure</strong> does an honest attempt of
+     locating this one for you and set a default, but if it fails,
+     you can set it here.
+    </p>
+    <p class="para">
+     Systems not using <strong class="command">sendmail</strong> should set this directive to the
+     sendmail wrapper/replacement their mail system offers, if any.
+     For example, <a href="http://cr.yp.to/qmail.html" class="link external">&raquo;&nbsp;Qmail</a>
+     users can normally set it to
+     <var class="filename">/var/qmail/bin/sendmail</var> or <var class="filename">
+     /var/qmail/bin/qmail-inject</var>.
+    </p>
+    <p class="para">
+     <strong class="command">qmail-inject</strong> does not require any option to
+     process mail correctly.
+    </p>
+    <p class="para">
+     This directive works also under Windows. If set, <var class="varname">smtp</var>,
+     <var class="varname">smtp_port</var> and <var class="varname">sendmail_from</var> are
+     ignored and the specified command is executed.
+    </p>
+   </dd>
+  
+ </dl>
+
+ </p>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

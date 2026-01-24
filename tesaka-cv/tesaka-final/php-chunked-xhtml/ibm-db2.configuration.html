@@ -1,0 +1,683 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Runtime Configuration</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="ibm-db2.installation.html" class="navbar__link">« Installation</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="ibm-db2.resources.html" class="navbar__link">Resource Types »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ibm-db2.setup.html">Installing/Configuring</a></li>
+        <li>Runtime Configuration</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="ibm-db2.configuration" class="section">
+ <h2 class="title">Runtime Configuration</h2>
+ <p class="simpara">
+The behaviour of these functions is affected by settings in <var class="filename">php.ini</var>.
+</p>
+ <table class="doctable table">
+  <caption><strong>ibm_db2 Configure Options</strong></caption>
+  
+   <thead>
+    <tr>
+     <th>Name</th>
+     <th>Default</th>
+     <th>Changeable</th>
+     <th>Changelog</th>
+    </tr>
+
+   </thead>
+
+   <tbody class="tbody">
+    <tr>
+     <td><a href="ibm-db2.configuration.html#ini.ibm-db2.binmode" class="link">ibm_db2.binmode</a></td>
+     <td>&quot;1&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-all">INI_ALL</a></code></strong></td>
+     <td class="empty">&nbsp;</td>
+    </tr>
+
+    <tr>
+     <td><a href="ibm-db2.configuration.html#ini.ibm-db2.i5-all-pconnect" class="link">ibm_db2.i5_all_pconnect</a></td>
+     <td>&quot;0&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td>Available as of ibm_db2 1.6.5.</td>
+    </tr>
+
+    <tr>
+     <td><a href="ibm-db2.configuration.html#ini.ibm-db2.i5-allow-commit" class="link">ibm_db2.i5_allow_commit</a></td>
+     <td>&quot;0&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td>Available as of ibm_db2 1.4.9.</td>
+    </tr>
+
+    <tr>
+     <td><a href="ibm-db2.configuration.html#ini.ibm-db2.i5-blank-userid" class="link">ibm_db2.i5_blank_userid</a></td>
+     <td>&quot;0&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td>Available as of ibm_db2 1.9.7.</td>
+    </tr>
+
+    <tr>
+     <td><a href="ibm-db2.configuration.html#ini.ibm-db2.i5-char-trim" class="link">ibm_db2.i5_char_trim</a></td>
+     <td>&quot;0&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td>Available as of ibm_db2 2.1.0.</td>
+    </tr>
+
+    <tr>
+     <td><a href="ibm-db2.configuration.html#ini.ibm-db2.i5-dbcs-alloc" class="link">ibm_db2.i5_dbcs_alloc</a></td>
+     <td>&quot;0&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td>Available as of ibm_db2 1.5.0.</td>
+    </tr>
+
+    <tr>
+     <td><a href="ibm-db2.configuration.html#ini.ibm-db2.i5-guard-profile" class="link">ibm_db2.i5_guard_profile</a></td>
+     <td>&quot;0&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td>Available as of ibm_db2 1.9.7.</td>
+    </tr>
+
+    <tr>
+     <td><a href="ibm-db2.configuration.html#ini.ibm-db2.i5-ignore-userid" class="link">ibm_db2.i5_ignore_userid</a></td>
+     <td>&quot;0&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td>Available as of ibm_db2 1.8.0.</td>
+    </tr>
+
+    <tr>
+     <td><a href="ibm-db2.configuration.html#ini.ibm-db2.i5-job-sort" class="link">ibm_db2.i5_job_sort</a></td>
+     <td>&quot;0&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td>Available as of ibm_db2 1.8.4.</td>
+    </tr>
+
+    <tr>
+     <td><a href="ibm-db2.configuration.html#ini.ibm-db2.i5-log-verbose" class="link">ibm_db2.i5_log_verbose</a></td>
+     <td>&quot;0&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td>Available as of ibm_db2 1.9.7.</td>
+    </tr>
+
+    <tr>
+     <td><a href="ibm-db2.configuration.html#ini.ibm-db2.i5-max-pconnect" class="link">ibm_db2.i5_max_pconnect</a></td>
+     <td>&quot;0&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td>Available as of ibm_db2 1.9.7.</td>
+    </tr>
+
+    <tr>
+     <td><a href="ibm-db2.configuration.html#ini.ibm-db2.i5-override-ccsid" class="link">ibm_db2.i5_override_ccsid</a></td>
+     <td>&quot;0&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td>Available as of ibm_db2 1.9.7.</td>
+    </tr>
+
+    <tr>
+     <td><a href="ibm-db2.configuration.html#ini.ibm-db2.i5-servermode-subsystem" class="link">ibm_db2.i5_servermode_subsystem</a></td>
+     <td>NULL</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td>Available as of ibm_db2 1.9.7.</td>
+    </tr>
+
+    <tr>
+     <td><a href="ibm-db2.configuration.html#ini.ibm-db2.i5-sys-naming" class="link">ibm_db2.i5_sys_naming</a></td>
+     <td>&quot;0&quot;</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td>Available as of ibm_db2 1.9.7.</td>
+    </tr>
+
+    <tr>
+     <td><a href="ibm-db2.configuration.html#ini.ibm-db2.instance-name" class="link">ibm_db2.instance_name</a></td>
+     <td>NULL</td>
+     <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+     <td>Available as of ibm_db2 1.0.2.</td>
+    </tr>
+
+   </tbody>
+  
+ </table>
+
+
+ <p class="para">Here&#039;s a short explanation of
+the configuration directives.</p>
+
+ <dl>
+  
+   <dt id="ini.ibm-db2.binmode">
+    <code class="parameter">ibm_db2.binmode</code>
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     This option controls the mode used for converting to and from binary
+     data in the PHP application.
+     <ul class="itemizedlist">
+      <li class="listitem">
+       <span class="simpara">
+        1 (DB2_BINARY)
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        2 (DB2_CONVERT)
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        3 (DB2_PASSTHRU)
+       </span>
+      </li>
+     </ul>
+    </p>
+   </dd>
+  
+  
+   <dt id="ini.ibm-db2.i5-all-pconnect">
+    <code class="parameter">ibm_db2.i5_all_pconnect</code>
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     This option forces all connections to be persistent on IBM i.
+     Basically, all <span class="function"><a href="function.db2-connect.html" class="function">db2_connect()</a></span> calls transparently become
+     <span class="function"><a href="function.db2-pconnect.html" class="function">db2_pconnect()</a></span> calls.
+     By default, this option is <code class="literal">0</code>.
+     This option is provided as a convenience for cases where persistent
+     connections are faster.
+     It should not be used in new applications.
+     <ul class="itemizedlist">
+      <li class="listitem">
+       <span class="simpara">
+        0  - Persistent and non-persistent connections can be made.
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        1 - All connections are persistent.
+       </span>
+      </li>
+     </ul>
+    </p>
+   </dd>
+  
+  
+   <dt id="ini.ibm-db2.i5-allow-commit">
+    <code class="parameter">ibm_db2.i5_allow_commit</code>
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     This option controls the transaction isolation mode used.
+     By default, this option is <code class="literal">0</code>, so commitment control isn&#039;t used.
+     This option can be overriden when connecting if the array key
+     <code class="parameter">i5_commit</code> is set in the connection options array
+     passed to <span class="function"><a href="function.db2-connect.html" class="function">db2_connect()</a></span> or
+     <span class="function"><a href="function.db2-pconnect.html" class="function">db2_pconnect()</a></span>.
+     <ul class="itemizedlist">
+      <li class="listitem">
+       <span class="simpara">
+        0 - commitment control is not used
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        1 - read uncommitted, dirty reads possible.
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        2 - read committed, dirty reads are not possible.
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        3 - repeatable read, dirty reads and non-repeatable reads are not possible
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        4 - serializeable, dirty reads, non-repeatable reads, and phantoms are not possible
+       </span>
+      </li>
+     </ul>
+    </p>
+   </dd>
+  
+  
+   <dt id="ini.ibm-db2.i5-blank-userid">
+    <code class="parameter">ibm_db2.i5_blank_userid</code>
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     This controls if a blank user ID should be allowed on IBM i.
+     By default, this option is <code class="literal">0</code>.
+     Unlike <code class="parameter">ibm_db2.i5_ignore_userid</code>, this option
+     doesn&#039;t force all user IDs to be empty or change job behaviour, but
+     simply allows an empty user ID to be passed, for connecting to Db2 as the
+     current user.
+     <ul class="itemizedlist">
+      <li class="listitem">
+       <span class="simpara">
+        0 - Don&#039;t allow a blank user ID to be passed.
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        1 - Allow a blank user ID to be passed.
+       </span>
+      </li>
+     </ul>
+    </p>
+   </dd>
+  
+  
+   <dt id="ini.ibm-db2.i5-char-trim">
+    <code class="parameter">ibm_db2.i5_char_trim</code>
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     This option controls if the end of strings are trimmed on IBM i.
+     Since many tables use fixed column sizes padded with spaces, this is
+     provided as a convenience.
+     By default, this option is <code class="literal">0</code>.
+     <ul class="itemizedlist">
+      <li class="listitem">
+       <span class="simpara">
+        0 - Columns are not trimmed.
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        1 - Spaces at the end of returned character columns are removed.
+       </span>
+      </li>
+     </ul>
+    </p>
+   </dd>
+  
+  
+   <dt id="ini.ibm-db2.i5-dbcs-alloc">
+    <code class="parameter">ibm_db2.i5_dbcs_alloc</code>
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     This options affects the internal buffer allocation strategy on IBM i.
+     By default, this option is <code class="literal">0</code>.
+     When this option is set, buffers are allocated with a much larger size,
+     in case the database underestimates a string&#039;s size when converting
+     between encodings.
+     This option uses six times as much memory for buffers (to account for
+     the largest possible UTF-8 sequences), but may be needed if truncated
+     data is returned.
+     <ul class="itemizedlist">
+      <li class="listitem">
+       <span class="simpara">
+        0 - Minimum size buffers are allocated.
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        1 - Larger size buffers are allocated.
+       </span>
+      </li>
+     </ul>
+    </p>
+   </dd>
+  
+  
+   <dt id="ini.ibm-db2.i5-guard-profile">
+    <code class="parameter">ibm_db2.i5_guard_profile</code>
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     This option checks if the database user profile was switched when
+     connecting to a persistent database connection on IBM i, and if so,
+     disconnects from the database.
+     By default, this option is set to <code class="literal">0</code>.
+     <ul class="itemizedlist">
+      <li class="listitem">
+       <span class="simpara">
+        0 - Don&#039;t check for profile swaps.
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        1 - Check for profile swaps and disconnect if so.
+       </span>
+      </li>
+     </ul>
+    </p>
+   </dd>
+  
+  
+   <dt id="ini.ibm-db2.i5-log-verbose">
+    <code class="parameter">ibm_db2.i5_log_verbose</code>
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     This option sets if SQL diagnostic messages like warnings and errors are
+     always sent to the PHP error log on IBM i.
+     Normally, only a brief message on failure is sent (such as &quot;statement
+     execute failed&quot;) to the PHP error log, as this option is set to
+     <code class="literal">0</code> by default.
+     Note that you can still and should call i.e.
+     <span class="function"><a href="function.db2-stmt-errormsg.html" class="function">db2_stmt_errormsg()</a></span> manually as part of checking if
+     functions fail.
+     <ul class="itemizedlist">
+      <li class="listitem">
+       <span class="simpara">
+        0 - Only logs brief messages.
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        1 - Logs the SQL diagnostic message in addition to the brief message.
+       </span>
+      </li>
+     </ul>
+    </p>
+   </dd>
+  
+  
+   <dt id="ini.ibm-db2.i5-ignore-userid">
+    <code class="parameter">ibm_db2.i5_ignore_userid</code>
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     This option ignores the user ID when connecting to the database when
+     running on IBM i, and runs SQL/CLI functionality inside of the PHP job,
+     instead of a separate job.
+     By default, this option is <code class="literal">0</code>.
+     When enabled, it no longer uses a separate database server job, and
+     always uses the current user profile for the database, ignoring the
+     username and password passed to <span class="function"><a href="function.db2-connect.html" class="function">db2_connect()</a></span> and
+     <span class="function"><a href="function.db2-pconnect.html" class="function">db2_pconnect()</a></span>.
+     <ul class="itemizedlist">
+      <li class="listitem">
+       <span class="simpara">
+        0 - Uses the specified credentials, and use an SQL/CLI server job.
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        1 - Always use blank credentials, and run SQL/CLI in the PHP job.
+       </span>
+      </li>
+     </ul>
+    </p>
+   </dd>
+  
+  
+   <dt id="ini.ibm-db2.i5-job-sort">
+    <code class="parameter">ibm_db2.i5_job_sort</code>
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     Controls the job sort option on IBM i.
+     By default, this option is <code class="literal">0</code>.
+     This corresponds to the IBM i SQL/CLI
+     <code class="literal">SQL_ATTR_CONN_SORT_SEQUENCE</code> attribute.
+     <ul class="itemizedlist">
+      <li class="listitem">
+       <span class="simpara">
+        0 - Uses the <code class="literal">*HEX</code> sort option, sorting by bytes.
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        1 - Uses the job sort sequence set for the PHP job.
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        2 - Uses the job sort sequence set for the database job.
+       </span>
+      </li>
+     </ul>
+    </p>
+   </dd>
+  
+  
+   <dt id="ini.ibm-db2.i5-max-pconnect">
+    <code class="parameter">ibm_db2.i5_max_pconnect</code>
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <span class="simpara">
+     This will affect how many times a persistent connection can be reused
+     when running on IBM i.
+     By default, this is set to <code class="literal">0</code>, which means a persistent
+     connection can always be reused.
+     This option can help work around issues in a long-running database job
+     (i.e. if a procedure is leaking memory), but is obviously not a long-term
+     fix.
+    </span>
+   </dd>
+  
+  
+   <dt id="ini.ibm-db2.i5-override-ccsid">
+    <code class="parameter">ibm_db2.i5_override_ccsid</code>
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <span class="simpara">
+     The PASE CCSID to use for character conversions from EBCDIC on IBM i.
+     By default, this is <code class="literal">0</code>, which will select the default
+     PASE job CCSID, which comes from the PASE locale settings.
+     For example, setting this to <code class="literal">1208</code> will use UTF-8.
+     This should only be modified if the PASE job CCSID isn&#039;t the expected
+     CCSID, and the locale cannot be modified.
+    </span>
+    <span class="simpara">
+     To learn more about CCSIDs on IBM i, consult the
+     <a href="https://www.ibm.com/docs/en/i/7.5?topic=information-ccsid-reference" class="link external">&raquo;&nbsp;IBM documentation</a>.
+     To learn how locales on IBM i PASE are mapped to CCSIDs, consult the
+     <a href="https://www.ibm.com/docs/en/i/7.5?topic=ssw_ibm_i_75/apis/pase_locales.html" class="link external">&raquo;&nbsp;IBM documentation</a>.
+    </span>
+   </dd>
+  
+  
+   <dt id="ini.ibm-db2.i5-sys-naming">
+    <code class="parameter">ibm_db2.i5_sys_naming</code>
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     This option controls the naming mode when connecting to an IBM i system.
+     By default, this option is <code class="literal">0</code>.
+     The naming mode affects how names are resolved and the allowed syntax for
+     names.
+     When set to <code class="literal">0</code>, this uses periods to qualify names and
+     uses the default library or user ID to resolve names.
+     When set to <code class="literal">1</code>, this uses slashes to qualify names and
+     uses the job library list to resolve names.
+     <ul class="itemizedlist">
+      <li class="listitem">
+       <span class="simpara">
+        0 - Uses the SQL naming mode (&quot;SCHEMA.TABLE&quot;).
+       </span>
+      </li>
+      <li class="listitem">
+       <span class="simpara">
+        1 - Uses the system naming mode (&quot;LIBRARY/FILE&quot;).
+       </span>
+      </li>
+     </ul>
+    </p>
+    <span class="simpara">
+     To learn more about naming modes on IBM i, consult the
+     <a href="https://www.ibm.com/docs/en/i/7.5?topic=application-naming-distributed-relational-database-objects" class="link external">&raquo;&nbsp;IBM documentation</a>.
+    </span>
+   </dd>
+  
+  
+   <dt id="ini.ibm-db2.i5-servermode-subsystem">
+    <code class="parameter">ibm_db2.i5_servermode-subsystem</code>
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+   </dt>
+   <dd>
+    <span class="simpara">
+     This option changes which subsystem database server jobs run under on
+     IBM i.
+     By default, this option is <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong>, so jobs will run under the default
+     subsystem for QSQSRVR jobs.
+    </span>
+   </dd>
+  
+  
+   <dt id="ini.ibm-db2.instance-name">
+    <code class="parameter">ibm_db2.instance_name</code>
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     On Linux and UNIX operating systems, this option defines the name of the
+     instance to use for cataloged database connections.
+     By default, this option is <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong>.
+     If this option is set, its value overrides the
+     <var class="varname">DB2INSTANCE</var> environment variable setting.
+    </p>
+    <span class="simpara">
+     This option is ignored on Windows operating systems.
+    </span>
+   </dd>
+  
+ </dl>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

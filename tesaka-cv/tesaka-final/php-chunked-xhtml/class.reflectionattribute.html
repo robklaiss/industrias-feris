@@ -1,0 +1,315 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>The ReflectionAttribute class</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="reflectionreference.getid.html" class="navbar__link">« ReflectionReference::getId</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="reflectionattribute.construct.html" class="navbar__link">ReflectionAttribute::__construct »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.reflection.html">Reflection</a></li>
+        <li>The ReflectionAttribute class</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="class.reflectionattribute" class="reference">
+
+ <h1 class="title">The ReflectionAttribute class</h1>
+ 
+
+ <div class="partintro"><p class="verinfo">(PHP 8)</p>
+
+
+  <div class="section" id="reflectionattribute.intro">
+   <h2 class="title">Introduction</h2>
+   <p class="para">
+    The <span class="classname"><strong class="classname">ReflectionAttribute</strong></span> class provides information about
+    an <a href="language.attributes.html" class="link">Attribute</a>.
+   </p>
+  </div>
+
+
+  <div class="section" id="reflectionattribute.synopsis">
+   <h2 class="title">Class synopsis</h2>
+
+
+   <div class="classsynopsis"><div class="classsynopsisinfo">
+    
+     <span class="modifier">class</span> <strong class="classname"><strong class="classname">ReflectionAttribute</strong></strong>
+    
+
+    
+     <span class="modifier">implements</span>
+      <a href="class.reflector.html" class="interfacename">Reflector</a> {</div>
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Constants */</div>
+    <div class="fieldsynopsis">
+     <span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="class.reflectionattribute.html#reflectionattribute.constants.is-instanceof"><var class="varname">IS_INSTANCEOF</var></a></var>;</div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Properties */</div>
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+      <var class="varname"><a href="class.reflectionattribute.html#reflectionattribute.props.name">$<var class="varname">name</var></a></var>;</div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Methods */</div>
+    <div class="constructorsynopsis dc-description">
+   <span class="modifier">private</span> <span class="methodname"><a href="reflectionattribute.construct.html" class="methodname">__construct</a></span>()</div>
+
+    <div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="reflectionattribute.getarguments.html" class="methodname">getArguments</a></span>(): <span class="type"><a href="language.types.array.html" class="type array">array</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="reflectionattribute.getname.html" class="methodname">getName</a></span>(): <span class="type"><a href="language.types.string.html" class="type string">string</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="reflectionattribute.gettarget.html" class="methodname">getTarget</a></span>(): <span class="type"><a href="language.types.integer.html" class="type int">int</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="reflectionattribute.isrepeated.html" class="methodname">isRepeated</a></span>(): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="reflectionattribute.newinstance.html" class="methodname">newInstance</a></span>(): <span class="type"><a href="language.types.object.html" class="type object">object</a></span></div>
+
+   }</div>
+
+
+  </div>
+
+  <div class="section" id="reflectionattribute.props">
+   <h2 class="title">Properties</h2>
+   <dl>
+    
+     <dt id="reflectionattribute.props.name"><var class="varname">name</var></dt>
+     <dd>
+      <span class="simpara">
+       The name of the attribute.
+      </span>
+     </dd>
+    
+   </dl>
+  </div>
+
+  
+  <div class="section" id="reflectionattribute.constants">
+   <h2 class="title">Predefined Constants</h2>
+   <div class="section" id="reflectionattribute.constants.flags">
+    <h2 class="title">ReflectionAttribute Flags</h2>
+    <dl>
+
+     
+      <dt id="reflectionattribute.constants.is-instanceof">
+       <strong><code><a href="class.reflectionattribute.html#reflectionattribute.constants.is-instanceof">ReflectionAttribute::IS_INSTANCEOF</a></code></strong>
+       <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      </dt>
+      <dd>
+       <p class="para">
+        Retrieve attributes using an
+        <code class="parameter">instanceof</code> check.
+       </p>
+      </dd>
+     
+
+    </dl>
+    <blockquote class="note"><p><strong class="note">Note</strong>: 
+     <p class="para">
+      The values of these constants may change between PHP versions.
+      It is recommended to always use the constants
+      and not rely on the values directly.
+     </p>
+    </p></blockquote>
+   </div>
+  </div>
+  
+
+  <div class="section">
+   <h2 class="title">Changelog</h2>
+   <table class="doctable informaltable">
+    
+     <thead>
+      <tr>
+       <th>Version</th>
+       <th>Description</th>
+      </tr>
+
+     </thead>
+
+     <tbody class="tbody">
+      <tr>
+       <td>8.4.0</td>
+       <td>
+        All class constants are now typed.
+       </td>
+      </tr>
+
+      <tr>
+       <td>8.4.0</td>
+       <td>
+        Added <span class="property"><a href="class.reflectionattribute.html#reflectionattribute.props.name">ReflectionAttribute::$name</a></span>.
+       </td>
+      </tr>
+
+     </tbody>
+    
+   </table>
+
+  </div>
+
+ </div>
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="reflectionattribute.construct.html">ReflectionAttribute::__construct</a> — Private constructor to disallow direct instantiation</li><li><a href="reflectionattribute.getarguments.html">ReflectionAttribute::getArguments</a> — Gets arguments passed to attribute</li><li><a href="reflectionattribute.getname.html">ReflectionAttribute::getName</a> — Gets attribute name</li><li><a href="reflectionattribute.gettarget.html">ReflectionAttribute::getTarget</a> — Returns the target of the attribute as bitmask</li><li><a href="reflectionattribute.isrepeated.html">ReflectionAttribute::isRepeated</a> — Returns whether the attribute of this name has been repeated on a code element</li><li><a href="reflectionattribute.newinstance.html">ReflectionAttribute::newInstance</a> — Instantiates the attribute class represented by this ReflectionAttribute class and arguments</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

@@ -9,10 +9,10 @@
     <xs:import namespace="http://www.w3.org/2000/09/xmldsig#"
                schemaLocation="xmldsig-core-schema.xsd"/>
 
-    <xs:include schemaLocation= "https://ekuatia.set.gov.py/sifen/xsd/Evento_Types_v150.xsd"/>    
-    <xs:include schemaLocation= "https://ekuatia.set.gov.py/sifen/xsd/Paises_v100.xsd"/>
-    <xs:include schemaLocation= "https://ekuatia.set.gov.py/sifen/xsd/Departamentos_v141.xsd"/>
-    <xs:include schemaLocation= "https://ekuatia.set.gov.py/sifen/xsd/DE_Types_v150.xsd"/>
+    <xs:include schemaLocation="Evento_Types_v150.xsd"/>    
+    <xs:include schemaLocation="Paises_v100.xsd"/>
+    <xs:include schemaLocation="Departamentos_v141.xsd"/>
+    <xs:include schemaLocation="DE_Types_v150.xsd"/>
     
     <xs:complexType name="trGeVeCan">
     	<xs:annotation>

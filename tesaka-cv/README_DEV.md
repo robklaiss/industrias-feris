@@ -76,6 +76,9 @@ export SIFEN_MTLS_P12_PASSWORD="password"
 python -m uvicorn web.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
+**Nota**: Para configuración detallada de ambientes (TEST vs PROD), consultar `docs/SIFEN_TEST_VS_PROD.md`.  
+Esta guía explica el uso del wrapper `tools/sifen_run.sh` y los perfiles `config/sifen_test.env` / `config/sifen_prod.env`.
+
 ## Pruebas Locales (Sin Enviar a SIFEN)
 
 ### Smoke Test de Firma y ZIP

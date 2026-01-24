@@ -1,0 +1,349 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Predefined Constants</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="outcontrol.configuration.html" class="navbar__link">« Runtime Configuration</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="outcontrol.output-buffering.html" class="navbar__link">Output Buffering »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.outcontrol.html">Output Control</a></li>
+        <li>Predefined Constants</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="outcontrol.constants" class="appendix">
+ <h1 class="title">Predefined Constants</h1>
+
+ <p class="simpara">
+The constants below are always available as part of the PHP core.
+</p>
+ <dl id="outcontrol.constants.flags-passed-to-handler">
+  <strong class="title">Status flags passed to output handler</strong>
+  <p class="para">
+   The following flags are passed to the second (<code class="parameter">phase</code>) parameter of the output handler set by <span class="function"><a href="function.ob-start.html" class="function">ob_start()</a></span> as part of a bitmask:
+  </p>
+  
+   <dt id="constant.php-output-handler-start">
+    <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-start">PHP_OUTPUT_HANDLER_START</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <p class="para">
+     Indicates that output buffering has begun.
+    </p>
+   </dd>
+  
+  
+   <dt id="constant.php-output-handler-write">
+    <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-write">PHP_OUTPUT_HANDLER_WRITE</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <p class="para">
+     Indicates that the output buffer is being flushed, and had data to output.
+    </p>
+   </dd>
+  
+  
+   <dt id="constant.php-output-handler-flush">
+    <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-flush">PHP_OUTPUT_HANDLER_FLUSH</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <p class="para">
+     Indicates that the buffer has been flushed.
+    </p>
+   </dd>
+  
+  
+   <dt id="constant.php-output-handler-clean">
+    <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-clean">PHP_OUTPUT_HANDLER_CLEAN</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <p class="para">
+     Indicates that the output buffer has been cleaned.
+    </p>
+   </dd>
+  
+  
+   <dt id="constant.php-output-handler-final">
+    <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-final">PHP_OUTPUT_HANDLER_FINAL</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <p class="para">
+     Indicates that this is the final output buffering operation.
+    </p>
+   </dd>
+  
+  
+   <dt id="constant.php-output-handler-cont">
+    <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-cont">PHP_OUTPUT_HANDLER_CONT</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <p class="para">
+     Indicates that the buffer has been flushed, but output buffering will
+     continue.
+    </p>
+    <p class="para">
+     This is an alias for
+     <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-write">PHP_OUTPUT_HANDLER_WRITE</a></code></strong>.
+    </p>
+   </dd>
+  
+  
+   <dt id="constant.php-output-handler-end">
+    <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-end">PHP_OUTPUT_HANDLER_END</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <p class="para">
+     Indicates that output buffering has ended.
+    </p>
+    <p class="para">
+     This is an alias for
+     <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-final">PHP_OUTPUT_HANDLER_FINAL</a></code></strong>.
+    </p>
+   </dd>
+  
+ </dl>
+ <dl id="outcontrol.constants.buffer-control-flags">
+  <strong class="title">Output buffer control flags</strong>
+  <p class="para">
+   The following flags can be passed to the third (<code class="parameter">flags</code>) parameter of the output handler set by <span class="function"><a href="function.ob-start.html" class="function">ob_start()</a></span> as a bitmask:
+  </p>
+  
+   <dt id="constant.php-output-handler-cleanable">
+    <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-cleanable">PHP_OUTPUT_HANDLER_CLEANABLE</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <p class="para">
+     Controls whether an output buffer created by
+     <span class="function"><a href="function.ob-start.html" class="function">ob_start()</a></span> can be cleaned
+     by <span class="function"><a href="function.ob-clean.html" class="function">ob_clean()</a></span>.
+     This flag does not control the behaviour of
+     <span class="function"><a href="function.ob-end-clean.html" class="function">ob_end_clean()</a></span> or <span class="function"><a href="function.ob-get-clean.html" class="function">ob_get_clean()</a></span>.
+    </p>
+   </dd>
+  
+  
+   <dt id="constant.php-output-handler-flushable">
+    <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-flushable">PHP_OUTPUT_HANDLER_FLUSHABLE</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <p class="para">
+     Controls whether an output buffer created by
+     <span class="function"><a href="function.ob-start.html" class="function">ob_start()</a></span> can be flushed
+     by <span class="function"><a href="function.ob-flush.html" class="function">ob_flush()</a></span>.
+     This flag does not control the behaviour of
+     <span class="function"><a href="function.ob-end-flush.html" class="function">ob_end_flush()</a></span> or <span class="function"><a href="function.ob-get-flush.html" class="function">ob_get_flush()</a></span>.
+    </p>
+   </dd>
+  
+  
+   <dt id="constant.php-output-handler-removable">
+    <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-removable">PHP_OUTPUT_HANDLER_REMOVABLE</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <p class="para">
+     Controls whether an output buffer created by
+     <span class="function"><a href="function.ob-start.html" class="function">ob_start()</a></span> can be removed before the end of the script
+     or when calling <span class="function"><a href="function.ob-end-clean.html" class="function">ob_end_clean()</a></span>, <span class="function"><a href="function.ob-end-flush.html" class="function">ob_end_flush()</a></span>,
+     <span class="function"><a href="function.ob-get-clean.html" class="function">ob_get_clean()</a></span> or <span class="function"><a href="function.ob-get-flush.html" class="function">ob_get_flush()</a></span>.
+    </p>
+   </dd>
+  
+  
+   <dt id="constant.php-output-handler-stdflags">
+    <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-stdflags">PHP_OUTPUT_HANDLER_STDFLAGS</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <p class="para">
+     The default set of output buffer flags; currently equivalent to
+     <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-cleanable">PHP_OUTPUT_HANDLER_CLEANABLE</a></code></strong> |
+     <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-flushable">PHP_OUTPUT_HANDLER_FLUSHABLE</a></code></strong> |
+     <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-removable">PHP_OUTPUT_HANDLER_REMOVABLE</a></code></strong>.
+    </p>
+   </dd>
+  
+ </dl>
+ <dl id="outcontrol.constants.flags-returned-by-handler">
+  <strong class="title">Output handler status flags</strong>
+  <p class="para">
+   The following flags are part of the <code class="literal">flags</code> bitmask
+   returned by <span class="function"><a href="function.ob-get-status.html" class="function">ob_get_status()</a></span>:
+  </p>
+  
+   <dt id="constant.php-output-handler-started">
+    <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-started">PHP_OUTPUT_HANDLER_STARTED</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <p class="para">
+     Indicates that the output handler was called.
+    </p>
+   </dd>
+  
+  
+   <dt id="constant.php-output-handler-disabled">
+    <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-disabled">PHP_OUTPUT_HANDLER_DISABLED</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <p class="para">
+     Indicates that the output handler is disabled.
+     This flag is set when the output handler returns <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong>
+     or fails while processing the buffer.
+     Prior to PHP 8.4.0, this flag could be set when starting an output buffer.
+    </p>
+   </dd>
+  
+  
+   <dt id="constant.php-output-handler-processed">
+    <strong><code><a href="outcontrol.constants.html#constant.php-output-handler-processed">PHP_OUTPUT_HANDLER_PROCESSED</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <p class="para">
+     Indicates that the output handler successfully processed the buffer.
+     Available as of PHP 8.4.0.
+    </p>
+   </dd>
+  
+ </dl>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

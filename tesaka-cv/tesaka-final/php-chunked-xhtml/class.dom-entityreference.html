@@ -1,0 +1,263 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>The Dom\EntityReference class</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="class.dom-entity.html" class="navbar__link">« Dom\Entity</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="class.dom-htmlcollection.html" class="navbar__link">Dom\HTMLCollection »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.dom.html">DOM</a></li>
+        <li>The Dom\EntityReference class</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="class.dom-entityreference" class="reference">
+ <h1 class="title">The Dom\EntityReference class</h1>
+ 
+
+ <div class="partintro"><p class="verinfo">(PHP 8 &gt;= 8.4.0)</p>
+
+  <div class="section" id="dom-entityreference.intro">
+   <h2 class="title">Introduction</h2>
+   <p class="simpara">
+    This is the modern, spec-compliant equivalent of
+    <span class="classname"><a href="class.domentityreference.html" class="classname">DOMEntityReference</a></span>.
+   </p>
+  </div>
+
+  <div class="section" id="dom-entityreference.synopsis">
+   <h2 class="title">Class synopsis</h2>
+
+   <div class="classsynopsis"><div class="classsynopsisinfo">
+    
+     <span class="modifier">class</span> <strong class="classname"><strong class="classname">Dom\EntityReference</strong></strong>
+    
+
+    
+     <span class="modifier">extends</span>
+      <a href="class.dom-node.html" class="classname">Dom\Node</a>
+     {</div>
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Inherited constants */</div>
+    <div class="fieldsynopsis">
+     <span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="class.dom-node.html#dom-node.constants.document-position-disconnected"><var class="varname">Dom\Node::DOCUMENT_POSITION_DISCONNECTED</var></a></var><span class="initializer"> = 0x1</span>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="class.dom-node.html#dom-node.constants.document-position-preceding"><var class="varname">Dom\Node::DOCUMENT_POSITION_PRECEDING</var></a></var><span class="initializer"> = 0x2</span>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="class.dom-node.html#dom-node.constants.document-position-following"><var class="varname">Dom\Node::DOCUMENT_POSITION_FOLLOWING</var></a></var><span class="initializer"> = 0x4</span>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="class.dom-node.html#dom-node.constants.document-position-contains"><var class="varname">Dom\Node::DOCUMENT_POSITION_CONTAINS</var></a></var><span class="initializer"> = 0x8</span>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="class.dom-node.html#dom-node.constants.document-position-contained-by"><var class="varname">Dom\Node::DOCUMENT_POSITION_CONTAINED_BY</var></a></var><span class="initializer"> = 0x10</span>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">const</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="fieldsynopsis_varname"><a href="class.dom-node.html#dom-node.constants.document-position-implementation-specific"><var class="varname">Dom\Node::DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC</var></a></var><span class="initializer"> = 0x20</span>;</div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Inherited properties */</div>
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">readonly</span>
+     <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+      <var class="varname"><a href="class.dom-node.html#dom-node.props.nodetype">$<var class="varname">nodeType</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">readonly</span>
+     <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+      <var class="varname"><a href="class.dom-node.html#dom-node.props.nodename">$<var class="varname">nodeName</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">readonly</span>
+     <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+      <var class="varname"><a href="class.dom-node.html#dom-node.props.baseuri">$<var class="varname">baseURI</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">readonly</span>
+     <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span>
+      <var class="varname"><a href="class.dom-node.html#dom-node.props.isconnected">$<var class="varname">isConnected</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">readonly</span>
+     <span class="type">?</span><span class="type"><span class="type"><a href="class.dom-document.html" class="type Dom\Document">Dom\Document</a></span><span class="type"></span></span>
+      <var class="varname"><a href="class.dom-node.html#dom-node.props.ownerdocument">$<var class="varname">ownerDocument</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">readonly</span>
+     <span class="type">?</span><span class="type"><span class="type"><a href="class.dom-node.html" class="type Dom\Node">Dom\Node</a></span><span class="type"></span></span>
+      <var class="varname"><a href="class.dom-node.html#dom-node.props.parentnode">$<var class="varname">parentNode</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">readonly</span>
+     <span class="type">?</span><span class="type"><span class="type"><a href="class.dom-element.html" class="type Dom\Element">Dom\Element</a></span><span class="type"></span></span>
+      <var class="varname"><a href="class.dom-node.html#dom-node.props.parentelement">$<var class="varname">parentElement</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">readonly</span>
+     <span class="type"><a href="class.dom-nodelist.html" class="type Dom\NodeList">Dom\NodeList</a></span>
+      <var class="varname"><a href="class.dom-node.html#dom-node.props.childnodes">$<var class="varname">childNodes</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">readonly</span>
+     <span class="type">?</span><span class="type"><span class="type"><a href="class.dom-node.html" class="type Dom\Node">Dom\Node</a></span><span class="type"></span></span>
+      <var class="varname"><a href="class.dom-node.html#dom-node.props.firstchild">$<var class="varname">firstChild</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">readonly</span>
+     <span class="type">?</span><span class="type"><span class="type"><a href="class.dom-node.html" class="type Dom\Node">Dom\Node</a></span><span class="type"></span></span>
+      <var class="varname"><a href="class.dom-node.html#dom-node.props.lastchild">$<var class="varname">lastChild</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">readonly</span>
+     <span class="type">?</span><span class="type"><span class="type"><a href="class.dom-node.html" class="type Dom\Node">Dom\Node</a></span><span class="type"></span></span>
+      <var class="varname"><a href="class.dom-node.html#dom-node.props.previoussibling">$<var class="varname">previousSibling</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="modifier">readonly</span>
+     <span class="type">?</span><span class="type"><span class="type"><a href="class.dom-node.html" class="type Dom\Node">Dom\Node</a></span><span class="type"></span></span>
+      <var class="varname"><a href="class.dom-node.html#dom-node.props.nextsibling">$<var class="varname">nextSibling</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="type">?</span><span class="type"><span class="type"><a href="language.types.string.html" class="type string">string</a></span><span class="type"></span></span>
+      <var class="varname"><a href="class.dom-node.html#dom-node.props.nodevalue">$<var class="varname">nodeValue</var></a></var>;</div>
+<div class="fieldsynopsis"><span class="modifier">public</span>
+     <span class="type">?</span><span class="type"><span class="type"><a href="language.types.string.html" class="type string">string</a></span><span class="type"></span></span>
+      <var class="varname"><a href="class.dom-node.html#dom-node.props.textcontent">$<var class="varname">textContent</var></a></var>;</div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Inherited methods */</div>
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Not documented yet */</div>
+    
+   }</div>
+  </div>
+
+ </div>
+
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

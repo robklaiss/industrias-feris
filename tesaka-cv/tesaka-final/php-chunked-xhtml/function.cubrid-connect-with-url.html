@@ -1,0 +1,325 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Establish the environment for connecting to CUBRID server</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.cubrid-connect.html" class="navbar__link">« cubrid_connect</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.cubrid-current-oid.html" class="navbar__link">cubrid_current_oid »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ref.cubrid.html">CUBRID Functions</a></li>
+        <li>Establish the environment for connecting to CUBRID server</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="function.cubrid-connect-with-url" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">cubrid_connect_with_url</h1>
+  <p class="verinfo">(PECL CUBRID &gt;= 8.3.1)</p><p class="refpurpose"><span class="refname">cubrid_connect_with_url</span> &mdash; <span class="dc-title">Establish the environment for connecting to CUBRID server</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-function.cubrid-connect-with-url-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="methodname"><strong>cubrid_connect_with_url</strong></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$conn_url</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$userid</code><span class="initializer"> = ?</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$passwd</code><span class="initializer"> = ?</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span> <code class="parameter">$new_link</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong></span></span><br>): <span class="type"><a href="language.types.resource.html" class="type resource">resource</a></span></div>
+
+  <p class="simpara">
+   The <span class="function"><strong>cubrid_connect_with_url()</strong></span> function is used to
+   establish the environment for connecting to your server by using connection
+   information passed with an url string argument. If the HA feature is
+   enabled in CUBRID, you must specify the connection information of the
+   standby server, which is used for failover when failure occurs, in the url
+   string argument of this function. If the user name and password is not
+   given, then the &quot;PUBLIC&quot; connection will be made by default.
+  </p>
+  <p class="simpara">
+   &lt;url&gt; ::= CUBRID:&lt;host&gt;:&lt;db_name&gt;:&lt;db_user&gt;:&lt;db_password&gt;:[?&lt;properties&gt;]
+  </p>
+  <p class="simpara">
+   &lt;properties&gt; ::= &lt;property&gt; [&amp;&lt;property&gt;]
+  </p>
+  <p class="simpara">
+   &lt;properties&gt; ::= alhosts=&lt;alternative_hosts&gt;[ &amp;rctime=&lt;time&gt;]
+  </p>
+  <p class="simpara">
+   &lt;properties&gt; ::= login_timeout=&lt;milli_sec&gt;
+  </p>
+  <p class="simpara">
+   &lt;properties&gt; ::= query_timeout=&lt;milli_sec&gt;
+  </p>
+  <p class="simpara">
+   &lt;properties&gt; ::= disconnect_on_query_timeout=true|false
+  </p>
+  <p class="simpara">
+   &lt;alternative_hosts&gt; ::= &lt;standby_broker1_host&gt;:&lt;port&gt; [,&lt;standby_broker2_host&gt;:&lt;port&gt;]
+  </p>
+  <p class="simpara">
+   &lt;host&gt; := HOSTNAME | IP_ADDR
+  </p>
+  <p class="simpara">
+   &lt;time&gt; := SECOND
+  </p>
+  <p class="simpara">
+   &lt;milli_sec&gt; := MILLI SECOND
+  </p>
+  <ul class="simplelist">
+   <li>host : A host name or IP address of the master database</li>
+   <li>db_name : A name of the database</li>
+   <li>db_user : A name of the database user</li>
+   <li>db_password : A database user password</li>
+   <li>
+    alhosts : Specifies the broker information of the standby server, which is
+    used for failover when it is impossible to connect to the active server.
+    You can specify multiple brokers for failover, and the connection to the brokers
+    is attempted in the order listed in alhosts</li>
+   <li>
+    rctime : An interval between the attempts to connect to the active broker in
+    which failure occurred. After a failure occurs, the system connects to the
+    broker specified by althosts (failover), terminates the transaction, and then
+    attempts to connect to the active broker of the master database at every rctime.
+    The default value is 600 seconds.</li>
+   <li>
+    login_timeout : Timeout value (unit: msec.) for database login. The default
+    value is 0, which means infinite postponement.
+   </li>
+   <li>
+    query_timeout : Timeout value (unit: msec.) for query request. Upon timeout,
+    a message to cancel requesting a query transferred to server is sent. The return
+    value can depend on the disconnect_on_query_timeout configuration; even though the
+    message to cancel a request is sent to server, that request may succeed.
+   </li>
+   <li>
+    disconnect_on_query_timeout : Configures a value whether to immediately return
+    an error of function being executed upon timeout. The default value is false.
+   </li>
+  </ul>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <span class="simpara">
+    <code class="literal">?</code> and <code class="literal">:</code> that are used as identifiers
+    in PHP connection URL can&#039;t be included in the password. The following is
+    an example of a password that is invalid to use as connection URL because it contains
+    &quot;<code class="literal">?:</code>&quot;.
+   </span>
+   <span class="simpara">
+    $url = &quot;CUBRID:localhost:33000:tdb:dba:12?:?login_timeout=100&quot;;
+   </span>
+   <span class="simpara">
+    Passwords that contain <code class="literal">?</code> or <code class="literal">:</code>
+    may be passed as a separate parameter.
+   </span>
+   <span class="simpara">
+    $url = &quot;CUBRID:localhost:33000:tbd:::?login_timeout=100&quot;;
+   </span>
+   <span class="simpara">
+    $conn = cubrid_connect_with_url($url, &quot;dba&quot;, &quot;12?&quot;);
+   </span>
+   <span class="simpara">
+    If user or password is empty,you can&#039;t delete &quot;<code class="literal">:</code>&quot;,the following is
+    an example.
+   </span>
+   <span class="simpara">
+    $url = &quot;CUBRID:localhost:33000:demodb:::&quot;;
+   </span>
+  </p></blockquote>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-function.cubrid-connect-with-url-parameters">
+  <h3 class="title">Parameters</h3>
+  <dl>
+   
+    <dt><code class="parameter">conn_url</code></dt>
+    <dd><span class="simpara">A character string that contains server connection information.</span></dd>
+   
+   
+    <dt><code class="parameter">userid</code></dt>
+    <dd><span class="simpara">User name for the database.</span></dd>
+   
+   
+    <dt><code class="parameter">passwd</code></dt>
+    <dd><span class="simpara">User password.</span></dd>
+   
+   
+    <dt><code class="parameter">new_link</code></dt>
+    <dd><span class="simpara">If a second call is made to
+      <span class="function"><strong>cubrid_connect_with_url()</strong></span> with the same arguments,
+      no new connection will be established, but instead, the connection
+      identifier of the already opened connection will be returned. The
+      <code class="parameter">new_link</code> parameter modifies this behavior and
+      makes <span class="function"><strong>cubrid_connect_with_url()</strong></span> always open a new
+      connection, even if <span class="function"><strong>cubrid_connect_with_url()</strong></span> was
+      called before with the same parameters.</span></dd>
+   
+  </dl>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-function.cubrid-connect-with-url-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="simpara">
+   Connection identifier, when process is successful, or <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong> on failure.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-function.cubrid-connect-with-url-examples">
+  <h3 class="title">Examples</h3>
+  <div class="example" id="example-1">
+   <p><strong>Example #1 <span class="function"><strong>cubrid_connect_with_url()</strong></span> url without properties example</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$conn_url </span><span style="color: #007700">= </span><span style="color: #DD0000">"CUBRID:localhost:33000:demodb:dba::"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$con </span><span style="color: #007700">= </span><span style="color: #0000BB">cubrid_connect_with_url</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn_url</span><span style="color: #007700">);<br /><br />if (</span><span style="color: #0000BB">$con</span><span style="color: #007700">) {<br />   echo </span><span style="color: #DD0000">"connected successfully"</span><span style="color: #007700">;<br />   </span><span style="color: #0000BB">cubrid_execute</span><span style="color: #007700">(</span><span style="color: #0000BB">$con</span><span style="color: #007700">, </span><span style="color: #DD0000">"create table person(id int,name char(16))"</span><span style="color: #007700">);<br />   </span><span style="color: #0000BB">$req </span><span style="color: #007700">=</span><span style="color: #0000BB">cubrid_execute</span><span style="color: #007700">(</span><span style="color: #0000BB">$con</span><span style="color: #007700">, </span><span style="color: #DD0000">"insert into person values(1,'James')"</span><span style="color: #007700">);<br /><br />   if (</span><span style="color: #0000BB">$req</span><span style="color: #007700">) {<br />      </span><span style="color: #0000BB">cubrid_close_request</span><span style="color: #007700">(</span><span style="color: #0000BB">$req</span><span style="color: #007700">);<br />      </span><span style="color: #0000BB">cubrid_commit</span><span style="color: #007700">(</span><span style="color: #0000BB">$con</span><span style="color: #007700">);<br />   } else {<br />      </span><span style="color: #0000BB">cubrid_rollback</span><span style="color: #007700">(</span><span style="color: #0000BB">$con</span><span style="color: #007700">);<br />   }<br />   </span><span style="color: #0000BB">cubrid_disconnect</span><span style="color: #007700">(</span><span style="color: #0000BB">$con</span><span style="color: #007700">);<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+
+  <div class="example" id="example-2">
+   <p><strong>Example #2 <span class="function"><strong>cubrid_connect_with_url()</strong></span> url with properties example</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$conn_url </span><span style="color: #007700">= </span><span style="color: #DD0000">"CUBRID:127.0.0.1:33000:demodb:dba::?login_timeout=100"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$con </span><span style="color: #007700">= </span><span style="color: #0000BB">cubrid_connect_with_url </span><span style="color: #007700">(</span><span style="color: #0000BB">$conn_url</span><span style="color: #007700">);<br /><br />if (</span><span style="color: #0000BB">$con</span><span style="color: #007700">) {<br />   echo </span><span style="color: #DD0000">"connected successfully"</span><span style="color: #007700">;<br />   </span><span style="color: #0000BB">cubrid_execute</span><span style="color: #007700">(</span><span style="color: #0000BB">$con</span><span style="color: #007700">, </span><span style="color: #DD0000">"create table person(id int,name char(16))"</span><span style="color: #007700">);<br />   </span><span style="color: #0000BB">$req </span><span style="color: #007700">=</span><span style="color: #0000BB">cubrid_execute</span><span style="color: #007700">(</span><span style="color: #0000BB">$con</span><span style="color: #007700">, </span><span style="color: #DD0000">"insert into person values(1,'James')"</span><span style="color: #007700">);<br /><br />   if (</span><span style="color: #0000BB">$req</span><span style="color: #007700">) {<br />      </span><span style="color: #0000BB">cubrid_close_request</span><span style="color: #007700">(</span><span style="color: #0000BB">$req</span><span style="color: #007700">);<br />      </span><span style="color: #0000BB">cubrid_commit</span><span style="color: #007700">(</span><span style="color: #0000BB">$con</span><span style="color: #007700">);<br />   } else {<br />      </span><span style="color: #0000BB">cubrid_rollback</span><span style="color: #007700">(</span><span style="color: #0000BB">$con</span><span style="color: #007700">);<br />   }<br />   </span><span style="color: #0000BB">cubrid_disconnect</span><span style="color: #007700">(</span><span style="color: #0000BB">$con</span><span style="color: #007700">);<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-function.cubrid-connect-with-url-seealso">
+  <h3 class="title">See Also</h3>
+  <ul class="simplelist">
+   <li><span class="function"><a href="function.cubrid-connect.html" class="function" rel="rdfs-seeAlso">cubrid_connect()</a> - Open a connection to a CUBRID Server</span></li>
+   <li><span class="function"><a href="function.cubrid-pconnect.html" class="function" rel="rdfs-seeAlso">cubrid_pconnect()</a> - Open a persistent connection to a CUBRID server</span></li>
+   <li><span class="function"><a href="function.cubrid-pconnect-with-url.html" class="function" rel="rdfs-seeAlso">cubrid_pconnect_with_url()</a> - Open a persistent connection to CUBRID server</span></li>
+   <li><span class="function"><a href="function.cubrid-disconnect.html" class="function" rel="rdfs-seeAlso">cubrid_disconnect()</a> - Close a database connection</span></li>
+   <li><span class="function"><a href="function.cubrid-close.html" class="function" rel="rdfs-seeAlso">cubrid_close()</a> - Close CUBRID connection</span></li>
+  </ul>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

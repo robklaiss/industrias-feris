@@ -1,0 +1,313 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Deprecated Features</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="migration73.incompatible.html" class="navbar__link">« Backward Incompatible Changes</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="migration73.other-changes.html" class="navbar__link">Other Changes »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="migration73.html">Migrating from PHP 7.2.x to PHP 7.3.x</a></li>
+        <li>Deprecated Features</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="migration73.deprecated" class="sect1">
+ <h2 class="title">Deprecated Features</h2>
+
+ <div class="sect2" id="migration73.deprecated.core">
+  <h3 class="title">PHP Core</h3>
+
+  <div class="sect3" id="migration73.deprecated.core.ci-constant">
+   <h4 class="title">Case-Insensitive Constants</h4>
+
+   <p class="para">
+    The declaration of case-insensitive constants has been deprecated. Passing
+    <strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong> as the third argument to <span class="function"><a href="function.define.html" class="function">define()</a></span> will now generate a
+    deprecation warning. The use of case-insensitive constants with a case that
+    differs from the declaration is also deprecated.
+   </p>
+  </div>
+
+  <div class="sect3" id="migration73.deprecated.core.assert">
+   <h4 class="title">Namespaced assert()</h4>
+
+   <p class="para">
+    Declaring a function called <code class="literal">assert()</code> inside a namespace is
+    deprecated. The <span class="function"><a href="function.assert.html" class="function">assert()</a></span> function is subject to special
+    handling by the engine, which may lead to inconsistent behavior when defining
+    a namespaced function with the same name.
+   </p>
+  </div>
+
+  <div class="sect3" id="migration73.deprecated.core.string-search">
+   <h4 class="title">Searching Strings for non-string Needle</h4>
+
+   <p class="para">
+    Passing a non-string needle to string search functions is deprecated. In the
+    future the needle will be interpreted as a string instead of an ASCII
+    codepoint. Depending on the intended behavior, you should either explicitly
+    cast the needle to string or perform an explicit call to
+    <span class="function"><a href="function.chr.html" class="function">chr()</a></span>. The following functions are affected:
+    <ul class="itemizedlist">
+     <li class="listitem">
+      <span class="simpara"><span class="function"><a href="function.strpos.html" class="function">strpos()</a></span></span>
+     </li>
+     <li class="listitem">
+      <span class="simpara"><span class="function"><a href="function.strrpos.html" class="function">strrpos()</a></span></span>
+     </li>
+     <li class="listitem">
+      <span class="simpara"><span class="function"><a href="function.stripos.html" class="function">stripos()</a></span></span>
+     </li>
+     <li class="listitem">
+      <span class="simpara"><span class="function"><a href="function.strripos.html" class="function">strripos()</a></span></span>
+     </li>
+     <li class="listitem">
+      <span class="simpara"><span class="function"><a href="function.strstr.html" class="function">strstr()</a></span></span>
+     </li>
+     <li class="listitem">
+      <span class="simpara"><span class="function"><a href="function.strchr.html" class="function">strchr()</a></span></span>
+     </li>
+     <li class="listitem">
+      <span class="simpara"><span class="function"><a href="function.strrchr.html" class="function">strrchr()</a></span></span>
+     </li>
+     <li class="listitem">
+      <span class="simpara"><span class="function"><a href="function.stristr.html" class="function">stristr()</a></span></span>
+     </li>
+    </ul>
+   </p>
+  </div>
+
+  <div class="sect3" id="migration73.deprecated.core.strip-tags-streaming">
+   <h4 class="title">Strip-Tags Streaming</h4>
+
+   <p class="para">
+    The <span class="function"><a href="function.fgetss.html" class="function">fgetss()</a></span> function and the <a href="filters.string.html" class="link">string.strip_tags stream filter</a> have been
+    deprecated. This also affects the
+    <span class="methodname"><a href="splfileobject.fgetss.html" class="methodname">SplFileObject::fgetss()</a></span>
+    method and <span class="function"><a href="function.gzgetss.html" class="function">gzgetss()</a></span> function.
+   </p>
+  </div>
+
+ </div>
+
+ <div class="sect2" id="migration73.deprecated.filter">
+  <h3 class="title">Data Filtering</h3>
+
+  <p class="para">
+   The explicit usage of the constants
+   <strong><code><a href="filter.constants.html#constant.filter-flag-scheme-required">FILTER_FLAG_SCHEME_REQUIRED</a></code></strong> and
+   <strong><code><a href="filter.constants.html#constant.filter-flag-host-required">FILTER_FLAG_HOST_REQUIRED</a></code></strong> is now deprecated; both are
+   implied for <strong><code><a href="filter.constants.html#constant.filter-validate-url">FILTER_VALIDATE_URL</a></code></strong> anyway.
+  </p>
+ </div>
+
+ <div class="sect2" id="migration73.deprecated.image">
+  <h3 class="title">Image Processing and GD</h3>
+
+  <p class="para">
+   <span class="function"><a href="function.image2wbmp.html" class="function">image2wbmp()</a></span> has been deprecated.
+  </p>
+ </div>
+
+ <div class="sect2" id="migration72.deprecated.intl">
+  <h3 class="title">Internationalization Functions</h3>
+
+  <p class="para">
+   Usage of the <strong><code>Normalizer::NONE</code></strong> form throws a deprecation
+   warning, if PHP is linked with ICU ≥ 56.
+  </p>
+ </div>
+
+ <div class="sect2" id="migration73.deprecated.mbstring">
+  <h3 class="title">Multibyte String</h3>
+
+  <p class="para">
+   The following undocumented <code class="literal">mbereg_*()</code> aliases have been
+   deprecated. Use the corresponding <code class="literal">mb_ereg_*()</code> variants
+   instead.
+   <ul class="itemizedlist">
+    <li class="listitem">
+     <span class="simpara"><span class="function"><strong>mbregex_encoding()</strong></span></span> 
+    </li>
+    <li class="listitem">
+     <span class="simpara"><span class="function"><strong>mbereg()</strong></span></span> 
+    </li>
+    <li class="listitem">
+     <span class="simpara"><span class="function"><strong>mberegi()</strong></span></span> 
+    </li>
+    <li class="listitem">
+     <span class="simpara"><span class="function"><strong>mbereg_replace()</strong></span></span> 
+    </li>
+    <li class="listitem">
+     <span class="simpara"><span class="function"><strong>mberegi_replace()</strong></span></span> 
+    </li>
+    <li class="listitem">
+     <span class="simpara"><span class="function"><strong>mbsplit()</strong></span></span> 
+    </li>
+    <li class="listitem">
+     <span class="simpara"><span class="function"><strong>mbereg_match()</strong></span></span> 
+    </li>
+    <li class="listitem">
+     <span class="simpara"><span class="function"><strong>mbereg_search()</strong></span></span> 
+    </li>
+    <li class="listitem">
+     <span class="simpara"><span class="function"><strong>mbereg_search_pos()</strong></span></span> 
+    </li>
+    <li class="listitem">
+     <span class="simpara"><span class="function"><strong>mbereg_search_regs()</strong></span></span> 
+    </li>
+    <li class="listitem">
+     <span class="simpara"><span class="function"><strong>mbereg_search_init()</strong></span></span> 
+    </li>
+    <li class="listitem">
+     <span class="simpara"><span class="function"><strong>mbereg_search_getregs()</strong></span></span> 
+    </li>
+    <li class="listitem">
+     <span class="simpara"><span class="function"><strong>mbereg_search_getpos()</strong></span></span> 
+    </li>
+    <li class="listitem">
+     <span class="simpara"><span class="function"><strong>mbereg_search_setpos()</strong></span></span> 
+    </li>
+   </ul>
+  </p>
+ </div>
+
+ <div class="sect2" id="migration73.deprecated.pdo-odbc">
+  <h3 class="title">ODBC and DB2 Functions (PDO_ODBC)</h3>
+
+  <p class="para">
+   The <a href="ref.pdo-odbc.html#ini.pdo-odbc.db2-instance-name" class="link">pdo_odbc.db2_instance_name</a>
+   ini setting has been formally deprecated. It is deprecated in the
+   documentation as of PHP 5.1.1.
+  </p>
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

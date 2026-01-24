@@ -175,6 +175,7 @@ python -m tools.validate_xsd --schema sirecepde artifacts/sirecepde_ejemplo.xml
 
 ## Referencias
 
+- **Configuración de ambientes**: `docs/SIFEN_TEST_VS_PROD.md` - Guía de TEST vs PROD
 - **Portal oficial**: https://ekuatia.set.gov.py
 - **Prevalidador**: https://ekuatia.set.gov.py/prevalidador/
 - **Índice XSD**: https://ekuatia.set.gov.py/sifen/xsd/

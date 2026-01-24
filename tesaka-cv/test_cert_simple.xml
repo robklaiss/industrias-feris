@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rLoteDE xmlns="http://ekuatia.set.gov.py/sifen/xsd" dVerFor="150">
+  <rDE Id="rDE_test">
+    <dVerFor>150</dVerFor>
+    <DE Id="DE_test">
+      <dEncDE>1</dEncDE>
+      <dVerFor>150</dVerFor>
+      <iTiDE>1</iTiDE>
+      <dNumDoc>123456789</dNumDoc>
+      <dPtoFac>001</dPtoFac>
+      <dSerDoc>001</dSerDoc>
+      <dNumDoc>000000001</dNumDoc>
+      <dFecEmi>2026-01-23</dFecEmi>
+      <dCodSeg>12345678901234567890</dCodSeg>
+    </DE>
+    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+    </Signature>
+  </rDE>
+</rLoteDE>

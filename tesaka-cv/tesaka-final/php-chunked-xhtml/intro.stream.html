@@ -1,0 +1,191 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Introduction</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="book.stream.html" class="navbar__link">« Streams</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="stream.setup.html" class="navbar__link">Installing/Configuring »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.stream.html">Streams</a></li>
+        <li>Introduction</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="intro.stream" class="preface">
+   <h1 class="title">Introduction</h1>
+   <p class="simpara">
+    Streams are
+    the way of generalizing file, network, data compression, and other
+    operations which share a common set of functions and uses.  In
+    its simplest definition, a <code class="literal">stream</code> is a 
+    <span class="type"><a href="language.types.resource.html" class="type resource">resource</a></span> object which exhibits streamable
+    behavior.  That is, it can be read from or written to in a linear 
+    fashion, and may be able to <span class="function"><a href="function.fseek.html" class="function">fseek()</a></span> to an
+    arbitrary location within the stream.
+   </p>
+   <p class="simpara">
+    A <code class="literal">wrapper</code> is additional code which tells the stream how to handle
+    specific protocols/encodings.  For example, the <code class="literal">http</code>
+    wrapper knows how to translate a URL into an <code class="literal">HTTP/1.0</code>
+    request for a file on a remote server.  There are many wrappers
+    built into PHP by default (See <a href="wrappers.html" class="xref">Supported Protocols and Wrappers</a>),
+    and additional, custom wrappers may be added either within a
+    PHP script using <span class="function"><a href="function.stream-wrapper-register.html" class="function">stream_wrapper_register()</a></span>,
+    or directly from an extension.
+    Because any variety of wrapper may be added to PHP, 
+    there is no set limit on what can be done with them.  To access the list
+    of currently registered wrappers, use <span class="function"><a href="function.stream-get-wrappers.html" class="function">stream_get_wrappers()</a></span>.
+   </p>
+   <p class="para">
+    A stream is referenced as: <code class="parameter">scheme</code>://<code class="parameter">target</code>
+    <ul class="itemizedlist">
+     <li class="listitem">
+      <span class="simpara">
+       <code class="parameter">scheme</code> (string) -
+       The name of the wrapper to be used.  Examples include: file, 
+       http, https, ftp, ftps, compress.zlib, compress.bz2, and php.  See 
+       <a href="wrappers.html" class="xref">Supported Protocols and Wrappers</a> for a list of PHP built-in wrappers.  If
+       no wrapper is specified, the function default is used (typically
+       <code class="literal">file</code>://).
+      </span>
+     </li>
+     <li class="listitem">
+      <span class="simpara">
+       <code class="parameter">target</code> - 
+       Depends on the wrapper used.  For filesystem related streams this is
+       typically a path and filename of the desired file.  For network related 
+       streams this is typically a hostname, often with a path appended.  Again, see
+       <a href="wrappers.html" class="xref">Supported Protocols and Wrappers</a> for a description of targets for built-in streams.
+      </span>
+     </li>
+    </ul>
+   </p>
+  </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

@@ -1,0 +1,592 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Rounds an arbitrary precision number</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="bcmath-number.powmod.html" class="navbar__link">« BcMath\Number::powmod</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="bcmath-number.serialize.html" class="navbar__link">BcMath\Number::__serialize »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="class.bcmath-number.html">BcMath\Number</a></li>
+        <li>Rounds an arbitrary precision number</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="bcmath-number.round" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">BcMath\Number::round</h1>
+  <p class="verinfo">(PHP 8 &gt;= 8.4.0)</p><p class="refpurpose"><span class="refname">BcMath\Number::round</span> &mdash; <span class="dc-title">Rounds an arbitrary precision number</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-bcmath-number.round-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><strong>BcMath\Number::round</strong></span>(<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$precision</code><span class="initializer"> = 0</span></span>, <span class="methodparam"><span class="type"><a href="enum.roundingmode.html" class="type RoundingMode">RoundingMode</a></span> <code class="parameter">$mode</code><span class="initializer"> = <strong><code>RoundingMode::HalfAwayFromZero</code></strong></span></span>): <span class="type"><a href="class.bcmath-number.html" class="type BcMath\Number">BcMath\Number</a></span></div>
+
+  <p class="simpara">
+   Returns the rounded value of <var class="varname">$this</var> to
+   specified <code class="parameter">precision</code>
+   (number of digits after the decimal point).
+   <code class="parameter">precision</code> can also be negative or zero (default).
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-bcmath-number.round-parameters">
+  <h3 class="title">Parameters</h3>
+  <dl>
+   
+   
+     <dt><code class="parameter">precision</code></dt>
+     <dd>
+      <p class="para">
+       The optional number of decimal digits to round to.
+      </p>
+      <p class="para">
+       If the <code class="parameter">precision</code> is positive, <code class="parameter">num</code> is
+       rounded to <code class="parameter">precision</code> significant digits after the decimal point.
+      </p>
+      <p class="para">
+       If the <code class="parameter">precision</code> is negative, <code class="parameter">num</code> is
+       rounded to <code class="parameter">precision</code> significant digits before the decimal point,
+       i.e. to the nearest multiple of <code class="code">pow(10, -$precision)</code>, e.g. for a
+       <code class="parameter">precision</code> of -1 <code class="parameter">num</code> is rounded to tens,
+       for a <code class="parameter">precision</code> of -2 to hundreds, etc.
+      </p>
+     </dd>
+    
+   
+    <dt><code class="parameter">mode</code></dt>
+    <dd>
+     <span class="simpara">
+      Specifies the rounding mode. For more information about modes, see <span class="enumname"><a href="enum.roundingmode.html" class="enumname">RoundingMode</a></span>.
+     </span>
+    </dd>
+   
+  </dl>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-bcmath-number.round-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="simpara">
+   Returns the result as a new <span class="classname"><a href="class.bcmath-number.html" class="classname">BcMath\Number</a></span> object.
+  </p>
+ </div>
+
+
+ <div class="refsect1 errors" id="refsect1-bcmath-number.round-errors">
+  <h3 class="title">Errors/Exceptions</h3>
+  <p class="simpara">
+   This method throws a <span class="exceptionname"><a href="class.valueerror.html" class="exceptionname">ValueError</a></span> if an invalid <code class="parameter">mode</code> is specified.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-bcmath-number.round-examples">
+  <h3 class="title">Examples</h3>
+   <div class="example" id="example-1">
+   <p><strong>Example #1 <span class="methodname"><strong>BcMath\Number::round()</strong></span> example</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />var_dump</span><span style="color: #007700">(<br />    new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'3.4'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(),<br />    new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'3.5'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(),<br />    new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'3.6'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(),<br />    new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'3.6'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">),<br />    new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'5.045'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">2</span><span style="color: #007700">),<br />    new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'5.055'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">2</span><span style="color: #007700">),<br />    new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'345'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(-</span><span style="color: #0000BB">2</span><span style="color: #007700">),<br />    new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'345'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(-</span><span style="color: #0000BB">3</span><span style="color: #007700">),<br />    new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'678'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(-</span><span style="color: #0000BB">2</span><span style="color: #007700">),<br />    new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'678'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(-</span><span style="color: #0000BB">3</span><span style="color: #007700">),<br />);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="examplescode"><pre class="examplescode">object(BcMath\Number)#2 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;3&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#3 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;4&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#4 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;4&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#5 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;4&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#6 (2) {
+  [&quot;value&quot;]=&gt;
+  string(4) &quot;5.05&quot;
+  [&quot;scale&quot;]=&gt;
+  int(2)
+}
+object(BcMath\Number)#7 (2) {
+  [&quot;value&quot;]=&gt;
+  string(4) &quot;5.06&quot;
+  [&quot;scale&quot;]=&gt;
+  int(2)
+}
+object(BcMath\Number)#8 (2) {
+  [&quot;value&quot;]=&gt;
+  string(3) &quot;300&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#9 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;0&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#10 (2) {
+  [&quot;value&quot;]=&gt;
+  string(3) &quot;700&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#11 (2) {
+  [&quot;value&quot;]=&gt;
+  string(4) &quot;1000&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}</pre>
+</div>
+   </div>
+  </div>
+  <div class="example" id="example-2">
+   <p><strong>Example #2 
+    Example of using <span class="methodname"><strong>BcMath\Number::round()</strong></span> with different <code class="parameter">precision</code> values
+   </strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$number </span><span style="color: #007700">= new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'123.45'</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">3</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">2</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(-</span><span style="color: #0000BB">1</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(-</span><span style="color: #0000BB">2</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(-</span><span style="color: #0000BB">3</span><span style="color: #007700">),<br />);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="examplescode"><pre class="examplescode">object(BcMath\Number)#2 (2) {
+  [&quot;value&quot;]=&gt;
+  string(7) &quot;123.450&quot;
+  [&quot;scale&quot;]=&gt;
+  int(3)
+}
+object(BcMath\Number)#3 (2) {
+  [&quot;value&quot;]=&gt;
+  string(6) &quot;123.45&quot;
+  [&quot;scale&quot;]=&gt;
+  int(2)
+}
+object(BcMath\Number)#4 (2) {
+  [&quot;value&quot;]=&gt;
+  string(5) &quot;123.5&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+object(BcMath\Number)#5 (2) {
+  [&quot;value&quot;]=&gt;
+  string(3) &quot;123&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#6 (2) {
+  [&quot;value&quot;]=&gt;
+  string(3) &quot;120&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#7 (2) {
+  [&quot;value&quot;]=&gt;
+  string(3) &quot;100&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#8 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;0&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}</pre>
+</div>
+   </div>
+  </div>
+  <div class="example" id="example-3">
+   <p><strong>Example #3 
+    Example of using <span class="methodname"><strong>BcMath\Number::round()</strong></span> with different <code class="parameter">mode</code> values
+   </strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">echo </span><span style="color: #DD0000">'Rounding modes with 9.5' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$number </span><span style="color: #007700">= new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'9.5'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfAwayFromZero</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfTowardsZero</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfEven</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfOdd</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">TowardsZero</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">AwayFromZero</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">NegativeInfinity</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">PositiveInfinity</span><span style="color: #007700">),<br />);<br /><br />echo </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />echo </span><span style="color: #DD0000">'Rounding modes with 8.5' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$number </span><span style="color: #007700">= new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'8.5'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfAwayFromZero</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfTowardsZero</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfEven</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfOdd</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">TowardsZero</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">AwayFromZero</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">NegativeInfinity</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">PositiveInfinity</span><span style="color: #007700">),<br />);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="examplescode"><pre class="examplescode">Rounding modes with 9.5
+object(BcMath\Number)#3 (2) {
+  [&quot;value&quot;]=&gt;
+  string(2) &quot;10&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#5 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;9&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#7 (2) {
+  [&quot;value&quot;]=&gt;
+  string(2) &quot;10&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#9 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;9&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#11 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;9&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#13 (2) {
+  [&quot;value&quot;]=&gt;
+  string(2) &quot;10&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#15 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;9&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#17 (2) {
+  [&quot;value&quot;]=&gt;
+  string(2) &quot;10&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+
+Rounding modes with 8.5
+object(BcMath\Number)#1 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;9&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#15 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;8&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#13 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;8&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#11 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;9&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#9 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;8&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#7 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;9&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#5 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;8&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}
+object(BcMath\Number)#3 (2) {
+  [&quot;value&quot;]=&gt;
+  string(1) &quot;9&quot;
+  [&quot;scale&quot;]=&gt;
+  int(0)
+}</pre>
+</div>
+   </div>
+  </div>
+  <div class="example" id="example-4">
+   <p><strong>Example #4 
+    Example of using <span class="methodname"><strong>BcMath\Number::round()</strong></span> with different <code class="parameter">mode</code> values
+    when specifying <code class="parameter">precision</code>
+   </strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$positive </span><span style="color: #007700">= new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'1.55'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$negative </span><span style="color: #007700">= new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'-1.55'</span><span style="color: #007700">);<br /><br />echo </span><span style="color: #DD0000">'Using RoundingMode::HalfAwayFromZero with 1 decimal digit precision' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(<br />    </span><span style="color: #0000BB">$positive</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfAwayFromZero</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$negative</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfAwayFromZero</span><span style="color: #007700">),<br />);<br /><br />echo </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />echo </span><span style="color: #DD0000">'Using RoundingMode::HalfTowardsZero with 1 decimal digit precision' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(<br />    </span><span style="color: #0000BB">$positive</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfTowardsZero</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$negative</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfTowardsZero</span><span style="color: #007700">),<br />);<br /><br />echo </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />echo </span><span style="color: #DD0000">'Using RoundingMode::HalfEven with 1 decimal digit precision' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(<br />    </span><span style="color: #0000BB">$positive</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfEven</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$negative</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfEven</span><span style="color: #007700">),<br />);<br /><br />echo </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />echo </span><span style="color: #DD0000">'Using RoundingMode::HalfOdd with 1 decimal digit precision' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(<br />    </span><span style="color: #0000BB">$positive</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfOdd</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$negative</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">HalfOdd</span><span style="color: #007700">),<br />);<br /><br />echo </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />echo </span><span style="color: #DD0000">'Using RoundingMode::TowardsZero with 1 decimal digit precision' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(<br />    </span><span style="color: #0000BB">$positive</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">TowardsZero</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$negative</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">TowardsZero</span><span style="color: #007700">),<br />);<br /><br />echo </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />echo </span><span style="color: #DD0000">'Using RoundingMode::AwayFromZero with 1 decimal digit precision' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(<br />    </span><span style="color: #0000BB">$positive</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">AwayFromZero</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$negative</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">AwayFromZero</span><span style="color: #007700">),<br />);<br /><br />echo </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />echo </span><span style="color: #DD0000">'Using RoundingMode::NegativeInfinity with 1 decimal digit precision' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(<br />    </span><span style="color: #0000BB">$positive</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">NegativeInfinity</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$negative</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">NegativeInfinity</span><span style="color: #007700">),<br />);<br /><br />echo </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />echo </span><span style="color: #DD0000">'Using RoundingMode::PositiveInfinity with 1 decimal digit precision' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(<br />    </span><span style="color: #0000BB">$positive</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">PositiveInfinity</span><span style="color: #007700">),<br />    </span><span style="color: #0000BB">$negative</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">RoundingMode</span><span style="color: #007700">::</span><span style="color: #0000BB">PositiveInfinity</span><span style="color: #007700">),<br />);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="examplescode"><pre class="examplescode">Using RoundingMode::HalfAwayFromZero with 1 decimal digit precision
+object(BcMath\Number)#4 (2) {
+  [&quot;value&quot;]=&gt;
+  string(3) &quot;1.6&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+object(BcMath\Number)#5 (2) {
+  [&quot;value&quot;]=&gt;
+  string(4) &quot;-1.6&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+
+Using RoundingMode::HalfTowardsZero with 1 decimal digit precision
+object(BcMath\Number)#4 (2) {
+  [&quot;value&quot;]=&gt;
+  string(3) &quot;1.5&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+object(BcMath\Number)#6 (2) {
+  [&quot;value&quot;]=&gt;
+  string(4) &quot;-1.5&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+
+Using RoundingMode::HalfEven with 1 decimal digit precision
+object(BcMath\Number)#4 (2) {
+  [&quot;value&quot;]=&gt;
+  string(3) &quot;1.6&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+object(BcMath\Number)#7 (2) {
+  [&quot;value&quot;]=&gt;
+  string(4) &quot;-1.6&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+
+Using RoundingMode::HalfOdd with 1 decimal digit precision
+object(BcMath\Number)#4 (2) {
+  [&quot;value&quot;]=&gt;
+  string(3) &quot;1.5&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+object(BcMath\Number)#8 (2) {
+  [&quot;value&quot;]=&gt;
+  string(4) &quot;-1.5&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+
+Using RoundingMode::TowardsZero with 1 decimal digit precision
+object(BcMath\Number)#4 (2) {
+  [&quot;value&quot;]=&gt;
+  string(3) &quot;1.5&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+object(BcMath\Number)#9 (2) {
+  [&quot;value&quot;]=&gt;
+  string(4) &quot;-1.5&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+
+Using RoundingMode::AwayFromZero with 1 decimal digit precision
+object(BcMath\Number)#4 (2) {
+  [&quot;value&quot;]=&gt;
+  string(3) &quot;1.6&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+object(BcMath\Number)#10 (2) {
+  [&quot;value&quot;]=&gt;
+  string(4) &quot;-1.6&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+
+Using RoundingMode::NegativeInfinity with 1 decimal digit precision
+object(BcMath\Number)#4 (2) {
+  [&quot;value&quot;]=&gt;
+  string(3) &quot;1.5&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+object(BcMath\Number)#11 (2) {
+  [&quot;value&quot;]=&gt;
+  string(4) &quot;-1.6&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+
+Using RoundingMode::PositiveInfinity with 1 decimal digit precision
+object(BcMath\Number)#4 (2) {
+  [&quot;value&quot;]=&gt;
+  string(3) &quot;1.6&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}
+object(BcMath\Number)#12 (2) {
+  [&quot;value&quot;]=&gt;
+  string(4) &quot;-1.5&quot;
+  [&quot;scale&quot;]=&gt;
+  int(1)
+}</pre>
+</div>
+   </div>
+  </div>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-bcmath-number.round-seealso">
+  <h3 class="title">See Also</h3>
+  <ul class="simplelist">
+   <li><span class="function"><a href="function.bcround.html" class="function" rel="rdfs-seeAlso">bcround()</a> - Round arbitrary precision number</span></li>
+   <li><span class="methodname"><a href="bcmath-number.ceil.html" class="methodname" rel="rdfs-seeAlso">BcMath\Number::ceil()</a> - Rounds up an arbitrary precision number</span></li>
+   <li><span class="methodname"><a href="bcmath-number.floor.html" class="methodname" rel="rdfs-seeAlso">BcMath\Number::floor()</a> - Rounds down an arbitrary precision number</span></li>
+  </ul>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

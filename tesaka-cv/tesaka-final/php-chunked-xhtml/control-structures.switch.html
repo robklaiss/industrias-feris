@@ -1,0 +1,308 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>switch</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="control-structures.continue.html" class="navbar__link">« continue</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="control-structures.match.html" class="navbar__link">match »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="language.control-structures.html">Control Structures</a></li>
+        <li>switch</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="control-structures.switch" class="sect1">
+ <h2 class="title">switch</h2>
+ <p class="verinfo">(PHP 4, PHP 5, PHP 7, PHP 8)</p>
+ <p class="simpara">
+  The <code class="literal">switch</code> statement is similar to a series of
+  IF statements on the same expression.  In many occasions, you may
+  want to compare the same variable (or expression) with many
+  different values, and execute a different piece of code depending
+  on which value it equals to.  This is exactly what the
+  <code class="literal">switch</code> statement is for.
+ </p>
+ <blockquote class="note"><p><strong class="note">Note</strong>: 
+  <span class="simpara">
+   Note that unlike some other languages, the
+   <a href="control-structures.continue.html" class="link">continue</a> statement
+   applies to <code class="literal">switch</code> and acts similar to <code class="literal">break</code>.  If you
+   have a <code class="literal">switch</code> inside a loop and wish to continue to the next iteration of
+   the outer loop, use <code class="literal">continue 2</code>.
+  </span>
+ </p></blockquote>
+ <blockquote class="note"><p><strong class="note">Note</strong>: 
+  <p class="para">
+   Note that switch/case does
+   <a href="types.comparisons.html#types.comparisions-loose" class="link">loose comparison</a>.
+  </p>
+ </p></blockquote>
+
+ <p class="para">
+  In the following example, each code block is equivalent.
+  One uses a series of <code class="literal">if</code> and
+  <code class="literal">elseif</code> statements, and the other a
+  <code class="literal">switch</code> statement.  In each case, the output is the same.
+  <div class="example" id="example-1">
+   <p><strong>Example #1 <code class="literal">switch</code> structure</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">// This switch statement:<br /><br /></span><span style="color: #007700">switch (</span><span style="color: #0000BB">$i</span><span style="color: #007700">) {<br />    case </span><span style="color: #0000BB">0</span><span style="color: #007700">:<br />        echo </span><span style="color: #DD0000">"i equals 0"</span><span style="color: #007700">;<br />        break;<br />    case </span><span style="color: #0000BB">1</span><span style="color: #007700">:<br />        echo </span><span style="color: #DD0000">"i equals 1"</span><span style="color: #007700">;<br />        break;<br />    case </span><span style="color: #0000BB">2</span><span style="color: #007700">:<br />        echo </span><span style="color: #DD0000">"i equals 2"</span><span style="color: #007700">;<br />        break;<br />}<br /><br /></span><span style="color: #FF8000">// Is equivalent to:<br /><br /></span><span style="color: #007700">if (</span><span style="color: #0000BB">$i </span><span style="color: #007700">== </span><span style="color: #0000BB">0</span><span style="color: #007700">) {<br />    echo </span><span style="color: #DD0000">"i equals 0"</span><span style="color: #007700">;<br />} elseif (</span><span style="color: #0000BB">$i </span><span style="color: #007700">== </span><span style="color: #0000BB">1</span><span style="color: #007700">) {<br />    echo </span><span style="color: #DD0000">"i equals 1"</span><span style="color: #007700">;<br />} elseif (</span><span style="color: #0000BB">$i </span><span style="color: #007700">== </span><span style="color: #0000BB">2</span><span style="color: #007700">) {<br />    echo </span><span style="color: #DD0000">"i equals 2"</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+ <p class="para">
+  It is important to understand how the <code class="literal">switch</code>
+  statement is executed in order to avoid mistakes.  The
+  <code class="literal">switch</code> statement executes line by line
+  (actually, statement by statement).  In the beginning, no code is
+  executed.  Only when a <code class="literal">case</code> statement is found
+  whose expression evaluates to a value that matches the value of the
+  <code class="literal">switch</code> expression does PHP begin to execute the
+  statements.  PHP continues to execute the statements until the end
+  of the <code class="literal">switch</code> block, or the first time it sees
+  a <code class="literal">break</code> statement.  If you don&#039;t write a
+  <code class="literal">break</code> statement at the end of a case&#039;s
+  statement list, PHP will go on executing the statements of the
+  following case.  For example:
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">switch (</span><span style="color: #0000BB">$i</span><span style="color: #007700">) {<br />    case </span><span style="color: #0000BB">0</span><span style="color: #007700">:<br />        echo </span><span style="color: #DD0000">"i equals 0"</span><span style="color: #007700">;<br />    case </span><span style="color: #0000BB">1</span><span style="color: #007700">:<br />        echo </span><span style="color: #DD0000">"i equals 1"</span><span style="color: #007700">;<br />    case </span><span style="color: #0000BB">2</span><span style="color: #007700">:<br />        echo </span><span style="color: #DD0000">"i equals 2"</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+ <p class="simpara">
+  Here, if <var class="varname">$i</var> is equal to 0, PHP would execute all of the echo
+  statements!  If <var class="varname">$i</var> is equal to 1, PHP would execute the last two
+  echo statements. You would get the expected behavior (&#039;i equals 2&#039;
+  would be displayed) only if <var class="varname">$i</var> is equal to 2.  Thus,
+  it is important not to forget <code class="literal">break</code> statements
+  (even though you may want to avoid supplying them on purpose under
+  certain circumstances).
+ </p>
+ <p class="simpara">
+  In a <code class="literal">switch</code> statement, the condition is
+  evaluated only once and the result is compared to each
+  <code class="literal">case</code> statement. In an <code class="literal">elseif</code>
+  statement, the condition is evaluated again. If your condition is
+  more complicated than a simple compare and/or is in a tight loop,
+  a <code class="literal">switch</code> may be faster.
+ </p>
+ <p class="para">
+  The statement list for a case can also be empty, which simply
+  passes control into the statement list for the next case.
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">switch (</span><span style="color: #0000BB">$i</span><span style="color: #007700">) {<br />    case </span><span style="color: #0000BB">0</span><span style="color: #007700">:<br />    case </span><span style="color: #0000BB">1</span><span style="color: #007700">:<br />    case </span><span style="color: #0000BB">2</span><span style="color: #007700">:<br />        echo </span><span style="color: #DD0000">"i is less than 3 but not negative"</span><span style="color: #007700">;<br />        break;<br />    case </span><span style="color: #0000BB">3</span><span style="color: #007700">:<br />        echo </span><span style="color: #DD0000">"i is 3"</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+ <p class="para">
+  A special case is the <code class="literal">default</code> case.  This case matches
+  anything that wasn&#039;t matched by the other cases.  For example:
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">switch (</span><span style="color: #0000BB">$i</span><span style="color: #007700">) {<br />    case </span><span style="color: #0000BB">0</span><span style="color: #007700">:<br />        echo </span><span style="color: #DD0000">"i equals 0"</span><span style="color: #007700">;<br />        break;<br />    case </span><span style="color: #0000BB">1</span><span style="color: #007700">:<br />        echo </span><span style="color: #DD0000">"i equals 1"</span><span style="color: #007700">;<br />        break;<br />    case </span><span style="color: #0000BB">2</span><span style="color: #007700">:<br />        echo </span><span style="color: #DD0000">"i equals 2"</span><span style="color: #007700">;<br />        break;<br />    default:<br />       echo </span><span style="color: #DD0000">"i is not equal to 0, 1 or 2"</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <span class="simpara">
+    Multiple default cases will raise a
+    <strong><code><a href="errorfunc.constants.html#constant.e-compile-error">E_COMPILE_ERROR</a></code></strong> error.
+   </span>
+  </p></blockquote>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <span class="simpara">
+    Technically the <code class="literal">default</code> case may be listed
+    in any order. It will only be used if no other case matches.
+    However, by convention it is best to place it at the end as the
+    last branch.
+   </span>
+  </p></blockquote>
+ </p>
+ <p class="para">
+  If no <code class="literal">case</code> branch matches, and there is no <code class="literal">default</code>
+  branch, then no code will be executed, just as if no <code class="literal">if</code> statement was true.
+ </p>
+ <p class="para">
+  A case value may be given as an expression. However, that expression will be
+  evaluated on its own and then loosely compared with the switch value. That means
+  it cannot be used for complex evaluations of the switch value.  For example:
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$target </span><span style="color: #007700">= </span><span style="color: #0000BB">1</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$start </span><span style="color: #007700">= </span><span style="color: #0000BB">3</span><span style="color: #007700">;<br /><br />switch (</span><span style="color: #0000BB">$target</span><span style="color: #007700">) {<br />    case </span><span style="color: #0000BB">$start </span><span style="color: #007700">- </span><span style="color: #0000BB">1</span><span style="color: #007700">:<br />        print </span><span style="color: #DD0000">"A"</span><span style="color: #007700">;<br />        break;<br />    case </span><span style="color: #0000BB">$start </span><span style="color: #007700">- </span><span style="color: #0000BB">2</span><span style="color: #007700">:<br />        print </span><span style="color: #DD0000">"B"</span><span style="color: #007700">;<br />        break;<br />    case </span><span style="color: #0000BB">$start </span><span style="color: #007700">- </span><span style="color: #0000BB">3</span><span style="color: #007700">:<br />        print </span><span style="color: #DD0000">"C"</span><span style="color: #007700">;<br />        break;<br />    case </span><span style="color: #0000BB">$start </span><span style="color: #007700">- </span><span style="color: #0000BB">4</span><span style="color: #007700">:<br />        print </span><span style="color: #DD0000">"D"</span><span style="color: #007700">;<br />        break;<br />}<br /><br /></span><span style="color: #FF8000">// Prints "B"<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+ <p class="para">
+  For more complex comparisons, the value <strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong> may be used as the switch value.
+  Or, alternatively, <code class="literal">if</code>-<code class="literal">else</code> blocks instead of <code class="literal">switch</code>.
+  <div class="informalexample">
+   <div class="example-contents">
+    <div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$offset </span><span style="color: #007700">= </span><span style="color: #0000BB">1</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$start </span><span style="color: #007700">= </span><span style="color: #0000BB">3</span><span style="color: #007700">;<br /><br />switch (</span><span style="color: #0000BB">true</span><span style="color: #007700">) {<br />    case </span><span style="color: #0000BB">$start </span><span style="color: #007700">- </span><span style="color: #0000BB">$offset </span><span style="color: #007700">=== </span><span style="color: #0000BB">1</span><span style="color: #007700">:<br />        print </span><span style="color: #DD0000">"A"</span><span style="color: #007700">;<br />        break;<br />    case </span><span style="color: #0000BB">$start </span><span style="color: #007700">- </span><span style="color: #0000BB">$offset </span><span style="color: #007700">=== </span><span style="color: #0000BB">2</span><span style="color: #007700">:<br />        print </span><span style="color: #DD0000">"B"</span><span style="color: #007700">;<br />        break;<br />    case </span><span style="color: #0000BB">$start </span><span style="color: #007700">- </span><span style="color: #0000BB">$offset </span><span style="color: #007700">=== </span><span style="color: #0000BB">3</span><span style="color: #007700">:<br />        print </span><span style="color: #DD0000">"C"</span><span style="color: #007700">;<br />        break;<br />    case </span><span style="color: #0000BB">$start </span><span style="color: #007700">- </span><span style="color: #0000BB">$offset </span><span style="color: #007700">=== </span><span style="color: #0000BB">4</span><span style="color: #007700">:<br />        print </span><span style="color: #DD0000">"D"</span><span style="color: #007700">;<br />        break;<br />}<br /><br /></span><span style="color: #FF8000">// Prints "B"<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+ <p class="para">
+  The alternative syntax for control structures is supported with
+  switches. For more information, see <a href="control-structures.alternative-syntax.html" class="link">Alternative syntax
+  for control structures</a>.
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">switch (</span><span style="color: #0000BB">$i</span><span style="color: #007700">):<br />    case </span><span style="color: #0000BB">0</span><span style="color: #007700">:<br />        echo </span><span style="color: #DD0000">"i equals 0"</span><span style="color: #007700">;<br />        break;<br />    case </span><span style="color: #0000BB">1</span><span style="color: #007700">:<br />        echo </span><span style="color: #DD0000">"i equals 1"</span><span style="color: #007700">;<br />        break;<br />    case </span><span style="color: #0000BB">2</span><span style="color: #007700">:<br />        echo </span><span style="color: #DD0000">"i equals 2"</span><span style="color: #007700">;<br />        break;<br />    default:<br />        echo </span><span style="color: #DD0000">"i is not equal to 0, 1 or 2"</span><span style="color: #007700">;<br />endswitch;<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+ <p class="para">
+  It&#039;s possible to use a semicolon instead of a colon after a case like:
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">switch(</span><span style="color: #0000BB">$beer</span><span style="color: #007700">)<br />{<br />    case </span><span style="color: #DD0000">'tuborg'</span><span style="color: #007700">;<br />    case </span><span style="color: #DD0000">'carlsberg'</span><span style="color: #007700">;<br />    case </span><span style="color: #DD0000">'stella'</span><span style="color: #007700">;<br />    case </span><span style="color: #DD0000">'heineken'</span><span style="color: #007700">;<br />        echo </span><span style="color: #DD0000">'Good choice'</span><span style="color: #007700">;<br />        break;<br />    default;<br />        echo </span><span style="color: #DD0000">'Please make a new selection...'</span><span style="color: #007700">;<br />        break;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+
+ <div class="sect2">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li><a href="control-structures.match.html" class="link">match</a></li>
+   </ul>
+  </p>
+ </div>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

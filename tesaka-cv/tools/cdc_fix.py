@@ -6,9 +6,12 @@ Funciones para calcular CDC desde XML y corregir DE@Id.
 
 from lxml import etree
 import re
+import base64
+import zipfile
+import io
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Tuple
 
 # Importar función de cálculo de DV
 import sys
@@ -43,6 +46,101 @@ def extract_digits(value: Optional[str], width: Optional[int] = None) -> str:
     return digits
 
 
+def _find_first_text_by_localname(root: ET.Element, name: str) -> Optional[str]:
+    """Busca el primer elemento por localname y retorna su texto (puede ser vacío)."""
+    for el in root.iter():
+        if local(el.tag) == name:
+            return (el.text or "").strip()
+    return None
+
+
+def normalize_xml_for_de_context(xml_bytes: bytes) -> bytes:
+    """
+    Normaliza el XML de entrada para que el resto del pipeline siempre opere
+    sobre un XML que contenga `<DE>`.
+
+    Soporta:
+    - XML directo `<DE>`.
+    - Lote `<rLoteDE>` que contiene `<DE>`.
+    - SOAP async que contiene `<xDE>` con ZIP(base64) que incluye `lote.xml`.
+    """
+    # Nota: no llamar recursivamente; esta funcion es el normalizador raiz.
+    try:
+        root = ET.fromstring(xml_bytes)
+    except ET.ParseError:
+        return xml_bytes
+
+    # Si ya contiene <DE>, no tocar
+    for el in root.iter():
+        if local(el.tag) == "DE":
+            return xml_bytes
+
+    # Intentar extraer xDE (ZIP base64) desde SOAP
+    xde_b64 = _find_first_text_by_localname(root, "xDE")
+    if not xde_b64:
+        return xml_bytes
+
+    try:
+        zip_bytes = base64.b64decode(xde_b64)
+    except Exception:
+        return xml_bytes
+
+    try:
+        with zipfile.ZipFile(io.BytesIO(zip_bytes), "r") as z:
+            names = z.namelist()
+            target = None
+            for n in names:
+                if n.lower().endswith("lote.xml"):
+                    target = n
+                    break
+            if target is None:
+                for n in names:
+                    if n.lower().endswith(".xml"):
+                        target = n
+                        break
+            if target is None:
+                return xml_bytes
+            return z.read(target)
+    except Exception:
+        return xml_bytes
+
+
+def extract_ruc_dv_from_any_xml(xml_bytes: bytes) -> Tuple[Optional[str], Optional[str]]:
+    """Extrae (dRucEm, dDVEmi) desde DE/lote o desde SOAP async (xDE)."""
+    normalized = normalize_xml_for_de_context(xml_bytes)
+    try:
+        root = ET.fromstring(normalized)
+    except ET.ParseError:
+        return (None, None)
+
+    # Buscar primer <DE>
+    de = None
+    if local(root.tag) == "DE":
+        de = root
+    else:
+        for el in root.iter():
+            if local(el.tag) == "DE":
+                de = el
+                break
+
+    if de is None:
+        return (None, None)
+
+    ruc = find_text_by_localname(de, "dRucEm")
+    dv = find_text_by_localname(de, "dDVEmi")
+    return (ruc, dv)
+
+
+def assert_ruc_dv_present(xml_bytes: bytes) -> None:
+    """Valida que el payload contenga dRucEm y dDVEmi (no vacíos)."""
+    ruc, dv = extract_ruc_dv_from_any_xml(xml_bytes)
+    if not ruc or not dv:
+        raise ValueError(
+            "Faltan campos obligatorios del emisor: dRucEm y/o dDVEmi. "
+            "Asegurar que el pipeline está construyendo el <DE> correctamente (o que el SOAP xDE incluye lote.xml válido)."
+        )
+
+
 def compute_cdc_from_xml(xml_bytes: bytes) -> str:
     """
     Calcula el CDC desde los campos del XML.
@@ -65,6 +163,7 @@ def compute_cdc_from_xml(xml_bytes: bytes) -> str:
     Raises:
         ValueError: Si falta algún campo requerido
     """
+    xml_bytes = normalize_xml_for_de_context(xml_bytes)
     try:
         root = ET.fromstring(xml_bytes)
     except ET.ParseError as e:
@@ -82,6 +181,9 @@ def compute_cdc_from_xml(xml_bytes: bytes) -> str:
     
     if de is None:
         raise ValueError("No se encontró elemento <DE> en el XML")
+
+    # Candado: RUC y DV del emisor deben existir siempre
+    assert_ruc_dv_present(xml_bytes)
     
     # Extraer campos según estructura CDC SIFEN
     # Estructura: tipde2 + ruc8 + dv1 + est3 + pun3 + num7 + tipcont1 + fec8 + tipemi1 + codseg1

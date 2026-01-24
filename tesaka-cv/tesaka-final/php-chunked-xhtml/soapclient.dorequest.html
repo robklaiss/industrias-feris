@@ -1,0 +1,278 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Performs a SOAP request</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="soapclient.construct.html" class="navbar__link">« SoapClient::__construct</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="soapclient.getcookies.html" class="navbar__link">SoapClient::__getCookies »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="class.soapclient.html">SoapClient</a></li>
+        <li>Performs a SOAP request</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="soapclient.dorequest" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">SoapClient::__doRequest</h1>
+  <p class="verinfo">(PHP 5, PHP 7, PHP 8)</p><p class="refpurpose"><span class="refname">SoapClient::__doRequest</span> &mdash; <span class="dc-title">Performs a SOAP request</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-soapclient.dorequest-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><strong>SoapClient::__doRequest</strong></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$request</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$location</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$action</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$version</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span> <code class="parameter">$oneWay</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong></span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.string.html" class="type string">string</a></span></span> <code class="parameter">$uriParserClass</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span><br>): <span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.string.html" class="type string">string</a></span></span></div>
+
+  <p class="para rdfs-comment">
+   Performs SOAP request over HTTP.
+  </p>
+  <p class="para">
+   This method can be overridden in subclasses to implement different transport
+   layers, perform additional XML processing or other purpose.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-soapclient.dorequest-parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+    
+     <dt><code class="parameter">request</code></dt>
+     <dd>
+      <p class="para">
+       The XML SOAP request.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">location</code></dt>
+     <dd>
+      <p class="para">
+       The URL to request.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">action</code></dt>
+     <dd>
+      <p class="para">
+       The SOAP action.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">version</code></dt>
+     <dd>
+      <p class="para">
+       The SOAP version.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">oneWay</code></dt>
+     <dd>
+      <p class="para">
+       If <code class="parameter">oneWay</code> is set to <strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong>, this method returns nothing.
+       Use this where a response is not expected.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">uriParserClass</code></dt>
+     <dd>
+      <span class="simpara">
+       The classname to use for parsing the redirection URI when a <code class="literal">&quot;Location&quot;</code> header is received in the response,
+       or <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong> to use the default, <span class="function"><a href="function.parse-url.html" class="function">parse_url()</a></span> based parsing.
+      </span>
+     </dd>
+    
+   </dl>
+  </p>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-soapclient.dorequest-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   The XML SOAP response.
+  </p>
+ </div>
+
+
+ <div class="refsect1 changelog" id="refsect1-soapclient.dorequest-changelog">
+  <h3 class="title">Changelog</h3>
+  <table class="doctable informaltable">
+   
+    <thead>
+     <tr>
+      <th>Version</th>
+      <th>Description</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+      <td>8.5.0</td>
+      <td>
+       The optional parameter <code class="parameter">uriParserClass</code> has been added.
+      </td>
+     </tr>
+
+     <tr>
+      <td>8.0.0</td>
+      <td>
+       The type of <code class="parameter">oneWay</code> is <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span> now; formerly it was <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>.
+      </td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-soapclient.dorequest-examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   <div class="example" id="example-1">
+    <p><strong>Example #1 <span class="function"><strong>SoapClient::__doRequest()</strong></span> example</strong></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #007700">function </span><span style="color: #0000BB">Add</span><span style="color: #007700">(</span><span style="color: #0000BB">$x</span><span style="color: #007700">, </span><span style="color: #0000BB">$y</span><span style="color: #007700">)<br />{<br />    return </span><span style="color: #0000BB">$x </span><span style="color: #007700">+ </span><span style="color: #0000BB">$y</span><span style="color: #007700">;<br />}<br /><br />class </span><span style="color: #0000BB">LocalSoapClient </span><span style="color: #007700">extends </span><span style="color: #0000BB">SoapClient<br /></span><span style="color: #007700">{<br />    private </span><span style="color: #0000BB">$server</span><span style="color: #007700">;<br /><br />    public function </span><span style="color: #0000BB">__construct</span><span style="color: #007700">(</span><span style="color: #0000BB">$wsdl</span><span style="color: #007700">, </span><span style="color: #0000BB">$options</span><span style="color: #007700">)<br />    {<br />        </span><span style="color: #0000BB">parent</span><span style="color: #007700">::</span><span style="color: #0000BB">__construct</span><span style="color: #007700">(</span><span style="color: #0000BB">$wsdl</span><span style="color: #007700">, </span><span style="color: #0000BB">$options</span><span style="color: #007700">);<br />        </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">server </span><span style="color: #007700">= new </span><span style="color: #0000BB">SoapServer</span><span style="color: #007700">(</span><span style="color: #0000BB">$wsdl</span><span style="color: #007700">, </span><span style="color: #0000BB">$options</span><span style="color: #007700">);<br />        </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">server</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">addFunction</span><span style="color: #007700">(</span><span style="color: #DD0000">'Add'</span><span style="color: #007700">);<br />    }<br /><br />    public function </span><span style="color: #0000BB">__doRequest</span><span style="color: #007700">(<br />        </span><span style="color: #0000BB">$request</span><span style="color: #007700">,<br />        </span><span style="color: #0000BB">$location</span><span style="color: #007700">,<br />        </span><span style="color: #0000BB">$action</span><span style="color: #007700">,<br />        </span><span style="color: #0000BB">$version</span><span style="color: #007700">,<br />        </span><span style="color: #0000BB">$one_way </span><span style="color: #007700">= </span><span style="color: #0000BB">false</span><span style="color: #007700">,<br />    ): ?</span><span style="color: #0000BB">string </span><span style="color: #007700">{<br />        </span><span style="color: #0000BB">ob_start</span><span style="color: #007700">();<br />        </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">server</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">handle</span><span style="color: #007700">(</span><span style="color: #0000BB">$request</span><span style="color: #007700">);<br />        </span><span style="color: #0000BB">$response </span><span style="color: #007700">= </span><span style="color: #0000BB">ob_get_contents</span><span style="color: #007700">();<br />        </span><span style="color: #0000BB">ob_end_clean</span><span style="color: #007700">();<br /><br />        return </span><span style="color: #0000BB">$response</span><span style="color: #007700">;<br />    }<br />}<br /><br /></span><span style="color: #0000BB">$x </span><span style="color: #007700">= new </span><span style="color: #0000BB">LocalSoapClient</span><span style="color: #007700">(<br />    </span><span style="color: #0000BB">null</span><span style="color: #007700">,<br />    [<br />        </span><span style="color: #DD0000">'location' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'test://'</span><span style="color: #007700">,<br />        </span><span style="color: #DD0000">'uri' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'http://testuri.org'</span><span style="color: #007700">,<br />    ]<br />);<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$x</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Add</span><span style="color: #007700">(</span><span style="color: #0000BB">3</span><span style="color: #007700">, </span><span style="color: #0000BB">4</span><span style="color: #007700">));<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+   </div>
+  </p>
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

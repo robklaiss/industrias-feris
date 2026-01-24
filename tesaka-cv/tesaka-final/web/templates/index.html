@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Documentos - TESAKA-SIFEN{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Lista de Documentos</h2>
+    <a href="/de/new" class="btn-primary">+ Nueva Factura</a>
+</div>
+
+{% if documents %}
+<table class="documents-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>CDC</th>
+            <th>Timbrado</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for doc in documents %}
+        <tr>
+            <td><a href="/de/{{ doc.id }}" class="link-id">{{ doc.id }}</a></td>
+            <td><a href="/de/{{ doc.id }}" class="link-cdc">{{ doc.cdc or 'N/A' }}</a></td>
+            <td>{{ doc.timbrado or 'N/A' }}</td>
+            <td>{{ doc.created_at if doc.created_at else 'N/A' }}</td>
+            <td>
+                <span class="status-badge status-{{ doc.last_status|lower|replace('_', '-') if doc.last_status else 'unknown' }}">
+                    {% if doc.last_status == 'signed_local' %}
+                        Firmado Local
+                    {% elif doc.last_status == 'sent_to_sifen' or doc.last_status == 'pending_sifen' %}
+                        Enviado a SIFEN
+                    {% elif doc.last_status == 'approved' %}
+                        Aprobado
+                    {% elif doc.last_status == 'rejected' %}
+                        Rechazado
+                    {% elif doc.last_status == 'error' %}
+                        Error
+                    {% else %}
+                        {{ doc.last_status or 'N/A' }}
+                    {% endif %}
+                </span>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="no-data">No hay documentos disponibles. <a href="/de/new">Crear uno nuevo</a></p>
+{% endif %}
+{% endblock %}
+

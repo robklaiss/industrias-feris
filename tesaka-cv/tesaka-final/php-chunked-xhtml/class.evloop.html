@@ -1,0 +1,742 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>The EvLoop class</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="evio.set.html" class="navbar__link">« EvIo::set</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="evloop.backend.html" class="navbar__link">EvLoop::backend »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.ev.html">Ev</a></li>
+        <li>The EvLoop class</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="class.evloop" class="reference">
+ <h1 class="title">The EvLoop class</h1>
+ 
+ <div class="partintro"><p class="verinfo">(PECL ev &gt;= 0.2.0)</p>
+
+  <div class="section" id="evloop.intro">
+   <h2 class="title">Introduction</h2>
+   <p class="simpara">
+    Represents an event loop that is always distinct from the
+    <em>default
+    loop</em>.
+    Unlike the
+    <em>default loop</em>,
+    it cannot handle
+    <span class="classname"><a href="class.evchild.html" class="classname">EvChild</a></span>
+    watchers.
+   </p>
+   <p class="simpara">
+    Having threads we have to create a loop per thread, and use the
+    <em>default loop</em>
+    in the parent thread.
+   </p>
+   <p class="simpara">
+    The
+    <em>default event loop</em>
+    is initialized automatically by
+    <em>Ev</em>.
+    It is accessible via methods of the
+    <span class="classname"><a href="class.ev.html" class="classname">Ev</a></span>
+    class, or via
+    <span class="methodname"><a href="evloop.defaultloop.html" class="methodname">EvLoop::defaultLoop()</a></span>
+    method.
+   </p>
+  </div>
+
+  <div class="section" id="evloop.synopsis">
+   <h2 class="title">Class synopsis</h2>
+
+
+   <div class="classsynopsis">
+    <span class="ooclass">
+     <strong class="classname"></strong>
+    </span>
+
+    <div class="classsynopsisinfo">
+     <span class="ooclass">
+      <span class="modifier">final</span>
+      <span class="modifier">class</span> <strong class="classname">EvLoop</strong>
+     </span>
+     {</div>
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Properties */</div>
+    <div class="fieldsynopsis">
+     <span class="modifier">public</span>
+      <var class="varname"><a href="class.evloop.html#evloop.props.data">$<var class="varname">data</var></a></var>;</div>
+
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+      <var class="varname"><a href="class.evloop.html#evloop.props.backend">$<var class="varname">backend</var></a></var>;</div>
+
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+      <var class="varname"><a href="class.evloop.html#evloop.props.is-default-loop">$<var class="varname">is_default_loop</var></a></var>;</div>
+
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+      <var class="varname"><a href="class.evloop.html#evloop.props.iteration">$<var class="varname">iteration</var></a></var>;</div>
+
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+      <var class="varname"><a href="class.evloop.html#evloop.props.pending">$<var class="varname">pending</var></a></var>;</div>
+
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+      <var class="varname"><a href="class.evloop.html#evloop.props.io-interval">$<var class="varname">io_interval</var></a></var>;</div>
+
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+      <var class="varname"><a href="class.evloop.html#evloop.props.timeout-interval">$<var class="varname">timeout_interval</var></a></var>;</div>
+
+    <div class="fieldsynopsis"><span class="modifier">public</span>
+      <var class="varname"><a href="class.evloop.html#evloop.props.depth">$<var class="varname">depth</var></a></var>;</div>
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Methods */</div>
+    <div class="constructorsynopsis dc-description">
+   <span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.construct.html" class="methodname">__construct</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$flags</code>
+   <span class="initializer"> = ?</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$data</code>
+    <span class="initializer"> = NULL</span>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.float.html" class="type float">float</a></span> <code class="parameter">$io_interval</code>
+    <span class="initializer"> = 0.0</span>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.float.html" class="type float">float</a></span> <code class="parameter">$timeout_interval</code>
+    <span class="initializer"> = 0.0</span>
+   </span><br>)</div>
+
+    <div class="methodsynopsis dc-description"><span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.backend.html" class="methodname">backend</a></span>(): <span class="type"><a href="language.types.integer.html" class="type int">int</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span>
+   <span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.check.html" class="methodname">check</a></span>(<span class="methodparam">
+    
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$callback</code>
+   </span>, <span class="methodparam">
+    
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$data</code>
+   <span class="initializer"> = ?</span></span>, <span class="methodparam">
+    
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$priority</code>
+   <span class="initializer"> = ?</span></span>): <span class="type"><a href="class.evcheck.html" class="type EvCheck">EvCheck</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span>
+   <span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.child.html" class="methodname">child</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$pid</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$trace</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$callback</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$data</code>
+   <span class="initializer"> = ?</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$priority</code>
+   <span class="initializer"> = ?</span></span><br>): <span class="type"><a href="class.evchild.html" class="type EvChild">EvChild</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span>
+   <span class="modifier">static</span>
+   <span class="methodname"><a href="evloop.defaultloop.html" class="methodname">defaultLoop</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$flags</code>
+    <span class="initializer"> = Ev::FLAG_AUTO</span>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$data</code>
+    <span class="initializer"> = NULL</span>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.float.html" class="type float">float</a></span> <code class="parameter">$io_interval</code>
+    <span class="initializer"> = 0.</span>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.float.html" class="type float">float</a></span> <code class="parameter">$timeout_interval</code>
+    <span class="initializer"> = 0.</span>
+   </span><br>): <span class="type"><a href="class.evloop.html" class="type EvLoop">EvLoop</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span>
+   <span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.embed.html" class="methodname">embed</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$other</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$callback</code>
+   <span class="initializer"> = ?</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$data</code>
+   <span class="initializer"> = ?</span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$priority</code>
+   <span class="initializer"> = ?</span></span><br>): <span class="type"><a href="class.evembed.html" class="type EvEmbed">EvEmbed</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span>
+   <span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.fork.html" class="methodname">fork</a></span>(<span class="methodparam">
+    
+    <span class="type"><a href="language.types.callable.html" class="type callable">callable</a></span> <code class="parameter">$callback</code>
+   </span>, <span class="methodparam">
+    
+    <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$data</code>
+    <span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span>
+   </span>, <span class="methodparam">
+    
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$priority</code>
+    <span class="initializer"> = 0</span>
+   </span>): <span class="type"><a href="class.evfork.html" class="type EvFork">EvFork</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span>
+   <span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.idle.html" class="methodname">idle</a></span>(<span class="methodparam">
+    
+    <span class="type"><a href="language.types.callable.html" class="type callable">callable</a></span> <code class="parameter">$callback</code>
+   </span>, <span class="methodparam">
+    
+    <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$data</code>
+    <span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span>
+   </span>, <span class="methodparam">
+    
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$priority</code>
+    <span class="initializer"> = 0</span>
+   </span>): <span class="type"><a href="class.evidle.html" class="type EvIdle">EvIdle</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.invokepending.html" class="methodname">invokePending</a></span>(): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span>
+   <span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.io.html" class="methodname">io</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$fd</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$events</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.callable.html" class="type callable">callable</a></span> <code class="parameter">$callback</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$data</code>
+    <span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$priority</code>
+    <span class="initializer"> = 0</span>
+   </span><br>): <span class="type"><a href="class.evio.html" class="type EvIo">EvIo</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.loopfork.html" class="methodname">loopFork</a></span>(): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.now.html" class="methodname">now</a></span>(): <span class="type"><a href="language.types.float.html" class="type float">float</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.nowupdate.html" class="methodname">nowUpdate</a></span>(): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span>
+   <span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.periodic.html" class="methodname">periodic</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.float.html" class="type float">float</a></span> <code class="parameter">$offset</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.float.html" class="type float">float</a></span> <code class="parameter">$interval</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.callable.html" class="type callable">callable</a></span> <code class="parameter">$callback</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$data</code>
+    <span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$priority</code>
+    <span class="initializer"> = 0</span>
+   </span><br>): <span class="type"><a href="class.evperiodic.html" class="type EvPeriodic">EvPeriodic</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span>
+   <span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.prepare.html" class="methodname">prepare</a></span>(<span class="methodparam">
+    
+    <span class="type"><a href="language.types.callable.html" class="type callable">callable</a></span> <code class="parameter">$callback</code>
+   </span>, <span class="methodparam">
+    
+    <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$data</code>
+    <span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span>
+   </span>, <span class="methodparam">
+    
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$priority</code>
+    <span class="initializer"> = 0</span>
+   </span>): <span class="type"><a href="class.evprepare.html" class="type EvPrepare">EvPrepare</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.resume.html" class="methodname">resume</a></span>(): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.run.html" class="methodname">run</a></span>(<span class="methodparam">
+    
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$flags</code>
+    <span class="initializer"> = 0</span>
+   </span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span>
+   <span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.signal.html" class="methodname">signal</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$signum</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.callable.html" class="type callable">callable</a></span> <code class="parameter">$callback</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$data</code>
+    <span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$priority</code>
+    <span class="initializer"> = 0</span>
+   </span><br>): <span class="type"><a href="class.evsignal.html" class="type EvSignal">EvSignal</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span>
+   <span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.stat.html" class="methodname">stat</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$path</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.float.html" class="type float">float</a></span> <code class="parameter">$interval</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.callable.html" class="type callable">callable</a></span> <code class="parameter">$callback</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$data</code>
+    <span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$priority</code>
+    <span class="initializer"> = 0</span>
+   </span><br>): <span class="type"><a href="class.evstat.html" class="type EvStat">EvStat</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.stop.html" class="methodname">stop</a></span>(<span class="methodparam">
+    
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$how</code>
+   <span class="initializer"> = ?</span></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.suspend.html" class="methodname">suspend</a></span>(): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span>
+   <span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.timer.html" class="methodname">timer</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.float.html" class="type float">float</a></span> <code class="parameter">$after</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.float.html" class="type float">float</a></span> <code class="parameter">$repeat</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.callable.html" class="type callable">callable</a></span> <code class="parameter">$callback</code>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$data</code>
+    <span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span>
+   </span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam">
+    
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$priority</code>
+    <span class="initializer"> = 0</span>
+   </span><br>): <span class="type"><a href="class.evtimer.html" class="type EvTimer">EvTimer</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span>
+   <span class="methodname"><a href="evloop.verify.html" class="methodname">verify</a></span>(): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+   }</div>
+
+  </div>
+
+  <div class="section" id="evloop.props">
+   <h2 class="title">Properties</h2>
+   <dl>
+    
+     <dt id="evloop.props.data">
+      <var class="varname">data</var>
+     </dt>
+     <dd>
+      <span class="simpara">
+       Custom data attached to loop
+      </span>
+     </dd>
+    
+    
+     <dt id="evloop.props.backend">
+      <var class="varname">backend</var>
+     </dt>
+     <dd>
+      <span class="simpara">
+       <em>Readonly</em>.
+       The
+       <a href="class.ev.html#ev.constants.watcher-backends" class="link">backend flags</a>
+       indicating the event backend in use.
+      </span>
+     </dd>
+    
+    
+     <dt id="evloop.props.is-default-loop">
+      <var class="varname">is_default_loop</var>
+     </dt>
+     <dd>
+      <span class="simpara">
+       <em>Readonly</em>.
+       <strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong> if it is the default event loop.
+      </span>
+     </dd>
+    
+    
+     <dt id="evloop.props.iteration">
+      <var class="varname">iteration</var>
+     </dt>
+     <dd>
+      <span class="simpara">
+       The current iteration count of the loop. See
+       <span class="methodname"><a href="ev.iteration.html" class="methodname">Ev::iteration()</a></span>
+      </span>
+     </dd>
+    
+    
+     <dt id="evloop.props.pending">
+      <var class="varname">pending</var>
+     </dt>
+     <dd>
+      <span class="simpara">
+       The number of pending watchers.
+       <code class="literal">0</code>
+       indicates that there are no watchers pending.
+      </span>
+     </dd>
+    
+    
+     <dt id="evloop.props.io-interval">
+      <var class="varname">io_interval</var>
+     </dt>
+     <dd>
+      <span class="simpara">
+       Higher
+       <var class="varname">io_interval</var>
+       allows
+       <em>libev</em>
+       to spend more time collecting
+       <span class="classname"><a href="class.evio.html" class="classname">EvIo</a></span>
+       events, so more events can be handled per iteration, at the cost of
+       increasing latency. Timeouts (both
+       <span class="classname"><a href="class.evperiodic.html" class="classname">EvPeriodic</a></span>
+       and
+       <span class="classname"><a href="class.evtimer.html" class="classname">EvTimer</a></span>)
+       will not be affected. Setting this to a non-zero value will introduce
+       an additional
+       <code class="literal">sleep()</code>
+       call into most loop iterations. The sleep time ensures that
+       <em>libev</em>
+       will not poll for
+       <span class="classname"><a href="class.evio.html" class="classname">EvIo</a></span>
+       events more often than once per this interval, on average. Many
+       programs can usually benefit by setting the
+       <var class="varname">io_interval</var>
+       to a value near
+       <code class="literal">0.1</code>,
+       which is often enough for interactive servers(not for games). It
+       usually doesn&#039;t make much sense to set it to a lower value than
+       <code class="literal">0.01</code>,
+       as this approaches the timing granularity of most systems.
+      </span>
+      <span class="simpara">
+       See also
+       <a href="http://pod.tst.eu/http://cvs.schmorp.de/libev/ev.pod#FUNCTIONS_CONTROLLING_EVENT_LOOPS" class="link external">&raquo;&nbsp;FUNCTIONS
+      CONTROLLING EVENT LOOPS</a>.
+      </span>
+     </dd>
+    
+    
+     <dt id="evloop.props.timeout-interval">
+      <var class="varname">timeout_interval</var>
+     </dt>
+     <dd>
+      <span class="simpara">
+       Higher
+       <var class="varname">timeout_interval</var>
+       allows
+       <em>libev</em>
+       to spend more time collecting timeouts, at the expense of increased
+       latency/jitter/inexactness(the watcher callback will be called later).
+       <span class="classname"><a href="class.evio.html" class="classname">EvIo</a></span>
+       watchers will not be affected. Setting this to a non-null value will
+       not introduce any overhead in
+       <em>libev</em>.
+       See also
+       <a href="http://pod.tst.eu/http://cvs.schmorp.de/libev/ev.pod#FUNCTIONS_CONTROLLING_EVENT_LOOPS" class="link external">&raquo;&nbsp;FUNCTIONS
+      CONTROLLING EVENT LOOPS</a>.
+      </span>
+     </dd>
+    
+    
+     <dt id="evloop.props.depth">
+      <var class="varname">depth</var>
+     </dt>
+     <dd>
+      <span class="simpara">
+       The recursion depth. See
+       <span class="methodname"><a href="ev.depth.html" class="methodname">Ev::depth()</a></span>.
+      </span>
+     </dd>
+    
+   </dl>
+  </div>
+
+ </div>
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="evloop.backend.html">EvLoop::backend</a> — Returns an integer describing the backend used by libev</li><li><a href="evloop.check.html">EvLoop::check</a> — Creates EvCheck object associated with the current event loop
+  instance</li><li><a href="evloop.child.html">EvLoop::child</a> — Creates EvChild object associated with the current event loop</li><li><a href="evloop.construct.html">EvLoop::__construct</a> — Constructs the event loop object</li><li><a href="evloop.defaultloop.html">EvLoop::defaultLoop</a> — Returns or creates the default event loop</li><li><a href="evloop.embed.html">EvLoop::embed</a> — Creates an instance of EvEmbed watcher associated
+  with the current EvLoop object</li><li><a href="evloop.fork.html">EvLoop::fork</a> — Creates EvFork watcher object associated with the current event
+  loop instance</li><li><a href="evloop.idle.html">EvLoop::idle</a> — Creates EvIdle watcher object associated with the current event
+  loop instance</li><li><a href="evloop.invokepending.html">EvLoop::invokePending</a> — Invoke all pending watchers while resetting their pending state</li><li><a href="evloop.io.html">EvLoop::io</a> — Create EvIo watcher object associated with the current event
+  loop instance</li><li><a href="evloop.loopfork.html">EvLoop::loopFork</a> — Must be called after a fork</li><li><a href="evloop.now.html">EvLoop::now</a> — Returns the current &quot;event loop time&quot;</li><li><a href="evloop.nowupdate.html">EvLoop::nowUpdate</a> — Establishes the current time by querying the kernel, updating the time
+    returned by EvLoop::now in the progress</li><li><a href="evloop.periodic.html">EvLoop::periodic</a> — Creates EvPeriodic watcher object associated with the current
+  event loop instance</li><li><a href="evloop.prepare.html">EvLoop::prepare</a> — Creates EvPrepare watcher object associated with the current
+  event loop instance</li><li><a href="evloop.resume.html">EvLoop::resume</a> — Resume previously suspended default event loop</li><li><a href="evloop.run.html">EvLoop::run</a> — Begin checking for events and calling callbacks for the loop</li><li><a href="evloop.signal.html">EvLoop::signal</a> — Creates EvSignal watcher object associated with the current
+  event loop instance</li><li><a href="evloop.stat.html">EvLoop::stat</a> — Creates EvStat watcher object associated with the current event
+  loop instance</li><li><a href="evloop.stop.html">EvLoop::stop</a> — Stops the event loop</li><li><a href="evloop.suspend.html">EvLoop::suspend</a> — Suspend the loop</li><li><a href="evloop.timer.html">EvLoop::timer</a> — Creates EvTimer watcher object associated with the current event
+  loop instance</li><li><a href="evloop.verify.html">EvLoop::verify</a> — Performs internal consistency checks(for debugging)</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

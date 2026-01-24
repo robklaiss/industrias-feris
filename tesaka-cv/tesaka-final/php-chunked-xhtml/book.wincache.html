@@ -1,0 +1,172 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Windows Cache for PHP</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.uopz-unset-return.html" class="navbar__link">« uopz_unset_return</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="intro.wincache.html" class="navbar__link">Introduction »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="refs.basic.php.html">Affecting PHP's Behaviour</a></li>
+        <li>Windows Cache for PHP</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="book.wincache" class="book">
+ 
+ <h1 class="title">Windows Cache for PHP</h1>
+ 
+
+ 
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+<ul class="chunklist chunklist_book"><li><a href="intro.wincache.html">Introduction</a></li><li><a href="wincache.setup.html">Installing/Configuring</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="wincache.requirements.html">Requirements</a></li><li><a href="wincache.installation.html">Installation</a></li><li><a href="wincache.configuration.html">Runtime Configuration</a></li><li><a href="wincache.stats.html">WinCache Statistics Script</a></li><li><a href="wincache.sessionhandler.html">WinCache Session Handler</a></li><li><a href="wincache.reroutes.html">WinCache Functions Reroutes</a></li></ul></li><li><a href="ref.wincache.html">WinCache Functions</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="function.wincache-fcache-fileinfo.html">wincache_fcache_fileinfo</a> — Retrieves information about files cached in the file cache</li><li><a href="function.wincache-fcache-meminfo.html">wincache_fcache_meminfo</a> — Retrieves information about file cache memory usage</li><li><a href="function.wincache-lock.html">wincache_lock</a> — Acquires an exclusive lock on a given key</li><li><a href="function.wincache-ocache-fileinfo.html">wincache_ocache_fileinfo</a> — Retrieves information about files cached in the opcode cache</li><li><a href="function.wincache-ocache-meminfo.html">wincache_ocache_meminfo</a> — Retrieves information about opcode cache memory usage</li><li><a href="function.wincache-refresh-if-changed.html">wincache_refresh_if_changed</a> — Refreshes the cache entries for the cached files</li><li><a href="function.wincache-rplist-fileinfo.html">wincache_rplist_fileinfo</a> — Retrieves information about resolve file path cache</li><li><a href="function.wincache-rplist-meminfo.html">wincache_rplist_meminfo</a> — Retrieves information about memory usage by the resolve file path cache</li><li><a href="function.wincache-scache-info.html">wincache_scache_info</a> — Retrieves information about files cached in the session cache</li><li><a href="function.wincache-scache-meminfo.html">wincache_scache_meminfo</a> — Retrieves information about session cache memory usage</li><li><a href="function.wincache-ucache-add.html">wincache_ucache_add</a> — Adds a variable in user cache only if variable does not already exist in the cache</li><li><a href="function.wincache-ucache-cas.html">wincache_ucache_cas</a> — Compares the variable with old value and assigns new value to it</li><li><a href="function.wincache-ucache-clear.html">wincache_ucache_clear</a> — Deletes entire content of the user cache</li><li><a href="function.wincache-ucache-dec.html">wincache_ucache_dec</a> — Decrements the value associated with the key</li><li><a href="function.wincache-ucache-delete.html">wincache_ucache_delete</a> — Deletes variables from the user cache</li><li><a href="function.wincache-ucache-exists.html">wincache_ucache_exists</a> — Checks if a variable exists in the user cache</li><li><a href="function.wincache-ucache-get.html">wincache_ucache_get</a> — Gets a variable stored in the user cache</li><li><a href="function.wincache-ucache-inc.html">wincache_ucache_inc</a> — Increments the value associated with the key</li><li><a href="function.wincache-ucache-info.html">wincache_ucache_info</a> — Retrieves information about data stored in the user cache</li><li><a href="function.wincache-ucache-meminfo.html">wincache_ucache_meminfo</a> — Retrieves information about user cache memory usage</li><li><a href="function.wincache-ucache-set.html">wincache_ucache_set</a> — Adds a variable in user cache and overwrites a variable if it already exists in the cache</li><li><a href="function.wincache-unlock.html">wincache_unlock</a> — Releases an exclusive lock on a given key</li></ul></li><li><a href="wincache.win32build.html">Building for Windows</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="wincache.win32build.prereq.html">Prerequisites</a></li><li><a href="wincache.win32build.building.html">Compiling and building</a></li><li><a href="wincache.win32build.verify.html">Verifying the build</a></li></ul></li></ul></div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

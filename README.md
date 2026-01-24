@@ -18,6 +18,20 @@ Para desarrollo rápido (sin health check):
 .venv/bin/python validate_pipeline_compliance.py --verbose && .venv/bin/python -m pytest -q
 ```
 
+## Configuración de ambientes (TEST vs PROD)
+
+El proyecto soporta dos ambientes: TEST (sandbox) y PROD (producción).  
+Ver `tesaka-cv/docs/SIFEN_TEST_VS_PROD.md` para la guía completa de configuración y uso.
+
+Uso básico:
+```bash
+cd tesaka-cv
+# TEST
+./tools/sifen_run.sh test send --xml mi_lote.xml
+# PROD  
+./tools/sifen_run.sh prod send --xml mi_lote.xml
+```
+
 ## Estructura del proyecto
 
 ```

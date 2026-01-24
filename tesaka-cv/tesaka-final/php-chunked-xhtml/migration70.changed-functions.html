@@ -1,0 +1,218 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Changed functions</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="migration70.deprecated.html" class="navbar__link">« Deprecated features in PHP 7.0.x</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="migration70.new-functions.html" class="navbar__link">New functions »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="migration70.html">Migrating from PHP 5.6.x to PHP 7.0.x</a></li>
+        <li>Changed functions</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="migration70.changed-functions" class="sect1">
+ <h2 class="title">Changed functions</h2>
+
+ <div class="sect2" id="migration70.changed-functions.core">
+  <h3 class="title">PHP Core</h3>
+  
+
+  <ul class="itemizedlist">
+  <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.debug-zval-dump.html" class="function">debug_zval_dump()</a></span> now prints &quot;int&quot; instead of &quot;long&quot;,
+     and &quot;float&quot; instead of &quot;double&quot;
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.dirname.html" class="function">dirname()</a></span> now optionally takes a second parameter,
+     <code class="parameter">depth</code>, to get the name of the directory
+     <code class="parameter">depth</code> levels up from the current directory.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.getrusage.html" class="function">getrusage()</a></span> is now supported on Windows.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.mktime.html" class="function">mktime()</a></span> and <span class="function"><a href="function.gmmktime.html" class="function">gmmktime()</a></span> functions
+     no longer accept <code class="parameter">is_dst</code> parameter.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.preg-replace.html" class="function">preg_replace()</a></span> function no longer supports
+     &quot;\e&quot; (<strong><code>PREG_REPLACE_EVAL</code></strong>). <span class="function"><a href="function.preg-replace-callback.html" class="function">preg_replace_callback()</a></span>
+     should be used instead.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.setlocale.html" class="function">setlocale()</a></span> function no longer accepts <code class="parameter">category</code>
+     passed as string. <strong><code><a href="string.constants.html#constant.lc-ctype">LC_<span class="replaceable">*</span></a></code></strong> constants must be used instead.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.exec.html" class="function">exec()</a></span>, <span class="function"><a href="function.system.html" class="function">system()</a></span> and <span class="function"><a href="function.passthru.html" class="function">passthru()</a></span>
+     functions have NULL byte protection now.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.shmop-open.html" class="function">shmop_open()</a></span> now returns a resource instead of an int,
+     which has to be passed to <span class="function"><a href="function.shmop-size.html" class="function">shmop_size()</a></span>,
+     <span class="function"><a href="function.shmop-write.html" class="function">shmop_write()</a></span>, <span class="function"><a href="function.shmop-read.html" class="function">shmop_read()</a></span>,
+     <span class="function"><a href="function.shmop-close.html" class="function">shmop_close()</a></span> and <span class="function"><a href="function.shmop-delete.html" class="function">shmop_delete()</a></span>.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.substr.html" class="function">substr()</a></span> and <span class="function"><a href="function.iconv-substr.html" class="function">iconv_substr()</a></span> now return an empty string,
+     if string is equal to start characters long.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.xml-parser-free.html" class="function">xml_parser_free()</a></span> is no longer sufficient to free the
+     parser resource, if it references an object and this object references that
+     parser resource. In this case it is necessary to additionally unset the $parser.
+    </span>
+   </li>
+  </ul>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

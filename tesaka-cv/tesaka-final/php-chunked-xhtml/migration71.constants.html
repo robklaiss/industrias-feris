@@ -1,0 +1,375 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>New global constants</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="migration71.new-functions.html" class="navbar__link">« New functions</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="migration71.incompatible.html" class="navbar__link">Backward incompatible changes »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="migration71.html">Migrating from PHP 7.0.x to PHP 7.1.x</a></li>
+        <li>New global constants</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="migration71.constants" class="sect1">
+ <h2 class="title">New global constants</h2>
+
+ <div class="sect2" id="migration71.constants.core">
+  <h3 class="title"><a href="reserved.constants.html" class="link">Core Predefined Constants</a></h3>
+
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="reserved.constants.html#constant.php-fd-setsize">PHP_FD_SETSIZE</a></code></strong>
+    </span>
+   </li>
+  </ul>
+ </div>
+ 
+ <div class="sect2" id="migration71.constants.curl">
+  <h3 class="title"><a href="book.curl.html" class="link">CURL</a></h3>
+
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="curl.constants.html#constant.curlmopt-pushfunction">CURLMOPT_PUSHFUNCTION</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="curl.constants.html#constant.curl-push-ok">CURL_PUSH_OK</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="curl.constants.html#constant.curl-push-deny">CURL_PUSH_DENY</a></code></strong>
+    </span>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration71.constants.filter">
+  <h3 class="title"><a href="book.filter.html" class="link">Data Filtering</a></h3>
+
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="filter.constants.html#constant.filter-flag-email-unicode">FILTER_FLAG_EMAIL_UNICODE</a></code></strong>
+    </span>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration71.constants.image">
+  <h3 class="title"><a href="book.image.html" class="link">Image Processing and GD</a></h3>
+
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="image.constants.html#constant.imagetype-webp">IMAGETYPE_WEBP</a></code></strong>
+    </span>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration71.constants.json">
+  <h3 class="title"><a href="book.json.html" class="link">JSON</a></h3>
+
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="json.constants.html#constant.json-unescaped-line-terminators">JSON_UNESCAPED_LINE_TERMINATORS</a></code></strong>
+    </span>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration71.constants.ldap">
+  <h3 class="title"><a href="book.ldap.html" class="link">LDAP</a></h3>
+
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-sasl-nocanon">LDAP_OPT_X_SASL_NOCANON</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-sasl-username">LDAP_OPT_X_SASL_USERNAME</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-cacertdir">LDAP_OPT_X_TLS_CACERTDIR</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-cacertfile">LDAP_OPT_X_TLS_CACERTFILE</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-certfile">LDAP_OPT_X_TLS_CERTFILE</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-cipher-suite">LDAP_OPT_X_TLS_CIPHER_SUITE</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-keyfile">LDAP_OPT_X_TLS_KEYFILE</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-random-file">LDAP_OPT_X_TLS_RANDOM_FILE</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-crlcheck">LDAP_OPT_X_TLS_CRLCHECK</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-crl-none">LDAP_OPT_X_TLS_CRL_NONE</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-crl-peer">LDAP_OPT_X_TLS_CRL_PEER</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-crl-all">LDAP_OPT_X_TLS_CRL_ALL</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-dhfile">LDAP_OPT_X_TLS_DHFILE</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-crlfile">LDAP_OPT_X_TLS_CRLFILE</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-protocol-min">LDAP_OPT_X_TLS_PROTOCOL_MIN</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-protocol-ssl2">LDAP_OPT_X_TLS_PROTOCOL_SSL2</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-protocol-ssl3">LDAP_OPT_X_TLS_PROTOCOL_SSL3</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-protocol-tls1-0">LDAP_OPT_X_TLS_PROTOCOL_TLS1_0</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-protocol-tls1-1">LDAP_OPT_X_TLS_PROTOCOL_TLS1_1</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-protocol-tls1-2">LDAP_OPT_X_TLS_PROTOCOL_TLS1_2</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-tls-package">LDAP_OPT_X_TLS_PACKAGE</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-keepalive-idle">LDAP_OPT_X_KEEPALIVE_IDLE</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-keepalive-probes">LDAP_OPT_X_KEEPALIVE_PROBES</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="ldap.constants.html#constant.ldap-opt-x-keepalive-interval">LDAP_OPT_X_KEEPALIVE_INTERVAL</a></code></strong>
+    </span>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration71.constants.pgsql">
+  <h3 class="title"><a href="book.pgsql.html" class="link">PostgreSQL</a></h3>
+
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="pgsql.constants.html#constant.pgsql-notice-last">PGSQL_NOTICE_LAST</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="pgsql.constants.html#constant.pgsql-notice-all">PGSQL_NOTICE_ALL</a></code></strong>
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="pgsql.constants.html#constant.pgsql-notice-clear">PGSQL_NOTICE_CLEAR</a></code></strong>
+    </span>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration71.constants.spl">
+  <h3 class="title"><a href="book.spl.html" class="link">SPL</a></h3>
+
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <strong><code><a href="random.constants.html#constant.mt-rand-php">MT_RAND_PHP</a></code></strong>
+    </span>
+   </li>
+  </ul>
+ </div>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

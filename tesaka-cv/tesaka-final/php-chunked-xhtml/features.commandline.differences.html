@@ -1,0 +1,374 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Differences to other SAPIs</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="features.commandline.html" class="navbar__link">« Command line usage</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="features.commandline.options.html" class="navbar__link">Options »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="features.commandline.html">Command line usage</a></li>
+        <li>Differences to other SAPIs</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="features.commandline.differences" class="section">
+  <h2 class="title">Differences to other <abbr title="Server Application Programming Interface">SAPI</abbr>s</h2>
+  
+  <p class="para">
+   Remarkable differences of the <abbr title="Command Line Interpreter/Interface">CLI</abbr> <abbr title="Server Application Programming Interface">SAPI</abbr> compared to other
+   <abbr title="Server Application Programming Interface">SAPI</abbr>s:
+   <ul class="itemizedlist">
+    <li class="listitem">
+     <p class="para">
+      Unlike the <abbr title="Common Gateway Interface">CGI</abbr> <abbr title="Server Application Programming Interface">SAPI</abbr>, no headers are
+      written to the output.
+     </p>
+     <p class="para">
+      Though the <abbr title="Common Gateway Interface">CGI</abbr> <abbr title="Server Application Programming Interface">SAPI</abbr> provides a way
+      to suppress HTTP headers, there&#039;s no equivalent switch to enable them in
+      the <abbr title="Command Line Interpreter/Interface">CLI</abbr> <abbr title="Server Application Programming Interface">SAPI</abbr>.
+     </p>
+     <p class="para">
+      <abbr title="Command Line Interpreter/Interface">CLI</abbr> is started up in quiet mode by default, though the <strong class="option unknown">-q</strong>
+      and <strong class="option unknown">--no-header</strong> switches are kept for compatibility so
+      that it is possible to use older <abbr title="Common Gateway Interface">CGI</abbr> scripts.
+     </p>
+     <p class="para">
+      It does not change the working directory to that of the script.
+      (<strong class="option unknown">-C</strong> and <strong class="option unknown">--no-chdir</strong> switches kept for
+      compatibility)
+     </p>
+     <p class="para">
+      Plain text error messages (no <abbr title="Hyper Text Markup Language">HTML</abbr> formatting).
+     </p>
+    </li>
+    
+    <li class="listitem">
+     <p class="para">
+      There are certain <var class="filename">php.ini</var> directives which are overridden by the
+      <abbr title="Command Line Interpreter/Interface">CLI</abbr> <abbr title="Server Application Programming Interface">SAPI</abbr> because they do not make sense in shell environments:
+     </p>
+     <p class="para">
+      <table class="doctable table">
+       <caption><strong>Overridden <var class="filename">php.ini</var> directives</strong></caption>
+       
+        <thead>
+         <tr>
+          <th>Directive</th>
+          <th><abbr title="Command Line Interpreter/Interface">CLI</abbr> <abbr title="Server Application Programming Interface">SAPI</abbr> default value</th>
+          <th>Comment</th>
+         </tr>
+
+        </thead>
+
+        <tbody class="tbody">
+         <tr>
+          <td><a href="errorfunc.configuration.html#ini.html-errors" class="link">html_errors</a></td>
+          <td><strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong></td>
+          <td>
+           Defaults to <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong>, as it can be quite hard to read error messages
+           in the shell environment when they are cluttered up with uninterpreted
+           <abbr title="Hyper Text Markup Language">HTML</abbr> tags.
+          </td>
+         </tr>
+
+         <tr>
+          <td><a href="outcontrol.configuration.html#ini.implicit-flush" class="link">implicit_flush</a></td>
+          <td><strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong></td>
+          <td>
+           In a shell environment, it is usually desirable for output, such as
+           from <span class="function"><a href="function.print.html" class="function">print</a></span>, <span class="function"><a href="function.echo.html" class="function">echo</a></span> and
+           friends, to be displayed immediately, and not held in a buffer.
+           Nonetheless, it is still possible to use
+           <a href="ref.outcontrol.html" class="link">output buffering</a> to
+           defer or manipulate standard output.
+          </td>
+         </tr>
+
+         <tr>
+          <td><a href="info.configuration.html#ini.max-execution-time" class="link">max_execution_time</a></td>
+          <td>0 (unlimited)</td>
+          <td>
+           PHP in a shell environment tends to be used for a much more diverse
+           range of purposes than typical Web-based scripts, and as these can
+           be very long-running, the maximum execution time is set to unlimited.
+          </td>
+         </tr>
+
+         <tr>
+          <td><a href="ini.core.html#ini.register-argc-argv" class="link">register_argc_argv</a></td>
+          <td><strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong></td>
+          <td>
+          <p class="para">
+           Setting this to <strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong> means that scripts executed via the
+           <abbr title="Command Line Interpreter/Interface">CLI</abbr> <abbr title="Server Application Programming Interface">SAPI</abbr> always have access to
+           <em>argc</em> (number of arguments passed to the
+           application) and <em>argv</em> (array of the actual
+           arguments).
+          </p>
+          <p class="para">
+           The PHP variables <var class="varname"><a href="reserved.variables.argc.html" class="classname">$argc</a></var>
+           and <var class="varname"><a href="reserved.variables.argv.html" class="classname">$argv</a></var> are automatically set to the appropriate
+           values when using the <abbr title="Command Line Interpreter/Interface">CLI</abbr> <abbr title="Server Application Programming Interface">SAPI</abbr>. These values can
+           also be found in the <var class="varname"><a href="reserved.variables.server.html" class="classname">$_SERVER</a></var> array, for example:
+           <var class="varname"><a href="reserved.variables.server.html" class="classname">$_SERVER['argv']</a></var>.
+          </p>
+          <div class="warning"><strong class="warning">Warning</strong>
+           <p class="para">
+            The presence of <var class="varname"><a href="reserved.variables.argv.html" class="classname">$argv</a></var> or <var class="varname"><a href="reserved.variables.server.html" class="classname">$_SERVER['argv']</a></var>
+            is not a reliable indication that a script is being run from the
+            command line because they may be set in other contexts when
+            <a href="ini.core.html#ini.register-argc-argv" class="link">register_argc_argv</a> is enabled.
+            The value returned by <span class="function"><a href="function.php-sapi-name.html" class="function">php_sapi_name()</a></span> should be checked
+            instead.
+            <div class="informalexample">
+             <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #007700">if (</span><span style="color: #0000BB">php_sapi_name</span><span style="color: #007700">() === </span><span style="color: #DD0000">'cli'</span><span style="color: #007700">) {<br />    echo </span><span style="color: #DD0000">"This is being run from the command line!\n"</span><span style="color: #007700">;<br />}</span></span></code></div>
+             </div>
+
+            </div>
+           </p>
+          </div>
+          </td>
+         </tr>
+
+         <tr>
+          <td><a href="outcontrol.configuration.html#ini.output-buffering" class="link">output_buffering</a></td>
+          <td><strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong></td>
+          <td>
+           <p class="para">
+            Although the <var class="filename">php.ini</var> setting is hardcoded to <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong>, the
+            <a href="book.outcontrol.html" class="link">Output buffering</a> functions
+            are available.
+           </p>
+          </td>
+         </tr>
+
+         <tr>
+          <td><a href="info.configuration.html#ini.max-input-time" class="link">max_input_time</a></td>
+          <td><strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong></td>
+          <td>
+           <p class="para">
+            The PHP <abbr title="Command Line Interpreter/Interface">CLI</abbr> does not support GET, POST or file uploads.
+           </p>
+          </td>
+         </tr>
+
+        </tbody>
+       
+      </table>
+
+     </p>
+     <blockquote class="note"><p><strong class="note">Note</strong>: 
+      <p class="para">
+       These directives cannot be initialized with another value from the
+       configuration file <var class="filename">php.ini</var> or a custom one (if specified). This
+       limitation is because the values are applied after all configuration
+       files have been parsed. However, their values can be changed
+       during runtime (although this is not sensible for all of them,
+       such as <a href="ini.core.html#ini.register-argc-argv" class="link">register_argc_argv</a>).
+      </p>
+     </p></blockquote>
+     <blockquote class="note"><p><strong class="note">Note</strong>: 
+      <p class="para">
+       It is recommended to set
+       <a href="misc.configuration.html#ini.ignore-user-abort" class="link">ignore_user_abort</a> for
+       command line scripts. See <span class="function"><a href="function.ignore-user-abort.html" class="function">ignore_user_abort()</a></span> for
+       more information.
+      </p>
+     </p></blockquote>
+    </li>
+    
+    <li class="listitem">
+     <p class="para">
+      To ease working in the shell environment, a number of constants are
+      defined for <a href="features.commandline.io-streams.html" class="link">I/O streams
+      </a>.
+     </p>
+    </li>
+    
+    <li class="listitem">
+     <p class="para">
+      The <abbr title="Command Line Interpreter/Interface">CLI</abbr> <abbr title="Server Application Programming Interface">SAPI</abbr> does <strong>not</strong> change the
+      current directory to the directory of the executed script.
+     </p>
+     <div class="example" id="example-1">
+      <p><strong>Example #1 
+       Example showing the difference to the <abbr title="Common Gateway Interface">CGI</abbr>
+       <abbr title="Server Application Programming Interface">SAPI</abbr>:
+      </strong></p>
+      <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">// Our simple test application named test.php<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">getcwd</span><span style="color: #007700">(), </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+      </div>
+
+      <div class="example-contents"><p>
+       When using the <abbr title="Common Gateway Interface">CGI</abbr> version, the output is:
+      </p></div>
+      <div class="example-contents screen">
+<div class="cdata"><pre>
+$ pwd
+/tmp
+
+$ php -q another_directory/test.php
+/tmp/another_directory
+</pre></div>
+      </div>
+      <div class="example-contents"><p>
+       This clearly shows that PHP changes its current directory to the one of
+       the executed script.
+      </p></div>
+      <div class="example-contents"><p>
+       Using the <abbr title="Command Line Interpreter/Interface">CLI</abbr> <abbr title="Server Application Programming Interface">SAPI</abbr> yields:
+      </p></div>
+      <div class="example-contents screen">
+<div class="cdata"><pre>
+$ pwd
+/tmp
+
+$ php -f another_directory/test.php
+/tmp
+</pre></div>
+      </div>
+      <div class="example-contents"><p>
+       This allows greater flexibility when writing shell tools in PHP.
+      </p></div>
+     </div>
+     <blockquote class="note"><p><strong class="note">Note</strong>: 
+      <p class="para">
+       The <abbr title="Common Gateway Interface">CGI</abbr> <abbr title="Server Application Programming Interface">SAPI</abbr> supports this
+       <abbr title="Command Line Interpreter/Interface">CLI</abbr> <abbr title="Server Application Programming Interface">SAPI</abbr> behaviour by means of the <strong class="option unknown">-C</strong> switch when run
+       from the command line.
+      </p>
+     </p></blockquote>
+    </li>
+   </ul>
+  </p>
+ </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

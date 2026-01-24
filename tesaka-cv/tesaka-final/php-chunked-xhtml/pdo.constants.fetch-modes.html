@@ -1,0 +1,1356 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Fetch Modes</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="pdo.constants.html" class="navbar__link">« Predefined Constants</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="pdo.connections.html" class="navbar__link">Connections and Connection management »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="pdo.constants.html">Predefined Constants</a></li>
+        <li>Fetch Modes</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="pdo.constants.fetch-modes" class="section">
+ <h2 class="title">Fetch Modes</h2>
+
+ <p class="simpara">
+  See <a href="pdo.constants.html#pdo.constants.cursors" class="link">cursor constants</a> for the
+  <code class="literal">PDO::FETCH_ORI_*</code> cursor constants.
+ </p>
+
+ <div class="section" id="pdo.fetch-modes.basic">
+  <h2 class="title">Basic Fetch Modes</h2>
+  <table class="doctable informaltable">
+   
+    <thead>
+     <tr>
+      <th>Fetch Mode</th>
+      <th>Summary</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-default">PDO::FETCH_DEFAULT</a></code></strong>
+      </td>
+      <td>
+       Special value for using the current default fetch mode.
+      </td>
+     </tr>
+
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-assoc">PDO::FETCH_ASSOC</a></code></strong>
+      </td>
+      <td>
+       Array indexed by column name only.
+      </td>
+     </tr>
+
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-both">PDO::FETCH_BOTH</a></code></strong> (Default)
+      </td>
+      <td>
+       Array indexed by both column number and name.
+      </td>
+     </tr>
+
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-named">PDO::FETCH_NAMED</a></code></strong>
+      </td>
+      <td>
+       Variant of <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-assoc">PDO::FETCH_ASSOC</a></code></strong> that retains duplicated
+       columns.
+      </td>
+     </tr>
+
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-num">PDO::FETCH_NUM</a></code></strong>
+      </td>
+      <td>
+       Array indexed by column number only.
+      </td>
+     </tr>
+
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-column">PDO::FETCH_COLUMN</a></code></strong>
+      </td>
+      <td>
+       A single column.
+      </td>
+     </tr>
+
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-key-pair">PDO::FETCH_KEY_PAIR</a></code></strong>
+      </td>
+      <td>
+       Key-value pairs, indexed by the first column.
+      </td>
+     </tr>
+
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-func">PDO::FETCH_FUNC</a></code></strong>
+      </td>
+      <td>
+       Use a function to create the return value.
+       (<span class="methodname"><a href="pdostatement.fetchall.html" class="methodname">PDOStatement::fetchAll()</a></span> only)
+      </td>
+     </tr>
+
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-obj">PDO::FETCH_OBJ</a></code></strong>
+      </td>
+      <td>
+       Anonymous (<span class="classname"><a href="class.stdclass.html" class="classname">stdClass</a></span>) object.
+      </td>
+     </tr>
+
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-class">PDO::FETCH_CLASS</a></code></strong>
+      </td>
+      <td>
+       An object of a specified class.
+      </td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+ </div>
+
+ <div class="section" id="pdo.fetch-modes.class-flags">
+  <h2 class="title">PDO::FETCH_CLASS options</h2>
+
+  <p class="simpara">
+   These modes are used to implement options when using
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-class">PDO::FETCH_CLASS</a></code></strong>.
+  </p>
+
+  <table class="doctable informaltable">
+   
+    <thead>
+     <tr>
+      <th>Fetch Mode</th>
+      <th>Summary</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-classtype">PDO::FETCH_CLASSTYPE</a></code></strong>
+      </td>
+      <td>
+       Use the first column as the class name.
+      </td>
+     </tr>
+
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-props-late">PDO::FETCH_PROPS_LATE</a></code></strong>
+      </td>
+      <td>
+       Call the constructor before setting properties.
+      </td>
+     </tr>
+
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-serialize">PDO::FETCH_SERIALIZE</a></code></strong>
+      </td>
+      <td>
+       Use PHP serialized data. Deprecated as of PHP 8.1.0.
+      </td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+ </div>
+
+ <div class="section" id="pdo.fetch-modes.single">
+  <h2 class="title">Single Result Modes</h2>
+
+  <p class="simpara">
+   The following modes cannot be used with
+   <span class="methodname"><a href="pdostatement.fetchall.html" class="methodname">PDOStatement::fetchAll()</a></span>.
+  </p>
+
+  <table class="doctable informaltable">
+   
+    <thead>
+     <tr>
+      <th>Fetch Mode</th>
+      <th>Summary</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-bound">PDO::FETCH_BOUND</a></code></strong>
+      </td>
+      <td>
+       Bind values to specified variables.
+      </td>
+     </tr>
+
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-into">PDO::FETCH_INTO</a></code></strong>
+      </td>
+      <td>
+       Update an existing object.
+      </td>
+     </tr>
+
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-lazy">PDO::FETCH_LAZY</a></code></strong>
+      </td>
+      <td>
+       Lazy fetch via <span class="classname"><a href="class.pdorow.html" class="classname">PDORow</a></span> for array- and object-like
+       access.
+      </td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+ </div>
+
+ <div class="section" id="pdo.fetch-modes.grouped">
+  <h2 class="title">
+   Special Behavior Flags for <span class="methodname"><a href="pdostatement.fetchall.html" class="methodname">PDOStatement::fetchAll()</a></span>
+  </h2>
+
+  <p class="simpara">
+   The following special modes for multiple results only work with
+   <span class="methodname"><a href="pdostatement.fetchall.html" class="methodname">PDOStatement::fetchAll()</a></span> and do not work with some other
+   fetch modes. Check the full documentation for details.
+  </p>
+
+  <table class="doctable informaltable">
+   
+    <thead>
+     <tr>
+      <th>Fetch Mode</th>
+      <th>Summary</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-group">PDO::FETCH_GROUP</a></code></strong>
+      </td>
+      <td>
+       Results are grouped by the first column.
+      </td>
+     </tr>
+
+     <tr>
+      <td>
+       <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-unique">PDO::FETCH_UNIQUE</a></code></strong>
+      </td>
+      <td>
+       Results are (uniquely) indexed by the first column.
+      </td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+ </div>
+
+ <div class="section" id="pdo.fetch-modes.duplicate-names">
+  <h2 class="title">Handling of Duplicated Column Names</h2>
+  <p class="simpara">
+   It&#039;s possible for results to contain multiple columns that use the same name.
+   For example, when joining 2 tables that both contain a column with the same
+   name.
+  </p>
+  <p class="simpara">
+   Because PHP structures such as arrays and objects don&#039;t support multiple keys
+   or properties that use the same name, the returned array or object will
+   contain only 1 of the values using the same name.
+  </p>
+  <p class="simpara">
+   Which value is returned for a given duplicated name should be considered
+   undefined.
+  </p>
+  <p class="simpara">
+   To avoid this issue, explicitly name columns using an alias. For example:
+  </p>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="sqlcode"><pre class="sqlcode">SELECT table1.created_at AS t1_created_at,
+       table2.created_at AS t2_created_at
+FROM table1
+JOIN table2 ON table1.table2id = table2.id</pre>
+</div>
+   </div>
+
+  </div>
+  <p class="simpara">
+   See also <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-named">PDO::FETCH_NAMED</a></code></strong>,
+   <strong><code><a href="pdo.constants.html#pdo.constants.attr-fetch-table-names">PDO::ATTR_FETCH_TABLE_NAMES</a></code></strong> and
+   <strong><code><a href="pdo.constants.html#pdo.constants.attr-fetch-catalog-names">PDO::ATTR_FETCH_CATALOG_NAMES</a></code></strong>.
+  </p>
+ </div>
+
+ <div class="section" id="pdo.fetch-modes.default">
+  <h2 class="title">Setting the Default Fetch Mode</h2>
+  <p class="simpara">
+   It is possible to set default fetch mode for all queries using
+   <strong><code><a href="pdo.constants.html#pdo.constants.attr-default-fetch-mode">PDO::ATTR_DEFAULT_FETCH_MODE</a></code></strong> with
+   <span class="methodname"><a href="pdo.construct.html" class="methodname">PDO::__construct()</a></span> or
+   <span class="methodname"><a href="pdo.setattribute.html" class="methodname">PDO::setAttribute()</a></span>.
+  </p>
+  <p class="simpara">
+   The default fetch mode for a specific statement can be set using
+   <span class="methodname"><a href="pdostatement.setfetchmode.html" class="methodname">PDOStatement::setFetchMode()</a></span>.
+   This affects reuse as a prepared statement and iteration (using
+   <a href="control-structures.foreach.html" class="link"><code class="literal">foreach</code></a>).
+  </p>
+  <div class="caution"><strong class="caution">Caution</strong>
+   <p class="simpara">
+    <span class="methodname"><a href="pdostatement.setattribute.html" class="methodname">PDOStatement::setAttribute()</a></span> cannot be used to set the
+    default fetch mode. It only accepts driver specific attributes and silently
+    ignores attributes that are not recognized.
+   </p>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-default">
+  <h2 class="title">PDO::FETCH_DEFAULT (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   Available as of PHP 8.0.7.
+  </p>
+  <p class="simpara">
+   This is a special value that uses the current default fetch mode for a
+   <span class="classname"><a href="class.pdostatement.html" class="classname">PDOStatement</a></span>. It&#039;s specifically useful as the default
+   value for method parameters when extending
+   <span class="classname"><a href="class.pdostatement.html" class="classname">PDOStatement</a></span> for use with
+   <strong><code><a href="pdo.constants.html#pdo.constants.attr-statement-class">PDO::ATTR_STATEMENT_CLASS</a></code></strong>.
+  </p>
+  <p class="para">
+   This value cannot be used with
+   <strong><code><a href="pdo.constants.html#pdo.constants.attr-default-fetch-mode">PDO::ATTR_DEFAULT_FETCH_MODE</a></code></strong>.
+  </p>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-assoc">
+  <h2 class="title">PDO::FETCH_ASSOC (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-assoc">PDO::FETCH_ASSOC</a></code></strong> returns an array indexed by column name
+   only.
+  </p>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$pdo</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT userid, name, country FROM users"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_ASSOC</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+Array
+(
+    [userid] =&gt; 104
+    [name] =&gt; Chris
+    [country] =&gt; Ukraine
+)
+</pre></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-both">
+  <h2 class="title">PDO::FETCH_BOTH (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   This is the default fetch mode.
+  </p>
+  <p class="simpara">
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-both">PDO::FETCH_BOTH</a></code></strong> returns an array indexed by both column
+   number and name. This means that every returned value is duplicated for each
+   result row.
+  </p>
+  <p class="simpara">
+   The column number starts at 0 and is determined by the result column order in
+   the query, not (for example) the order columns are defined in the table.
+  </p>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <span class="simpara">
+    Using the numeric column index is not recommended as this may change when
+    the query is changed, or when the table schema is changed when using
+    <code class="literal">SELECT *</code>.
+   </span>
+  </p></blockquote>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <span class="simpara">
+    The number of entries indexed by name may not match the number of entries
+    indexed by number in cases where multiple returned columns use the same
+    name.
+   </span>
+  </p></blockquote>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$pdo</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT userid, name, country FROM users"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_BOTH</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+Array
+(
+    [id] =&gt; 104,
+    [0] =&gt; 104,
+    [name] =&gt; Chris,
+    [1] =&gt; Chris,
+    [country] =&gt; Ukraine,
+    [2] =&gt; Ukraine
+)
+</pre></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-named">
+  <h2 class="title">PDO::FETCH_NAMED (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-named">PDO::FETCH_NAMED</a></code></strong> returns results in the same format as
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-assoc">PDO::FETCH_ASSOC</a></code></strong> except that where multiple columns use
+   the same name, all values are returned as a list.
+  </p>
+  <p class="simpara">
+   For more information on handling of duplicated column names and alternatives,
+   see the <a href="pdo.constants.fetch-modes.html#pdo.fetch-modes.duplicate-names" class="link">handling of
+   duplicated names section</a> above.
+  </p>
+  <p class="simpara">
+   The order in which duplicated values are returned should be considered
+   undefined. There&#039;s no way to tell where each value came from.
+  </p>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$pdo</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(<br />    </span><span style="color: #DD0000">"SELECT users.*, referrer.name<br />     FROM users<br />     LEFT JOIN users AS referrer ON users.referred_by = referrer.userid<br />     WHERE userid = 109"<br /></span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_NUM</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+Array
+(
+    [userid] =&gt; 109
+    [name] =&gt; Array
+        (
+            [0] =&gt; Toni
+            [1] =&gt; Chris
+        )
+    [country] =&gt; Germany
+    [referred_by] = 104
+)
+</pre></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-num">
+  <h2 class="title">PDO::FETCH_NUM (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-num">PDO::FETCH_NUM</a></code></strong> returns an array indexed by column number
+   only. The column number starts at 0 and is determined by the result column order in
+   the query, not (for example) the order columns are defined in the table.
+  </p>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <span class="simpara">
+    Using the numeric column index is not recommended as this may change when
+    the query is changed, or when the table schema is changed when using
+    <code class="literal">SELECT *</code>.
+   </span>
+  </p></blockquote>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$pdo</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT userid, name, country FROM users"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_NUM</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+Array
+(
+    [0] =&gt; 104
+    [1] =&gt; Chris
+    [2] =&gt; Ukraine
+)
+</pre></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-column">
+  <h2 class="title">PDO::FETCH_COLUMN (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-column">PDO::FETCH_COLUMN</a></code></strong> returns values from a single column.
+   Use the second argument for <span class="methodname"><a href="pdostatement.setfetchmode.html" class="methodname">PDOStatement::setFetchMode()</a></span>
+   or <span class="methodname"><a href="pdostatement.fetchall.html" class="methodname">PDOStatement::fetchAll()</a></span> to specify which column is
+   returned.
+  </p>
+  <p class="simpara">
+   If the specified column does not exist a <span class="classname"><a href="class.valueerror.html" class="classname">ValueError</a></span>
+   will be thrown.
+  </p>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$pdo</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT name, country FROM users LIMIT 3"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetchAll</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_COLUMN</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$pdo</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT name, country FROM users LIMIT 3"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetchAll</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_COLUMN</span><span style="color: #007700">, </span><span style="color: #0000BB">1</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+Array
+(
+    [0] =&gt; Chris
+    [1] =&gt; Jamie
+    [2] =&gt; Robin
+)
+
+Array
+(
+    [0] =&gt; Ukraine
+    [1] =&gt; England
+    [2] =&gt; Germany
+)
+</pre></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-key-pair">
+  <h2 class="title">PDO::FETCH_KEY_PAIR (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-key-pair">PDO::FETCH_KEY_PAIR</a></code></strong> returns pairs of values, indexed by
+   the first column. The results must contain only 2 columns. This fetch mode
+   only makes sense with <span class="methodname"><a href="pdostatement.fetchall.html" class="methodname">PDOStatement::fetchAll()</a></span>.
+  </p>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <span class="simpara">
+    If the first column is not unique, values will be lost. Which value(s) are
+    lost should be considered undefined.
+   </span>
+  </p></blockquote>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$pdo</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT name, country FROM users LIMIT 3"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetchAll</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_KEY_PAIR</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+Array
+(
+    [Chris] =&gt; Ukraine
+    [Jamie] =&gt; England
+    [Robin] =&gt; Germany
+)
+</pre></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-func">
+  <h2 class="title">PDO::FETCH_FUNC (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   Specify a function to create the returned value. This mode can only be used
+   with <span class="methodname"><a href="pdostatement.fetchall.html" class="methodname">PDOStatement::fetchAll()</a></span>.
+  </p>
+  <p class="simpara">
+   The function receives the values as parameters.
+   There&#039;s no way to retrieve the column name a given value was associated with.
+   It is crucial to ensure that the column order in the query matches the
+   order of parameters of the function.
+  </p>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <span class="simpara">
+    The effects of <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-group">PDO::FETCH_GROUP</a></code></strong> and
+    <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-unique">PDO::FETCH_UNIQUE</a></code></strong> are applied to results before the
+    function is called.
+   </span>
+  </p></blockquote>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">function </span><span style="color: #0000BB">valueCreator</span><span style="color: #007700">(</span><span style="color: #0000BB">$col1</span><span style="color: #007700">, </span><span style="color: #0000BB">$col2</span><span style="color: #007700">, </span><span style="color: #0000BB">$col3</span><span style="color: #007700">)<br />{<br />    return [<br />        </span><span style="color: #DD0000">'col1' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">$col1</span><span style="color: #007700">,<br />        </span><span style="color: #DD0000">'col2' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">strtoupper</span><span style="color: #007700">(</span><span style="color: #0000BB">$col2</span><span style="color: #007700">),<br />        </span><span style="color: #DD0000">'col3' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">$col3</span><span style="color: #007700">,<br />        </span><span style="color: #DD0000">'customKey' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'customValue'</span><span style="color: #007700">,<br />    ];<br />}<br /><br /></span><span style="color: #0000BB">$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$pdo</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT userid, name, country FROM users LIMIT 3"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetchAll</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_FUNC</span><span style="color: #007700">, </span><span style="color: #0000BB">valueCreator</span><span style="color: #007700">(...));<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+Array
+(
+    [0] =&gt; Array
+        (
+            [col1] =&gt; 104
+            [col2] =&gt; SAM
+            [col3] =&gt; Ukraine
+            [customKey] =&gt; customValue
+        )
+
+    [1] =&gt; Array
+        (
+            [col1] =&gt; 105
+            [col2] =&gt; JAMIE
+            [col3] =&gt; England
+            [customKey] =&gt; customValue
+        )
+
+    [2] =&gt; Array
+        (
+            [col1] =&gt; 107
+            [col2] =&gt; ROBIN
+            [col3] =&gt; Germany
+            [customKey] =&gt; customValue
+        )
+
+)
+</pre></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-obj">
+  <h2 class="title">PDO::FETCH_OBJ (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-obj">PDO::FETCH_OBJ</a></code></strong> returns a <span class="classname"><a href="class.stdclass.html" class="classname">stdClass</a></span>
+   object.
+  </p>
+  <p class="simpara">
+   See also <span class="methodname"><a href="pdostatement.fetchobject.html" class="methodname">PDOStatement::fetchObject()</a></span> and
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-class">PDO::FETCH_CLASS</a></code></strong>.
+  </p>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$pdo</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT userid, name, country FROM users"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_OBJ</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+stdClass Object
+(
+    [userid] =&gt; 104
+    [name] =&gt; Chris
+    [country] =&gt; Ukraine
+)
+</pre></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-class">
+  <h2 class="title">PDO::FETCH_CLASS (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   Returns an object of a specified class. For additional behaviors see the
+   <a href="pdo.constants.fetch-modes.html#pdo.fetch-modes.class-flags" class="link">option flags</a>.
+  </p>
+  <p class="simpara">
+   If a property does not exist with the name of a returned column, it will be
+   dynamically declared. This behavior is deprecated and will cause an error
+   from PHP 9.0.
+  </p>
+  <p class="simpara">
+   See also <span class="methodname"><a href="pdostatement.fetchobject.html" class="methodname">PDOStatement::fetchObject()</a></span>.
+  </p>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class </span><span style="color: #0000BB">TestEntity<br /></span><span style="color: #007700">{<br />    public </span><span style="color: #0000BB">$userid</span><span style="color: #007700">;<br /><br />    public </span><span style="color: #0000BB">$name</span><span style="color: #007700">;<br /><br />    public </span><span style="color: #0000BB">$country</span><span style="color: #007700">;<br /><br />    public </span><span style="color: #0000BB">$referred_by_userid</span><span style="color: #007700">;<br /><br />    public function </span><span style="color: #0000BB">__construct</span><span style="color: #007700">()<br />    {<br />        print </span><span style="color: #DD0000">"Constructor called with "</span><span style="color: #007700">. </span><span style="color: #0000BB">count</span><span style="color: #007700">(</span><span style="color: #0000BB">func_get_args</span><span style="color: #007700">()) .</span><span style="color: #DD0000">" args\n"</span><span style="color: #007700">;<br />        print </span><span style="color: #DD0000">"Properties set when constructor called? "<br />            </span><span style="color: #007700">. (isset(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">name</span><span style="color: #007700">) ? </span><span style="color: #DD0000">'Yes' </span><span style="color: #007700">: </span><span style="color: #DD0000">'No'</span><span style="color: #007700">) . </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />    }<br />}<br /><br /></span><span style="color: #0000BB">$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$db</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(<br />    </span><span style="color: #DD0000">"SELECT userid, name, country, referred_by_userid FROM users"<br /></span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">setFetchMode</span><span style="color: #007700">(</span><span style="color: #0000BB">PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_CLASS</span><span style="color: #007700">, </span><span style="color: #0000BB">TestEntity</span><span style="color: #007700">::class);<br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$result</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output
+something similar to:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+Constructor called with 0 args
+Properties set when constructor called? Yes
+object(TestEntity)#3 (4) {
+  [&quot;userid&quot;]=&gt;
+  int(104)
+  [&quot;name&quot;]=&gt;
+  string(5) &quot;Chris&quot;
+  [&quot;country&quot;]=&gt;
+  string(7) &quot;Ukraine&quot;
+  [&quot;referred_by_userid&quot;]=&gt;
+  NULL
+}
+</pre></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-classtype">
+  <h2 class="title">PDO::FETCH_CLASSTYPE (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   This fetch mode can only be used combined with
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-class">PDO::FETCH_CLASS</a></code></strong> (and
+   <a href="pdo.constants.fetch-modes.html#pdo.fetch-modes.class-flags" class="link">its other options</a>).
+  </p>
+  <p class="simpara">
+   When this fetch mode is used, PDO will use the first returned column as the
+   name of the class to return.
+  </p>
+  <p class="simpara">
+   If the specified class cannot be found, a <span class="classname"><a href="class.stdclass.html" class="classname">stdClass</a></span>
+   object will be returned, without warning or error.
+  </p>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class </span><span style="color: #0000BB">TestEntity<br /></span><span style="color: #007700">{<br />    public </span><span style="color: #0000BB">$userid</span><span style="color: #007700">;<br /><br />    public </span><span style="color: #0000BB">$name</span><span style="color: #007700">;<br /><br />    public </span><span style="color: #0000BB">$country</span><span style="color: #007700">;<br /><br />    public </span><span style="color: #0000BB">$referred_by_userid</span><span style="color: #007700">;<br /><br />    public function </span><span style="color: #0000BB">__construct</span><span style="color: #007700">()<br />    {<br />        print </span><span style="color: #DD0000">"Constructor called with "</span><span style="color: #007700">. </span><span style="color: #0000BB">count</span><span style="color: #007700">(</span><span style="color: #0000BB">func_get_args</span><span style="color: #007700">()) .</span><span style="color: #DD0000">" args\n"</span><span style="color: #007700">;<br />        print </span><span style="color: #DD0000">"Properties set when constructor called? "<br />            </span><span style="color: #007700">. (isset(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">name</span><span style="color: #007700">) ? </span><span style="color: #DD0000">'Yes' </span><span style="color: #007700">: </span><span style="color: #DD0000">'No'</span><span style="color: #007700">) . </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />    }<br />}<br /><br /></span><span style="color: #0000BB">$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$db</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(<br />    </span><span style="color: #DD0000">"SELECT 'TestEntity', userid, name, country, referred_by_userid FROM users"<br /></span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">setFetchMode</span><span style="color: #007700">(</span><span style="color: #0000BB">PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_CLASS </span><span style="color: #007700">| </span><span style="color: #0000BB">PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_CLASSTYPE</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$result</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output
+something similar to:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+Constructor called with 0 args
+Properties set when constructor called? Yes
+object(TestEntity)#3 (4) {
+  [&quot;userid&quot;]=&gt;
+  int(104)
+  [&quot;name&quot;]=&gt;
+  string(5) &quot;Chris&quot;
+  [&quot;country&quot;]=&gt;
+  string(7) &quot;Ukraine&quot;
+  [&quot;referred_by_userid&quot;]=&gt;
+  NULL
+}
+</pre></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-props-late">
+  <h2 class="title">PDO::FETCH_PROPS_LATE (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   This fetch mode can only be used combined with
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-class">PDO::FETCH_CLASS</a></code></strong> (and
+   <a href="pdo.constants.fetch-modes.html#pdo.fetch-modes.class-flags" class="link">its other options</a>).
+  </p>
+  <p class="simpara">
+   When this fetch mode is used, the constructor will be called before the
+   properties are set.
+  </p>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class </span><span style="color: #0000BB">TestEntity<br /></span><span style="color: #007700">{<br />    public </span><span style="color: #0000BB">$userid</span><span style="color: #007700">;<br /><br />    public </span><span style="color: #0000BB">$name</span><span style="color: #007700">;<br /><br />    public </span><span style="color: #0000BB">$country</span><span style="color: #007700">;<br /><br />    public </span><span style="color: #0000BB">$referred_by_userid</span><span style="color: #007700">;<br /><br />    public function </span><span style="color: #0000BB">__construct</span><span style="color: #007700">()<br />    {<br />        print </span><span style="color: #DD0000">"Constructor called with "</span><span style="color: #007700">. </span><span style="color: #0000BB">count</span><span style="color: #007700">(</span><span style="color: #0000BB">func_get_args</span><span style="color: #007700">()) .</span><span style="color: #DD0000">" args\n"</span><span style="color: #007700">;<br />        print </span><span style="color: #DD0000">"Properties set when constructor called? "<br />            </span><span style="color: #007700">. (isset(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">name</span><span style="color: #007700">) ? </span><span style="color: #DD0000">'Yes' </span><span style="color: #007700">: </span><span style="color: #DD0000">'No'</span><span style="color: #007700">) . </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />    }<br />}<br /><br /></span><span style="color: #0000BB">$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$db</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(<br />    </span><span style="color: #DD0000">"SELECT userid, name, country, referred_by_userid FROM users"<br /></span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">setFetchMode</span><span style="color: #007700">(</span><span style="color: #0000BB">PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_CLASS </span><span style="color: #007700">| </span><span style="color: #0000BB">PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_PROPS_LATE</span><span style="color: #007700">, </span><span style="color: #0000BB">TestEntity</span><span style="color: #007700">::class);<br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$result</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output
+something similar to:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+Constructor called with 0 args
+Properties set when constructor called? No
+object(TestEntity)#3 (4) {
+  [&quot;userid&quot;]=&gt;
+  int(104)
+  [&quot;name&quot;]=&gt;
+  string(5) &quot;Chris&quot;
+  [&quot;country&quot;]=&gt;
+  string(7) &quot;Ukraine&quot;
+  [&quot;referred_by_userid&quot;]=&gt;
+  NULL
+}
+</pre></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-serialize">
+  <h2 class="title">PDO::FETCH_SERIALIZE (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <div class="warning"><strong class="warning">Warning</strong><p class="simpara">This feature has been
+<em>DEPRECATED</em> as of PHP 8.1.0. Relying on this feature
+is highly discouraged.</p></div>
+  <p class="simpara">
+   This fetch mode can only be used combined with
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-class">PDO::FETCH_CLASS</a></code></strong> (and
+   <a href="pdo.constants.fetch-modes.html#pdo.fetch-modes.class-flags" class="link">its other options</a>).
+  </p>
+  <p class="simpara">
+   When this fetch mode is used, the specified class must be
+   <span class="interfacename"><a href="class.serializable.html" class="interfacename">Serializable</a></span>.
+  </p>
+  <div class="caution"><strong class="caution">Caution</strong>
+   <p class="simpara">
+    This feature does not support a string that contains a complete serialized
+    object (with <span class="function"><a href="function.serialize.html" class="function">serialize()</a></span>).
+   </p>
+  </div>
+  <div class="caution"><strong class="caution">Caution</strong>
+   <p class="simpara">
+    This fetch mode does not call the constructor.
+   </p>
+  </div>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class </span><span style="color: #0000BB">TestEntity </span><span style="color: #007700">implements </span><span style="color: #0000BB">Serializable<br /></span><span style="color: #007700">{<br />    public </span><span style="color: #0000BB">$userid</span><span style="color: #007700">;<br /><br />    public </span><span style="color: #0000BB">$name</span><span style="color: #007700">;<br /><br />    public </span><span style="color: #0000BB">$country</span><span style="color: #007700">;<br /><br />    public </span><span style="color: #0000BB">$referred_by_userid</span><span style="color: #007700">;<br /><br />    public function </span><span style="color: #0000BB">__construct</span><span style="color: #007700">()<br />    {<br />        print </span><span style="color: #DD0000">"Constructor called with " </span><span style="color: #007700">. </span><span style="color: #0000BB">count</span><span style="color: #007700">(</span><span style="color: #0000BB">func_get_args</span><span style="color: #007700">()) . </span><span style="color: #DD0000">" args\n"</span><span style="color: #007700">;<br />        print </span><span style="color: #DD0000">"Properties set when constructor called? "<br />            </span><span style="color: #007700">. (isset(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">name</span><span style="color: #007700">) ? </span><span style="color: #DD0000">'Yes' </span><span style="color: #007700">: </span><span style="color: #DD0000">'No'</span><span style="color: #007700">) . </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />    }<br /><br />    public function </span><span style="color: #0000BB">serialize</span><span style="color: #007700">()<br />    {<br />        return </span><span style="color: #0000BB">join</span><span style="color: #007700">(<br />            </span><span style="color: #DD0000">"|"</span><span style="color: #007700">,<br />            [</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">userid</span><span style="color: #007700">, </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">name</span><span style="color: #007700">, </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">country</span><span style="color: #007700">, </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">referred_by_userid</span><span style="color: #007700">]<br />        );<br />    }<br /><br />    public function </span><span style="color: #0000BB">unserialize</span><span style="color: #007700">(</span><span style="color: #0000BB">string $data</span><span style="color: #007700">)<br />    {<br />        </span><span style="color: #0000BB">$parts </span><span style="color: #007700">= </span><span style="color: #0000BB">explode</span><span style="color: #007700">(</span><span style="color: #DD0000">"|"</span><span style="color: #007700">, </span><span style="color: #0000BB">$data</span><span style="color: #007700">);<br />        </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">userid </span><span style="color: #007700">= (int) </span><span style="color: #0000BB">$parts</span><span style="color: #007700">[</span><span style="color: #0000BB">0</span><span style="color: #007700">];<br />        </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">name </span><span style="color: #007700">= </span><span style="color: #0000BB">$parts</span><span style="color: #007700">[</span><span style="color: #0000BB">1</span><span style="color: #007700">];<br />        </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">country </span><span style="color: #007700">= </span><span style="color: #0000BB">$parts</span><span style="color: #007700">[</span><span style="color: #0000BB">2</span><span style="color: #007700">];<br /><br />        </span><span style="color: #0000BB">$refId </span><span style="color: #007700">= </span><span style="color: #0000BB">$parts</span><span style="color: #007700">[</span><span style="color: #0000BB">3</span><span style="color: #007700">];<br />        </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">referred_by_userid </span><span style="color: #007700">= (</span><span style="color: #0000BB">$refId </span><span style="color: #007700">=== </span><span style="color: #DD0000">"" </span><span style="color: #007700">? </span><span style="color: #0000BB">null </span><span style="color: #007700">: (int) </span><span style="color: #0000BB">$refId</span><span style="color: #007700">);<br />    }<br />}<br /><br />print </span><span style="color: #DD0000">"Set up record (constructor called manually):\n"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$db</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">exec</span><span style="color: #007700">(<br />    </span><span style="color: #DD0000">"CREATE TABLE serialize (<br />        sdata TEXT<br />    )"<br /></span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$origObj </span><span style="color: #007700">= new </span><span style="color: #0000BB">TestEntity</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">$origObj</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">userid </span><span style="color: #007700">= </span><span style="color: #0000BB">200</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$origObj</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">name </span><span style="color: #007700">= </span><span style="color: #DD0000">'Seri'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$origObj</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">country </span><span style="color: #007700">= </span><span style="color: #DD0000">'Syria'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$origObj</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">referred_by_userid </span><span style="color: #007700">= </span><span style="color: #0000BB">null</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$insert </span><span style="color: #007700">= </span><span style="color: #0000BB">$db</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">prepare</span><span style="color: #007700">(</span><span style="color: #DD0000">"INSERT INTO serialize (sdata) VALUES (:sdata)"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$insert</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">execute</span><span style="color: #007700">([</span><span style="color: #DD0000">'sdata' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">$origObj</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">serialize</span><span style="color: #007700">()]);<br /><br />print </span><span style="color: #DD0000">"\nRetrieve result:\n"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$query </span><span style="color: #007700">= </span><span style="color: #DD0000">"SELECT sdata FROM serialize"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$db</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(</span><span style="color: #0000BB">$query</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">// NOTE: Constructor is never called!<br /></span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">setFetchMode</span><span style="color: #007700">(</span><span style="color: #0000BB">PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_CLASS </span><span style="color: #007700">| </span><span style="color: #0000BB">PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_SERIALIZE</span><span style="color: #007700">, </span><span style="color: #0000BB">TestEntity</span><span style="color: #007700">::class);<br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$result</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output
+something similar to:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+Deprecated: TestEntity implements the Serializable interface, which is deprecated. Implement __serialize() and __unserialize() instead (or in addition, if support for old PHP versions is necessary) in Standard input code on line 2
+Set up record (constructor called manually):
+Constructor called with 0 args
+Properties set when constructor called? No
+
+Retrieve result:
+Deprecated: PDOStatement::setFetchMode(): The PDO::FETCH_SERIALIZE mode is deprecated in Standard input code on line 58
+
+Deprecated: PDOStatement::fetch(): The PDO::FETCH_SERIALIZE mode is deprecated in Standard input code on line 59
+object(TestEntity)#5 (4) {
+  [&quot;userid&quot;]=&gt;
+  int(200)
+  [&quot;name&quot;]=&gt;
+  string(4) &quot;Seri&quot;
+  [&quot;country&quot;]=&gt;
+  string(5) &quot;Syria&quot;
+  [&quot;referred_by_userid&quot;]=&gt;
+  NULL
+}
+</pre></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-bound">
+  <h2 class="title">PDO::FETCH_BOUND (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   This fetch mode cannot be used with
+   <span class="methodname"><a href="pdostatement.fetchall.html" class="methodname">PDOStatement::fetchAll()</a></span>.
+  </p>
+  <p class="simpara">
+   This fetch mode does not directly return a result, but binds values to
+   variables specified with <span class="methodname"><a href="pdostatement.bindcolumn.html" class="methodname">PDOStatement::bindColumn()</a></span>. The
+   called fetch method returns <strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong>.
+  </p>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <span class="simpara">
+    When using prepared statements, to work correctly, variables must be bound
+    after the query is executed.
+   </span>
+  </p></blockquote>
+  <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$query </span><span style="color: #007700">= </span><span style="color: #DD0000">"SELECT users.userid, users.name, users.country, referrer.name<br />    FROM users<br />    LEFT JOIN users AS referrer ON users.referred_by_userid = referrer.userid"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$db</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">prepare</span><span style="color: #007700">(</span><span style="color: #0000BB">$query</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">execute</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">bindColumn</span><span style="color: #007700">(</span><span style="color: #DD0000">'userid'</span><span style="color: #007700">, </span><span style="color: #0000BB">$userId</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">bindColumn</span><span style="color: #007700">(</span><span style="color: #DD0000">'name'</span><span style="color: #007700">, </span><span style="color: #0000BB">$name</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">bindColumn</span><span style="color: #007700">(</span><span style="color: #DD0000">'country'</span><span style="color: #007700">, </span><span style="color: #0000BB">$country</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">// Bind by column position to resolve duplicated column name<br />// To avoid this breaking if the query is changed, use an SQL alias instead<br />// For example: referrer.name AS referrer_name<br /></span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">bindColumn</span><span style="color: #007700">(</span><span style="color: #0000BB">4</span><span style="color: #007700">, </span><span style="color: #0000BB">$referrerName</span><span style="color: #007700">);<br /><br />while (</span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_BOUND</span><span style="color: #007700">)) {<br />    print </span><span style="color: #0000BB">join</span><span style="color: #007700">(</span><span style="color: #DD0000">"\t"</span><span style="color: #007700">, [</span><span style="color: #0000BB">$userId</span><span style="color: #007700">, </span><span style="color: #0000BB">$name</span><span style="color: #007700">, </span><span style="color: #0000BB">$country</span><span style="color: #007700">, (</span><span style="color: #0000BB">$referrerName </span><span style="color: #007700">?? </span><span style="color: #DD0000">'NULL'</span><span style="color: #007700">)]) . </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />}</span></span></code></div>
+  </div>
+
+  <p class="para">The above example will output:</p>
+  <div class="example-contents screen">
+<div class="cdata"><pre>
+104	Chris	Ukraine	NULL
+105	Jamie	England	NULL
+107	Robin	Germany	Chris
+108	Sean	Ukraine	NULL
+109	Toni	Germany	NULL
+110	Toni	Germany	NULL
+</pre></div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-into">
+  <h2 class="title">PDO::FETCH_INTO (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   This fetch mode cannot be used with
+   <span class="methodname"><a href="pdostatement.fetchall.html" class="methodname">PDOStatement::fetchAll()</a></span>.
+  </p>
+  <p class="simpara">
+   This fetch mode updates properties in the specified object. The object is
+   returned on success.
+  </p>
+  <p class="simpara">
+   If a property does not exist with the name of a returned column, it will be
+   dynamically declared. This behavior is deprecated and will cause an error
+   from PHP 9.0.
+  </p>
+  <p class="simpara">
+   Properties must be <code class="literal">public</code> and cannot be
+   <code class="literal">readonly</code>.
+  </p>
+  <div class="caution"><strong class="caution">Caution</strong>
+   <p class="simpara">
+    There&#039;s no way to change the object to be updated without using
+    <span class="methodname"><a href="pdostatement.setfetchmode.html" class="methodname">PDOStatement::setFetchMode()</a></span> between retrieving each
+    record.
+   </p>
+  </div>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class </span><span style="color: #0000BB">TestEntity<br /></span><span style="color: #007700">{<br />    public </span><span style="color: #0000BB">$userid</span><span style="color: #007700">;<br /><br />    public </span><span style="color: #0000BB">$name</span><span style="color: #007700">;<br /><br />    public </span><span style="color: #0000BB">$country</span><span style="color: #007700">;<br /><br />    public </span><span style="color: #0000BB">$referred_by_userid</span><span style="color: #007700">;<br />}<br /><br /></span><span style="color: #0000BB">$obj </span><span style="color: #007700">= new </span><span style="color: #0000BB">TestEntity</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">setFetchMode</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_INTO</span><span style="color: #007700">, </span><span style="color: #0000BB">$obj</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$db</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT userid, name, country, referred_by_userid FROM users"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$result</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output
+something similar to:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+object(TestEntity)#3 (4) {
+  [&quot;userid&quot;]=&gt;
+  int(104)
+  [&quot;name&quot;]=&gt;
+  string(5) &quot;Chris&quot;
+  [&quot;country&quot;]=&gt;
+  string(7) &quot;Ukraine&quot;
+  [&quot;referred_by_userid&quot;]=&gt;
+  NULL
+}
+</pre></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-lazy">
+  <h2 class="title">PDO::FETCH_LAZY (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   This fetch mode cannot be used with
+   <span class="methodname"><a href="pdostatement.fetchall.html" class="methodname">PDOStatement::fetchAll()</a></span>.
+  </p>
+  <p class="simpara">
+   This fetch mode returns a <span class="classname"><a href="class.pdorow.html" class="classname">PDORow</a></span> object which provides
+   both array- and object-like access to values (i.e. combines the behavior of
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-both">PDO::FETCH_BOTH</a></code></strong> and
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-obj">PDO::FETCH_OBJ</a></code></strong>), retrieved in a lazy manner.
+  </p>
+  <p class="simpara">
+   This can provide memory efficient access (on the PHP side) to unbuffered
+   results on the database server. Whether PDO uses client-side buffering for
+   results depends on the database-specific driver used (and its configuration).
+  </p>
+  <div class="caution"><strong class="caution">Caution</strong>
+   <p class="simpara">
+    <span class="classname"><a href="class.pdorow.html" class="classname">PDORow</a></span> will return <code class="literal">NULL</code> without
+    any error or warning when accessing properties or keys that are not defined.
+    This can make errors such as typos or queries not returning expected data
+    harder to spot and debug.
+   </p>
+  </div>
+  <div class="caution"><strong class="caution">Caution</strong>
+   <p class="simpara">
+    The returned <span class="classname"><a href="class.pdorow.html" class="classname">PDORow</a></span> object is updated each time a
+    result is retrieved.
+   </p>
+  </div>
+  <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$db</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT userid, name, country, referred_by_userid FROM users"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_LAZY</span><span style="color: #007700">);<br /><br />print </span><span style="color: #DD0000">"ID: "</span><span style="color: #007700">. </span><span style="color: #0000BB">$result</span><span style="color: #007700">[</span><span style="color: #0000BB">0</span><span style="color: #007700">] .</span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />print </span><span style="color: #DD0000">"Name: </span><span style="color: #007700">{</span><span style="color: #0000BB">$result</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">name</span><span style="color: #007700">}</span><span style="color: #DD0000">\n"</span><span style="color: #007700">;<br />print </span><span style="color: #DD0000">"Country: " </span><span style="color: #007700">. </span><span style="color: #0000BB">$result</span><span style="color: #007700">[</span><span style="color: #DD0000">'country'</span><span style="color: #007700">] .</span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br /></span><span style="color: #FF8000">// Returns NULL. No warning or error is raised.<br /></span><span style="color: #007700">print </span><span style="color: #DD0000">"Does not exist: " </span><span style="color: #007700">. </span><span style="color: #0000BB">var_export</span><span style="color: #007700">(</span><span style="color: #0000BB">$result</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">does_not_exist</span><span style="color: #007700">, </span><span style="color: #0000BB">true</span><span style="color: #007700">) . </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$differentResult </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_LAZY</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">// The previously retrieved PDORow now points to the newly retrieved result<br /></span><span style="color: #007700">print </span><span style="color: #DD0000">"ID: "</span><span style="color: #007700">. </span><span style="color: #0000BB">$result</span><span style="color: #007700">[</span><span style="color: #0000BB">0</span><span style="color: #007700">] .</span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;</span></span></code></div>
+  </div>
+
+  <p class="para">The above example will output:</p>
+  <div class="example-contents screen">
+<div class="cdata"><pre>
+ID: 104
+Name: Chris
+Country: Ukraine
+Does not exist: NULL
+ID: 105
+</pre></div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-group">
+  <h2 class="title">PDO::FETCH_GROUP (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-group">PDO::FETCH_GROUP</a></code></strong> returns lists of associative arrays,
+   indexed by a (non-unique) column. This fetch mode only works with
+   <span class="methodname"><a href="pdostatement.fetchall.html" class="methodname">PDOStatement::fetchAll()</a></span>.
+  </p>
+  <p class="simpara">
+   When combined with <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-unique">PDO::FETCH_UNIQUE</a></code></strong>, both modes will
+   use the same column, rendering the combination of these modes useless.
+  </p>
+  <p class="simpara">
+   This fetch should be combined with one of
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-assoc">PDO::FETCH_ASSOC</a></code></strong>, <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-both">PDO::FETCH_BOTH</a></code></strong>,
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-named">PDO::FETCH_NAMED</a></code></strong>, <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-num">PDO::FETCH_NUM</a></code></strong>,
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-column">PDO::FETCH_COLUMN</a></code></strong> or
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-func">PDO::FETCH_FUNC</a></code></strong>.
+  </p>
+  <p class="simpara">
+   If no fetch mode from the above list is given, the current default fetch mode
+   for the <span class="classname"><a href="class.pdostatement.html" class="classname">PDOStatement</a></span> will be used.
+  </p>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$pdo</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT country, userid, name FROM users"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetchAll</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_GROUP </span><span style="color: #007700">| </span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_ASSOC</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+Array
+(
+    [Ukraine] =&gt; Array
+        (
+            [0] =&gt; Array
+                (
+                    [userid] =&gt; 104
+                    [name] =&gt; Chris
+                )
+
+            [1] =&gt; Array
+                (
+                    [userid] =&gt; 108
+                    [name] =&gt; Sean
+                )
+
+        )
+    [England] =&gt; Array
+        (
+            [0] =&gt; Array
+                (
+                    [userid] =&gt; 105
+                    [name] =&gt; Jamie
+                )
+
+        )
+
+    [Germany] =&gt; Array
+        (
+            [0] =&gt; Array
+                (
+                    [userid] =&gt; 107
+                    [name] =&gt; Robin
+                )
+
+            [1] =&gt; Array
+                (
+                    [userid] =&gt; 109
+                    [name] =&gt; Toni
+                )
+        )
+)
+</pre></div>
+   </div>
+  </div>
+  <p class="simpara">
+   In the above example one should note that the first column is omitted from the
+   array for each row, only available as the key. It can be included by
+   repeating the column, as in the following example:
+  </p>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$pdo</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT country, userid, name, country FROM users"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetchAll</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_GROUP </span><span style="color: #007700">| </span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_ASSOC</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+Array
+(
+    [Ukraine] =&gt; Array
+        (
+            [0] =&gt; Array
+                (
+                    [userid] =&gt; 104
+                    [name] =&gt; Chris
+                    [country] =&gt; Ukraine
+                )
+
+            [1] =&gt; Array
+                (
+                    [userid] =&gt; 108
+                    [name] =&gt; Sean
+                    [country] =&gt; Ukraine
+                )
+
+        )
+    [England] =&gt; Array
+        (
+            [0] =&gt; Array
+                (
+                    [userid] =&gt; 105
+                    [name] =&gt; Jamie
+                    [country] =&gt; England
+                )
+
+        )
+
+    [Germany] =&gt; Array
+        (
+            [0] =&gt; Array
+                (
+                    [userid] =&gt; 107
+                    [name] =&gt; Robin
+                    [country] =&gt; Germany
+                )
+
+            [1] =&gt; Array
+                (
+                    [userid] =&gt; 109
+                    [name] =&gt; Toni
+                    [country] =&gt; Germany
+                )
+        )
+)
+</pre></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="section" id="pdo.constants.fetch-unique">
+  <h2 class="title">PDO::FETCH_UNIQUE (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)</h2>
+  <p class="simpara">
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-unique">PDO::FETCH_UNIQUE</a></code></strong> uses the first column to index records,
+   returning 1 record per index value. This fetch mode only works with
+   <span class="methodname"><a href="pdostatement.fetchall.html" class="methodname">PDOStatement::fetchAll()</a></span>.
+  </p>
+  <p class="simpara">
+   When combined with <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-group">PDO::FETCH_GROUP</a></code></strong>, both modes will use
+   the same column, rendering the combination of these modes useless.
+  </p>
+  <p class="simpara">
+   This fetch should be combined with one of
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-assoc">PDO::FETCH_ASSOC</a></code></strong>, <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-both">PDO::FETCH_BOTH</a></code></strong>,
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-named">PDO::FETCH_NAMED</a></code></strong>, <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-num">PDO::FETCH_NUM</a></code></strong>,
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-column">PDO::FETCH_COLUMN</a></code></strong> or
+   <strong><code><a href="pdo.constants.fetch-modes.html#pdo.constants.fetch-func">PDO::FETCH_FUNC</a></code></strong>.
+  </p>
+  <p class="simpara">
+   If no fetch mode from the above list is given, the current default fetch mode
+   for the <span class="classname"><a href="class.pdostatement.html" class="classname">PDOStatement</a></span> will be used.
+  </p>
+  <p class="simpara">
+   When used with a column that is known to be unique (such as record ID), this
+   mode provides the ability to quickly return results indexed by that value.
+  </p>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <span class="simpara">
+    If the first column is not unique, values will be lost. Which value(s) are
+    lost should be considered undefined.
+   </span>
+  </p></blockquote>
+  <div class="caution"><strong class="caution">Caution</strong>
+   <p class="simpara">
+    Filtering records should be done in SQL where possible. The database will
+    use indexes to optimize this process and return only the required records.
+    Selecting more records than required from the database may significantly
+    increase memory usage and query time for larger result sets.
+   </p>
+  </div>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$pdo</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT userid, name, country FROM users LIMIT 3"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetchAll</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_UNIQUE </span><span style="color: #007700">| </span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_ASSOC</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+Array
+(
+    [104] =&gt; Array
+        (
+            [name] =&gt; Chris
+            [country] =&gt; Ukraine
+        )
+
+    [105] =&gt; Array
+        (
+            [name] =&gt; Jamie
+            [country] =&gt; England
+        )
+
+    [107] =&gt; Array
+        (
+            [name] =&gt; Robin
+            [country] =&gt; Germany
+        )
+
+)
+</pre></div>
+   </div>
+  </div>
+  <p class="simpara">
+   In the above example one should note that the first column is omitted from the
+   array for each row, only available as the key. It can be included by
+   repeating the column, as in the following example:
+  </p>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">$pdo</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">query</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT userid, userid, name, country FROM users LIMIT 3"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">$stmt</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">fetchAll</span><span style="color: #007700">(</span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_UNIQUE </span><span style="color: #007700">| </span><span style="color: #0000BB">\PDO</span><span style="color: #007700">::</span><span style="color: #0000BB">FETCH_ASSOC</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">);</span></span></code></div>
+   </div>
+
+   <p class="para">The above example will output:</p>
+   <div class="example-contents screen">
+<div class="cdata"><pre>
+Array
+(
+    [104] =&gt; Array
+        (
+            [userid] =&gt; 104
+            [name] =&gt; Chris
+            [country] =&gt; Ukraine
+        )
+
+    [105] =&gt; Array
+        (
+            [userid] =&gt; 105
+            [name] =&gt; Jamie
+            [country] =&gt; England
+        )
+
+    [107] =&gt; Array
+        (
+            [userid] =&gt; 107
+            [name] =&gt; Robin
+            [country] =&gt; Germany
+        )
+
+)
+</pre></div>
+   </div>
+  </div>
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

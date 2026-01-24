@@ -1,0 +1,163 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Enum values in constant expressions</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="language.enumerations.traits.html" class="navbar__link">« Traits</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="language.enumerations.object-differences.html" class="navbar__link">Differences from objects »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="language.enumerations.html">Enumerations</a></li>
+        <li>Enum values in constant expressions</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="language.enumerations.expressions" class="sect1">
+  <h2 class="title">Enum values in constant expressions</h2>
+
+  <p class="para">
+   Because cases are represented as constants on the enum itself, they may be used as static
+   values in most constant expressions: property defaults, static variable defaults, parameter
+   defaults, global and class constant values. They may not be used in other enum case values, but
+   normal constants may refer to an enum case.
+  </p>
+
+  <p class="para">
+   However, implicit magic method calls such as <span class="classname"><a href="class.arrayaccess.html" class="classname">ArrayAccess</a></span> on enums are not allowed in static
+   or constant definitions as we cannot absolutely guarantee that the resulting value is deterministic
+   or that the method invocation is free of side effects. Function calls, method calls, and
+   property access continue to be invalid operations in constant expressions.
+  </p>
+
+  <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #FF8000">// This is an entirely legal Enum definition.<br /></span><span style="color: #007700">enum </span><span style="color: #0000BB">Direction </span><span style="color: #007700">implements </span><span style="color: #0000BB">ArrayAccess<br /></span><span style="color: #007700">{<br />    case </span><span style="color: #0000BB">Up</span><span style="color: #007700">;<br />    case </span><span style="color: #0000BB">Down</span><span style="color: #007700">;<br /><br />    public function </span><span style="color: #0000BB">offsetExists</span><span style="color: #007700">(</span><span style="color: #0000BB">$offset</span><span style="color: #007700">): </span><span style="color: #0000BB">bool<br />    </span><span style="color: #007700">{<br />        return </span><span style="color: #0000BB">false</span><span style="color: #007700">;<br />    }<br /><br />    public function </span><span style="color: #0000BB">offsetGet</span><span style="color: #007700">(</span><span style="color: #0000BB">$offset</span><span style="color: #007700">): </span><span style="color: #0000BB">mixed<br />    </span><span style="color: #007700">{<br />        return </span><span style="color: #0000BB">null</span><span style="color: #007700">;<br />    }<br /><br />    public function </span><span style="color: #0000BB">offsetSet</span><span style="color: #007700">(</span><span style="color: #0000BB">$offset</span><span style="color: #007700">, </span><span style="color: #0000BB">$value</span><span style="color: #007700">): </span><span style="color: #0000BB">void<br />    </span><span style="color: #007700">{<br />        throw new </span><span style="color: #0000BB">Exception</span><span style="color: #007700">();<br />    }<br /><br />    public function </span><span style="color: #0000BB">offsetUnset</span><span style="color: #007700">(</span><span style="color: #0000BB">$offset</span><span style="color: #007700">): </span><span style="color: #0000BB">void<br />    </span><span style="color: #007700">{<br />        throw new </span><span style="color: #0000BB">Exception</span><span style="color: #007700">();<br />    }<br />}<br /><br />class </span><span style="color: #0000BB">Foo<br /></span><span style="color: #007700">{<br />    </span><span style="color: #FF8000">// This is allowed.<br />    </span><span style="color: #007700">const </span><span style="color: #0000BB">DOWN </span><span style="color: #007700">= </span><span style="color: #0000BB">Direction</span><span style="color: #007700">::</span><span style="color: #0000BB">Down</span><span style="color: #007700">;<br /><br />    </span><span style="color: #FF8000">// This is disallowed, as it may not be deterministic.<br />    </span><span style="color: #007700">const </span><span style="color: #0000BB">UP </span><span style="color: #007700">= </span><span style="color: #0000BB">Direction</span><span style="color: #007700">::</span><span style="color: #0000BB">Up</span><span style="color: #007700">[</span><span style="color: #DD0000">'short'</span><span style="color: #007700">];<br />    </span><span style="color: #FF8000">// Fatal error: Cannot use [] on enums in constant expression<br /></span><span style="color: #007700">}<br /><br /></span><span style="color: #FF8000">// This is entirely legal, because it's not a constant expression.<br /></span><span style="color: #0000BB">$x </span><span style="color: #007700">= </span><span style="color: #0000BB">Direction</span><span style="color: #007700">::</span><span style="color: #0000BB">Up</span><span style="color: #007700">[</span><span style="color: #DD0000">'short'</span><span style="color: #007700">];<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #DD0000">"\$x is " </span><span style="color: #007700">. </span><span style="color: #0000BB">var_export</span><span style="color: #007700">(</span><span style="color: #0000BB">$x</span><span style="color: #007700">, </span><span style="color: #0000BB">true</span><span style="color: #007700">));<br /><br /></span><span style="color: #0000BB">$foo </span><span style="color: #007700">= new </span><span style="color: #0000BB">Foo</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+  </div>
+
+ </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

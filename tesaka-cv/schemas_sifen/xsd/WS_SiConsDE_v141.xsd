@@ -3,8 +3,8 @@
 	elementFormDefault="qualified" xmlns="http://ekuatia.set.gov.py/sifen/xsd"
 	targetNamespace="http://ekuatia.set.gov.py/sifen/xsd">
 
-	<xs:include schemaLocation= "https://ekuatia.set.gov.py/sifen/xsd/FE_Types_v141.xsd"/>
-	<xs:include schemaLocation= "https://ekuatia.set.gov.py/sifen/xsd/SIFEN_Types_v141.xsd"/>
+	<xs:include schemaLocation="FE_Types_v141.xsd"/>
+	<xs:include schemaLocation="SIFEN_Types_v141.xsd"/>
 
 	<xs:element name="rEnviConsDeRequest">
 		<xs:complexType>

@@ -1,0 +1,256 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Installing from source on Unix and macOS systems</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="install.unix.openbsd.html" class="navbar__link">« Installing from packages or ports on OpenBSD</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="install.unix.commandline.html" class="navbar__link">CGI and command line setups »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="install.unix.html">Installation on Unix systems</a></li>
+        <li>Installing from source on Unix and macOS systems</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="install.unix.source" class="sect1">
+ <h2 class="title">Installing from source on Unix and macOS systems</h2>
+ <p class="para">
+  Prerequisite software for compiling:
+  <ul class="simplelist">
+   <li>
+    <a href="https://www.gnu.org/software/make/make.html" class="link external">&raquo;&nbsp;GNU <strong class="command">make</strong></a>
+   </li>
+   <li>
+    A C compiler (as of PHP 8.0.0, C99 compatibility is required; as of PHP 8.4.0, C11 compatibility is required)
+   </li>
+   <li>
+    A web server
+   </li>
+   <li>
+    Any module specific components (such as <abbr title="Graphics Draw">GD</abbr>,
+    <abbr title="Portable Document Format">PDF</abbr> libs, etc.)
+   </li>
+  </ul>
+ </p>
+
+ <p class="para">
+  When building directly from Git sources or after custom modifications,
+  these additional tools may be necessary:
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <a href="https://www.gnu.org/software/autoconf/autoconf.html" class="link external">&raquo;&nbsp;autoconf</a>:
+    </span>
+    <ul class="simplelist">
+     <li>
+      PHP 7.3 and later: 2.68+
+     </li>
+     <li>
+      PHP 7.2: 2.64+
+     </li>
+     <li>
+      PHP 7.1 and earlier: 2.59+
+     </li>
+    </ul>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <a href="https://re2c.org/" class="link external">&raquo;&nbsp;re2c</a>:
+    </span>
+    <ul class="simplelist">
+     <li>
+      PHP 8.3 and later: 1.0.3+
+     </li>
+     <li>
+      PHP 8.2 and earlier: 0.13.4+
+     </li>
+    </ul>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <a href="http://www.gnu.org/software/bison/bison.html" class="link external">&raquo;&nbsp;bison</a>:
+    </span>
+    <ul class="simplelist">
+     <li>
+      PHP 7.4 and later: 3.0.0+
+     </li>
+     <li>
+      PHP 7.3 and earlier: 2.4+ (including Bison 3.x)
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </p>
+
+ <p class="simpara">
+  For more detailed steps for compiling PHP from source, see the
+  <a href="https://github.com/php/php-src/blob/master/README.md" class="link external">&raquo;&nbsp;README.md</a>
+  file in the source tarball.
+ </p>
+
+ <p class="simpara">
+  The initial PHP setup and configuration process is controlled by the
+  use of the command line options of the <strong class="command">configure</strong>
+  script. A list of available options along with short explanations can
+  be shown by running <strong class="command">./configure --help</strong>.
+  This manual documents the different options separately.
+  The <a href="configure.about.html" class="link">core options can be found in the
+  appendix</a>, while the different extension specific options are
+  described on the reference pages.
+ </p>
+
+ <p class="simpara">
+  After the configuration script was been run, PHP can be built using
+  the <strong class="command">make</strong> command.
+  The <a href="faq.installation.html" class="link">Installation section of the
+  frequently asked questions</a> has further information about how
+  to handle build problems.
+ </p>
+
+ <blockquote class="note"><p><strong class="note">Note</strong>: 
+  <span class="simpara">
+   Some Unix systems (such as OpenBSD and SELinux) may disallow mapping
+   pages both writable and executable for security reasons, what is called
+   <a href="https://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options#Restrict_mprotect()" class="link external">&raquo;&nbsp;PaX MPROTECT</a>
+   or <a href="https://en.wikipedia.org/wiki/W^X" class="link external">&raquo;&nbsp;W^X violation
+   protection</a>.
+   This kind of memory mapping is necessary for PCRE&#039;s JIT support, so
+   either PHP has to be built <a href="pcre.installation.html" class="link">without
+   PCRE&#039;s JIT support</a>, or the binary has to be whitelisted by
+   any means provided by the system.
+  </span>
+ </p></blockquote>
+
+ <blockquote class="note"><p><strong class="note">Note</strong>: 
+  <span class="simpara">
+   Cross-compiling for ARM with the Android toolchain is currently not supported.
+  </span>
+ </p></blockquote>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

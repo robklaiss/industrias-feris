@@ -1,0 +1,243 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>List of php.ini sections</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="ini.list.html" class="navbar__link">« List of php.ini directives</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="ini.core.html" class="navbar__link">Description of core php.ini directives »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ini.html">php.ini directives</a></li>
+        <li>List of php.ini sections</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="ini.sections" class="section">
+  <h2 class="title">List of <var class="filename">php.ini</var> sections</h2>
+  <p class="para">
+   This list includes the <var class="filename">php.ini</var> sections you can set to configure your
+   PHP setup on a per Host or Path basis. These sections are optional.
+  </p>
+  <p class="para">
+   These sections don&#039;t directly affect PHP. They are used to group other
+   <var class="filename">php.ini</var> directives together and to get them to act upon a particular host
+   or on a particular path.
+  </p>
+  <p class="para">
+   These sections are used only in CGI/FastCGI mode and they can not set
+   <a href="ini.core.html#ini.extension" class="link">extension</a> and <a href="ini.core.html#ini.zend-extension" class="link">zend_extension</a> directives.
+  </p>
+  <p class="para">
+   <table class="doctable table">
+    <caption><strong>Sections</strong></caption>
+    
+     <thead>
+      <tr>
+       <th>Name</th>
+       <th>Changeable</th>
+       <th>Changelog</th>
+      </tr>
+
+     </thead>
+
+     <tbody class="tbody">
+      <tr>
+       <td><a href="ini.sections.html#ini.per-host" class="link">[HOST=]</a></td>
+       <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+       <td class="empty">&nbsp;</td>
+      </tr>
+
+      <tr>
+       <td><a href="ini.sections.html#ini.per-path" class="link">[PATH=]</a></td>
+       <td><strong><code><a href="info.constants.html#constant.ini-system">INI_SYSTEM</a></code></strong></td>
+       <td class="empty">&nbsp;</td>
+      </tr>
+
+     </tbody>
+    
+   </table>
+
+  </p>
+  
+  <p class="para">Here&#039;s a short explanation of
+the configuration directives.</p>
+  
+  <p class="para">
+   <dl>
+    
+     <dt id="ini.per-host">
+      <code class="parameter">[HOST=&lt;host&gt;]</code>
+     </dt>
+     <dd>
+      <p class="para">
+       This section allows you to define a set of <var class="filename">php.ini</var> directives that
+       will take effect on the named host.
+      </p>
+      <p class="para">
+       <div class="example" id="example-1">
+        <p><strong>Example #1 Activate full on-screen error reporting for dev. domain</strong></p>
+        <div class="example-contents">
+<div class="php.inicode"><pre class="php.inicode">[HOST=dev.site.com]
+error_reporting = E_ALL
+display_errors = On</pre>
+</div>
+        </div>
+
+       </div>
+      </p>
+     </dd>
+    
+    
+    
+     <dt id="ini.per-path">
+      <code class="parameter">[PATH=&lt;path&gt;]</code>
+     </dt>
+     <dd>
+      <p class="para">
+       This section allows you to define a set of <var class="filename">php.ini</var> directives that
+       will take effect when a script runs from the named path.
+      </p>
+      <p class="para">
+       <div class="example" id="example-2">
+        <p><strong>Example #2 Add security script for protected areas</strong></p>
+        <div class="example-contents">
+<div class="php.inicode"><pre class="php.inicode">[PATH=/home/site/public/secure]
+auto_prepend_file=security.php</pre>
+</div>
+        </div>
+
+       </div>
+      </p>
+     </dd>
+    
+    
+   </dl>
+  </p>
+ </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

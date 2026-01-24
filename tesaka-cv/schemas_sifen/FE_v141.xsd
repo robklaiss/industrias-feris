@@ -8,11 +8,11 @@
 
     <xs:import namespace="http://www.w3.org/2000/09/xmldsig#"
                schemaLocation="xmldsig-core-schema.xsd"/>
-    <xs:include schemaLocation= "https://ekuatia.set.gov.py/sifen/xsd/Paises_v100.xsd"/>
-    <xs:include schemaLocation= "https://ekuatia.set.gov.py/sifen/xsd/Departamentos_v141.xsd"/>
-    <xs:include schemaLocation= "https://ekuatia.set.gov.py/sifen/xsd/Monedas_v100.xsd"/>
-    <xs:include schemaLocation= "https://ekuatia.set.gov.py/sifen/xsd/Unidades_Medida_v141.xsd"/>
-    <xs:include schemaLocation= "https://ekuatia.set.gov.py/sifen/xsd/FE_Types_v141.xsd"/>
+    <xs:include schemaLocation="Paises_v100.xsd"/>
+    <xs:include schemaLocation="Departamentos_v141.xsd"/>
+    <xs:include schemaLocation="Monedas_v100.xsd"/>
+    <xs:include schemaLocation="Unidades_Medida_v141.xsd"/>
+    <xs:include schemaLocation="FE_Types_v141.xsd"/>
 
     <xs:complexType name="tgCOpeDE">
         <xs:annotation>

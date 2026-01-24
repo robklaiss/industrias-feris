@@ -1,0 +1,344 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Swoole Functions</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="swoole.constants.html" class="navbar__link">« Predefined Constants</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.swoole-async-dns-lookup.html" class="navbar__link">swoole_async_dns_lookup »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.swoole.html">Swoole</a></li>
+        <li>Swoole Functions</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="ref.swoole-funcs" class="reference">
+ <h1 class="title">Swoole Functions</h1>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="function.swoole-async-dns-lookup.html">swoole_async_dns_lookup</a> — Async and non-blocking hostname to IP lookup</li><li><a href="function.swoole-async-read.html">swoole_async_read</a> — Read file stream asynchronously</li><li><a href="function.swoole-async-readfile.html">swoole_async_readfile</a> — Read a file asynchronously</li><li><a href="function.swoole-async-set.html">swoole_async_set</a> — Update the async I/O options</li><li><a href="function.swoole-async-write.html">swoole_async_write</a> — Write data to a file stream asynchronously</li><li><a href="function.swoole-async-writefile.html">swoole_async_writefile</a> — Write data to a file asynchronously</li><li><a href="function.swoole-clear-error.html">swoole_clear_error</a> — Clear errors in the socket or on the last error code</li><li><a href="function.swoole-client-select.html">swoole_client_select</a> — Get the file description which are ready to read/write or error</li><li><a href="function.swoole-cpu-num.html">swoole_cpu_num</a> — Get the number of CPU</li><li><a href="function.swoole-errno.html">swoole_errno</a> — Get the error code of the latest system call</li><li><a href="function.swoole-error-log.html">swoole_error_log</a> — Output error messages to the log</li><li><a href="function.swoole-event-add.html">swoole_event_add</a> — Add new callback functions of a socket into the EventLoop</li><li><a href="function.swoole-event-defer.html">swoole_event_defer</a> — Add callback function to the next event loop</li><li><a href="function.swoole-event-del.html">swoole_event_del</a> — Remove all event callback functions of a socket</li><li><a href="function.swoole-event-exit.html">swoole_event_exit</a> — Exit the eventloop, only available at the client side</li><li><a href="function.swoole-event-set.html">swoole_event_set</a> — Update the event callback functions of a socket</li><li><a href="function.swoole-event-wait.html">swoole_event_wait</a> — Start the event loop</li><li><a href="function.swoole-event-write.html">swoole_event_write</a> — Write data to a socket</li><li><a href="function.swoole-get-local-ip.html">swoole_get_local_ip</a> — Get the IPv4 IP addresses of each NIC on the machine</li><li><a href="function.swoole-last-error.html">swoole_last_error</a> — Get the lastest error message</li><li><a href="function.swoole-load-module.html">swoole_load_module</a> — Load a swoole extension</li><li><a href="function.swoole-select.html">swoole_select</a> — Select the file descriptions which are ready to read/write or error in the eventloop</li><li><a href="function.swoole-set-process-name.html">swoole_set_process_name</a> — Set the process name</li><li><a href="function.swoole-strerror.html">swoole_strerror</a> — Convert the Errno into error messages</li><li><a href="function.swoole-timer-after.html">swoole_timer_after</a> — Trigger a one time callback function in the future</li><li><a href="function.swoole-timer-exists.html">swoole_timer_exists</a> — Check if a timer callback function is existed</li><li><a href="function.swoole-timer-tick.html">swoole_timer_tick</a> — Trigger a timer tick callback function by time interval</li><li><a href="function.swoole-version.html">swoole_version</a> — Get the version of Swoole</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

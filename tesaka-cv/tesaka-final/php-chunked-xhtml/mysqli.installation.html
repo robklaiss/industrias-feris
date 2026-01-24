@@ -1,0 +1,277 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Installation</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="mysqli.requirements.html" class="navbar__link">« Requirements</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="mysqli.configuration.html" class="navbar__link">Runtime Configuration »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="mysqli.setup.html">Installing/Configuring</a></li>
+        <li>Installation</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="mysqli.installation" class="section">
+
+<h2 class="title">Installation</h2>
+
+ <p class="para">
+  The <code class="literal">mysqli</code> extension was introduced with PHP version 
+  5.0.0. The MySQL Native Driver was included in PHP version 5.3.0.
+ </p>
+
+ <div class="section" id="mysqli.installation.linux">
+
+  <h2 class="title">Installation on Linux</h2>
+
+  <p class="para">
+   The common Unix distributions include binary versions of PHP that can
+   be installed. Although these binary versions are typically built with
+   support for the MySQL extensions, the extension libraries
+   themselves may need to be installed using an additional package. Check
+   the package manager that comes with your chosen distribution for
+   availability.
+  </p>
+  
+  <p class="para">
+   For example, on Ubuntu the <code class="literal">php5-mysql</code> package installs
+   the ext/mysql, ext/mysqli, and pdo_mysql PHP extensions. On CentOS, 
+   the <code class="literal">php-mysql</code> package also installs these three 
+   PHP extensions.
+  </p>
+
+  <p class="para">
+   Alternatively, you can compile this extension yourself. Building PHP from 
+   source allows you to specify the MySQL extensions you want to use, as well 
+   as your choice of client library for each extension.
+  </p>
+
+  <p class="para">
+   The MySQL Native Driver is the recommended client library option, as it
+   results in improved performance and gives access to features not
+   available when using the MySQL Client Library. Refer to
+   <a href="mysqli.overview.html#mysqli.overview.mysqlnd" class="link">What is PHP&#039;s MySQL Native
+   Driver?</a> for a brief overview of the advantages of MySQL Native
+   Driver.
+  </p>
+
+  <p class="para">
+   The <code class="literal">/path/to/mysql_config</code> represents the location of
+   the <code class="literal">mysql_config</code> program that comes with MySQL
+   Server.
+  </p>
+
+  <table id="mysqli.installation.time.matrix" class="doctable table">
+   <caption><strong>mysqli compile time support matrix</strong></caption>
+   
+    <thead>
+     <tr>
+      <th>PHP Version</th>
+      <th>Default</th>
+      <th>Configure Options: <a href="mysqlnd.overview.html" class="link">mysqlnd</a></th>
+      <th>Configure Options: <code class="literal">libmysqlclient</code></th>
+      <th>Changelog</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+      <td>5.4.x and above</td>
+      <td>mysqlnd</td>
+      <td><strong class="option configure">--with-mysqli</strong></td>
+      <td><strong class="option configure">--with-mysqli=/path/to/mysql_config</strong></td>
+      <td>mysqlnd is the default</td>
+     </tr>
+
+     <tr>
+      <td>5.3.x</td>
+      <td>libmysqlclient</td>
+      <td><strong class="option configure">--with-mysqli=mysqlnd</strong></td>
+      <td><strong class="option configure">--with-mysqli=/path/to/mysql_config</strong></td>
+      <td>mysqlnd is supported</td>
+     </tr>
+
+     <tr>
+      <td>5.0.x, 5.1.x, 5.2.x</td>
+      <td>libmysqlclient</td>
+      <td>Not Available</td>
+      <td><strong class="option configure">--with-mysqli=/path/to/mysql_config</strong></td>
+      <td>mysqlnd is not supported</td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+
+  <p class="para">
+   Note that it is possible to freely mix MySQL extensions and client
+   libraries. For example, it is possible to enable the MySQL extension
+   to use the MySQL Client Library (libmysqlclient), while configuring the
+   <code class="literal">mysqli</code> extension to use the MySQL Native Driver.
+   However, all permutations of extension and client library are
+   possible.
+  </p>
+
+ </div>
+
+ <div class="section" id="mysqli.installation.windows">
+
+  <h2 class="title">Installation on Windows Systems</h2>
+
+  <p class="para">
+   On Windows, <var class="filename">php_mysqli.dll</var> DLL must be enabled in
+   <var class="filename">php.ini</var>.
+  </p>
+
+  <p class="para">
+   As with enabling any PHP extension (such as
+   <var class="filename">php_mysqli.dll</var>), the PHP directive
+   <a href="ini.core.html#ini.extension-dir" class="link">extension_dir</a> should be set
+   to the directory where the PHP extensions are located. See also the
+   <a href="install.windows.manual.html" class="link">Manual Windows Installation
+   Instructions</a>. An example <code class="literal">extension_dir</code>
+   value is <var class="filename">c:\php\ext</var>.
+  </p>
+
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <p class="para">
+    If when starting the web server an error similar to the following
+    occurs: <code class="literal">&quot;Unable to load dynamic library
+    &#039;./php_mysqli.dll&#039;&quot;</code>, this is because
+    <var class="filename">php_mysqli.dll</var> cannot be found by the system.
+   </p>
+  </p></blockquote>
+
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

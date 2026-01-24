@@ -1,0 +1,310 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>New Global Constants</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="migration85.new-functions.html" class="navbar__link">« New Functions</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="migration85.incompatible.html" class="navbar__link">Backward Incompatible Changes »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="migration85.html">Migrating from PHP 8.4.x to PHP 8.5.x</a></li>
+        <li>New Global Constants</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="migration85.constants" class="sect1">
+ <h2 class="title">New Global Constants</h2>
+
+ <div class="sect2" id="migration85.constants.core">
+  <h3 class="title">Core</h3>
+
+  <ul class="simplelist">
+   <li>
+    <strong><code><a href="reserved.constants.html#constant.php-build-date">PHP_BUILD_DATE</a></code></strong>
+   </li>
+   <li>
+    <strong><code><a href="reserved.constants.html#constant.php-build-provider">PHP_BUILD_PROVIDER</a></code></strong>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration85.constants.curl">
+  <h3 class="title">cURL</h3>
+
+  <ul class="simplelist">
+   <li>
+    <strong><code>CURLINFO_USED_PROXY</code></strong>
+   </li>
+   <li>
+    <strong><code>CURLINFO_HTTPAUTH_USED</code></strong>
+   </li>
+   <li>
+    <strong><code>CURLINFO_PROXYAUTH_USED</code></strong>
+   </li>
+   <li>
+    <strong><code>CURLINFO_CONN_ID</code></strong>
+   </li>
+   <li>
+    <strong><code>CURLINFO_QUEUE_TIME_T</code></strong>
+   </li>
+   <li>
+    <strong><code>CURLOPT_INFILESIZE_LARGE</code></strong>
+   </li>
+   <li>
+    <strong><code>CURLFOLLOW_ALL</code></strong>
+   </li>
+   <li>
+    <strong><code>CURLFOLLOW_OBEYCODE</code></strong>
+   </li>
+   <li>
+    <strong><code>CURLFOLLOW_FIRSTONLY</code></strong>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration85.constants.filter">
+  <h3 class="title">Filter</h3>
+
+  <ul class="simplelist">
+   <li>
+    <strong><code>FILTER_THROW_ON_FAILURE</code></strong>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration85.constants.intl">
+  <h3 class="title">Intl</h3>
+
+  <ul class="simplelist">
+   <li>
+    <strong><code>DECIMAL_COMPACT_SHORT</code></strong>
+   </li>
+   <li>
+    <strong><code>DECIMAL_COMPACT_LONG</code></strong>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration85.constants.openssl">
+  <h3 class="title">OpenSSL</h3>
+
+  <ul class="simplelist">
+   <li><strong><code>OPENSSL_PKCS1_PSS_PADDING</code></strong></li>
+   <li><strong><code>PKCS7_NOSMIMECAP</code></strong></li>
+   <li><strong><code>PKCS7_CRLFEOL</code></strong></li>
+   <li><strong><code>PKCS7_NOCRL</code></strong></li>
+   <li><strong><code>PKCS7_NO_DUAL_CONTENT</code></strong></li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration85.constants.posix">
+  <h3 class="title">POSIX</h3>
+
+  <ul class="simplelist">
+   <li><strong><code>POSIX_SC_OPEN_MAX</code></strong></li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration85.constants.sockets">
+  <h3 class="title">Sockets</h3>
+
+  <ul class="simplelist">
+   <li>
+    <strong><code>IPPROTO_ICMP</code></strong>
+   </li>
+   <li>
+    <strong><code>IPPROTO_ICMPV6</code></strong>
+   </li>
+   <li>
+    <strong><code>TCP_FUNCTION_BLK</code></strong> (FreeBSD only)
+   </li>
+   <li>
+    <strong><code>TCP_FUNCTION_ALIAS</code></strong> (FreeBSD only)
+   </li>
+   <li>
+    <strong><code>TCP_REUSPORT_LB_NUMA</code></strong> (FreeBSD only)
+   </li>
+   <li>
+    <strong><code>TCP_REUSPORT_LB_NUMA_NODOM</code></strong> (FreeBSD only)
+   </li>
+   <li>
+    <strong><code>TCP_REUSPORT_LB_NUMA_CURDOM</code></strong> (FreeBSD only)
+   </li>
+   <li>
+    <strong><code>TCP_BBR_ALGORITHM</code></strong> (FreeBSD only)
+   </li>
+   <li>
+    <strong><code>AF_PACKET</code></strong> (Linux only)
+   </li>
+   <li>
+    <strong><code>IP_BINDANY</code></strong> (FreeBSD/NetBSD/OpenBSD only)
+   </li>
+   <li>
+    <strong><code>SO_BUSY_POLL</code></strong> (Linux only)
+   </li>
+   <li>
+    <strong><code>UDP_SEGMENT</code></strong> (Linux only)
+   </li>
+   <li>
+    <strong><code>SHUT_RD</code></strong>
+   </li>
+   <li>
+    <strong><code>SHUT_WR</code></strong>
+   </li>
+   <li>
+    <strong><code>SHUT_RDWR</code></strong>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration85.constants.tokenizer">
+  <h3 class="title">Tokenizer</h3>
+  <ul class="simplelist">
+   <li>
+    <strong><code>T_VOID_CAST</code></strong>
+   </li>
+   <li>
+    <strong><code>T_PIPE</code></strong>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration85.constants.standard">
+  <h3 class="title">Standard</h3>
+
+  <ul class="simplelist">
+   <li>
+    <strong><code>IMAGETYPE_SVG</code></strong>
+    when libxml is loaded.
+   </li>
+  </ul>
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

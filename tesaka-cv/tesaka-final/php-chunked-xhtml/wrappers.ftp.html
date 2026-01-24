@@ -1,0 +1,293 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Accessing FTP(s) URLs</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="wrappers.http.html" class="navbar__link">« http://</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="wrappers.php.html" class="navbar__link">php:// »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="wrappers.html">Supported Protocols and Wrappers</a></li>
+        <li>Accessing FTP(s) URLs</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="wrappers.ftp" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">ftp://</h1>
+  <h1 class="refname">ftps://</h1>
+  <p class="refpurpose"><span class="refname">ftp://</span> -- <span class="refname">ftps://</span> &mdash; <span class="dc-title">Accessing FTP(s) URLs</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-wrappers.ftp-description">
+  <h3 class="title">Description</h3>
+  <p class="para">
+   Allows read access to existing files and creation of new files
+   via FTP.  If the server does not support passive mode ftp, the
+   connection will fail.
+  </p>
+  <p class="simpara">
+   You can open files for either reading or writing, but not both
+   simultaneously.  If the remote file already exists on the ftp
+   server and you attempt to open it for writing but have not specified
+   the context option <code class="literal">overwrite</code>, the connection
+   will fail.  If you need to overwrite existing files over ftp,
+   specify the <code class="literal">overwrite</code> option in the context
+   and open the file for writing.  Alternatively, you can
+   use the <a href="ref.ftp.html" class="link">FTP extension</a>.
+  </p>
+  <p class="simpara">
+   If you have set the <a href="filesystem.configuration.html#ini.from" class="link">from</a> directive
+   in <var class="filename">php.ini</var>, then this value will be sent as the anonymous FTP
+   password.
+  </p>
+ </div>
+
+
+ <div class="refsect1 usage" id="refsect1-wrappers.ftp-usage"> 
+  <h3 class="title">Usage</h3>
+  <ul class="itemizedlist">
+   <li class="listitem"><span class="simpara"><var class="filename">ftp://example.com/pub/file.txt</var></span></li>
+   <li class="listitem"><span class="simpara"><var class="filename">ftp://user:password@example.com/pub/file.txt</var></span></li>
+   <li class="listitem"><span class="simpara"><var class="filename">ftps://example.com/pub/file.txt</var></span></li>
+   <li class="listitem"><span class="simpara"><var class="filename">ftps://user:password@example.com/pub/file.txt</var></span></li>
+  </ul>
+ </div>
+ 
+
+ <div class="refsect1 options" id="refsect1-wrappers.ftp-options">
+  <h3 class="title">Options</h3>
+  <p class="para">
+   <table class="doctable table">
+    <caption><strong>Wrapper Summary</strong></caption>
+    
+     <thead>
+      <tr>
+       <th>Attribute</th>
+       <th>Supported</th>
+      </tr>
+
+     </thead>
+
+     <tbody class="tbody">
+      <tr>
+       <td>Restricted by <a href="filesystem.configuration.html#ini.allow-url-fopen" class="link">allow_url_fopen</a></td>
+       <td>Yes</td>
+      </tr>
+
+      <tr>
+       <td>Allows Reading</td>
+       <td>Yes</td>
+      </tr>
+
+      <tr>
+       <td>Allows Writing</td>
+       <td>Yes (new files/existing files with <code class="parameter">overwrite</code>)</td>
+      </tr>
+
+      <tr>
+       <td>Allows Appending</td>
+       <td>Yes</td>
+      </tr>
+
+      <tr>
+       <td>Allows Simultaneous Reading and Writing</td>
+       <td>No</td>
+      </tr>
+
+      <tr>
+       <td>Supports <span class="function"><a href="function.stat.html" class="function">stat()</a></span></td>
+       <td>
+        <span class="function"><a href="function.filesize.html" class="function">filesize()</a></span>, <span class="function"><a href="function.filemtime.html" class="function">filemtime()</a></span>,
+        <span class="function"><a href="function.filetype.html" class="function">filetype()</a></span>, <span class="function"><a href="function.file-exists.html" class="function">file_exists()</a></span>,
+        <span class="function"><a href="function.is-file.html" class="function">is_file()</a></span>, and <span class="function"><a href="function.is-dir.html" class="function">is_dir()</a></span>
+        elements only.
+       </td>
+      </tr>
+
+      <tr>
+       <td>Supports <span class="function"><a href="function.unlink.html" class="function">unlink()</a></span></td>
+       <td>Yes</td>
+      </tr>
+
+      <tr>
+       <td>Supports <span class="function"><a href="function.rename.html" class="function">rename()</a></span></td>
+       <td>Yes</td>
+      </tr>
+
+      <tr>
+       <td>Supports <span class="function"><a href="function.mkdir.html" class="function">mkdir()</a></span></td>
+       <td>Yes</td>
+      </tr>
+
+      <tr>
+       <td>Supports <span class="function"><a href="function.rmdir.html" class="function">rmdir()</a></span></td>
+       <td>Yes</td>
+      </tr>
+
+     </tbody>
+    
+   </table>
+
+  </p>
+ </div>
+ 
+
+ <div class="refsect1 notes" id="refsect1-wrappers.ftp-notes">
+  <h3 class="title">Notes</h3>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <p class="para">
+    FTPS is only supported when the <a href="book.openssl.html" class="link">openssl</a>
+    extension is enabled.
+   </p>
+   <span class="simpara">
+    If the server does not support SSL, then the connection falls back
+    to regular unencrypted ftp.
+   </span>
+  </p></blockquote>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <strong>Appending</strong><br />
+   <span class="simpara">
+    Files may be appended via the <code class="literal">ftp://</code> URL wrapper.
+   </span>
+  </p></blockquote>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-wrappers.ftp-seealso">
+  <h3 class="title">See Also</h3>
+  <ul class="simplelist">
+   <li><a href="context.ftp.html" class="xref">FTP context options</a></li>
+  </ul>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

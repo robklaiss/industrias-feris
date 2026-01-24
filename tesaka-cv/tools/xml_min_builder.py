@@ -74,7 +74,6 @@ def build_minimal_de_v150(allow_placeholder: bool = False) -> bytes:
     # Crear root con namespace
     DE = ET.Element(f"{{{SIFEN_NS}}}DE")
     DE.set("Id", de_id)
-    DE.set("version", "150")
     
     # dDVId (dígito verificador del CDC)
     dDVId = ET.SubElement(DE, f"{{{SIFEN_NS}}}dDVId")
@@ -102,7 +101,9 @@ def build_minimal_de_v150(allow_placeholder: bool = False) -> bytes:
     
     # dCodSeg (código de seguridad)
     dCodSeg = ET.SubElement(gOpeDE, f"{{{SIFEN_NS}}}dCodSeg")
-    dCodSeg.text = timbrado_id[:8]
+    import re
+    digits = re.sub(r"\D", "", str(timbrado_id))
+    dCodSeg.text = digits[-9:].zfill(9)
     
     # gTimb (datos del timbrado)
     gTimb = ET.SubElement(DE, f"{{{SIFEN_NS}}}gTimb")
@@ -113,7 +114,7 @@ def build_minimal_de_v150(allow_placeholder: bool = False) -> bytes:
     
     # dDesTiDE (descripción tipo DE)
     dDesTiDE = ET.SubElement(gTimb, f"{{{SIFEN_NS}}}dDesTiDE")
-    dDesTiDE.text = "Factura Electrónica"
+    dDesTiDE.text = "Factura electrónica"
     
     # dNumTim (número de timbrado)
     dNumTim = ET.SubElement(gTimb, f"{{{SIFEN_NS}}}dNumTim")
@@ -296,7 +297,7 @@ def build_minimal_de_v150(allow_placeholder: bool = False) -> bytes:
     
     # dDesUniMed (descripción unidad de medida)
     dDesUniMed = ET.SubElement(gItem, f"{{{SIFEN_NS}}}dDesUniMed")
-    dDesUniMed.text = "UNIDAD"
+    dDesUniMed.text = "UNI"
     
     # dCantProSer (cantidad)
     dCantProSer = ET.SubElement(gItem, f"{{{SIFEN_NS}}}dCantProSer")

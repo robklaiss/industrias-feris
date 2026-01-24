@@ -1,0 +1,248 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Collecting Cycles</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="features.gc.refcounting-basics.html" class="navbar__link">« Reference Counting Basics</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="features.gc.performance-considerations.html" class="navbar__link">Performance Considerations »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="features.gc.html">Garbage Collection</a></li>
+        <li>Collecting Cycles</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="features.gc.collecting-cycles" class="sect1">
+   <h2 class="title">Collecting Cycles</h2>
+   <p class="para">
+    Traditionally, reference counting memory mechanisms, such as that used
+    previously by PHP, fail to address circular reference memory leaks;
+    however, as of 5.3.0, PHP implements the synchronous algorithm from the
+    <a href="https://pages.cs.wisc.edu/~cymen/misc/interests/Bacon01Concurrent.pdf" class="link external">&raquo;&nbsp;Concurrent Cycle Collection in Reference Counted Systems</a>
+    paper which addresses that issue.
+   </p>
+   <p class="para">
+    A full explanation of how the algorithm works would be slightly beyond the
+    scope of this section, but the basics are explained here. First of all,
+    we have to establish a few ground rules. If a refcount is increased, it&#039;s
+    still in use and therefore, not garbage. If the refcount is decreased and
+    hits zero, the zval can be freed. This means that garbage cycles can only
+    be created when a refcount argument is decreased to a non-zero value.
+    Secondly, in a garbage cycle, it is possible to discover which parts are
+    garbage by checking whether it is possible to decrease their refcount by
+    one, and then checking which of the zvals have a refcount of zero.
+   </p>
+   <p class="para">
+     <div class="mediaobject">
+      
+      <div class="imageobject">
+       <img src="images/12f37b1c6963c1c5c18f30495416a197-gc-algorithm.png" alt="Garbage collection algorithm" width="614" height="814" />
+      </div>
+     </div>
+   </p>
+   <p class="para">
+    To avoid having to call the checking of garbage cycles with every possible
+    decrease of a refcount, the algorithm instead puts all possible roots
+    (zvals) in the &quot;root buffer&quot; (marking them &quot;purple&quot;). It also makes sure
+    that each possible garbage root ends up in the buffer only once. Only when
+    the root buffer is full does the collection mechanism start for all the
+    different zvals inside. See step A in the figure above.
+   </p>
+   <p class="para">
+    In step B, the algorithm runs a depth-first search on all possible roots
+    to decrease by one the refcounts of each zval it finds, making sure not to
+    decrease a refcount on the same zval twice (by marking them as &quot;grey&quot;). In
+    step C, the algorithm again runs a depth-first search from each root node,
+    to check the refcount of each zval again. If it finds that the refcount is
+    zero, the zval is marked &quot;white&quot; (blue in the figure). If it&#039;s larger than
+    zero, it reverts the decreasing of the refcount by one with a depth-first
+    search from that point on, and they are marked &quot;black&quot; again. In the last
+    step (D), the algorithm walks over the root buffer removing the zval roots
+    from there, and meanwhile, checks which zvals have been marked &quot;white&quot; in
+    the previous step. Every zval marked as &quot;white&quot; will be freed.
+   </p>
+   <p class="para">
+    Now that you have a basic understanding of how the algorithm works, we
+    will look back at how this integrates with PHP. By default, PHP&#039;s garbage
+    collector is turned on. There is, however, a <var class="filename">php.ini</var>
+    setting that allows you to change this:
+    <a href="info.configuration.html#ini.zend.enable-gc" class="link">zend.enable_gc</a>.
+   </p>
+   <p class="para">
+    When the garbage collector is turned on, the cycle-finding algorithm as
+    described above is executed whenever the root buffer runs full. The root
+    buffer has a fixed size of 10,000 possible roots (although you can alter
+    this by changing the <strong><code>GC_THRESHOLD_DEFAULT</code></strong> constant in
+    <code class="literal">Zend/zend_gc.c</code> in the PHP source code, and re-compiling
+    PHP). When the garbage collector is turned off, the cycle-finding
+    algorithm will never run. However, possible roots will always be recorded
+    in the root buffer, no matter whether the garbage collection mechanism has
+    been activated with this configuration setting.
+   </p>
+   <p class="para">
+    If the root buffer becomes full with possible roots while the garbage
+    collection mechanism is turned off, further possible roots will simply not
+    be recorded. Those possible roots that are not recorded will never be
+    analyzed by the algorithm. If they were part of a circular reference
+    cycle, they would never be cleaned up and would create a memory leak.
+   </p>
+   <p class="para">
+    The reason why possible roots are recorded even if the mechanism has been
+    disabled is because it&#039;s faster to record possible roots than to have to
+    check whether the mechanism is turned on every time a possible root could
+    be found. The garbage collection and analysis mechanism itself, however,
+    can take a considerable amount of time.
+   </p>
+   <p class="para">
+    Besides changing the <a href="info.configuration.html#ini.zend.enable-gc" class="link">zend.enable_gc</a> configuration
+    setting, it is also possible to turn the garbage collecting mechanism on
+    and off by calling <span class="function"><a href="function.gc-enable.html" class="function">gc_enable()</a></span> or
+    <span class="function"><a href="function.gc-disable.html" class="function">gc_disable()</a></span> respectively.  Calling those functions has
+    the same effect as turning on or off the mechanism with the configuration
+    setting. It is also possible to force the collection of cycles even if the
+    possible root buffer is not full yet. For this, you can use the
+    <span class="function"><a href="function.gc-collect-cycles.html" class="function">gc_collect_cycles()</a></span> function. This function will return
+    how many cycles were collected by the algorithm.
+   </p>
+   <p class="para">
+    The rationale behind the ability to turn the mechanism on and off, and to
+    initiate cycle collection yourself, is that some parts of your application
+    could be highly time-sensitive. In those cases, you might not want the
+    garbage collection mechanism to kick in. Of course, by turning off the
+    garbage collection for certain parts of your application, you do risk
+    creating memory leaks because some possible roots might not fit into the
+    limited root buffer. Therefore, it is probably wise to call
+    <span class="function"><a href="function.gc-collect-cycles.html" class="function">gc_collect_cycles()</a></span> just before you call
+    <span class="function"><a href="function.gc-disable.html" class="function">gc_disable()</a></span> to free up the memory that could be lost
+    through possible roots that are already recorded in the root buffer. This
+    then leaves an empty buffer so that there is more space for storing
+    possible roots while the cycle collecting mechanism is turned off.
+   </p>
+  </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

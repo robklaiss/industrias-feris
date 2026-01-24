@@ -1,0 +1,276 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Compression Streams</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="wrappers.php.html" class="navbar__link">« php://</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="wrappers.data.html" class="navbar__link">data:// »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="wrappers.html">Supported Protocols and Wrappers</a></li>
+        <li>Compression Streams</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="wrappers.compression" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">zlib://</h1>
+  <h1 class="refname">bzip2://</h1>
+  <h1 class="refname">zip://</h1>
+  <p class="refpurpose"><span class="refname">zlib://</span> -- <span class="refname">bzip2://</span> -- <span class="refname">zip://</span> &mdash; <span class="dc-title">Compression Streams</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-wrappers.compression-description">
+  <h3 class="title">Description</h3>
+  <p class="simpara"><var class="filename">compress.zlib://</var> and <var class="filename">compress.bzip2://</var></p>
+
+  <p class="simpara">
+   <var class="filename">zlib:</var> works like <span class="function"><a href="function.gzopen.html" class="function">gzopen()</a></span>, except that the
+   stream can be used with <span class="function"><a href="function.fread.html" class="function">fread()</a></span> and the other
+   filesystem functions.  This is deprecated due
+   to ambiguities with filenames containing &#039;:&#039; characters; use
+   <var class="filename">compress.zlib://</var> instead.
+  </p>
+
+  <p class="simpara">
+   <var class="filename">compress.zlib://</var> and
+   <var class="filename">compress.bzip2://</var> are equivalent to
+   <span class="function"><a href="function.gzopen.html" class="function">gzopen()</a></span> and <span class="function"><a href="function.bzopen.html" class="function">bzopen()</a></span>
+   respectively, and operate even on systems that do not support
+   fopencookie.
+  </p>
+
+  <p class="simpara">
+   <a href="book.zip.html" class="link">ZIP extension</a> registers <var class="filename">zip:</var> wrapper. As of
+   PHP 7.2.0 and libzip 1.2.0+, support for the passwords for encrypted archives were added, allowing
+   passwords to be supplied by stream contexts. Passwords can be set using the <code class="literal">&#039;password&#039;</code>
+   stream context option.
+  </p>
+ </div>
+
+
+ <div class="refsect1 usage" id="refsect1-wrappers.compression-usage"> 
+  <h3 class="title">Usage</h3>
+  <ul class="itemizedlist">
+   <li class="listitem"><span class="simpara"><var class="filename">compress.zlib://file.gz</var></span></li>
+   <li class="listitem"><span class="simpara"><var class="filename">compress.bzip2://file.bz2</var></span></li>
+   <li class="listitem"><span class="simpara"><var class="filename">zip://archive.zip#dir/file.txt</var></span></li>
+  </ul>
+ </div>
+ 
+
+ <div class="refsect1 options" id="refsect1-wrappers.compression-options">
+  <h3 class="title">Options</h3>
+  <p class="para">
+   <table class="doctable table">
+    <caption><strong>Wrapper Summary</strong></caption>
+    
+     <thead>
+      <tr>
+       <th>Attribute</th>
+       <th>Supported</th>
+      </tr>
+
+     </thead>
+
+     <tbody class="tbody">
+      <tr>
+       <td>Restricted by <a href="filesystem.configuration.html#ini.allow-url-fopen" class="link">allow_url_fopen</a></td>
+       <td>No</td>
+      </tr>
+
+      <tr>
+       <td>Allows Reading</td>
+       <td>Yes</td>
+      </tr>
+
+      <tr>
+       <td>Allows Writing</td>
+       <td>Yes (except <code class="literal">zip://</code>)</td>
+      </tr>
+
+      <tr>
+       <td>Allows Appending</td>
+       <td>Yes (except <code class="literal">zip://</code>)</td>
+      </tr>
+
+      <tr>
+       <td>Allows Simultaneous Reading and Writing</td>
+       <td>No</td>
+      </tr>
+
+      <tr>
+       <td>Supports <span class="function"><a href="function.stat.html" class="function">stat()</a></span></td>
+       <td>
+        No, use the normal <code class="literal">file://</code> wrapper
+        to stat compressed files.
+       </td>
+      </tr>
+
+      <tr>
+       <td>Supports <span class="function"><a href="function.unlink.html" class="function">unlink()</a></span></td>
+       <td>
+        No, use the normal <code class="literal">file://</code> wrapper
+        to unlink compressed files.
+       </td>
+      </tr>
+
+      <tr>
+       <td>Supports <span class="function"><a href="function.rename.html" class="function">rename()</a></span></td>
+       <td>No</td>
+      </tr>
+
+      <tr>
+       <td>Supports <span class="function"><a href="function.mkdir.html" class="function">mkdir()</a></span></td>
+       <td>No</td>
+      </tr>
+
+      <tr>
+       <td>Supports <span class="function"><a href="function.rmdir.html" class="function">rmdir()</a></span></td>
+       <td>No</td>
+      </tr>
+
+     </tbody>
+    
+   </table>
+
+  </p>
+ </div>
+ 
+
+ <div class="refsect1 seealso" id="refsect1-wrappers.compression-seealso">
+  <h3 class="title">See Also</h3>
+  <ul class="simplelist">
+   <li><a href="context.zlib.html" class="xref">Zlib context options</a></li>
+  </ul>
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

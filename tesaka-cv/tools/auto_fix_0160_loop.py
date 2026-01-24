@@ -18,6 +18,7 @@ import sys
 import time
 import traceback
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -400,7 +401,18 @@ def ensure_expected_before_found(xml_path: Path, expected: str, found: str) -> T
         new_name = f"{base_name.rsplit('_loopfix', 1)[0]}_loopfix_{loop_num}_{expected}.xml"
         new_path = artifacts_dir / new_name
         
-        doc.write(str(new_path), encoding="utf-8", xml_declaration=True)
+        try:
+            doc.write(str(new_path), encoding="utf-8", xml_declaration=True)
+        except OSError as e:
+            # errno 63 = File name too long (macOS)
+            if getattr(e, "errno", None) == 63:
+                ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+                # nombre corto y estable
+                new_path = xml_path.with_name(f"fix_{ts}.xml")
+                doc.write(str(new_path), encoding="utf-8", xml_declaration=True)
+            else:
+                raise
+
         
         # Guardar orden final del gTotSub si aplica
         if strip_ns(parent.tag) == "gTotSub":
@@ -816,6 +828,7 @@ def main() -> int:
     follow_py = REPO_ROOT / "tools" / "follow_lote.py"
 
     if not artifacts_dir.exists():
+        out_xml = None  # default to avoid UnboundLocalError in summary
         eprint(f"ERROR: artifacts-dir no existe: {artifacts_dir}")
         return 2
     if not in_xml.exists():
@@ -1014,7 +1027,7 @@ def main() -> int:
 
 ## Files:
 - Input: {current_xml.name}
-- Output: {out_xml.name}
+- Output: {((locals().get('out_xml').name) if locals().get('out_xml') else 'N/A')}
 - Artifacts Dir: {artifacts_dir.name}
 {gtotsub_info}
 ## Status:

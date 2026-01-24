@@ -1,0 +1,11 @@
+{
+  "request_id": "test_123",
+  "endpoint": "https://sifen-test.set.gov.py/de/ws/async/recibe-lote",
+  "http_status": 200,
+  "dCodRes": "0301",
+  "dMsgRes": "Procesado correctamente",
+  "dEstRes": "Aceptado",
+  "dProtConsLote": "012345678901234567890123456789",
+  "dId": "123456",
+  "ok": true
+}

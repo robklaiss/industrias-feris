@@ -1,0 +1,664 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Predefined Constants</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="dom.installation.html" class="navbar__link">« Installation</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="dom.examples.html" class="navbar__link">Examples »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.dom.html">DOM</a></li>
+        <li>Predefined Constants</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="dom.constants" class="chapter">
+ <h1 class="title">Predefined Constants</h1>
+
+ <p class="simpara">
+The constants below are defined by this extension, and
+will only be available when the extension has either
+been compiled into PHP or dynamically loaded at runtime.
+</p>
+  <table class="doctable table">
+   <caption><strong>XML constants</strong></caption>
+   
+    <thead>
+     <tr>
+      <th>Constants</th>
+      <th>Value</th>
+      <th>Description</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr id="constant.xml-element-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-element-node">XML_ELEMENT_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>1</td>
+      <td>Node is a <span class="classname"><a href="class.domelement.html" class="classname">DOMElement</a></span> / <span class="classname"><a href="class.dom-element.html" class="classname">Dom\Element</a></span></td>
+     </tr>
+
+     <tr id="constant.xml-attribute-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-attribute-node">XML_ATTRIBUTE_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>2</td>
+      <td>Node is a <span class="classname"><a href="class.domattr.html" class="classname">DOMAttr</a></span> / <span class="classname"><a href="class.dom-attr.html" class="classname">Dom\Attr</a></span></td>
+     </tr>
+
+     <tr id="constant.xml-text-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-text-node">XML_TEXT_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>3</td>
+      <td>Node is a <span class="classname"><a href="class.domtext.html" class="classname">DOMText</a></span> / <span class="classname"><a href="class.dom-text.html" class="classname">Dom\Text</a></span></td>
+     </tr>
+
+     <tr id="constant.xml-cdata-section-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-cdata-section-node">XML_CDATA_SECTION_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>4</td>
+      <td>Node is a <span class="classname"><a href="class.domcharacterdata.html" class="classname">DOMCharacterData</a></span> / <span class="classname"><a href="class.dom-characterdata.html" class="classname">Dom\CharacterData</a></span></td>
+     </tr>
+
+     <tr id="constant.xml-entity-ref-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-entity-ref-node">XML_ENTITY_REF_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>5</td>
+      <td>Node is a <span class="classname"><a href="class.domentityreference.html" class="classname">DOMEntityReference</a></span> / <span class="classname"><a href="class.dom-entityreference.html" class="classname">Dom\EntityReference</a></span></td>
+     </tr>
+
+     <tr id="constant.xml-entity-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-entity-node">XML_ENTITY_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>6</td>
+      <td>Node is a <span class="classname"><a href="class.domentity.html" class="classname">DOMEntity</a></span> / <span class="classname"><a href="class.dom-entity.html" class="classname">Dom\Entity</a></span></td>
+     </tr>
+
+     <tr id="constant.xml-pi-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-pi-node">XML_PI_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>7</td>
+      <td>Node is a <span class="classname"><a href="class.domprocessinginstruction.html" class="classname">DOMProcessingInstruction</a></span> / <span class="classname"><a href="class.dom-processinginstruction.html" class="classname">Dom\ProcessingInstruction</a></span></td>
+     </tr>
+
+     <tr id="constant.xml-comment-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-comment-node">XML_COMMENT_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>8</td>
+      <td>Node is a <span class="classname"><a href="class.domcomment.html" class="classname">DOMComment</a></span> / <span class="classname"><a href="class.dom-comment.html" class="classname">Dom\Comment</a></span></td>
+     </tr>
+
+     <tr id="constant.xml-document-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-document-node">XML_DOCUMENT_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>9</td>
+      <td>Node is a <span class="classname"><a href="class.domdocument.html" class="classname">DOMDocument</a></span> / <span class="classname"><a href="class.dom-document.html" class="classname">Dom\Document</a></span></td>
+     </tr>
+
+     <tr id="constant.xml-document-type-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-document-type-node">XML_DOCUMENT_TYPE_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>10</td>
+      <td>Node is a <span class="classname"><a href="class.domdocumenttype.html" class="classname">DOMDocumentType</a></span> / <span class="classname"><a href="class.dom-documenttype.html" class="classname">Dom\DocumentType</a></span></td>
+     </tr>
+
+     <tr id="constant.xml-document-frag-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-document-frag-node">XML_DOCUMENT_FRAG_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>11</td>
+      <td>Node is a <span class="classname"><a href="class.domdocumentfragment.html" class="classname">DOMDocumentFragment</a></span> / <span class="classname"><a href="class.dom-documentfragment.html" class="classname">Dom\DocumentFragment</a></span></td>
+     </tr>
+
+     <tr id="constant.xml-notation-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-notation-node">XML_NOTATION_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>12</td>
+      <td>Node is a <span class="classname"><a href="class.domnotation.html" class="classname">DOMNotation</a></span> / <span class="classname"><a href="class.dom-notation.html" class="classname">Dom\Notation</a></span></td>
+     </tr>
+
+     <tr id="constant.xml-html-document-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-html-document-node">XML_HTML_DOCUMENT_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>13</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr id="constant.xml-dtd-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-dtd-node">XML_DTD_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>14</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr id="constant.xml-element-decl-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-element-decl-node">XML_ELEMENT_DECL_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>15</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr id="constant.xml-attribute-decl-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-attribute-decl-node">XML_ATTRIBUTE_DECL_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>16</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr id="constant.xml-entity-decl-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-entity-decl-node">XML_ENTITY_DECL_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>17</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr id="constant.xml-namespace-decl-node">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-namespace-decl-node">XML_NAMESPACE_DECL_NODE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>18</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr id="constant.xml-attribute-cdata">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-attribute-cdata">XML_ATTRIBUTE_CDATA</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>1</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr id="constant.xml-attribute-id">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-attribute-id">XML_ATTRIBUTE_ID</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>2</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr id="constant.xml-attribute-idref">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-attribute-idref">XML_ATTRIBUTE_IDREF</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>3</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr id="constant.xml-attribute-idrefs">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-attribute-idrefs">XML_ATTRIBUTE_IDREFS</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>4</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr id="constant.xml-attribute-entity">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-attribute-entity">XML_ATTRIBUTE_ENTITY</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>5</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr id="constant.xml-attribute-nmtoken">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-attribute-nmtoken">XML_ATTRIBUTE_NMTOKEN</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>7</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr id="constant.xml-attribute-nmtokens">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-attribute-nmtokens">XML_ATTRIBUTE_NMTOKENS</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>8</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr id="constant.xml-attribute-enumeration">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-attribute-enumeration">XML_ATTRIBUTE_ENUMERATION</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>9</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr id="constant.xml-attribute-notation">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-attribute-notation">XML_ATTRIBUTE_NOTATION</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>10</td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr id="constant.xml-local-namespace">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.xml-local-namespace">XML_LOCAL_NAMESPACE</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td class="empty">&nbsp;</td>
+      <td>A namespace declaration node.</td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+  <table class="doctable table">
+   <caption><strong>HTML constants</strong></caption>
+   
+    <thead>
+     <tr>
+      <th>Constants</th>
+      <th>Description</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr id="constant.dom-html-no-default-ns">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-html-no-default-ns">Dom\HTML_NO_DEFAULT_NS</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>
+       <span class="simpara">
+        This disables setting the namespace of elements during parsing when
+        using <span class="classname"><a href="class.dom-htmldocument.html" class="classname">Dom\HTMLDocument</a></span>.
+        This exists for backwards compatibility with
+        <span class="classname"><a href="class.domdocument.html" class="classname">DOMDocument</a></span>.
+       </span>
+       <div class="caution"><strong class="caution">Caution</strong>
+        <p class="simpara">
+         Some DOM methods depend on the <abbr title="Hyper Text Markup Language">HTML</abbr> namespace
+         being set.
+         By using this parser option, the behaviour of those methods can be
+         influenced.
+        </p>
+       </div>
+      </td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+  <table class="doctable table">
+   <caption><strong><span class="classname"><a href="class.domexception.html" class="classname">DOMException</a></span> / <span class="classname"><strong class="classname">Dom\Exception</strong></span> constants</strong></caption>
+   
+    <thead>
+     <tr>
+      <th>Constants</th>
+      <th>Value</th>
+      <th>Description</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr id="constant.dom-php-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-php-err">DOM_PHP_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>0</td>
+      <td>
+       Error code not part of the DOM specification. Meant for PHP errors.
+       Deprecated as of PHP 8.4.0 because this is no longer used.
+       Prior to PHP 8.4.0, this was inconsistently used to indicate
+       out-of-memory situations.
+      </td>
+     </tr>
+
+     <tr id="constant.dom-index-size-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-index-size-err">DOM_INDEX_SIZE_ERR</a></code></strong> / <strong><code><a href="dom.constants.html#constant.dom-index-size-err">Dom\INDEX_SIZE_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>1</td>
+      <td>
+       If index or size is negative, or greater than the allowed value.
+      </td>
+     </tr>
+
+     <tr id="constant.domstring-size-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.domstring-size-err">DOMSTRING_SIZE_ERR</a></code></strong> / <strong><code>Dom\STRING_SIZE_ERR</code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>2</td>
+      <td>
+       If the specified range of text does not fit into a
+       <span class="type"><a href="language.types.string.html" class="type string">string</a></span>.
+      </td>
+     </tr>
+
+     <tr id="constant.dom-hierarchy-request-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-hierarchy-request-err">DOM_HIERARCHY_REQUEST_ERR</a></code></strong> / <strong><code><a href="dom.constants.html#constant.dom-hierarchy-request-err">Dom\HIERARCHY_REQUEST_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>3</td>
+      <td>If any node is inserted somewhere it doesn&#039;t belong</td>
+     </tr>
+
+     <tr id="constant.dom-wrong-document-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-wrong-document-err">DOM_WRONG_DOCUMENT_ERR</a></code></strong> / <strong><code><a href="dom.constants.html#constant.dom-wrong-document-err">Dom\WRONG_DOCUMENT_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>4</td>
+      <td>
+       If a node is used in a different document than the one that created it.
+      </td>
+     </tr>
+
+     <tr id="constant.dom-invalid-character-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-invalid-character-err">DOM_INVALID_CHARACTER_ERR</a></code></strong> / <strong><code><a href="dom.constants.html#constant.dom-invalid-character-err">Dom\INVALID_CHARACTER_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>5</td>
+      <td>
+       If an invalid or illegal character is specified, such as in a name.
+      </td>
+     </tr>
+
+     <tr id="constant.dom-no-data-allowed-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-no-data-allowed-err">DOM_NO_DATA_ALLOWED_ERR</a></code></strong> / <strong><code><a href="dom.constants.html#constant.dom-no-data-allowed-err">Dom\NO_DATA_ALLOWED_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>6</td>
+      <td>
+       If data is specified for a node which does not support data.
+      </td>
+     </tr>
+
+     <tr id="constant.dom-no-modification-allowed-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-no-modification-allowed-err">DOM_NO_MODIFICATION_ALLOWED_ERR</a></code></strong> / <strong><code><a href="dom.constants.html#constant.dom-no-modification-allowed-err">Dom\NO_MODIFICATION_ALLOWED_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>7</td>
+      <td>
+       If an attempt is made to modify an object where modifications are not allowed.
+      </td>
+     </tr>
+
+     <tr id="constant.dom-not-found-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-not-found-err">DOM_NOT_FOUND_ERR</a></code></strong> / <strong><code><a href="dom.constants.html#constant.dom-not-found-err">Dom\NOT_FOUND_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>8</td>
+      <td>
+       If an attempt is made to reference a node in a context where it does not exist.
+      </td>
+     </tr>
+
+     <tr id="constant.dom-not-supported-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-not-supported-err">DOM_NOT_SUPPORTED_ERR</a></code></strong> / <strong><code><a href="dom.constants.html#constant.dom-not-supported-err">Dom\NOT_SUPPORTED_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>9</td>
+      <td>
+       If the implementation does not support the requested type of object or operation.
+      </td>
+     </tr>
+
+     <tr id="constant.dom-inuse-attribute-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-inuse-attribute-err">DOM_INUSE_ATTRIBUTE_ERR</a></code></strong> / <strong><code><a href="dom.constants.html#constant.dom-inuse-attribute-err">Dom\INUSE_ATTRIBUTE_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>10</td>
+      <td>
+       If an attempt is made to add an attribute that is already in use elsewhere.
+      </td>
+     </tr>
+
+     <tr id="constant.dom-invalid-state-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-invalid-state-err">DOM_INVALID_STATE_ERR</a></code></strong> / <strong><code><a href="dom.constants.html#constant.dom-invalid-state-err">Dom\INVALID_STATE_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>11</td>
+      <td>
+       If an attempt is made to use an object that is not, or is no longer, usable.
+      </td>
+     </tr>
+
+     <tr id="constant.dom-syntax-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-syntax-err">DOM_SYNTAX_ERR</a></code></strong> / <strong><code><a href="dom.constants.html#constant.dom-syntax-err">Dom\SYNTAX_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>12</td>
+      <td>If an invalid or illegal string is specified.</td>
+     </tr>
+
+     <tr id="constant.dom-invalid-modification-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-invalid-modification-err">DOM_INVALID_MODIFICATION_ERR</a></code></strong> / <strong><code><a href="dom.constants.html#constant.dom-invalid-modification-err">Dom\INVALID_MODIFICATION_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>13</td>
+      <td>If an attempt is made to modify the type of the underlying object.</td>
+     </tr>
+
+     <tr id="constant.dom-namespace-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-namespace-err">DOM_NAMESPACE_ERR</a></code></strong> / <strong><code><a href="dom.constants.html#constant.dom-namespace-err">Dom\NAMESPACE_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>14</td>
+      <td>
+       If an attempt is made to create or change an object in a way which is
+       incorrect with regard to namespaces.
+      </td>
+     </tr>
+
+     <tr id="constant.dom-invalid-access-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-invalid-access-err">DOM_INVALID_ACCESS_ERR</a></code></strong> / <strong><code><a href="dom.constants.html#constant.dom-invalid-access-err">Dom\INVALID_ACCESS_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>15</td>
+      <td>
+       If a parameter or an operation is not supported by the underlying object.
+      </td>
+     </tr>
+
+     <tr id="constant.dom-validation-err">
+      <td>
+       <strong><code><a href="dom.constants.html#constant.dom-validation-err">DOM_VALIDATION_ERR</a></code></strong> / <strong><code><a href="dom.constants.html#constant.dom-validation-err">Dom\VALIDATION_ERR</a></code></strong>
+       (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+      </td>
+      <td>16</td>
+      <td>
+       If a call to a method such as insertBefore or removeChild would make the Node
+       invalid with respect to &quot;partial validity&quot;, this exception would be raised and
+       the operation would not be done.
+      </td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+ </div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

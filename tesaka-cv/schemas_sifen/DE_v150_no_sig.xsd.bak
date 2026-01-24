@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- XSD modificado para validar DE sin firma (para smoke test) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           xmlns:sifen="http://ekuatia.set.gov.py/sifen/xsd"
+           targetNamespace="http://ekuatia.set.gov.py/sifen/xsd"
+           elementFormDefault="qualified">
+    
+    <!-- Incluir los tipos base -->
+    <xs:include schemaLocation="file:///Users/robinklaiss/Dev/industrias-feris-facturacion-electronica-simplificado/tesaka-cv/schemas_sifen/DE_Types_v150.xsd"/>
+    
+    <!-- Definición del DE sin firma (similar al XSD original pero sin Signature) -->
+    <xs:complexType name="tDE_no_sig">
+        <xs:annotation>
+            <xs:documentation>
+                Campos firmados del DE (sin Signature para validación previa)
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="dDVId" type="sifen:tDVer" />
+            <xs:element name="dFecFirma" type="sifen:fecHhmmss" />
+            <xs:element name="dSisFact">
+                <xs:annotation>
+                    <xs:documentation>
+                        1-Sistema de facturación del contribuyente
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:positiveInteger">
+                        <xs:maxInclusive value="1" />
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="gOpeDE" type="sifen:tgCOpeDE" />
+            <xs:element name="gTimb" type="sifen:tgDTim" />
+            <xs:element name="gDatGralOpe" type="sifen:tgDaGOC" />
+            <xs:element name="gDtipDE" type="sifen:tgDtipDE" />
+            <xs:element name="gTotSub" type="sifen:tgTotSub" minOccurs="0" />
+            <xs:element name="gCamGen" type="sifen:tgCamGen" minOccurs="0" />
+            <xs:element name="gCamDEAsoc" type="sifen:tgCamDEAsoc"
+                minOccurs="0" maxOccurs="99" />
+        </xs:sequence>
+        <!--CDC pasa a ser atributo del rDE -->
+        <xs:attribute name="Id" type="sifen:tCDC" use="required" />
+    </xs:complexType>
+    
+    <!-- Elemento raíz DE -->
+    <xs:element name="DE" type="sifen:tDE_no_sig" />
+    
+</xs:schema>
