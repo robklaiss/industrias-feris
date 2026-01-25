@@ -19,9 +19,11 @@ Notas importantes:
 """
 
 import os
+import json
 import logging
 import time
 import random
+from datetime import datetime
 from typing import Dict, Any, Optional, List, TYPE_CHECKING
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse
@@ -95,6 +97,37 @@ SIZE_LIMITS = {
     "siConsDE": 1000 * 1024,  # 1000 KB (asumido)
     "siConsLoteDE": 10000 * 1024,  # 10.000 KB (asumido)
 }
+
+
+def build_consulta_lote_raw_envelope(d_id: str, d_prot_cons_lote: str) -> bytes:
+    """Construye el envelope SOAP 1.2 requerido por siConsLoteDE."""
+    if not d_id or not str(d_id).strip():
+        raise ValueError("dId no puede estar vacío para consulta_lote_raw")
+    if not d_prot_cons_lote or not str(d_prot_cons_lote).strip():
+        raise ValueError("dProtConsLote no puede estar vacío para consulta_lote_raw")
+
+    if etree is None:
+        raise SifenClientError("lxml no está disponible para construir SOAP consulta_lote_raw")
+
+    soap_ns = "http://www.w3.org/2003/05/soap-envelope"
+
+    envelope = etree.Element(f"{{{soap_ns}}}Envelope", nsmap={"soap": soap_ns})
+    etree.SubElement(envelope, f"{{{soap_ns}}}Header")
+    body = etree.SubElement(envelope, f"{{{soap_ns}}}Body")
+    r_envi = etree.SubElement(body, "rEnviConsLoteDe", nsmap={None: SIFEN_NS})
+
+    d_id_elem = etree.SubElement(r_envi, "dId")
+    d_id_elem.text = str(d_id)
+
+    d_prot_elem = etree.SubElement(r_envi, "dProtConsLote")
+    d_prot_elem.text = str(d_prot_cons_lote)
+
+    return etree.tostring(
+        envelope,
+        xml_declaration=True,
+        encoding="UTF-8",
+        pretty_print=False,
+    )
 
 # Códigos de error SIFEN (parciales)
 ERROR_CODES = {
@@ -183,8 +216,12 @@ class SoapClient:
         if not url:
             return url
 
-        # Para recibe-lote y consulta-ruc, conservar el .wsdl
-        if "/recibe-lote.wsdl" in url or "/consulta-ruc.wsdl" in url:
+        # Para recibe-lote, consulta-ruc y consulta-lote, conservar el .wsdl
+        if (
+            "/recibe-lote.wsdl" in url
+            or "/consulta-ruc.wsdl" in url
+            or "/consulta-lote.wsdl" in url
+        ):
             # Solo quitar query string si existe
             if "?" in url:
                 url = url.split("?")[0]
@@ -199,6 +236,131 @@ class SoapClient:
             url = url[:-5]  # quitar ".wsdl"
 
         return url
+
+    def _get_artifacts_dir(self) -> Path:
+        """Resolve artifacts directory (env override) and ensure it exists."""
+        raw_dir = os.getenv("SIFEN_ARTIFACTS_DIR") or os.getenv("SIFEN_ARTIFACTS_PATH")
+        try:
+            base_path = Path(raw_dir).expanduser() if raw_dir else Path("artifacts")
+        except Exception:
+            base_path = Path("artifacts")
+        base_path.mkdir(parents=True, exist_ok=True)
+        return base_path
+
+    def _prepare_request_artifacts(
+        self,
+        *,
+        artifacts_dir: Path,
+        label: str,
+        post_url: str,
+        headers: Dict[str, str],
+        soap_bytes: bytes,
+    ) -> Path:
+        """Persist request payload and curl helper for a specific attempt."""
+        request_path = artifacts_dir / f"{label}_request.xml"
+        try:
+            request_path.write_bytes(soap_bytes)
+        except Exception as exc:
+            logger.warning(f"No se pudo guardar request SOAP ({label}): {exc}")
+
+        curl_path = artifacts_dir / f"{label}_curl.sh"
+        try:
+            self._write_curl_script(curl_path, post_url, headers, request_path)
+        except Exception as exc:
+            logger.warning(f"No se pudo generar curl helper ({label}): {exc}")
+
+        return request_path
+
+    @staticmethod
+    def _write_curl_script(
+        curl_path: Path,
+        post_url: str,
+        headers: Dict[str, str],
+        request_path: Path,
+    ) -> None:
+        lines: List[str] = [
+            "#!/bin/bash",
+            "set -euo pipefail",
+            "",
+            "# Reemplaza estos paths antes de usar el curl equivalente",
+            'CERT_PATH="${CERT_PATH:-/path/to/your_cert.pem}"',
+            'KEY_PATH="${KEY_PATH:-/path/to/your_key.pem}"',
+            "",
+            "curl -v -X POST \\",
+            f"  '{post_url}' \\",
+        ]
+
+        for key, value in headers.items():
+            if value is None:
+                continue
+            lines.append(f"  -H '{key}: {value}' \\")
+
+        lines.extend(
+            [
+                f"  --data-binary '@{request_path}' \\",
+                "  --cert \"$CERT_PATH\" \\",
+                "  --key \"$KEY_PATH\"",
+            ]
+        )
+
+        curl_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        try:
+            curl_path.chmod(0o700)
+        except Exception:
+            pass
+
+    def _persist_http_attempt(
+        self,
+        *,
+        artifacts_dir: Path,
+        label: str,
+        service_key: str,
+        post_url: str,
+        soap_version: str,
+        headers: Dict[str, str],
+        request_path: Path,
+        response_status: Optional[int],
+        response_headers: Optional[Dict[str, Any]],
+        response_body: Optional[bytes],
+        error_message: Optional[str],
+    ) -> None:
+        meta_path = artifacts_dir / f"{label}_http.json"
+        response_path = artifacts_dir / f"{label}_response.xml"
+
+        if response_body is not None:
+            try:
+                response_path.write_bytes(response_body)
+            except Exception as exc:
+                logger.warning(f"No se pudo guardar response SOAP ({label}): {exc}")
+        elif not response_path.exists():
+            try:
+                response_path.write_text("", encoding="utf-8")
+            except Exception:
+                pass
+
+        metadata: Dict[str, Any] = {
+            "timestamp": datetime.now().isoformat(),
+            "service": service_key,
+            "post_url": post_url,
+            "soap_version": soap_version,
+            "content_type": headers.get("Content-Type"),
+            "soapaction_header": headers.get("SOAPAction"),
+            "request_path": str(request_path),
+            "response_path": str(response_path),
+            "headers": headers,
+        }
+
+        if response_status is not None:
+            metadata["http_status"] = response_status
+        if response_headers is not None:
+            metadata["response_headers"] = response_headers
+        if error_message:
+            metadata["error"] = error_message
+
+        try:
+            meta_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
+        except Exception as exc:
+            logger.warning(f"No se pudo guardar metadata HTTP ({label}): {exc}")
 
     def _extract_soap_address_from_wsdl(self, wsdl_url: str) -> Optional[str]:
         """Parsea el SOAP address (location) desde el XML del WSDL usando mTLS.
@@ -1003,11 +1165,63 @@ class SoapClient:
         import hashlib
         
         debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+        artifacts_dir = self._get_artifacts_dir()
+
+        # Guardar mínimo SIEMPRE
+        try:
+            request_file_real = artifacts_dir / f"soap_last_request{suffix}.xml"
+            request_file_real.write_bytes(soap_bytes)
+
+            request_xml = soap_bytes.decode("utf-8", errors="replace")
+            if "<xDE>" in request_xml or "<xsd:xDE>" in request_xml:
+                import re
+
+                def replace_xde(match):
+                    prefix = match.group(1)
+                    content = match.group(2)
+                    suf = match.group(3)
+                    content_len = len(content.strip())
+                    return f"{prefix}__BASE64_REDACTED_LEN_{content_len}__{suf}"
+
+                request_xml = re.sub(
+                    r"(<xDE[^>]*>)([^<]+)(</xDE>)",
+                    replace_xde,
+                    request_xml,
+                    flags=re.DOTALL,
+                )
+                request_xml = re.sub(
+                    r"(<xsd:xDE[^>]*>)([^<]+)(</xsd:xDE>)",
+                    replace_xde,
+                    request_xml,
+                    flags=re.DOTALL,
+                )
+
+            request_file_redacted = artifacts_dir / f"soap_last_request_redacted{suffix}.xml"
+            request_file_redacted.write_text(request_xml, encoding="utf-8")
+
+            response_file = artifacts_dir / f"soap_last_response{suffix}.xml"
+            if response_body:
+                response_file.write_bytes(response_body)
+            elif exception_class:
+                import xml.etree.ElementTree as ET
+
+                error_root = ET.Element("error")
+                ET.SubElement(error_root, "exception_class").text = exception_class
+                if exception_message:
+                    ET.SubElement(error_root, "exception_message").text = exception_message[:500]
+                error_xml = ET.tostring(error_root, encoding="unicode")
+                response_file.write_text(
+                    f'<?xml version="1.0" encoding="UTF-8"?>\n{error_xml}',
+                    encoding="utf-8",
+                )
+        except Exception as e:
+            logger.warning(f"Error al guardar artifacts mínimos de SOAP: {e}")
+
         if not debug_enabled and response_status == 200:
             return  # Solo guardar en error si no está habilitado
         
         try:
-            debug_file = Path("artifacts") / f"soap_last_http_debug{suffix}.txt"
+            debug_file = artifacts_dir / f"soap_last_http_debug{suffix}.txt"
             debug_file.parent.mkdir(exist_ok=True)
             
             soap_sha256 = hashlib.sha256(soap_bytes).hexdigest()
@@ -1137,7 +1351,7 @@ class SoapClient:
             
             # Guardar headers finales en archivo separado
             try:
-                headers_file = Path("artifacts") / f"soap_last_request_headers{suffix}.txt"
+                headers_file = artifacts_dir / f"soap_last_request_headers{suffix}.txt"
                 with open(headers_file, "w", encoding="utf-8") as hf:
                     for key in sorted(headers.keys()):
                         hf.write(f"{key}: {headers[key]}\n")
@@ -1153,7 +1367,7 @@ class SoapClient:
                 
                 # 1. Guardar request REAL si SIFEN_DEBUG_SOAP=1
                 if debug_soap:
-                    request_file_real = Path("artifacts") / f"soap_last_request_REAL{suffix}.xml"
+                    request_file_real = artifacts_dir / f"soap_last_request_REAL{suffix}.xml"
                     request_file_real.write_bytes(soap_bytes)  # REAL sin redactar
                     logger.debug(f"SOAP request REAL guardado en: {request_file_real}")
                 
@@ -1182,12 +1396,12 @@ class SoapClient:
                         flags=re.DOTALL
                     )
                 
-                request_file = Path("artifacts") / f"soap_last_request{suffix}.xml"
+                request_file = artifacts_dir / f"soap_last_request_redacted{suffix}.xml"
                 request_file.write_text(request_xml, encoding="utf-8")
                 logger.debug(f"SOAP request (redactado) guardado en: {request_file}")
                 
                 # Response XML (si existe, o crear placeholder si hay excepción)
-                response_file = Path("artifacts") / f"soap_last_response{suffix}.xml"
+                response_file = artifacts_dir / f"soap_last_response{suffix}.xml"
                 if response_body:
                     response_file.write_bytes(response_body)
                     logger.debug(f"SOAP response guardado en: {response_file}")
@@ -1213,7 +1427,7 @@ class SoapClient:
     # ---------------------------------------------------------------------
     # RAW POST (requests)
     # ---------------------------------------------------------------------
-    def _post_raw_soap(self, service_key: str, soap_bytes: bytes) -> bytes:
+    def _post_raw_soap(self, service_key: str, soap_bytes: bytes, soap_version: str = "1.2") -> bytes:
         if service_key not in self._soap_address:
             self._get_client(service_key)  # intenta poblar _soap_address
 
@@ -1253,6 +1467,9 @@ class SoapClient:
                     "Content-Type": f'application/soap+xml; charset=utf-8; action="{action}"',
                 }
 
+        artifacts_dir = self._get_artifacts_dir()
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
         # Implementar retries con backoff exponencial y jitter (configurable)
         max_attempts = int(os.getenv("SIFEN_SOAP_MAX_RETRIES", "3")) + 1  # +1 para el intento inicial
         base_delay = float(os.getenv("SIFEN_SOAP_BACKOFF_BASE", "0.6"))
@@ -1262,6 +1479,18 @@ class SoapClient:
         resp = None
         
         for attempt in range(1, max_attempts + 1):
+            attempt_label = f"{service_key}_{timestamp}_try{attempt}"
+            request_path = self._prepare_request_artifacts(
+                artifacts_dir=artifacts_dir,
+                label=attempt_label,
+                post_url=url,
+                headers=headers,
+                soap_bytes=soap_bytes,
+            )
+            response_status: Optional[int] = None
+            response_headers: Optional[Dict[str, Any]] = None
+            response_body: Optional[bytes] = None
+            error_message: Optional[str] = None
             try:
                 logger.debug(f"Intento {attempt}/{max_attempts} para POST a {url}")
                 resp = session.post(
@@ -1270,7 +1499,23 @@ class SoapClient:
                     headers=headers,
                     timeout=(self.connect_timeout, self.read_timeout),
                 )
-                
+                response_status = resp.status_code
+                response_headers = dict(resp.headers)
+                response_body = resp.content
+                self._persist_http_attempt(
+                    artifacts_dir=artifacts_dir,
+                    label=attempt_label,
+                    service_key=service_key,
+                    post_url=url,
+                    soap_version=soap_version,
+                    headers=headers,
+                    request_path=request_path,
+                    response_status=response_status,
+                    response_headers=response_headers,
+                    response_body=response_body,
+                    error_message=None,
+                )
+
                 # Si llegamos aquí, el POST fue exitoso (no hubo error de conexión)
                 break
                 
@@ -1279,6 +1524,20 @@ class SoapClient:
                     requests.exceptions.HTTPError,
                     ConnectionResetError) as e:
                 last_exception = e
+                error_message = str(e)
+                self._persist_http_attempt(
+                    artifacts_dir=artifacts_dir,
+                    label=attempt_label,
+                    service_key=service_key,
+                    post_url=url,
+                    soap_version=soap_version,
+                    headers=headers,
+                    request_path=request_path,
+                    response_status=response_status,
+                    response_headers=response_headers,
+                    response_body=response_body,
+                    error_message=error_message,
+                )
                 
                 if attempt < max_attempts:
                     # Calcular delay con backoff exponencial y jitter
@@ -1301,6 +1560,22 @@ class SoapClient:
                 f"Error de conexión después de {max_attempts} intentos: {last_exception}"
             ) from last_exception
         
+        # Persistir intento final si el status code no fue exitoso
+        if resp.status_code != 200:
+            self._persist_http_attempt(
+                artifacts_dir=artifacts_dir,
+                label=f"{service_key}_{timestamp}_final",
+                service_key=service_key,
+                post_url=url,
+                soap_version=soap_version,
+                headers=headers,
+                request_path=request_path,
+                response_status=resp.status_code,
+                response_headers=dict(resp.headers),
+                response_body=resp.content,
+                error_message=f"HTTP {resp.status_code}",
+            )
+
         # Guardar JSON de routing para evidencia (solo para recibe_lote)
         if service_key == "recibe_lote":
             self._save_route_probe_json(service_key, url, headers, soap_bytes, resp)
@@ -1326,13 +1601,11 @@ class SoapClient:
         Si falla algo, se loguea warning y se continúa.
         """
         try:
-            from pathlib import Path
             import json
             import xml.etree.ElementTree as ET
             from datetime import datetime
             
-            out_dir = Path("artifacts")
-            out_dir.mkdir(exist_ok=True)
+            out_dir = self._get_artifacts_dir()
             
             # Parsear response para extraer campos SIFEN
             dCodRes = dMsgRes = dProtConsLote = dTpoProces = None
@@ -1438,10 +1711,7 @@ class SoapClient:
             return
 
         try:
-            from pathlib import Path
-
-            out_dir = Path("artifacts")
-            out_dir.mkdir(exist_ok=True)
+            out_dir = self._get_artifacts_dir()
 
             # Guardar SOAP enviado
             sent_file = out_dir / f"soap_last_sent{suffix}.xml"
@@ -2014,7 +2284,7 @@ class SoapClient:
         wsdl_info = None
         env_tag = (getattr(self.config, "env", None) or os.getenv("SIFEN_ENV", "test")).strip().lower()
         wsdl_cache_path = Path(f"/tmp/recibe-lote_{env_tag}.wsdl")
-        wsdl_inspected_path = Path("artifacts/wsdl_inspected.json")
+        wsdl_inspected_path = self._get_artifacts_dir() / "wsdl_inspected.json"
         
         if inspect_wsdl is None:
             raise SifenClientError("wsdl_introspect no disponible. Instalar dependencias.")
@@ -2051,8 +2321,7 @@ class SoapClient:
                 save_wsdl_inspection(wsdl_info, wsdl_inspected_path)
                 
                 # 5. Guardar expectativas del WSDL para diagnóstico
-                artifacts_dir = Path("artifacts")
-                artifacts_dir.mkdir(parents=True, exist_ok=True)
+                artifacts_dir = self._get_artifacts_dir()
                 
                 wsdl_expectations = []
                 wsdl_expectations.append(f"Operation name: {wsdl_info.get('operation_name', 'NOT_FOUND')}")
@@ -2211,13 +2480,13 @@ class SoapClient:
                 mtls_cert_path = session.cert
         
         # SOURCE OF TRUTH: Guardar bytes exactos que se enviarán por HTTP
-        artifacts_dir = Path("artifacts")
-        artifacts_dir.mkdir(parents=True, exist_ok=True)
+        artifacts_dir = self._get_artifacts_dir()
         
         # 1. Guardar bytes exactos y XML textual del request que se enviará
         try:
             artifacts_dir.joinpath("soap_last_request_BYTES.bin").write_bytes(soap_bytes)
             artifacts_dir.joinpath("soap_last_request_SENT.xml").write_bytes(soap_bytes)
+            artifacts_dir.joinpath("soap_last_request.xml").write_bytes(soap_bytes)
             logger.debug("Guardado: soap_last_request_BYTES.bin y soap_last_request_SENT.xml")
         except Exception as e:
             logger.warning(f"Error al guardar request bytes: {e}")
@@ -2911,8 +3180,7 @@ class SoapClient:
             # Guardar artifacts de debug si está habilitado
             if debug_enabled and history:
                 try:
-                    artifacts_dir = Path("artifacts")
-                    artifacts_dir.mkdir(exist_ok=True)
+                    artifacts_dir = self._get_artifacts_dir()
                     
                     # Guardar request
                     if hasattr(history, "last_sent") and history.last_sent:
@@ -3131,8 +3399,7 @@ class SoapClient:
             # Guardar artifacts si está habilitado
             if debug_enabled and history:
                 try:
-                    artifacts_dir = Path("artifacts")
-                    artifacts_dir.mkdir(exist_ok=True)
+                    artifacts_dir = self._get_artifacts_dir()
                     if hasattr(history, "last_sent") and history.last_sent:
                         request_envelope = history.last_sent.get("envelope", "")
                         if request_envelope:
@@ -3219,206 +3486,210 @@ class SoapClient:
         
         return result
 
-    def consulta_lote_raw(self, dprot_cons_lote: str, did: int = 1, dump_http: bool = False) -> Dict[str, Any]:
-        """Consulta lote sin depender del WSDL (POST directo al endpoint).
-        
-        Args:
-            dprot_cons_lote: dProtConsLote (número de lote)
-            did: dId (default: 1)
-            dump_http: Si True, retorna también sent_headers y sent_xml para debug
-            
-        Returns:
-            Dict con http_status, raw_xml, y opcionalmente dCodResLot/dMsgResLot.
-            Si dump_http=True, también incluye sent_headers y sent_xml.
-        """
-        import lxml.etree as etree  # noqa: F401
-        
-        # Construir SOAP 1.2 envelope con estructura exacta requerida
-        # SOAP 1.2 namespace
-        SOAP_12_NS = "http://www.w3.org/2003/05/soap-envelope"
-        
-        # Envelope SOAP 1.2 (sin prefijo sifen en nsmap, se usa default namespace en rEnviConsLoteDe)
-        envelope = etree.Element(
-            f"{{{SOAP_12_NS}}}Envelope",
-            nsmap={"soap": SOAP_12_NS}
-        )
-        
-        # Header vacío
-        header = etree.SubElement(envelope, f"{{{SOAP_12_NS}}}Header")
-        
-        # Body
-        body = etree.SubElement(envelope, f"{{{SOAP_12_NS}}}Body")
-        
-        # rEnviConsLoteDe directamente en Body con namespace default (sin prefijo sifen:)
-        # Usar xmlns="http://ekuatia.set.gov.py/sifen/xsd" como default namespace
-        r_envi_cons = etree.SubElement(
-            body, "rEnviConsLoteDe", nsmap={None: SIFEN_NS}
-        )
-        
-        # dId y dProtConsLote sin prefijo (unqualified, heredan el default namespace)
-        d_id_elem = etree.SubElement(r_envi_cons, "dId")
-        d_id_elem.text = str(did)
-        d_prot_elem = etree.SubElement(r_envi_cons, "dProtConsLote")
-        d_prot_elem.text = str(dprot_cons_lote)
-        
-        soap_bytes = etree.tostring(
-            envelope, xml_declaration=True, encoding="UTF-8", pretty_print=False
-        )
-        
-        # Determinar endpoint según ambiente (con .wsdl al final)
-        if self.config.env == "test":
-            endpoint = "https://sifen-test.set.gov.py/de/ws/consultas/consulta-lote.wsdl"
-        else:
-            endpoint = "https://sifen.set.gov.py/de/ws/consultas/consulta-lote.wsdl"
-        
-        # Headers SOAP 1.2 (application/soap+xml; NO usar header SOAPAction separado)
-        # WSDL observado para consulta-lote: soapAction="" (vacío)
-        headers = {
-            "Content-Type": "application/soap+xml; charset=utf-8",
-            "Accept": "application/soap+xml",
-        }
-        
-        # Guardar debug antes de enviar
-        debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
-        if debug_enabled:
-            try:
-                from pathlib import Path
-                out_dir = Path("artifacts")
-                out_dir.mkdir(exist_ok=True)
-                sent_file = out_dir / "soap_last_sent_consulta.xml"
-                sent_file.write_bytes(soap_bytes)
-            except Exception:
-                pass  # No romper el flujo si falla debug
-        
-        # Si dump_http está activo, guardar headers y XML enviados
+    def consulta_lote_raw(
+        self,
+        dprot_cons_lote: str,
+        did: Optional[str] = None,
+        dump_http: bool = False,
+        artifacts_dir: Optional[Path] = None,
+    ) -> Dict[str, Any]:
+        """Consulta lote sin depender de zeep/WSDL y genera artifacts detallados."""
+
+        if not dprot_cons_lote or not str(dprot_cons_lote).strip():
+            raise SifenClientError("dProtConsLote es obligatorio para consulta_lote_raw")
+
+        if did is None or not str(did).strip():
+            did = datetime.utcnow().strftime("%Y%m%d%H%M%S") + str(random.randint(0, 9))
+
+        soap_bytes = build_consulta_lote_raw_envelope(str(did), str(dprot_cons_lote).strip())
         soap_xml_str = soap_bytes.decode("utf-8", errors="replace")
-        result: Dict[str, Any] = {
-            "http_status": 0,
-            "raw_xml": "",
-        }
-        if dump_http:
-            result["sent_headers"] = headers.copy()
-            result["sent_xml"] = soap_xml_str
-        
-        # POST usando la sesión existente con mTLS
+
+        artifacts_dir_path = artifacts_dir if artifacts_dir else self._get_artifacts_dir()
         session = self.transport.session
+
+        # mTLS: usar paths configurados; fallback a variables de entorno estándar
+        cert_path = (
+            getattr(self.config, "cert_pem_path", None)
+            or getattr(self.config, "cert_path", None)
+            or __import__("os").environ.get("SIFEN_CERT_PATH")
+        )
+        key_path = (
+            getattr(self.config, "key_pem_path", None)
+            or getattr(self.config, "key_path", None)
+            or __import__("os").environ.get("SIFEN_KEY_PATH")
+        )
+        cert_pair = (cert_path, key_path) if cert_path and key_path else None
+
+        wsdl_url = self.config.get_soap_service_url("consulta_lote")
+        # Para consulta-lote, el endpoint POST debe incluir .wsdl (como recibe-lote y consulta-ruc)
+        # NO quitamos .wsdl porque SIFEN espera el POST exactamente a /consulta-lote.wsdl
+        endpoint_candidates = [wsdl_url]
+
+        content_type_variants = [
+            'application/soap+xml; charset=utf-8; action="siConsLoteDE"',
+            'application/soap+xml; charset=utf-8; action="siConsLoteDe"',
+        ]
+
+        attempts: List[Dict[str, Any]] = []
+        last_error: Optional[Exception] = None
         
-        try:
-            resp = session.post(
-                endpoint,
-                data=soap_bytes,
-                headers=headers,
-                timeout=(self.connect_timeout, self.read_timeout),
-            )
-            result["http_status"] = resp.status_code
-            result["raw_xml"] = resp.text
-            
-            # Si dump_http está activo, agregar headers y body recibidos
-            if dump_http:
-                result["received_headers"] = dict(resp.headers)
-                # Primeras 500 líneas o completo si es más corto
-                body_lines = resp.text.split("\n") if resp.text else []
-                if len(body_lines) > 500:
-                    result["received_body_preview"] = "\n".join(body_lines[:500]) + f"\n... (truncado, total {len(body_lines)} líneas)"
-                else:
-                    result["received_body_preview"] = resp.text
-            
-            # Guardar debug incluso si HTTP != 200
-            if debug_enabled:
-                try:
-                    from pathlib import Path
-                    out_dir = Path("artifacts")
-                    out_dir.mkdir(exist_ok=True)
-                    received_file = out_dir / "soap_last_received_consulta.xml"
-                    received_file.write_bytes(resp.content)
-                except Exception:
-                    pass  # No romper el flujo si falla debug
-            
-            # Intentar parsear XML y extraer campos (dCodResLot/dMsgResLot o fallback dCodRes/dMsgRes)
+        # Intentar descargar WSDL primero para verificar si viene vacío
+        wsdl_attempts = 0
+        max_wsdl_attempts = 3
+        wsdl_delay = 1.0
+        
+        while wsdl_attempts < max_wsdl_attempts:
+            wsdl_attempts += 1
             try:
-                resp_root = etree.fromstring(resp.content)
-                def _find_text(local_name: str) -> Optional[str]:
-                    try:
-                        nodes = resp_root.xpath(f'//*[local-name()="{local_name}"]')
-                        if nodes and nodes[0].text:
-                            return nodes[0].text.strip()
-                    except Exception:
-                        return None
-                    return None
+                print(f"🔍 Intentando descargar WSDL (intento {wsdl_attempts}/{max_wsdl_attempts})...")
+                wsdl_response = session.get(
+                    wsdl_url,
+                    cert=cert_pair,
+                    verify=(self.config.ca_bundle_path or True),
+                    timeout=10
+                )
+                
+                if wsdl_response.status_code == 200:
+                    if len(wsdl_response.content) == 0:
+                        print(f"⚠️ WSDL vino vacío (bytes=0), reintentando en {wsdl_delay}s...")
+                        time.sleep(wsdl_delay)
+                        wsdl_delay *= 2  # Backoff exponencial
+                        continue
+                    else:
+                        print(f"✅ WSDL descargado correctamente ({len(wsdl_response.content)} bytes)")
+                        break
+                else:
+                    print(f"❌ Error HTTP {wsdl_response.status_code} descargando WSDL")
+                    
+            except Exception as e:
+                print(f"❌ Error descargando WSDL: {e}")
+                if wsdl_attempts < max_wsdl_attempts:
+                    time.sleep(wsdl_delay)
+                    wsdl_delay *= 2
+        
+        if wsdl_attempts >= max_wsdl_attempts:
+            raise SifenClientError("No se pudo descargar WSDL después de varios intentos (viene vacío)")
 
-                d_cod_res_lot = _find_text("dCodResLot")
-                d_msg_res_lot = _find_text("dMsgResLot")
-                d_cod_res = _find_text("dCodRes")
-                d_msg_res = _find_text("dMsgRes")
+        for endpoint in endpoint_candidates:
+            for content_type in content_type_variants:
+                attempt_index = len(attempts) + 1
+                label = f"consulta_lote_raw_{attempt_index:02d}"
+                headers = {
+                    "Content-Type": content_type,
+                    "Accept": "application/soap+xml",
+                }
 
-                if d_cod_res_lot:
-                    result["dCodResLot"] = d_cod_res_lot
-                if d_msg_res_lot:
-                    result["dMsgResLot"] = d_msg_res_lot
-                if d_cod_res:
-                    result["dCodRes"] = d_cod_res
-                if d_msg_res:
-                    result["dMsgRes"] = d_msg_res
+                request_path = self._prepare_request_artifacts(
+                    artifacts_dir=artifacts_dir_path,
+                    label=label,
+                    post_url=endpoint,
+                    headers=headers,
+                    soap_bytes=soap_bytes,
+                )
 
-                # gResProcLote (detalle por CDC)
-                g_res_proc_lote = []
-                for lote_node in resp_root.xpath('//*[local-name()="gResProcLote"]'):
-                    try:
-                        id_text = None
-                        est_text = None
-                        prot_aut_text = None
+                attempt_ctx: Dict[str, Any] = {
+                    "label": label,
+                    "endpoint": endpoint,
+                    "content_type": content_type,
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "request_path": str(request_path),
+                }
 
-                        id_nodes = lote_node.xpath('./*[local-name()="id"]')
-                        if id_nodes and id_nodes[0].text:
-                            id_text = id_nodes[0].text.strip()
-                        est_nodes = lote_node.xpath('./*[local-name()="dEstRes"]')
-                        if est_nodes and est_nodes[0].text:
-                            est_text = est_nodes[0].text.strip()
-                        prot_nodes = lote_node.xpath('./*[local-name()="dProtAut"]')
-                        if prot_nodes and prot_nodes[0].text:
-                            prot_aut_text = prot_nodes[0].text.strip()
+                try:
+                    resp = session.post(
+                        endpoint,
+                        data=soap_bytes,
+                        headers=headers,
+                        cert=cert_pair,
+                        verify=(self.config.ca_bundle_path or True),
+                        timeout=(self.connect_timeout, self.read_timeout),
+                    )
+                    response_body = resp.content or b""
+                    response_headers = dict(resp.headers)
+                    attempt_ctx["http_status"] = resp.status_code
+                    attempt_ctx["response_path"] = str(
+                        (artifacts_dir_path / f"{label}_response.xml").resolve()
+                    )
 
-                        g_res_proc = []
-                        for proc_node in lote_node.xpath('./*[local-name()="gResProc"]'):
-                            cod_nodes = proc_node.xpath('./*[local-name()="dCodRes"]')
-                            msg_nodes = proc_node.xpath('./*[local-name()="dMsgRes"]')
-                            g_res_proc.append(
-                                {
-                                    "dCodRes": cod_nodes[0].text.strip() if cod_nodes and cod_nodes[0].text else None,
-                                    "dMsgRes": msg_nodes[0].text.strip() if msg_nodes and msg_nodes[0].text else None,
-                                }
-                            )
+                    self._persist_http_attempt(
+                        artifacts_dir=artifacts_dir_path,
+                        label=label,
+                        service_key="consulta_lote_raw",
+                        post_url=endpoint,
+                        soap_version="1.2",
+                        headers=headers,
+                        request_path=request_path,
+                        response_status=resp.status_code,
+                        response_headers=response_headers,
+                        response_body=response_body,
+                        error_message=None,
+                    )
 
-                        g_res_proc_lote.append(
-                            {
-                                "id": id_text,
-                                "dEstRes": est_text,
-                                "dProtAut": prot_aut_text,
-                                "gResProc": g_res_proc,
-                            }
+                    if resp.status_code >= 500 or not response_body:
+                        last_error = SifenClientError(
+                            f"HTTP {resp.status_code} sin cuerpo al consultar lote"
                         )
-                    except Exception:
+                        attempts.append(attempt_ctx)
                         continue
 
-                if g_res_proc_lote:
-                    result["gResProcLote"] = g_res_proc_lote
-            except Exception:
-                pass  # Si no se puede parsear, solo devolver raw_xml
-            
-        except Exception as e:
-            # Guardar debug incluso si hay excepción
-            if debug_enabled:
-                try:
-                    from pathlib import Path
-                    out_dir = Path("artifacts")
-                    out_dir.mkdir(exist_ok=True)
-                    received_file = out_dir / "soap_last_received_consulta.xml"
-                    received_file.write_bytes(b"")  # Vacío si no hay respuesta
-                except Exception:
-                    pass
-            raise SifenClientError(f"Error al consultar lote: {e}") from e
-        
-        return result
+                    try:
+                        xml_root = etree.fromstring(response_body)
+                    except Exception as parse_exc:
+                        last_error = parse_exc
+                        attempts.append(attempt_ctx)
+                        continue
+
+                    parsed = self._parse_consulta_lote_response_from_xml(xml_root)
+                    parsed.setdefault("parsed_fields", {})
+                    parsed["parsed_fields"].setdefault("dProtConsLote", str(dprot_cons_lote))
+                    parsed["parsed_fields"].setdefault("dId", str(did))
+                    parsed_result = {
+                        **parsed,
+                        "http_status": resp.status_code,
+                        "endpoint": endpoint,
+                        "attempts": attempts + [attempt_ctx],
+                        "headers_sent": headers.copy(),
+                        "headers_received": response_headers,
+                        "response_xml": response_body.decode("utf-8", errors="replace"),
+                        "request_xml": soap_xml_str,
+                    }
+
+                    # Copiar campos útiles al nivel raíz para heurísticas existentes
+                    for key in ("dCodResLot", "dMsgResLot", "dCodRes", "dMsgRes"):
+                        val = parsed_result["parsed_fields"].get(key)
+                        if val and key not in parsed_result:
+                            parsed_result[key] = val
+
+                    if dump_http:
+                        parsed_result["sent_headers"] = headers.copy()
+                        parsed_result["sent_xml"] = soap_xml_str
+                        parsed_result["received_headers"] = response_headers
+                        parsed_result["received_body"] = parsed_result["response_xml"]
+
+                    return parsed_result
+
+                except Exception as exc:
+                    last_error = exc
+                    attempt_ctx["error"] = str(exc)
+                    self._persist_http_attempt(
+                        artifacts_dir=artifacts_dir_path,
+                        label=label,
+                        service_key="consulta_lote_raw",
+                        post_url=endpoint,
+                        soap_version="1.2",
+                        headers=headers,
+                        request_path=request_path,
+                        response_status=None,
+                        response_headers=None,
+                        response_body=None,
+                        error_message=str(exc),
+                    )
+                finally:
+                    attempts.append(attempt_ctx)
+
+        raise SifenClientError(
+            f"consulta_lote_raw falló tras {len(attempts)} intentos: {last_error}"
+        )
     
     def consulta_de_por_cdc_raw(self, cdc: str, dump_http: bool = False, did: Optional[str] = None) -> Dict[str, Any]:
         """Consulta estado de un DE individual por CDC (sin depender del WSDL).
@@ -3638,9 +3909,7 @@ class SoapClient:
                 debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
                 if debug_enabled:
                     try:
-                        from pathlib import Path
-                        out_dir = Path("artifacts")
-                        out_dir.mkdir(exist_ok=True)
+                        out_dir = self._get_artifacts_dir()
                         received_file = out_dir / "soap_last_received_consulta_de.xml"
                         received_file.write_bytes(resp.content)
                     except Exception:
@@ -3649,9 +3918,7 @@ class SoapClient:
                 # Guardar artifacts de dump_http incluso si hay error HTTP
                 if dump_http:
                     try:
-                        from pathlib import Path
-                        artifacts_dir = Path("artifacts")
-                        artifacts_dir.mkdir(exist_ok=True)
+                        artifacts_dir = self._get_artifacts_dir()
                         timestamp = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
                         
                         # Guardar SOAP enviado
@@ -3708,9 +3975,7 @@ class SoapClient:
                     # Último intento falló: guardar artifacts si dump_http y luego re-raise
                     if dump_http:
                         try:
-                            from pathlib import Path
-                            artifacts_dir = Path("artifacts")
-                            artifacts_dir.mkdir(exist_ok=True)
+                            artifacts_dir = self._get_artifacts_dir()
                             timestamp = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
                             
                             # Guardar SOAP enviado (aunque falló)
@@ -3739,9 +4004,7 @@ class SoapClient:
                 last_exception = e
                 if dump_http:
                     try:
-                        from pathlib import Path
-                        artifacts_dir = Path("artifacts")
-                        artifacts_dir.mkdir(exist_ok=True)
+                        artifacts_dir = self._get_artifacts_dir()
                         timestamp = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
                         
                         # Guardar SOAP enviado (aunque falló)
@@ -4041,9 +4304,7 @@ class SoapClient:
                 debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
                 if debug_enabled:
                     try:
-                        from pathlib import Path
-                        out_dir = Path("artifacts")
-                        out_dir.mkdir(exist_ok=True)
+                        out_dir = self._get_artifacts_dir()
                         received_file = out_dir / "soap_last_received_consulta_ruc.xml"
                         received_file.write_bytes(resp.content)
                     except Exception:
@@ -4052,9 +4313,7 @@ class SoapClient:
                 # Guardar artifacts de dump_http incluso si hay error HTTP
                 if dump_http:
                     try:
-                        from pathlib import Path
-                        artifacts_dir = Path("artifacts")
-                        artifacts_dir.mkdir(exist_ok=True)
+                        artifacts_dir = self._get_artifacts_dir()
                         timestamp = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
                         
                         # Guardar SOAP enviado
@@ -4160,9 +4419,7 @@ class SoapClient:
                     # Último intento falló: guardar artifacts si dump_http y luego re-raise
                     if dump_http:
                         try:
-                            from pathlib import Path
-                            artifacts_dir = Path("artifacts")
-                            artifacts_dir.mkdir(exist_ok=True)
+                            artifacts_dir = self._get_artifacts_dir()
                             timestamp = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
                             
                             # Guardar SOAP enviado (aunque falló)
@@ -4191,9 +4448,7 @@ class SoapClient:
                 last_exception = e
                 if dump_http:
                     try:
-                        from pathlib import Path
-                        artifacts_dir = Path("artifacts")
-                        artifacts_dir.mkdir(exist_ok=True)
+                        artifacts_dir = self._get_artifacts_dir()
                         timestamp = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
                         
                         # Guardar SOAP enviado (aunque falló)
