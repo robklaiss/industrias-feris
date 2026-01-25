@@ -154,6 +154,65 @@ def _extract_cdc_from_xml(de_xml: str) -> str:
         raise ValueError(f"Error al extraer CDC del XML: {e}")
 
 
+def _ensure_artifacts_dir() -> FSPath:
+    """Crea (si es necesario) y retorna el directorio artifacts/ como FSPath.
+
+    Best-effort: nunca levanta excepción hacia el caller.
+    """
+    artifacts_dir = FSPath("artifacts")
+    try:
+        artifacts_dir.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        # Si falla la creación, igual devolvemos la ruta para logging/debug
+        pass
+    return artifacts_dir
+
+
+def _write_text(path: FSPath, content: str) -> None:
+    """Escribe contenido de texto en un archivo, sin romper el flujo ante errores."""
+    try:
+        path = FSPath(path)
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+        except Exception:
+            pass
+        path.write_text(content, encoding="utf-8")
+    except Exception:
+        logger.warning("No se pudo escribir artifact de texto en %s", path, exc_info=True)
+
+
+def _write_json(path: FSPath, obj) -> None:
+    """Escribe un objeto JSON en un archivo, sin romper el flujo ante errores."""
+    try:
+        import json
+        path = FSPath(path)
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+        except Exception:
+            pass
+        path.write_text(json.dumps(obj, indent=2, ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        logger.warning("No se pudo escribir artifact JSON en %s", path, exc_info=True)
+
+
+def _safe_db_error_update(doc_id: int, message: str) -> None:
+    """Actualiza el estado del documento a error sin levantar nuevas excepciones."""
+    try:
+        from .document_status import STATUS_ERROR
+        db.update_document_status(
+            doc_id=doc_id,
+            last_status=STATUS_ERROR,
+            last_message=message,
+        )
+    except Exception as e:
+        logger.error(
+            "No se pudo actualizar estado=error para documento %s: %s",
+            doc_id,
+            e,
+            exc_info=True,
+        )
+
+
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     """Lista los últimos 50 documentos"""
@@ -645,7 +704,7 @@ async def de_new_submit(
                         num_doc_int = int(numero_documento)
                         numero_documento = str(num_doc_int + 1).zfill(len(numero_documento))
                         # Regenerar DE con nuevo número (build_de_xml ya importado arriba)
-                        from tools.build_de import build_de_xml
+                        # FIX: tools.build_de no existe en tesaka-final (evitar crash)
                         de_xml = build_de_xml(
                             ruc=emisor_ruc,
                             timbrado=timbrado,
@@ -692,36 +751,42 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
       * "lote": Envía como siRecepLoteDE, guarda dProtConsLote y consulta automáticamente
       * "direct": Envía como siRecepDE, respuesta inmediata sin consulta de lote
     """
+    logger.info("SEND_TO_SIFEN: doc_id=%s mode=%s", doc_id, mode)
+
+    # Este valor se completa en el flujo de firma (modo lote) si está disponible
+    password_source = "unknown"
+
     try:
         # Validar mode
         if mode not in ("lote", "direct"):
             raise HTTPException(
                 status_code=400,
-                detail=f"Parámetro 'mode' inválido: '{mode}'. Valores permitidos: 'lote', 'direct'"
+                detail=f"Parámetro 'mode' inválido: '{mode}'. Valores permitidos: 'lote', 'direct'",
             )
-        
+
         document = db.get_document(doc_id)
         if not document:
             raise HTTPException(status_code=404, detail=f"Documento {doc_id} no encontrado")
-        
+
         # Importar constantes de estado
         from .document_status import STATUS_ERROR
         from .sifen_status_mapper import map_recepcion_response_to_status
-        
+
         # Importar cliente SIFEN (lazy import)
         import sys
         import re
+
         sys.path.insert(0, str(FSPath(__file__).parent.parent))
-        
+
         try:
             from app.sifen_client.soap_client import SoapClient
             from app.sifen_client.exceptions import SifenClientError
             from app.sifen_client.config import get_sifen_config
-            
+
             # Obtener configuración
             env = os.getenv("SIFEN_ENV", "test")
             config = get_sifen_config(env=env)
-            
+
             # Crear cliente (puede lanzar SifenClientError si falta mTLS)
             try:
                 client = SoapClient(config=config)
@@ -735,34 +800,43 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                 error_msg = f"Error al crear cliente SIFEN: {str(e)}"
                 db.update_document_status(doc_id, status="error", message=error_msg)
                 return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
-            
+
             # Obtener DE XML
-            de_xml = document['de_xml']
-            
+            de_xml = document["de_xml"]
+
             if mode == "lote":
                 # Flujo por lote (siRecepLoteDE)
-                from tools.send_sirecepde import build_r_envio_lote_xml, build_and_sign_lote_from_xml
+                from tools.send_sirecepde import (
+                    build_r_envio_lote_xml,
+                    build_and_sign_lote_from_xml,
+                )
                 from app.sifen_client.pkcs12_utils import _find_openssl_binary
-                
+
                 de_xml_bytes = de_xml.encode("utf-8")
-                
+
                 # Obtener certificado de firma (usar mTLS si no hay específico de firma)
-                sign_cert_path = os.getenv("SIFEN_SIGN_P12_PATH") or os.getenv("SIFEN_MTLS_P12_PATH")
-                primary_password = _get_secret("SIFEN_SIGN_P12_PASSWORD", "SIFEN_SIGN_P12_PASSWORD_FILE")
-                fallback_password = _get_secret("SIFEN_MTLS_P12_PASSWORD", "SIFEN_MTLS_P12_PASSWORD_FILE")
+                sign_cert_path = os.getenv("SIFEN_SIGN_P12_PATH") or os.getenv(
+                    "SIFEN_MTLS_P12_PATH"
+                )
+                primary_password = _get_secret(
+                    "SIFEN_SIGN_P12_PASSWORD", "SIFEN_SIGN_P12_PASSWORD_FILE"
+                )
+                fallback_password = _get_secret(
+                    "SIFEN_MTLS_P12_PASSWORD", "SIFEN_MTLS_P12_PASSWORD_FILE"
+                )
                 sign_cert_password = primary_password or fallback_password
 
                 password_source = "missing"
                 if primary_password:
-                    password_source = "env" if os.getenv("SIFEN_SIGN_P12_PASSWORD") else "file"
+                    password_source = (
+                        "env" if os.getenv("SIFEN_SIGN_P12_PASSWORD") else "file"
+                    )
                 elif fallback_password:
-                    password_source = "env" if os.getenv("SIFEN_MTLS_P12_PASSWORD") else "file"
+                    password_source = (
+                        "env" if os.getenv("SIFEN_MTLS_P12_PASSWORD") else "file"
+                    )
 
-                artifacts_dir = FSPath("artifacts")
-                try:
-                    artifacts_dir.mkdir(parents=True, exist_ok=True)
-                except Exception:
-                    pass
+                artifacts_dir = _ensure_artifacts_dir()
 
                 try:
                     openssl_bin = _find_openssl_binary()
@@ -776,7 +850,9 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                         f"password_source={password_source}\n"
                         f"openssl_bin={openssl_bin}\n"
                     )
-                    artifacts_dir.joinpath("sign_env_debug.txt").write_text(debug_txt, encoding="utf-8")
+                    artifacts_dir.joinpath("sign_env_debug.txt").write_text(
+                        debug_txt, encoding="utf-8"
+                    )
                 except Exception:
                     pass
 
@@ -788,7 +864,10 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                 )
 
                 if not sign_cert_path:
-                    error_msg = "BLOQUEADO: SIFEN_SIGN_P12_PATH no está seteado (o SIFEN_MTLS_P12_PATH). Ver artifacts/sign_env_debug.txt"
+                    error_msg = (
+                        "BLOQUEADO: SIFEN_SIGN_P12_PATH no está seteado (o SIFEN_MTLS_P12_PATH). "
+                        "Ver artifacts/sign_env_debug.txt"
+                    )
                     db.update_document_status(doc_id, status="error", message=error_msg)
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
                 if not sign_cert_password:
@@ -798,59 +877,70 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                     )
                     db.update_document_status(doc_id, status="error", message=error_msg)
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
-                
+
                 # GUARD-RAIL: Verificar dependencias críticas ANTES de construir/firmar
                 try:
                     from tools.send_sirecepde import _check_signing_dependencies
+
                     _check_signing_dependencies()
                 except RuntimeError as e:
-                    error_msg = f"BLOQUEADO: {str(e)}. Ver artifacts/sign_blocked_reason.txt"
+                    error_msg = (
+                        f"BLOQUEADO: {str(e)}. Ver artifacts/sign_blocked_reason.txt"
+                    )
                     db.update_document_status(doc_id, status="error", message=error_msg)
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
-                
+
                 # Construir y firmar lote usando el pipeline correcto
                 try:
                     zip_base64, lote_xml_bytes, zip_bytes, _ = build_and_sign_lote_from_xml(
                         xml_bytes=de_xml_bytes,
                         cert_path=sign_cert_path,
                         cert_password=sign_cert_password,
-                        return_debug=True
+                        return_debug=True,
                     )
                 except Exception as e:
                     error_msg = f"BLOQUEADO: Error al construir/firmar lote: {str(e)}"
                     db.update_document_status(doc_id, status="error", message=error_msg)
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
-                
-                payload_xml = build_r_envio_lote_xml(did=1, xml_bytes=de_xml_bytes, zip_base64=zip_base64)
-                
+
+                payload_xml = build_r_envio_lote_xml(
+                    did=1, xml_bytes=de_xml_bytes, zip_base64=zip_base64
+                )
+
                 # PREFLIGHT: Validar antes de enviar
                 from tools.send_sirecepde import preflight_soap_request
+
                 preflight_success, preflight_error = preflight_soap_request(
                     payload_xml=payload_xml,
                     zip_bytes=zip_bytes,
                     lote_xml_bytes=lote_xml_bytes,
-                    artifacts_dir=FSPath("artifacts")
+                    artifacts_dir=FSPath("artifacts"),
                 )
-                
+
                 if not preflight_success:
-                    error_msg = f"BLOQUEADO: Preflight falló - {preflight_error}. Ver artifacts/preflight_*.xml y artifacts/preflight_zip.zip"
+                    error_msg = (
+                        "BLOQUEADO: Preflight falló - "
+                        f"{preflight_error}. Ver artifacts/preflight_*.xml y artifacts/preflight_zip.zip"
+                    )
                     db.update_document_status(doc_id, status="error", message=error_msg)
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
-                
+
                 # --- GATE: verificar habilitación FE del RUC antes de enviar ---
                 try:
                     from lxml import etree
                     from tools.send_sirecepde import _extract_ruc_from_cert
+
                     # Constante de namespace SIFEN
                     SIFEN_NS_URI = "http://ekuatia.set.gov.py/sifen/xsd"
-                    
+
                     # Helper para extraer localname
                     def _localname(tag: str) -> str:
                         """Extrae el localname de un tag (sin namespace)"""
+
                         if isinstance(tag, str) and "}" in tag:
                             return tag.split("}", 1)[1]
                         return tag
-                    
+
                     # Extraer RUC emisor del lote.xml
                     ruc_de = None
                     ruc_de_with_dv = None
@@ -864,7 +954,7 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                                 if isinstance(elem.tag, str) and _localname(elem.tag) == "DE":
                                     de_elem = elem
                                     break
-                            
+
                             if de_elem is not None:
                                 # Buscar dRucEm y dDVEmi dentro de gEmis
                                 g_emis = de_elem.find(f".//{{{SIFEN_NS_URI}}}gEmis")
@@ -872,77 +962,102 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                                     d_ruc_elem = g_emis.find(f"{{{SIFEN_NS_URI}}}dRucEm")
                                     if d_ruc_elem is not None and d_ruc_elem.text:
                                         ruc_de = d_ruc_elem.text.strip()
-                                    
+
                                     d_dv_elem = g_emis.find(f"{{{SIFEN_NS_URI}}}dDVEmi")
                                     if d_dv_elem is not None and d_dv_elem.text:
                                         ruc_dv = d_dv_elem.text.strip()
-                                    
+
                                     # Construir RUC-DE completo si hay DV
                                     if ruc_de and ruc_dv:
                                         ruc_de_with_dv = f"{ruc_de}-{ruc_dv}"
                                     elif ruc_de:
                                         ruc_de_with_dv = ruc_de
                         except Exception as e:
-                            logger.warning(f"No se pudo extraer RUC del lote.xml para gate: {e}")
-                    
+                            logger.warning(
+                                "No se pudo extraer RUC del lote.xml para gate: %s", e
+                            )
+
                     # Extraer RUC del certificado P12
                     ruc_cert = None
                     ruc_cert_with_dv = None
                     try:
                         if sign_cert_path and sign_cert_password:
-                            cert_info = _extract_ruc_from_cert(sign_cert_path, sign_cert_password)
+                            cert_info = _extract_ruc_from_cert(
+                                sign_cert_path, sign_cert_password
+                            )
                             if cert_info:
                                 ruc_cert = cert_info.get("ruc")
                                 ruc_cert_with_dv = cert_info.get("ruc_with_dv")
                     except Exception:
                         pass  # Silenciosamente fallar si no se puede extraer
-                    
+
                     # --- SANITY CHECK: Comparar RUCs ---
                     ruc_gate = None
                     if ruc_de:
                         # ruc_gate debe ser SOLO el número (sin DV)
                         ruc_gate = str(ruc_de).strip().split("-", 1)[0].strip()
-                    
+
                     # Loggear sanity check
-                    logger.info("="*60)
+                    logger.info("=" * 60)
                     logger.info("=== SIFEN SANITY CHECK ===")
-                    logger.info(f"RUC-DE:     {ruc_de_with_dv or ruc_de or '(no encontrado)'}")
-                    logger.info(f"RUC-GATE:   {ruc_gate or '(no encontrado)'}")
-                    logger.info(f"RUC-CERT:   {ruc_cert_with_dv or ruc_cert or '(no disponible)'}")
-                    
+                    logger.info(
+                        "RUC-DE:     %s", ruc_de_with_dv or ruc_de or "(no encontrado)"
+                    )
+                    logger.info("RUC-GATE:   %s", ruc_gate or "(no encontrado)")
+                    logger.info(
+                        "RUC-CERT:   %s", ruc_cert_with_dv or ruc_cert or "(no disponible)"
+                    )
+
                     # Comparaciones booleanas
-                    match_de_gate = (ruc_de and ruc_gate and ruc_de.split("-", 1)[0].strip() == ruc_gate)
-                    match_cert_gate = (ruc_cert and ruc_gate and ruc_cert == ruc_gate)
-                    
-                    logger.info(f"match(DE.ruc == GATE.ruc):   {match_de_gate}")
+                    match_de_gate = (
+                        ruc_de
+                        and ruc_gate
+                        and ruc_de.split("-", 1)[0].strip() == ruc_gate
+                    )
+                    match_cert_gate = (
+                        ruc_cert and ruc_gate and ruc_cert == ruc_gate
+                    )
+
+                    logger.info("match(DE.ruc == GATE.ruc):   %s", match_de_gate)
                     if ruc_cert:
-                        logger.info(f"match(CERT.ruc == GATE.ruc): {match_cert_gate}")
-                    
+                        logger.info(
+                            "match(CERT.ruc == GATE.ruc): %s", match_cert_gate
+                        )
+
                     # Warnings si hay mismatch (pero no bloquear todavía)
                     if ruc_de and ruc_gate and not match_de_gate:
-                        logger.warning(f"RUC del DE ({ruc_de.split('-', 1)[0]}) no coincide con RUC-GATE ({ruc_gate})")
+                        logger.warning(
+                            "RUC del DE (%s) no coincide con RUC-GATE (%s)",
+                            ruc_de.split("-", 1)[0],
+                            ruc_gate,
+                        )
                     if ruc_cert and ruc_gate and not match_cert_gate:
-                        logger.warning(f"RUC del certificado ({ruc_cert}) no coincide con RUC-GATE ({ruc_gate})")
-                    
-                    logger.info("="*60)
-                    
-                    debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
+                        logger.warning(
+                            "RUC del certificado (%s) no coincide con RUC-GATE (%s)",
+                            ruc_cert,
+                            ruc_gate,
+                        )
+
+                    logger.info("=" * 60)
+
+                    debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in (
+                        "1",
+                        "true",
+                        "True",
+                    )
                     # Guardar artifact JSON si debug está habilitado
-                    # debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
                     if debug_enabled:
                         try:
-                            artifacts_dir = FSPath("artifacts")
-                            artifacts_dir.mkdir(parents=True, exist_ok=True)
+                            artifacts_dir = _ensure_artifacts_dir()
                         except Exception:
                             artifacts_dir = None
                     else:
                         artifacts_dir = None
-                    
+
                     if artifacts_dir:
                         try:
-                            import json
                             from datetime import datetime
-                            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
                             sanity_data = {
                                 "timestamp": datetime.now().isoformat(),
                                 "ruc_de": ruc_de_with_dv or ruc_de,
@@ -950,99 +1065,148 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                                 "ruc_cert": ruc_cert_with_dv or ruc_cert,
                                 "matches": {
                                     "de_gate": match_de_gate,
-                                    "cert_gate": match_cert_gate if ruc_cert else None
-                                }
+                                    "cert_gate": match_cert_gate if ruc_cert else None,
+                                },
                             }
+                            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                             sanity_file = artifacts_dir / f"sanity_check_{timestamp}.json"
-                            sanity_file.write_text(json.dumps(sanity_data, indent=2, ensure_ascii=False), encoding="utf-8")
+                            _write_json(sanity_file, sanity_data)
                         except Exception:
                             pass  # Silenciosamente fallar si no se puede guardar
-                    
+
                     # Hard-fail si falta dRucEm o es inválido
                     if not ruc_de or not ruc_gate:
-                        error_msg = f"BLOQUEADO: No se pudo extraer RUC válido del DE. dRucEm={ruc_de!r} RUC-GATE={ruc_gate!r}"
+                        error_msg = (
+                            "BLOQUEADO: No se pudo extraer RUC válido del DE. "
+                            f"dRucEm={ruc_de!r} RUC-GATE={ruc_gate!r}"
+                        )
                         logger.error(error_msg)
-                        db.update_document_status(doc_id, status="error", message=error_msg)
-                        return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
-                    
+                        db.update_document_status(
+                            doc_id, status="error", message=error_msg
+                        )
+                        return RedirectResponse(
+                            url=f"/de/{doc_id}?error=1", status_code=303
+                        )
+
                     # Consultar habilitación FE del RUC
-                    logger.info(f"Verificando habilitación FE del RUC: {ruc_gate}")
-                    dump_http = os.getenv("SIFEN_DUMP_HTTP", "0") in ("1", "true", "True")
-                    ruc_check = client.consulta_ruc_raw(ruc=ruc_gate, dump_http=dump_http)
+                    logger.info("Verificando habilitación FE del RUC: %s", ruc_gate)
+                    dump_http = os.getenv("SIFEN_DUMP_HTTP", "0") in (
+                        "1",
+                        "true",
+                        "True",
+                    )
+                    ruc_check = client.consulta_ruc_raw(
+                        ruc=ruc_gate, dump_http=dump_http
+                    )
                     cod = (ruc_check.get("dCodRes") or "").strip()
                     msg = (ruc_check.get("dMsgRes") or "").strip()
-                    
+
                     # Extraer dRUCFactElec de xContRUC
                     x_cont_ruc = ruc_check.get("xContRUC", {})
-                    d_fact_raw = x_cont_ruc.get("dRUCFactElec") if isinstance(x_cont_ruc, dict) else None
+                    d_fact_raw = (
+                        x_cont_ruc.get("dRUCFactElec")
+                        if isinstance(x_cont_ruc, dict)
+                        else None
+                    )
                     # Normalizar: convertir a string, trim, uppercase
-                    d_fact_normalized = (str(d_fact_raw).strip().upper() if d_fact_raw is not None else "")
-                    
+                    d_fact_normalized = (
+                        str(d_fact_raw).strip().upper()
+                        if d_fact_raw is not None
+                        else ""
+                    )
+
                     # Valores que indican HABILITADO: "1", "S", "SI"
                     habilitado = d_fact_normalized in ("1", "S", "SI")
-                    
+
                     if cod != "0502":
-                        error_msg = f"BLOQUEADO: SIFEN siConsRUC no confirmó el RUC. dCodRes={cod} dMsgRes={msg}"
-                        logger.error(error_msg)
-                        db.update_document_status(doc_id, status="error", message=error_msg)
-                        return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
-                    
-                    if not habilitado:
-                        razon = x_cont_ruc.get("dRazCons", "") if isinstance(x_cont_ruc, dict) else ""
-                        est = x_cont_ruc.get("dDesEstCons", "") if isinstance(x_cont_ruc, dict) else ""
-                        # Mostrar valor original y normalizado para diagnóstico
-                        d_fact_display = repr(d_fact_raw) if d_fact_raw is not None else "None"
                         error_msg = (
-                            f"BLOQUEADO: RUC NO habilitado para Facturación Electrónica en SIFEN ({env}). "
-                            f"RUC={ruc_gate} RazónSocial='{razon}' Estado='{est}' "
+                            "BLOQUEADO: SIFEN siConsRUC no confirmó el RUC. "
+                            f"dCodRes={cod} dMsgRes={msg}"
+                        )
+                        logger.error(error_msg)
+                        db.update_document_status(
+                            doc_id, status="error", message=error_msg
+                        )
+                        return RedirectResponse(
+                            url=f"/de/{doc_id}?error=1", status_code=303
+                        )
+
+                    if not habilitado:
+                        razon = (
+                            x_cont_ruc.get("dRazCons", "")
+                            if isinstance(x_cont_ruc, dict)
+                            else ""
+                        )
+                        est = (
+                            x_cont_ruc.get("dDesEstCons", "")
+                            if isinstance(x_cont_ruc, dict)
+                            else ""
+                        )
+                        # Mostrar valor original y normalizado para diagnóstico
+                        d_fact_display = (
+                            repr(d_fact_raw) if d_fact_raw is not None else "None"
+                        )
+                        error_msg = (
+                            "BLOQUEADO: RUC NO habilitado para Facturación Electrónica en SIFEN "
+                            f"({env}). RUC={ruc_gate} RazónSocial='{razon}' Estado='{est}' "
                             f"dRUCFactElec={d_fact_display} (normalizado='{d_fact_normalized}'). "
                             "Debés gestionar la habilitación FE del RUC en SIFEN/SET."
                         )
                         logger.error(error_msg)
-                        db.update_document_status(doc_id, status="error", message=error_msg)
-                        return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
-                    
-                    logger.info(f"RUC {ruc_gate} habilitado para FE (dRUCFactElec={d_fact_raw!r} -> '{d_fact_normalized}')")
+                        db.update_document_status(
+                            doc_id, status="error", message=error_msg
+                        )
+                        return RedirectResponse(
+                            url=f"/de/{doc_id}?error=1", status_code=303
+                        )
+
+                    logger.info(
+                        "RUC %s habilitado para FE (dRUCFactElec=%r -> '%s')",
+                        ruc_gate,
+                        d_fact_raw,
+                        d_fact_normalized,
+                    )
                 except Exception as e:
                     # hard-fail: no enviar lote si el gate falla
                     error_msg = f"BLOQUEADO: Error en gate de habilitación FE: {str(e)}"
-                    logger.error(f"GATE FALLÓ: {e}", exc_info=True)
+                    logger.error("GATE FALLÓ: %s", e, exc_info=True)
                     db.update_document_status(doc_id, status="error", message=error_msg)
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
                 # --- FIN GATE ---
-                
+
                 # Enviar lote a SIFEN (solo si preflight y gate pasaron)
                 response = client.recepcion_lote(payload_xml)
-                
+
                 # Extraer campos de la respuesta (SIEMPRE parsear aunque dProtConsLote sea 0)
-                d_prot_cons_lote = response.get('d_prot_cons_lote')
-                d_cod_res = response.get('codigo_respuesta')
-                d_msg_res = response.get('mensaje')
-                d_tpo_proces = response.get('d_tpo_proces')
-                
+                d_prot_cons_lote = response.get("d_prot_cons_lote")
+                d_cod_res = response.get("codigo_respuesta")
+                d_msg_res = response.get("mensaje")
+                d_tpo_proces = response.get("d_tpo_proces")
+
                 # Guardar artifact de debug si está habilitado
-                    # debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
                 if debug_enabled:
                     try:
-                        artifacts_dir = FSPath("artifacts")
-                        artifacts_dir.mkdir(parents=True, exist_ok=True)
+                        artifacts_dir = _ensure_artifacts_dir()
                         import json
+
                         parsed_response = {
                             "dCodRes": d_cod_res,
                             "dMsgRes": d_msg_res,
                             "dProtConsLote": d_prot_cons_lote,
-                            "dTpoProces": d_tpo_proces
+                            "dTpoProces": d_tpo_proces,
                         }
-                        artifacts_dir.joinpath("last_lote_response_parsed.json").write_text(
+                        artifacts_dir.joinpath(
+                            "last_lote_response_parsed.json"
+                        ).write_text(
                             json.dumps(parsed_response, indent=2, ensure_ascii=False),
-                            encoding="utf-8"
+                            encoding="utf-8",
                         )
                     except Exception:
                         pass
-                
+
                 # Mapear respuesta de recepción a estado (NO es aprobación, solo recepción)
                 status, code, message = map_recepcion_response_to_status(response)
-                
+
                 # Guardar respuesta del documento con d_prot_cons_lote si existe
                 db.update_document_status(
                     doc_id=doc_id,
@@ -1050,9 +1214,9 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                     code=code,
                     message=message,
                     sirecepde_xml=payload_xml,
-                    d_prot_cons_lote=d_prot_cons_lote
+                    d_prot_cons_lote=d_prot_cons_lote,
                 )
-                
+
                 # Si se recibió dProtConsLote > 0, guardar lote y consultar automáticamente
                 # NO consultar si dProtConsLote es 0 o None (no hay protocolo)
                 d_prot_int = None
@@ -1063,14 +1227,14 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                             d_prot_int = int(d_prot_str)
                     except (ValueError, AttributeError):
                         pass
-                
+
                 if d_prot_int and d_prot_int > 0:
                     # Validar que sea solo dígitos
-                    if not re.match(r'^\d+$', d_prot_cons_lote.strip()):
+                    if not re.match(r"^\d+$", d_prot_cons_lote.strip()):
                         # Log warning pero continuar
                         logger.warning(
-                            f"dProtConsLote no es solo dígitos: '{d_prot_cons_lote}'. "
-                            "No se guardará ni consultará el lote."
+                            "dProtConsLote no es solo dígitos: '%s'. No se guardará ni consultará el lote.",
+                            d_prot_cons_lote,
                         )
                     else:
                         try:
@@ -1078,29 +1242,35 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                             lote_id = lotes_db.create_lote(
                                 env=env,
                                 d_prot_cons_lote=d_prot_cons_lote.strip(),
-                                de_document_id=doc_id
+                                de_document_id=doc_id,
                             )
-                            
+
                             # Consultar automáticamente el estado del lote
-                            await _check_lote_status_async(lote_id, env, d_prot_cons_lote.strip())
-                            
+                            await _check_lote_status_async(
+                                lote_id, env, d_prot_cons_lote.strip()
+                            )
+
                         except ValueError as e:
                             # Lote ya existe o error de validación
-                            logger.warning(f"No se pudo guardar/consultar lote: {e}")
+                            logger.warning(
+                                "No se pudo guardar/consultar lote: %s", e
+                            )
                         except Exception as e:
                             # Error al consultar, pero no fallar el envío
-                            logger.error(f"Error al consultar lote automáticamente: {e}")
-            
+                            logger.error(
+                                "Error al consultar lote automáticamente: %s", e
+                            )
+
             else:  # mode == "direct"
                 # Flujo directo (siRecepDE)
                 from tools.build_sirecepde import build_sirecepde_xml
-                
+
                 # Construir rEnviDe desde el DE XML
                 payload_xml = build_sirecepde_xml(
                     de_xml_content=de_xml,
-                    d_id="1"
+                    d_id="1",
                 )
-                
+
                 # Enviar directamente a SIFEN
                 try:
                     response = client.recepcion_de(payload_xml)
@@ -1109,36 +1279,38 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                     error_msg = str(e)
                     db.update_document_status(doc_id, status="error", message=error_msg)
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
-                
+
                 # Parsear respuesta (recepcion_de retorna dict con ok, codigo_respuesta, mensaje, etc.)
                 # IMPORTANTE: En modo directo, siRecepDE puede devolver aprobación inmediata,
                 # pero según documentación SIFEN, esto es raro. Mapear correctamente.
                 if isinstance(response, dict):
                     # Mapear respuesta de recepción a estado
                     status, code, message = map_recepcion_response_to_status(response)
-                    
+
                     # Guardar respuesta XML parseada si está disponible
-                    response_xml = response.get('parsed_fields', {}).get('xml')
+                    response_xml = response.get("parsed_fields", {}).get("xml")
                 else:
                     # Respuesta inesperada (no dict), guardar como error
                     status = STATUS_ERROR
                     code = None
                     message = "Respuesta recibida pero no parseada correctamente"
                     response_xml = str(response) if response else None
-                
+
                 # Guardar respuesta del documento
                 db.update_document_status(
                     doc_id=doc_id,
                     status=status,
                     code=code,
                     message=message,
-                    sirecepde_xml=payload_xml
+                    sirecepde_xml=payload_xml,
                 )
-            
+
             return RedirectResponse(url=f"/de/{doc_id}?sent=1", status_code=303)
-            
+
         except ImportError as e:
-            error_msg = f"Error de importación: {e}. Instala dependencias: pip install -r app/requirements.txt"
+            error_msg = (
+                f"Error de importación: {e}. Instala dependencias: pip install -r app/requirements.txt"
+            )
             db.update_document_status(doc_id, status="error", message=error_msg)
             return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
         except (SifenClientError, Exception) as e:
@@ -1146,11 +1318,185 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
             error_msg = str(e)
             db.update_document_status(doc_id, status="error", message=error_msg)
             return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
-            
-    except HTTPException:
+
+    except HTTPException as http_exc:
+        # Mantener flujos esperados (400/404, etc.) y solo capturar 500 silenciosos
+        status_code = getattr(http_exc, "status_code", 500) or 500
+        if status_code >= 500:
+            # Tratar como error interno inesperado
+            import traceback
+            from datetime import datetime
+
+            artifacts_dir = _ensure_artifacts_dir()
+            now = datetime.now().isoformat()
+            exc_type = type(http_exc).__name__
+            exc_msg = str(http_exc)
+            tb_str = traceback.format_exc()
+
+            traceback_text = (
+                f"timestamp={now}\n"
+                f"doc_id={doc_id} mode={mode}\n"
+                f"exception={exc_type}: {exc_msg}\n"
+                f"traceback:\n{tb_str}\n"
+            )
+            _write_text(artifacts_dir / "send_500_traceback.txt", traceback_text)
+
+            # Contexto extendido para debugging
+            try:
+                from app.sifen_client.pkcs12_utils import _find_openssl_binary
+            except Exception:
+                _find_openssl_binary = None  # type: ignore
+
+            sign_p12_path = os.getenv("SIFEN_SIGN_P12_PATH") or os.getenv(
+                "SIFEN_MTLS_P12_PATH"
+            )
+            openssl_bin = None
+            if _find_openssl_binary is not None:
+                try:
+                    openssl_bin = _find_openssl_binary()
+                except Exception:
+                    openssl_bin = None
+
+            context = {
+                "timestamp": now,
+                "doc_id": doc_id,
+                "mode": mode,
+                "exception_type": exc_type,
+                "exception_message": exc_msg,
+                "sign_p12_path": sign_p12_path,
+                "password_source": password_source or "unknown",
+                "openssl_bin": openssl_bin,
+                "cwd": os.getcwd(),
+                "paths": {
+                    "web_main": str(FSPath(__file__).resolve()),
+                    "pkcs12_utils": str(
+                        FSPath(__file__).parent.parent
+                        / "app"
+                        / "sifen_client"
+                        / "pkcs12_utils.py"
+                    ),
+                },
+                "artifacts": {
+                    "sign_env_debug": str(
+                        artifacts_dir / "sign_env_debug.txt"
+                    ),
+                    "sign_error_details": str(
+                        artifacts_dir / "sign_error_details.txt"
+                    ),
+                    "preflight_zip": str(
+                        artifacts_dir / "preflight_zip.zip"
+                    ),
+                    "last_lote": str(
+                        artifacts_dir / "last_lote.xml"
+                    ),
+                    "send_500_traceback": str(
+                        artifacts_dir / "send_500_traceback.txt"
+                    ),
+                },
+            }
+            _write_json(artifacts_dir / "send_500_context.json", context)
+
+            # Loggear siempre el traceback completo a stdout/stderr
+            logger.exception(
+                "SEND_TO_SIFEN HTTPException 500: doc_id=%s mode=%s", doc_id, mode
+            )
+
+            short_msg = f"{exc_type}: {exc_msg}"
+            if len(short_msg) > 200:
+                short_msg = short_msg[:200] + "..."
+            db_msg = (
+                f"INTERNAL_500: {short_msg} "
+                "(ver artifacts/send_500_traceback.txt)"
+            )
+            _safe_db_error_update(doc_id, db_msg)
+
+            return RedirectResponse(
+                url=f"/de/{doc_id}?error=1", status_code=303
+            )
+
+        # Para códigos no 5xx, mantener comportamiento existente
         raise
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+        # Último paraguas: nunca devolver 500 silencioso
+        import traceback
+        from datetime import datetime
+
+        artifacts_dir = _ensure_artifacts_dir()
+        now = datetime.now().isoformat()
+        exc_type = type(e).__name__
+        exc_msg = str(e)
+        tb_str = traceback.format_exc()
+
+        traceback_text = (
+            f"timestamp={now}\n"
+            f"doc_id={doc_id} mode={mode}\n"
+            f"exception={exc_type}: {exc_msg}\n"
+            f"traceback:\n{tb_str}\n"
+        )
+        _write_text(artifacts_dir / "send_500_traceback.txt", traceback_text)
+
+        try:
+            from app.sifen_client.pkcs12_utils import _find_openssl_binary
+        except Exception:
+            _find_openssl_binary = None  # type: ignore
+
+        sign_p12_path = os.getenv("SIFEN_SIGN_P12_PATH") or os.getenv(
+            "SIFEN_MTLS_P12_PATH"
+        )
+        openssl_bin = None
+        if _find_openssl_binary is not None:
+            try:
+                openssl_bin = _find_openssl_binary()
+            except Exception:
+                openssl_bin = None
+
+        context = {
+            "timestamp": now,
+            "doc_id": doc_id,
+            "mode": mode,
+            "exception_type": exc_type,
+            "exception_message": exc_msg,
+            "sign_p12_path": sign_p12_path,
+            "password_source": password_source or "unknown",
+            "openssl_bin": openssl_bin,
+            "cwd": os.getcwd(),
+            "paths": {
+                "web_main": str(FSPath(__file__).resolve()),
+                "pkcs12_utils": str(
+                    FSPath(__file__).parent.parent
+                    / "app"
+                    / "sifen_client"
+                    / "pkcs12_utils.py"
+                ),
+            },
+            "artifacts": {
+                "sign_env_debug": str(artifacts_dir / "sign_env_debug.txt"),
+                "sign_error_details": str(
+                    artifacts_dir / "sign_error_details.txt"
+                ),
+                "preflight_zip": str(artifacts_dir / "preflight_zip.zip"),
+                "last_lote": str(artifacts_dir / "last_lote.xml"),
+                "send_500_traceback": str(
+                    artifacts_dir / "send_500_traceback.txt"
+                ),
+            },
+        }
+        _write_json(artifacts_dir / "send_500_context.json", context)
+
+        logger.exception(
+            "SEND_TO_SIFEN Exception: doc_id=%s mode=%s", doc_id, mode
+        )
+
+        short_msg = f"{exc_type}: {exc_msg}"
+        if len(short_msg) > 200:
+            short_msg = short_msg[:200] + "..."
+        db_msg = (
+            f"INTERNAL_500: {short_msg} (ver artifacts/send_500_traceback.txt)"
+        )
+        _safe_db_error_update(doc_id, db_msg)
+
+        return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
 
 
 async def _check_lote_status_async(lote_id: int, env: str, prot: str):
