@@ -43,6 +43,17 @@ def _find_openssl_binary() -> Optional[str]:
     Returns:
         Ruta al binario openssl o None si no se encuentra
     """
+    env_override = os.getenv("OPENSSL_BIN")
+    if env_override:
+        try:
+            if os.path.exists(env_override) and os.access(env_override, os.X_OK):
+                return env_override
+            logger.warning(
+                f"OPENSSL_BIN está seteado pero no es ejecutable o no existe: {env_override}"
+            )
+        except Exception:
+            pass
+
     # Intentar Homebrew en Apple Silicon primero
     homebrew_openssl = "/opt/homebrew/bin/openssl"
     if os.path.exists(homebrew_openssl) and os.access(homebrew_openssl, os.X_OK):
@@ -203,6 +214,26 @@ def p12_to_temp_pem_files(p12_path: str, p12_password: str) -> Tuple[str, str]:
         PKCS12Error: Si el archivo no existe, la contraseña es incorrecta,
                      o no se puede extraer cert/key
     """
+    if not p12_path:
+        raise PKCS12Error(
+            "Falta P12: setear SIFEN_SIGN_P12_PATH (o SIFEN_MTLS_P12_PATH)"
+        )
+    if not p12_password:
+        raise PKCS12Error(
+            "Falta password: setear SIFEN_SIGN_P12_PASSWORD (o SIFEN_MTLS_P12_PASSWORD)"
+        )
+
+    try:
+        openssl_bin_dbg = _find_openssl_binary()
+        logger.info(
+            "PKCS12: iniciar conversión P12→PEM (p12_path=%s, password_set=%s, openssl_bin=%s)",
+            str(p12_path),
+            True,
+            openssl_bin_dbg,
+        )
+    except Exception:
+        pass
+
     p12_file = Path(p12_path)
     
     if not p12_file.exists():

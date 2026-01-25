@@ -30,6 +30,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
+import logging
 
 # Cargar variables de entorno desde .env si existe
 try:
@@ -50,6 +51,8 @@ except ImportError:
 
 from . import db
 from . import lotes_db
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="TESAKA-SIFEN", version="1.0.0")
 
@@ -728,12 +731,50 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
             if mode == "lote":
                 # Flujo por lote (siRecepLoteDE)
                 from tools.send_sirecepde import build_r_envio_lote_xml, build_and_sign_lote_from_xml
-                from app.sifen_client.config import get_mtls_cert_path_and_password
+                from app.sifen_client.pkcs12_utils import _find_openssl_binary
                 
                 de_xml_bytes = de_xml.encode("utf-8")
                 
                 # Obtener certificado de firma (usar mTLS si no hay específico de firma)
-                sign_cert_path, sign_cert_password = get_mtls_cert_path_and_password()
+                sign_cert_path = os.getenv("SIFEN_SIGN_P12_PATH") or os.getenv("SIFEN_MTLS_P12_PATH")
+                sign_cert_password = os.getenv("SIFEN_SIGN_P12_PASSWORD") or os.getenv("SIFEN_MTLS_P12_PASSWORD")
+
+                artifacts_dir = FSPath("artifacts")
+                try:
+                    artifacts_dir.mkdir(parents=True, exist_ok=True)
+                except Exception:
+                    pass
+
+                try:
+                    openssl_bin = _find_openssl_binary()
+                except Exception:
+                    openssl_bin = None
+
+                try:
+                    debug_txt = (
+                        f"sign_p12_path={sign_cert_path}\n"
+                        f"sign_password_set={'yes' if bool(sign_cert_password) else 'no'}\n"
+                        f"openssl_bin={openssl_bin}\n"
+                    )
+                    artifacts_dir.joinpath("sign_env_debug.txt").write_text(debug_txt, encoding="utf-8")
+                except Exception:
+                    pass
+
+                logger.info(
+                    "SIGN_ENV: sign_p12_path=%s password_set=%s openssl_bin=%s",
+                    sign_cert_path,
+                    bool(sign_cert_password),
+                    openssl_bin,
+                )
+
+                if not sign_cert_path:
+                    error_msg = "BLOQUEADO: SIFEN_SIGN_P12_PATH no está seteado (o SIFEN_MTLS_P12_PATH). Ver artifacts/sign_env_debug.txt"
+                    db.update_document_status(doc_id, status="error", message=error_msg)
+                    return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
+                if not sign_cert_password:
+                    error_msg = "BLOQUEADO: SIFEN_SIGN_P12_PASSWORD no está seteado (o SIFEN_MTLS_P12_PASSWORD). Ver artifacts/sign_env_debug.txt"
+                    db.update_document_status(doc_id, status="error", message=error_msg)
+                    return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
                 
                 # GUARD-RAIL: Verificar dependencias críticas ANTES de construir/firmar
                 try:

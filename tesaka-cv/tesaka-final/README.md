@@ -52,6 +52,21 @@ El XML de interés está en `zeep_consulta_lote_sent_try*.xml`:
 - `SIFEN_ENV=test` - Ambiente de prueba
 - `SIFEN_XSD_DIR` - Apunta a schemas_sifen local
 
+## Firma P12 (XMLDSig) - variables requeridas
+
+- `SIFEN_SIGN_P12_PATH` (fallback: `SIFEN_MTLS_P12_PATH`)
+- `SIFEN_SIGN_P12_PASSWORD` (fallback: `SIFEN_MTLS_P12_PASSWORD`)
+
+Opcional:
+- `OPENSSL_BIN` para forzar el binario `openssl` a usar en el fallback `-legacy`.
+
+### Smoke test local (con cleanup)
+
+```bash
+cd tesaka-cv/tesaka-final
+python3 -c "import os; from app.sifen_client.pkcs12_utils import p12_to_temp_pem_files, cleanup_pem_files; p=os.environ.get('SIFEN_SIGN_P12_PATH') or os.environ.get('SIFEN_MTLS_P12_PATH'); w=os.environ.get('SIFEN_SIGN_P12_PASSWORD') or os.environ.get('SIFEN_MTLS_P12_PASSWORD'); c,k=p12_to_temp_pem_files(p,w); print('cert_pem=',c,'key_pem=',k); cleanup_pem_files(c,k); print('OK')"
+```
+
 ## Dependencias
 - Usa el .venv existente de tesaka-cv
 - Requiere: zeep, requests, lxml, cryptography
