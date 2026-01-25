@@ -445,6 +445,7 @@ def canonical_gTotSub_order(doc: etree._ElementTree) -> int:
         "dTotAntItem",
         "dTotAnt",
         "dPorcDescTotal",
+        "dDescTotal",
         "dTotIVA",
         "dTotGralOp",
         "dTotGrav",
@@ -634,6 +635,53 @@ def ensure_gTotSub_order_and_subs(doc: etree._ElementTree) -> int:
     ensure("dSubExe")
     ensure("dSubExo")
 
+    # ensure dDescTotal cuando hay dTotIVA (SIFEN espera dDescTotal antes de dTotIVA)
+    iva = find_first(gTotSub, "dTotIVA")
+    porc = find_first(gTotSub, "dPorcDescTotal")
+    desc_total = find_first(gTotSub, "dDescTotal")
+    if (iva is not None) or (porc is not None):
+        from lxml import etree
+
+        def _desired_desc_total_index() -> int:
+            children = list(gTotSub)
+            idx_iva = children.index(iva) if iva is not None and iva in children else None
+            idx_porc = children.index(porc) if porc is not None and porc in children else None
+
+            target = len(children)
+            if idx_porc is not None:
+                target = idx_porc + 1
+            if idx_iva is not None:
+                target = min(target, idx_iva)
+            return target
+
+        if desc_total is None:
+            desc_total = etree.Element(f"{{{_ns}}}dDescTotal")
+            desc_total.text = "0"
+            insert_at = _desired_desc_total_index()
+            gTotSub.insert(insert_at, desc_total)
+            changed += 1
+        if (desc_total.text or "").strip() == "":
+            desc_total.text = "0"
+            changed += 1
+
+        children = list(gTotSub)
+        idx_desc = children.index(desc_total)
+        idx_iva = children.index(iva) if iva is not None and iva in children else None
+        idx_porc = children.index(porc) if porc is not None and porc in children else None
+
+        need_move = False
+        if idx_iva is not None and idx_desc >= idx_iva:
+            need_move = True
+        if idx_porc is not None and idx_desc <= idx_porc:
+            need_move = True
+
+        if need_move:
+            gTotSub.remove(desc_total)
+            insert_at = _desired_desc_total_index()
+            gTotSub.insert(insert_at, desc_total)
+            changed += 1
+
+
     # Orden esperado de gTotSub (clave para 0160: dTotOpe ANTES de dTotIVA)
     order = [
         "dSubExe",
@@ -642,6 +690,8 @@ def ensure_gTotSub_order_and_subs(doc: etree._ElementTree) -> int:
         "dSub10",
         "dTotOpe",
         "dTotDesc",
+        "dPorcDescTotal",
+        "dDescTotal",
         "dTotIVA",
         "dTotGralOp",
         "dTotGrav",
@@ -1055,7 +1105,7 @@ def main() -> int:
                     if n:
                         fixes_applied.append(f"dDesUniMed fixed: {n}")
 
-                if ("dSubExo" in msg) or ("dSubExe" in msg) or ("dTotGralOp" in msg) or ("gTotSub" in msg):
+                if ("dSubExo" in msg) or ("dSubExe" in msg) or ("dTotGralOp" in msg) or ("gTotSub" in msg) or ("dDescTotal" in msg) or ("dPorcDescTotal" in msg) or ("dTotIVA" in msg):
                     print("[fix] gTotSub order/subs")
                     # Aplicar orden canónico primero
                     n = canonical_gTotSub_order(doc)

@@ -411,131 +411,84 @@ def call_consulta_lote_http(
                 if key.startswith('xmlns:'):
                     ns[key.split(':')[1]] = value
             
-            # Asegurar namespace por defecto
-            if 'ns2' not in ns:
-                ns['ns2'] = sifen_ns
-            if 'env' not in ns:
-                ns['env'] = 'http://www.w3.org/2003/05/soap-envelope'
-            if 's' not in ns:
-                ns['s'] = sifen_ns
-            
-            # Buscar respuesta en el Body
-            response_elem = root.find('.//env:Body', ns)
-            if response_elem is not None:
-                # Buscar rResEnviConsLoteDe o rRetEnviDe (con cualquier prefijo)
-                res_elem = None
-                response_type = None
-                
-                for prefix in ['ns2', 's']:
-                    res_elem = response_elem.find(f'.//{prefix}:rResEnviConsLoteDe', ns)
-                    if res_elem is not None:
-                        response_type = 'consulta_lote'
-                        break
-                    
-                    # También puede venir rRetEnviDe en algunos casos
-                    res_elem = response_elem.find(f'.//{prefix}:rRetEnviDe', ns)
-                    if res_elem is not None:
-                        response_type = 'ret_envi_de'
-                        break
-                
-                if res_elem is not None:
-                    # Extraer campos principales según el tipo de respuesta
-                    d_fec_proc = res_elem.findtext('.//ns2:dFecProc', namespaces=ns) or res_elem.findtext('.//s:dFecProc', namespaces=ns)
-                    
-                    if response_type == 'consulta_lote':
-                        d_cod_res_lot = res_elem.findtext('.//ns2:dCodResLot', namespaces=ns) or res_elem.findtext('.//s:dCodResLot', namespaces=ns)
-                        d_msg_res_lot = res_elem.findtext('.//ns2:dMsgResLot', namespaces=ns) or res_elem.findtext('.//s:dMsgResLot', namespaces=ns)
-                        
-                        result.update({
-                            "dFecProc": d_fec_proc,
-                            "dCodResLot": d_cod_res_lot,
-                            "dMsgResLot": d_msg_res_lot,
-                        })
-                        
-                        # Extraer gResProcLote si existe
-                        g_res_proc = None
-                        for prefix in ['ns2', 's']:
-                            g_res_proc = res_elem.find(f'.//{prefix}:gResProcLote', ns)
-                            if g_res_proc is not None:
-                                break
-                        
-                        if g_res_proc is not None:
-                            documentos = []
-                            
-                            # Buscar documentos
-                            for prefix in ['ns2', 's']:
-                                for doc in g_res_proc.findall(f'.//{prefix}:id', ns):
-                                    doc_id = doc.text
-                                    doc_est = g_res_proc.findtext(f'{prefix}:dEstRes[{doc_id}]', ns) or "N/A"
-                                    documentos.append({
-                                        "id": doc_id,
-                                        "estado": doc_est
-                                    })
-                                if documentos:
-                                    break
-                            
-                            result["documentos"] = documentos
-                            
-                            # Extraer resultado del lote
-                            lot_id = None
-                            lot_est = None
-                            for prefix in ['ns2', 's']:
-                                lot_id = g_res_proc.findtext(f'{prefix}:id', namespaces=ns)
-                                lot_est = g_res_proc.findtext(f'{prefix}:dEstRes', namespaces=ns)
-                                if lot_id or lot_est:
-                                    break
-                            
-                            if lot_id:
-                                result.update({
-                                    "lote_id": lot_id,
-                                    "dEstRes": lot_est,
-                                })
-                            
-                            # Buscar código/mensaje de rechazo si existe
-                            g_res_proc_inner = None
-                            for prefix in ['ns2', 's']:
-                                g_res_proc_inner = g_res_proc.find(f'.//{prefix}:gResProc', ns)
-                                if g_res_proc_inner is not None:
-                                    break
-                            
-                            if g_res_proc_inner is not None:
-                                d_cod_res = None
-                                d_msg_res = None
-                                for prefix in ['ns2', 's']:
-                                    d_cod_res = g_res_proc_inner.findtext(f'{prefix}:dCodRes', namespaces=ns)
-                                    d_msg_res = g_res_proc_inner.findtext(f'{prefix}:dMsgRes', namespaces=ns)
-                                    if d_cod_res or d_msg_res:
-                                        break
-                                result.update({
-                                    "dCodRes": d_cod_res,
-                                    "dMsgRes": d_msg_res,
-                                })
-                    
-                    elif response_type == 'ret_envi_de':
-                        # Respuesta de tipo rRetEnviDe (error general)
-                        result.update({
-                            "dFecProc": d_fec_proc,
-                            "dEstRes": res_elem.findtext('.//ns2:dEstRes', namespaces=ns) or res_elem.findtext('.//s:dEstRes', namespaces=ns),
-                        })
-                        
-                        # Buscar código/mensaje en gResProc
-                        g_res_proc = None
-                        for prefix in ['ns2', 's']:
-                            g_res_proc = res_elem.find(f'.//{prefix}:gResProc', ns)
-                            if g_res_proc is not None:
-                                break
-                        
-                        if g_res_proc is not None:
-                            d_cod_res = g_res_proc.findtext('.//ns2:dCodRes', namespaces=ns) or g_res_proc.findtext('.//s:dCodRes', namespaces=ns)
-                            d_msg_res = g_res_proc.findtext('.//ns2:dMsgRes', namespaces=ns) or g_res_proc.findtext('.//s:dMsgRes', namespaces=ns)
-                            
-                            result.update({
-                                "dCodRes": d_cod_res,
-                                "dMsgRes": d_msg_res,
-                            })
-                    
-                    result["ok"] = True
-                    
+            # Parse robusto SIN prefijos (evita: prefix 'ns2' not found in prefix map)
+            def _local(tag: str) -> str:
+                return tag.split('}', 1)[-1] if '}' in tag else tag
+
+            def _find_first_by_local(root_elem, local_name: str):
+                for el in root_elem.iter():
+                    if _local(el.tag) == local_name:
+                        return el
+                return None
+
+            def _findall_by_local(root_elem, local_name: str):
+                out = []
+                for el in root_elem.iter():
+                    if _local(el.tag) == local_name:
+                        out.append(el)
+                return out
+
+            def _text_first(parent, local_name: str):
+                el = _find_first_by_local(parent, local_name) if parent is not None else None
+                txt = (el.text or '').strip() if el is not None else ''
+                return txt or None
+
+            # Buscar el Body SOAP por localname
+            body = _find_first_by_local(root, 'Body')
+            if body is None:
+                raise RuntimeError('No se encontró SOAP Body')
+
+            # Buscar rResEnviConsLoteDe (OK) o rRetEnviDe (error) por localname
+            res_elem = _find_first_by_local(body, 'rResEnviConsLoteDe')
+            response_type = 'consulta_lote' if res_elem is not None else None
+            if res_elem is None:
+                res_elem = _find_first_by_local(body, 'rRetEnviDe')
+                response_type = 'ret_envi_de' if res_elem is not None else None
+
+            if res_elem is None:
+                raise RuntimeError('No se encontró rResEnviConsLoteDe ni rRetEnviDe en el SOAP Body')
+
+            # Campos comunes
+            d_fec_proc = _text_first(res_elem, 'dFecProc')
+            result['dFecProc'] = d_fec_proc
+
+            if response_type == 'consulta_lote':
+                result['dCodResLot'] = _text_first(res_elem, 'dCodResLot')
+                result['dMsgResLot'] = _text_first(res_elem, 'dMsgResLot')
+
+                # gResProcLote (si existe)
+                g_res_proc_lote = _find_first_by_local(res_elem, 'gResProcLote')
+                if g_res_proc_lote is not None:
+                    # documentos
+                    documentos = []
+                    for g_doc in _findall_by_local(g_res_proc_lote, 'gResProcDoc'):
+                        doc_id = _text_first(g_doc, 'id')
+                        doc_est = _text_first(g_doc, 'dEstRes')
+                        if doc_id or doc_est:
+                            documentos.append({'id': doc_id, 'estado': doc_est})
+                    result['documentos'] = documentos
+
+                    # estado/id del lote dentro de gResProcLote
+                    lot_id = _text_first(g_res_proc_lote, 'id')
+                    lot_est = _text_first(g_res_proc_lote, 'dEstRes')
+                    if lot_id or lot_est:
+                        result['lote_id'] = lot_id
+                        result['dEstRes'] = lot_est
+
+                    # gResProc interno (rechazo a nivel lote/doc)
+                    g_inner = _find_first_by_local(g_res_proc_lote, 'gResProc')
+                    if g_inner is not None:
+                        result['dCodRes'] = _text_first(g_inner, 'dCodRes')
+                        result['dMsgRes'] = _text_first(g_inner, 'dMsgRes')
+
+            elif response_type == 'ret_envi_de':
+                result['dEstRes'] = _text_first(res_elem, 'dEstRes')
+                g_res_proc = _find_first_by_local(res_elem, 'gResProc')
+                if g_res_proc is not None:
+                    result['dCodRes'] = _text_first(g_res_proc, 'dCodRes')
+                    result['dMsgRes'] = _text_first(g_res_proc, 'dMsgRes')
+
+            result['ok'] = True
         except ET.ParseError as e:
             raise RuntimeError(f"XML mal formado: {e}")
         

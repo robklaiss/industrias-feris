@@ -38,6 +38,30 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
+def _resolve_artifacts_dir(artifacts_dir: Optional[Path] = None) -> Path:
+    """Resolve artifacts directory (prefer explicit param, else env override, else artifacts/)."""
+    if artifacts_dir is not None:
+        p = Path(artifacts_dir)
+    else:
+        raw_dir = os.getenv("SIFEN_ARTIFACTS_DIR") or os.getenv("SIFEN_ARTIFACTS_PATH")
+        try:
+            p = Path(raw_dir).expanduser() if raw_dir else Path("artifacts")
+        except Exception:
+            p = Path("artifacts")
+    p.mkdir(parents=True, exist_ok=True)
+    return p
+
+
+def _resolve_run_artifacts_dir(*, run_id: Optional[str], artifacts_dir_override: Optional[Path]) -> Path:
+    """Resolve deterministic per-run artifacts dir."""
+    if run_id:
+        return _resolve_artifacts_dir(Path("artifacts") / str(run_id))
+    if artifacts_dir_override is not None:
+        return _resolve_artifacts_dir(artifacts_dir_override)
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return _resolve_artifacts_dir(Path("artifacts") / f"run_{ts}")
+
 # Agregar el directorio padre al path para imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -2794,11 +2818,10 @@ def build_lote_base64_from_single_xml(xml_bytes: bytes, return_debug: bool = Fal
     
     # Guardar artifact de debug del rDE fragment (si artifacts_dir existe)
     try:
-        artifacts_dir = Path("artifacts")
-        if artifacts_dir.exists():
-            debug_rde_file = artifacts_dir / "debug_rde_fragment.xml"
-            debug_rde_file.write_bytes(rde_patched)
-            print(f"💾 Guardado artifact debug: {debug_rde_file}")
+        artifacts_dir = _resolve_artifacts_dir()
+        debug_rde_file = artifacts_dir / "debug_rde_fragment.xml"
+        debug_rde_file.write_bytes(rde_patched)
+        print(f"💾 Guardado artifact debug: {debug_rde_file}")
     except Exception as e:
         # Silencioso: no fallar si no se puede guardar el artifact
         pass
@@ -3027,7 +3050,8 @@ def build_and_sign_lote_from_xml(
     cert_path: str,
     cert_password: str,
     return_debug: bool = False,
-    dump_http: bool = False
+    dump_http: bool = False,
+    artifacts_dir: Optional[Path] = None,
 ) -> Union[str, Tuple[str, bytes, bytes, None]]:
     """
     Construye el lote.xml COMPLETO como árbol lxml ANTES de firmar, luego firma el DE
@@ -3042,8 +3066,7 @@ def build_and_sign_lote_from_xml(
         _check_signing_dependencies()
     except RuntimeError as e:
         # Guardar artifacts si faltan dependencias
-        artifacts_dir = Path("artifacts")
-        artifacts_dir.mkdir(parents=True, exist_ok=True)
+        artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
         try:
             artifacts_dir.joinpath("sign_blocked_input.xml").write_bytes(xml_bytes)
             artifacts_dir.joinpath("sign_blocked_reason.txt").write_text(
@@ -3074,8 +3097,7 @@ def build_and_sign_lote_from_xml(
     # Soporte para rEnviDe (siRecepDE) que contiene xDE en base64
     if root_localname == "rEnviDe":
         # Guardar input original para debug
-        artifacts_dir = Path("artifacts")
-        artifacts_dir.mkdir(parents=True, exist_ok=True)
+        artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
         try:
             artifacts_dir.joinpath("renvide_input.xml").write_bytes(xml_bytes)
         except Exception:
@@ -3373,13 +3395,12 @@ def build_and_sign_lote_from_xml(
         rde_signed_bytes = sign_de_with_p12(rde_to_sign_bytes, cert_path, cert_password)
         # Mover Signature dentro del DE si está fuera (como hermano del DE dentro del rDE)
         debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
-        artifacts_dir = Path("artifacts")
+        artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
         rde_signed_bytes = _move_signature_into_de_if_needed(rde_signed_bytes, artifacts_dir, debug_enabled)
     except Exception as e:
         # Si no se puede firmar, NO continuar - guardar artifacts y fallar
         error_msg = f"No se pudo firmar con xmlsec: {e}"
-        artifacts_dir = Path("artifacts")
-        artifacts_dir.mkdir(parents=True, exist_ok=True)
+        artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
         try:
             # Guardar el XML PRE-firma del rde_el actual (ya pasado por ensure_rde_sifen)
             artifacts_dir.joinpath("sign_error_input.xml").write_bytes(rde_to_sign_bytes)
@@ -3557,8 +3578,7 @@ def build_and_sign_lote_from_xml(
             print(f"✅ Post-firma validado: SignatureMethod=rsa-sha256, DigestMethod=sha256, Reference URI=#{de_id}")
     except Exception as e:
         # Guardar artifacts si falla validación post-firma
-        artifacts_dir = Path("artifacts")
-        artifacts_dir.mkdir(parents=True, exist_ok=True)
+        artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
         try:
             artifacts_dir.joinpath("sign_preflight_failed.xml").write_bytes(rde_signed_bytes)
             # Verificar si hay problemas de malformación en el XML firmado
@@ -3764,8 +3784,7 @@ def build_and_sign_lote_from_xml(
     # 12. Sanity gate: detectar problemas comunes de XML mal formado (SIFEN 0160)
     problem = _scan_xml_bytes_for_common_malformed(lote_xml_bytes)
     if problem:
-        artifacts_dir = Path("artifacts")
-        artifacts_dir.mkdir(parents=True, exist_ok=True)
+        artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
         try:
             artifacts_dir.joinpath("prevalidator_raw.xml").write_bytes(lote_xml_bytes)
             artifacts_dir.joinpath("prevalidator_sanity_report.txt").write_text(
@@ -3801,8 +3820,7 @@ def build_and_sign_lote_from_xml(
     
     # Guardar lote.xml para inspección (antes de crear ZIP)
     # SIEMPRE guardar artifacts/last_lote.xml (no solo en debug)
-    artifacts_dir = Path("artifacts")
-    artifacts_dir.mkdir(parents=True, exist_ok=True)
+    artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
     try:
         artifacts_dir.joinpath("last_lote.xml").write_bytes(lote_xml_bytes)
         if debug_enabled:
@@ -3943,8 +3961,7 @@ def build_and_sign_lote_from_xml(
                 print(f"   - Firma válida (SHA256, URI=#{de_id_zip}): ✅")
     except zipfile.BadZipFile as e:
         # Guardar artifacts si falla validación ZIP
-        artifacts_dir = Path("artifacts")
-        artifacts_dir.mkdir(parents=True, exist_ok=True)
+        artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
         try:
             artifacts_dir.joinpath("preflight_zip.zip").write_bytes(zip_bytes)
             artifacts_dir.joinpath("preflight_error.txt").write_text(
@@ -3956,8 +3973,7 @@ def build_and_sign_lote_from_xml(
         raise RuntimeError(f"Error al validar ZIP: {e}")
     except Exception as e:
         # Guardar artifacts si falla validación
-        artifacts_dir = Path("artifacts")
-        artifacts_dir.mkdir(parents=True, exist_ok=True)
+        artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
         try:
             artifacts_dir.joinpath("preflight_lote.xml").write_bytes(lote_xml_bytes)
             artifacts_dir.joinpath("preflight_zip.zip").write_bytes(zip_bytes)
@@ -4010,8 +4026,7 @@ def build_and_sign_lote_from_xml(
     
     # 17. Guardar artifacts SIEMPRE (aunque el envío falle)
     try:
-        artifacts_dir = Path("artifacts")
-        artifacts_dir.mkdir(parents=True, exist_ok=True)
+        artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
         
         # Guardar ZIP
         last_xde_zip = artifacts_dir / "last_xde.zip"
@@ -4117,9 +4132,7 @@ def preflight_soap_request(
         - success: True si pasa todas las validaciones
         - error_message: None si success=True, mensaje de error si success=False
     """
-    if artifacts_dir is None:
-        artifacts_dir = Path("artifacts")
-    artifacts_dir.mkdir(parents=True, exist_ok=True)
+    artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
     
     try:
         # 1. Validar que SOAP request parsea
@@ -4471,8 +4484,26 @@ def build_r_envio_lote_xml(did: Union[int, str], xml_bytes: bytes, zip_base64: O
         base = datetime.now().strftime("%Y%m%d%H%M%S")  # 14 dígitos
         return base + str(random.randint(0, 9))  # + 1 dígito random = 15
     
-    # SIEMPRE generar dId de 15 dígitos (ignorar el parámetro did)
-    did = make_did_15()  # SIEMPRE (no reutilizar nada)
+    def normalize_did(did) -> str:
+        """Normaliza dId para rEnvioLote.
+        - Si did es None/''/'auto' => genera 15 dígitos.
+        - Si viene seteado => DEBE ser exactamente 15 dígitos (requisito práctico SIFEN).
+        """
+        if did is None:
+            return make_did_15()
+        if isinstance(did, int):
+            did = str(did)
+        did = str(did).strip()
+        if did.lower() in ("", "auto"):
+            return make_did_15()
+        if not (did.isdigit() and len(did) == 15):
+            raise ValueError(
+                f"dId de rEnvioLote debe ser 15 dígitos (YYYYMMDDHHMMSSx). Recibido: '{did}'"
+            )
+        return did
+
+    # NO ignorar el parámetro did: usarlo si es válido, o autogenerar si corresponde
+    did = normalize_did(did)
     
     if zip_base64 is None:
         xde_b64 = build_lote_base64_from_single_xml(xml_bytes)
@@ -4805,9 +4836,7 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
         error_msg = f"BLOQUEADO: {str(e)}. Ejecutar scripts/bootstrap_env.sh"
         try:
             xml_bytes = xml_path.read_bytes()
-            if artifacts_dir is None:
-                artifacts_dir = Path("artifacts")
-            artifacts_dir.mkdir(parents=True, exist_ok=True)
+            artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
             artifacts_dir.joinpath("sign_blocked_input.xml").write_bytes(xml_bytes)
             artifacts_dir.joinpath("sign_blocked_reason.txt").write_text(
                 f"BLOQUEADO: Dependencias de firma faltantes\n\n{str(e)}\n\n"
@@ -4822,6 +4851,9 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
             "error": error_msg,
             "error_type": "DependencyError"
         }
+
+    artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
+    os.environ["SIFEN_ARTIFACTS_DIR"] = str(artifacts_dir)
     
     # Leer XML como bytes
     # TEST/DEV: bump doc para generar un nuevo CDC y evitar 0301 por reenvío
@@ -4955,7 +4987,8 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
                 cert_path=sign_cert_path,
                 cert_password=sign_cert_password,
                 return_debug=True,
-                dump_http=dump_http
+                dump_http=dump_http,
+                artifacts_dir=artifacts_dir,
             )
             if isinstance(result, tuple):
                 if len(result) == 4:
@@ -5013,8 +5046,7 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
             debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
             if debug_enabled:
                 try:
-                    artifacts_dir = Path("artifacts")
-                    artifacts_dir.mkdir(parents=True, exist_ok=True)
+                    artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
                     traceback_file = artifacts_dir / "send_exception_traceback.txt"
                     traceback_file.write_text(
                         f"Error: {error_msg}\n"
@@ -5265,8 +5297,7 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
         debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
         if debug_enabled:
             try:
-                artifacts_dir = Path("artifacts")
-                artifacts_dir.mkdir(parents=True, exist_ok=True)
+                artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
                 traceback_file = artifacts_dir / "send_exception_traceback.txt"
                 traceback_file.write_text(
                     f"Error: {error_msg}\n"
@@ -5628,6 +5659,21 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
                     encoding="utf-8"
                 )
                 print(f"\n💾 Respuesta guardada en: {response_file}")
+
+            # Guardar summary.txt SIEMPRE
+            try:
+                xde_sha256 = hashlib.sha256(zip_base64.encode("utf-8")).hexdigest()
+                zip_sha256 = hashlib.sha256(zip_bytes).hexdigest()
+                d_prot_cons_lote = response.get("d_prot_cons_lote")
+                summary_lines = [
+                    f"dId={did_para_log}",
+                    f"xDE_sha256={xde_sha256}",
+                    f"zip_sha256={zip_sha256}",
+                    f"dProtConsLote={'' if d_prot_cons_lote is None else str(d_prot_cons_lote)}",
+                ]
+                (artifacts_dir / "summary.txt").write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
+            except Exception:
+                pass
             
             # Instrumentación para debug del error 1264
             if codigo_respuesta == "1264" and artifacts_dir:
@@ -5693,8 +5739,7 @@ def send_sirecepde(xml_path: Path, env: str = "test", artifacts_dir: Optional[Pa
         debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
         if debug_enabled:
             try:
-                artifacts_dir = Path("artifacts")
-                artifacts_dir.mkdir(parents=True, exist_ok=True)
+                artifacts_dir = _resolve_artifacts_dir(artifacts_dir)
                 traceback_file = artifacts_dir / "send_exception_traceback.txt"
                 traceback_file.write_text(
                     f"Error: {str(e)}\n"
@@ -6006,6 +6051,13 @@ Configuración requerida (variables de entorno):
     )
     
     parser.add_argument(
+        "--run-id",
+        type=str,
+        default=None,
+        help="ID determinístico de corrida. Si se especifica, se usa artifacts/<RUN_ID>/"
+    )
+
+    parser.add_argument(
         "--env",
         choices=["test", "prod"],
         default=None,
@@ -6063,15 +6115,13 @@ Configuración requerida (variables de entorno):
         print(f"❌ Ambiente inválido: {env}. Debe ser 'test' o 'prod'")
         return 1
     
-    # Resolver artifacts dir
-    if args.artifacts_dir is None:
-        artifacts_dir = Path(__file__).parent.parent / "artifacts"
-    else:
-        artifacts_dir = args.artifacts_dir
+    artifacts_dir = _resolve_run_artifacts_dir(run_id=getattr(args, "run_id", None), artifacts_dir_override=args.artifacts_dir)
+    os.environ["SIFEN_ARTIFACTS_DIR"] = str(artifacts_dir)
     
-    # Resolver XML path
+    # Resolver XML path (base dir para 'latest' mantiene compatibilidad)
     try:
-        xml_path = resolve_xml_path(args.xml, artifacts_dir)
+        base_dir_for_latest = args.artifacts_dir if args.artifacts_dir is not None else Path("artifacts")
+        xml_path = resolve_xml_path(args.xml, base_dir_for_latest)
     except FileNotFoundError as e:
         print(f"❌ {e}")
         import traceback
@@ -6111,6 +6161,15 @@ Configuración requerida (variables de entorno):
     debug_soap = os.getenv("SIFEN_DEBUG_SOAP", "0") in ("1", "true", "True")
     if debug_soap:
         print(f"EXITING_WITH={exit_code}")
+
+    # Manual/documentación: mostrar dir de artifacts y paths clave
+    try:
+        print(f"Artifacts dir: {artifacts_dir.resolve()}")
+        print(f"SOAP request (real): {(artifacts_dir / 'soap_last_request.xml').resolve()}")
+        if result.get("response_file"):
+            print(f"Response JSON: {Path(result.get('response_file')).resolve()}")
+    except Exception:
+        pass
     
     return exit_code
 

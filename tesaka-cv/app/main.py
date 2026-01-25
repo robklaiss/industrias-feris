@@ -19,6 +19,16 @@ from .tesaka_client import TesakaClient, TesakaClientError
 # Cargar variables de entorno
 load_dotenv()
 
+# ===== GUARDRAIL MODO TEST - PROHIBIDO PROD =====
+# Forzar ambiente TEST sin importar configuración
+SIFEN_ENV_FORCED = "test"
+if os.getenv("SIFEN_ENV") == "prod":
+    raise RuntimeError("MODO TEST: Producción está deshabilitada. SIFEN_ENV no puede ser 'prod'")
+# Sobrescribir cualquier variable de entorno
+os.environ["SIFEN_ENV"] = SIFEN_ENV_FORCED
+print(f"🔒 SIFEN_ENV_FORCED={SIFEN_ENV_FORCED} (MODO TEST)")
+# ===============================================
+
 # Inicializar FastAPI
 app = FastAPI(title="Industrias Feris")
 
@@ -58,6 +68,7 @@ from .routes_sales_invoices import register_sales_invoice_routes
 from .routes_products import register_product_routes
 from .routes_sifen import register_sifen_routes
 from .routes_artifacts import register_artifacts_routes
+from .routes_emit import register_emit_routes
 
 register_product_routes(app, jinja_env)
 register_contract_routes(app, jinja_env)
@@ -67,6 +78,7 @@ register_remission_routes(app, jinja_env)
 register_sales_invoice_routes(app, jinja_env)
 register_sifen_routes(app, jinja_env)
 register_artifacts_routes(app, jinja_env)
+register_emit_routes(app, jinja_env)
 
 
 @app.get("/", response_class=HTMLResponse)

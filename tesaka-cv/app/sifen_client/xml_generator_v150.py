@@ -323,25 +323,6 @@ def create_rde_xml_v150(
             <dTotalGs>100000</dTotalGs>
         </gTotSub>
     </DE>
-    <ds:Signature>
-        <ds:SignedInfo>
-            <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-            <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-            <ds:Reference URI="">
-                <ds:Transforms>
-                    <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
-                </ds:Transforms>
-                <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-                <ds:DigestValue>dGhpcyBpcyBhIHRlc3QgZGlnZXN0IHZhbHVl</ds:DigestValue>
-            </ds:Reference>
-        </ds:SignedInfo>
-        <ds:SignatureValue>dGhpcyBpcyBhIHRlc3Qgc2lnbmF0dXJlIHZhbHVlIGZvciBwcnVlYmFzIG9ubHk=</ds:SignatureValue>
-        <ds:KeyInfo>
-            <ds:X509Data>
-                <ds:X509Certificate>LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVKakNDQWpLZ0F3SUJBZ0lEQW5CZ2txaGtpRzl3MEJBUXNGQUFEV1lqRU1NQW9HQTFVRUNoTURVbVZzWVcKd2dnRWlNQTBHQ1NxR1NJYjM=</ds:X509Certificate>
-            </ds:X509Data>
-        </ds:KeyInfo>
-    </ds:Signature>
     <gCamFuFD>
         <dCarQR>TESTQRCODE12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890</dCarQR>
     </gCamFuFD>

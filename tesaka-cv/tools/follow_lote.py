@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 
@@ -343,10 +344,63 @@ def run_consulta_lote(
         os.makedirs(os.path.dirname(out_path), exist_ok=True)
         cmd += ["--out", out_path]
 
-    # Heredar env vars explícitamente (asegurar que SIFEN_* se pasen)
     env_dict = os.environ.copy()
-    p = subprocess.run(cmd, env=env_dict)
-    return int(p.returncode)
+    proc = subprocess.run(cmd, env=env_dict)
+    if proc.returncode == 0:
+        return 0
+
+    print("⚠️  tools.consulta_lote_de falló. Intentando fallback RAW directo...")
+    fallback_rc = run_consulta_lote_raw_fallback(
+        env=env,
+        prot=prot,
+        artifacts_dir=artifacts_dir,
+        out_path=out_path,
+    )
+    return 0 if fallback_rc == 0 else int(proc.returncode)
+
+
+def run_consulta_lote_raw_fallback(
+    env: str,
+    prot: str,
+    artifacts_dir: Optional[str],
+    out_path: Optional[str],
+) -> int:
+    try:
+        from app.sifen_client.config import get_sifen_config
+        from app.sifen_client.soap_client import SoapClient
+    except ImportError as exc:
+        print(f"❌ No se pudo importar SoapClient para fallback RAW: {exc}")
+        return 1
+
+    artifacts_base = Path(artifacts_dir or "artifacts")
+    artifacts_base.mkdir(parents=True, exist_ok=True)
+
+    target_path = Path(out_path) if out_path else artifacts_base / "consulta_lote_raw_fallback.json"
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        config = get_sifen_config(env=env)
+        client = SoapClient(config)
+        try:
+            result = client.consulta_lote_raw(
+                dprot_cons_lote=prot,
+                artifacts_dir=artifacts_base,
+            )
+        finally:
+            try:
+                client.close()
+            except Exception:
+                pass
+
+        target_path.write_text(
+            json.dumps(result, ensure_ascii=False, indent=2, default=str),
+            encoding="utf-8",
+        )
+        print(f"✅ Fallback consulta_lote_raw guardó respuesta en: {target_path}")
+        return 0
+    except Exception as exc:
+        print(f"❌ Fallback consulta_lote_raw también falló: {exc}")
+        return 1
 
 
 def build_consulta_output_path(artifacts_dir: str) -> str:

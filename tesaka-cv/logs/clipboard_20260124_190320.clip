@@ -1,0 +1,1 @@
+bash tools/run_patch_from_clipboard.sh --keep --verbose

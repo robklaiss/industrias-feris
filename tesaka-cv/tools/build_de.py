@@ -86,12 +86,18 @@ def build_de_xml(
         except:
             dv_ruc = "0"
     
-    # Limpiar RUC: solo dígitos, normalizar a 8 dígitos con zero-fill a la izquierda
-    ruc_clean = ''.join(c for c in ruc_num if c.isdigit())
-    if not ruc_clean:
+    # Limpiar RUC: solo dígitos
+    ruc_digits = ''.join(c for c in ruc_num if c.isdigit())
+    if not ruc_digits:
         raise ValueError(f"RUC debe contener al menos un dígito. Valor recibido: '{ruc_num}'")
-    # Normalizar a 8 dígitos para CDC (zero-fill a la izquierda)
-    ruc_clean = ruc_clean.zfill(8)[-8:]  # Tomar últimos 8 dígitos si es más largo
+    # En el XML (dRucEm) NO queremos cero a la izquierda. (Ej: 4554737, no 04554737)
+    ruc_emisor = ruc_digits.lstrip('0') or '0'
+    # Para CDC: normalizar a 8 dígitos (left-pad) como veníamos haciendo, pero SOLO para el CDC
+    ruc_cdc = ruc_digits.zfill(8)[-8:]
+    
+    # GUARDRAIL: Asegurar que no hay cero a la izquierda en dRucEm
+    if ruc_emisor.startswith('0') and len(ruc_emisor) > 1:
+        raise ValueError(f"dRucEm no puede tener cero a la izquierda. RUC original: {ruc_str}, dRucEm: {ruc_emisor}")
     
     # Monto para CDC (simplificado)
     monto = "100000"
@@ -103,7 +109,7 @@ def build_de_xml(
     tipo_documento_cdc = str(tipo_documento).zfill(2)[-2:]
     
     # Generar CDC (usar campos normalizados)
-    cdc = generate_cdc(ruc_clean, timbrado, establecimiento_cdc, punto_expedicion_cdc, 
+    cdc = generate_cdc(ruc_cdc, timbrado, establecimiento_cdc, punto_expedicion_cdc, 
                       numero_documento_cdc, tipo_documento_cdc, fecha.replace("-", ""), monto)
     
     # Validación defensiva: asegurar que el CDC sea válido antes de usarlo
@@ -204,7 +210,7 @@ def build_de_xml(
     <gDatGralOpe>
         <dFeEmiDE>{fecha_emision}</dFeEmiDE>
         <gEmis>
-            <dRucEm>{ruc_clean}</dRucEm>
+            <dRucEm>{ruc_emisor}</dRucEm>
             <dDVEmi>{dv_ruc}</dDVEmi>
             <iTipCont>1</iTipCont>
             <dNomEmi>{d_nom_emi}</dNomEmi>
@@ -279,25 +285,6 @@ def build_de_xml(
         <dTBasGraIVA>0</dTBasGraIVA>
         <dTotalGs>100000</dTotalGs>
     </gTotSub>
-    <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
-        <ds:SignedInfo>
-            <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-            <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-            <ds:Reference URI="">
-                <ds:Transforms>
-                    <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
-                </ds:Transforms>
-                <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-                <ds:DigestValue>dGhpcyBpcyBhIHRlc3QgZGlnZXN0IHZhbHVl</ds:DigestValue>
-            </ds:Reference>
-        </ds:SignedInfo>
-        <ds:SignatureValue>dGhpcyBpcyBhIHRlc3Qgc2lnbmF0dXJlIHZhbHVlIGZvciBwcnVlYmFzIG9ubHk=</ds:SignatureValue>
-        <ds:KeyInfo>
-            <ds:X509Data>
-                <ds:X509Certificate>LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVKakNDQWpLZ0F3SUJBZ0lEQW5CZ2txaGtpRzl3MEJBUXNGQUFEV1lqRU1NQW9HQTFVRUNoTURVbVZzWVcKd2dnRWlNQTBHQ1NxR1NJYjM=</ds:X509Certificate>
-            </ds:X509Data>
-        </ds:KeyInfo>
-    </ds:Signature>
     <gCamFuFD>
         <dCarQR>TESTQRCODE12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890</dCarQR>
     </gCamFuFD>

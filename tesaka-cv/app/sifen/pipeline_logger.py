@@ -36,7 +36,8 @@ class PipelineLogger:
         # File handler if log_dir provided
         if log_dir:
             log_dir.mkdir(parents=True, exist_ok=True)
-            log_file = log_dir / f"{name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+            log_file = log_dir / f"{name}_{datetime.now().strfti
+            reme('%Y%m%d_%H%M%S')}.log"
             file_handler = logging.FileHandler(log_file)
             file_handler.setLevel(logging.DEBUG)
             file_formatter = logging.Formatter(
