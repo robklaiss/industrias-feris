@@ -54,10 +54,27 @@ def _find_openssl_binary() -> Optional[str]:
         except Exception:
             pass
 
-    # Intentar Homebrew en Apple Silicon primero
-    homebrew_openssl = "/opt/homebrew/bin/openssl"
-    if os.path.exists(homebrew_openssl) and os.access(homebrew_openssl, os.X_OK):
-        return homebrew_openssl
+    # Preferir OpenSSL de Homebrew (Apple Silicon / Intel) antes que /usr/bin/openssl (LibreSSL)
+    candidates = [
+        "/opt/homebrew/opt/openssl@3/bin/openssl",
+        "/usr/local/opt/openssl@3/bin/openssl",
+        "/opt/homebrew/bin/openssl",
+        "/usr/local/bin/openssl",
+    ]
+    for cand in candidates:
+        try:
+            if os.path.exists(cand) and os.access(cand, os.X_OK):
+                return cand
+        except Exception:
+            pass
+
+    # Fallback a /usr/bin/openssl (macOS, típicamente LibreSSL)
+    system_openssl = "/usr/bin/openssl"
+    try:
+        if os.path.exists(system_openssl) and os.access(system_openssl, os.X_OK):
+            return system_openssl
+    except Exception:
+        pass
     
     # Buscar en PATH
     openssl_path = shutil.which("openssl")
@@ -89,6 +106,9 @@ def _p12_to_pem_openssl_fallback(
         PKCS12Error: Si openssl no está disponible o falla la conversión
     """
     openssl_bin = _find_openssl_binary()
+    if not openssl_bin or not isinstance(openssl_bin, (str, bytes, os.PathLike)):
+        raise PKCS12Error("No se encontró binario openssl válido (setear OPENSSL_BIN o instalar openssl)")
+
     if not openssl_bin:
         raise PKCS12Error(
             "OpenSSL no encontrado en el sistema. "
@@ -101,54 +121,58 @@ def _p12_to_pem_openssl_fallback(
     env = os.environ.copy()
     env[env_var_name] = p12_password
     
+    def _run_pkcs12(args: list, *, allow_retry_without_legacy: bool) -> subprocess.CompletedProcess:
+        cmd = [openssl_bin, "pkcs12"] + args
+        result = subprocess.run(
+            cmd,
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        if result.returncode == 0:
+            return result
+
+        err = (result.stderr or result.stdout or "").lower()
+        if allow_retry_without_legacy and ("unknown option" in err or "unknown flag" in err) and "legacy" in err:
+            # LibreSSL y algunos OpenSSL viejos no soportan -legacy
+            cmd2 = [openssl_bin, "pkcs12"] + [a for a in args if a != "-legacy"]
+            return subprocess.run(
+                cmd2,
+                env=env,
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+        return result
+
     try:
-        # Extraer certificado: openssl pkcs12 -legacy -in <p12> -clcerts -nokeys -out <cert_pem> -passin env:SIFEN_P12_PASS_TMP
-        cert_cmd = [
-            openssl_bin,
-            "pkcs12",
+        # Extraer certificado
+        cert_args = [
             "-legacy",
             "-in", p12_path,
             "-clcerts",
             "-nokeys",
             "-out", cert_pem_path,
-            "-passin", f"env:{env_var_name}"
+            "-passin", f"env:{env_var_name}",
         ]
-        
-        cert_result = subprocess.run(
-            cert_cmd,
-            env=env,
-            capture_output=True,
-            text=True,
-            timeout=30
-        )
-        
+        cert_result = _run_pkcs12(cert_args, allow_retry_without_legacy=True)
         if cert_result.returncode != 0:
-            # Limpiar variable de entorno antes de lanzar error
             error_output = cert_result.stderr or cert_result.stdout or "Sin salida"
-            # NO incluir la contraseña en el error
             raise PKCS12Error(
                 f"Error al extraer certificado con OpenSSL: {error_output[:500]}"
             )
         
-        # Extraer clave privada: openssl pkcs12 -legacy -in <p12> -nocerts -nodes -out <key_pem> -passin env:SIFEN_P12_PASS_TMP
-        key_cmd = [
-            openssl_bin,
-            "pkcs12",
+        # Extraer clave privada
+        key_args = [
             "-legacy",
             "-in", p12_path,
             "-nocerts",
             "-nodes",
             "-out", key_pem_path,
-            "-passin", f"env:{env_var_name}"
+            "-passin", f"env:{env_var_name}",
         ]
-        
-        key_result = subprocess.run(
-            key_cmd,
-            env=env,
-            capture_output=True,
-            text=True,
-            timeout=30
-        )
+        key_result = _run_pkcs12(key_args, allow_retry_without_legacy=True)
         
         if key_result.returncode != 0:
             # Limpiar archivo de certificado si se creó
@@ -220,7 +244,8 @@ def p12_to_temp_pem_files(p12_path: str, p12_password: str) -> Tuple[str, str]:
         )
     if not p12_password:
         raise PKCS12Error(
-            "Falta password: setear SIFEN_SIGN_P12_PASSWORD (o SIFEN_MTLS_P12_PASSWORD)"
+            "Falta password: setear SIFEN_SIGN_P12_PASSWORD (o SIFEN_SIGN_P12_PASSWORD_FILE) "
+            "(o MTLS equivalentes)"
         )
 
     try:

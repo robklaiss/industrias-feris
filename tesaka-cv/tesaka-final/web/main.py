@@ -75,6 +75,19 @@ app.mount("/static", StaticFiles(directory=str(WEB_DIR / "static")), name="stati
 # Configurar templates
 templates = Jinja2Templates(directory=str(WEB_DIR / "templates"))
 
+def _get_secret(env_key: str, file_key: str) -> Optional[str]:
+    v = os.getenv(env_key)
+    if v:
+        return v
+    fp = os.getenv(file_key)
+    if fp:
+        try:
+            p = FSPath(fp)
+            if p.exists() and p.is_file():
+                return p.read_text(encoding="utf-8").strip()
+        except Exception:
+            return None
+    return None
 
 def _check_emisor_ruc():
     """
@@ -113,8 +126,6 @@ def _check_emisor_ruc():
     default_ruc = f"{default_ruc_num}-{dv}"
     
     # Log informativo (solo en desarrollo)
-    import logging
-    logger = logging.getLogger(__name__)
     logger.info(
         f"SIFEN_EMISOR_RUC no configurado. Usando valor por defecto para desarrollo: {default_ruc}. "
         "Para producción, configurá SIFEN_EMISOR_RUC en .env o variables de entorno."
@@ -737,7 +748,15 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                 
                 # Obtener certificado de firma (usar mTLS si no hay específico de firma)
                 sign_cert_path = os.getenv("SIFEN_SIGN_P12_PATH") or os.getenv("SIFEN_MTLS_P12_PATH")
-                sign_cert_password = os.getenv("SIFEN_SIGN_P12_PASSWORD") or os.getenv("SIFEN_MTLS_P12_PASSWORD")
+                primary_password = _get_secret("SIFEN_SIGN_P12_PASSWORD", "SIFEN_SIGN_P12_PASSWORD_FILE")
+                fallback_password = _get_secret("SIFEN_MTLS_P12_PASSWORD", "SIFEN_MTLS_P12_PASSWORD_FILE")
+                sign_cert_password = primary_password or fallback_password
+
+                password_source = "missing"
+                if primary_password:
+                    password_source = "env" if os.getenv("SIFEN_SIGN_P12_PASSWORD") else "file"
+                elif fallback_password:
+                    password_source = "env" if os.getenv("SIFEN_MTLS_P12_PASSWORD") else "file"
 
                 artifacts_dir = FSPath("artifacts")
                 try:
@@ -754,6 +773,7 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                     debug_txt = (
                         f"sign_p12_path={sign_cert_path}\n"
                         f"sign_password_set={'yes' if bool(sign_cert_password) else 'no'}\n"
+                        f"password_source={password_source}\n"
                         f"openssl_bin={openssl_bin}\n"
                     )
                     artifacts_dir.joinpath("sign_env_debug.txt").write_text(debug_txt, encoding="utf-8")
@@ -772,7 +792,10 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                     db.update_document_status(doc_id, status="error", message=error_msg)
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
                 if not sign_cert_password:
-                    error_msg = "BLOQUEADO: SIFEN_SIGN_P12_PASSWORD no está seteado (o SIFEN_MTLS_P12_PASSWORD). Ver artifacts/sign_env_debug.txt"
+                    error_msg = (
+                        "BLOQUEADO: SIFEN_SIGN_P12_PASSWORD o SIFEN_SIGN_P12_PASSWORD_FILE "
+                        "(o MTLS equivalentes) no está seteado. Ver artifacts/sign_env_debug.txt"
+                    )
                     db.update_document_status(doc_id, status="error", message=error_msg)
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
                 
@@ -815,9 +838,6 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
                 
                 # --- GATE: verificar habilitación FE del RUC antes de enviar ---
-                import logging
-                logger = logging.getLogger(__name__)
-                
                 try:
                     from lxml import etree
                     from tools.send_sirecepde import _extract_ruc_from_cert
@@ -1023,72 +1043,6 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                 # Mapear respuesta de recepción a estado (NO es aprobación, solo recepción)
                 status, code, message = map_recepcion_response_to_status(response)
                 
-                # Guardar paquete de diagnóstico automáticamente si dCodRes=0301 con dProtConsLote=0
-                if d_cod_res == "0301" and (d_prot_cons_lote is None or d_prot_cons_lote == 0 or str(d_prot_cons_lote) == "0"):
-                    try:
-                        artifacts_dir = FSPath("artifacts")
-                        artifacts_dir.mkdir(parents=True, exist_ok=True)
-                        
-                        # Importar función de diagnóstico
-                        sys.path.insert(0, str(FSPath(__file__).parent.parent))
-                        from tools.send_sirecepde import _save_0301_diagnostic_package
-                        
-                        # Extraer dId del payload
-                        from lxml import etree
-                        SIFEN_NS = "http://ekuatia.set.gov.py/sifen/xsd"
-                        payload_root = etree.fromstring(payload_xml.encode("utf-8"))
-                        did = "1"  # Default
-                        d_id_elem = payload_root.find(f".//{{{SIFEN_NS}}}dId")
-                        if d_id_elem is None:
-                            d_id_elem = payload_root.find(".//dId")
-                        if d_id_elem is not None and d_id_elem.text:
-                            did = d_id_elem.text.strip()
-                        
-                        # Llamar función de diagnóstico (zip_bytes y lote_xml_bytes ya están disponibles)
-                        # Nota: zip_bytes y lote_xml_bytes están disponibles desde build_and_sign_lote_from_xml
-                        if lote_xml_bytes:
-                            _save_0301_diagnostic_package(
-                                artifacts_dir=artifacts_dir,
-                                response=response,
-                                payload_xml=payload_xml,
-                                zip_bytes=zip_bytes,
-                                lote_xml_bytes=lote_xml_bytes,
-                                env=env,
-                                did=did
-                            )
-                        else:
-                            # Si no se pudo extraer, al menos guardar un resumen básico
-                            import json
-                            from datetime import datetime
-                            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                            basic_summary = {
-                                "diagnostic_package": {
-                                    "trigger": "dCodRes=0301 with dProtConsLote=0",
-                                    "timestamp": timestamp,
-                                    "env": env,
-                                    "note": "No se pudo extraer lote_xml_bytes (no disponible en contexto)"
-                                },
-                                "response": {
-                                    "dCodRes": d_cod_res,
-                                    "dMsgRes": d_msg_res,
-                                    "dProtConsLote": d_prot_cons_lote,
-                                },
-                                "request": {
-                                    "dId": did,
-                                    "soap_request_redacted": payload_xml[:1000] + "... [truncado]"
-                                }
-                            }
-                            summary_file = artifacts_dir / f"diagnostic_0301_summary_basic_{timestamp}.json"
-                            summary_file.write_text(
-                                json.dumps(basic_summary, indent=2, ensure_ascii=False, default=str),
-                                encoding="utf-8"
-                            )
-                    except Exception as e:
-                        # No bloquear el flujo si falla el diagnóstico
-                        import logging
-                        logger = logging.getLogger(__name__)
-                        logger.warning(f"Error al guardar paquete de diagnóstico 0301: {e}")
-                
                 # Guardar respuesta del documento con d_prot_cons_lote si existe
                 db.update_document_status(
                     doc_id=doc_id,
@@ -1114,8 +1068,6 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                     # Validar que sea solo dígitos
                     if not re.match(r'^\d+$', d_prot_cons_lote.strip()):
                         # Log warning pero continuar
-                        import logging
-                        logger = logging.getLogger(__name__)
                         logger.warning(
                             f"dProtConsLote no es solo dígitos: '{d_prot_cons_lote}'. "
                             "No se guardará ni consultará el lote."
@@ -1134,13 +1086,9 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                             
                         except ValueError as e:
                             # Lote ya existe o error de validación
-                            import logging
-                            logger = logging.getLogger(__name__)
                             logger.warning(f"No se pudo guardar/consultar lote: {e}")
                         except Exception as e:
                             # Error al consultar, pero no fallar el envío
-                            import logging
-                            logger = logging.getLogger(__name__)
                             logger.error(f"Error al consultar lote automáticamente: {e}")
             
             else:  # mode == "direct"
@@ -1273,16 +1221,12 @@ async def _check_lote_status_async(lote_id: int, env: str, prot: str):
                         )
                         
                         # Log de transición de estado
-                        import logging
-                        logger = logging.getLogger(__name__)
                         logger.info(
                             f"DE {doc_id} (CDC: {cdc}) actualizado a estado {de_status} "
                             f"después de consultar lote {prot}"
                         )
         except Exception as e:
             # Error al actualizar DE, pero no fallar la consulta del lote
-            import logging
-            logger = logging.getLogger(__name__)
             logger.warning(f"Error al actualizar estado de DE después de consultar lote: {e}")
     else:
         # Error al consultar

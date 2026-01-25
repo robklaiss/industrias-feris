@@ -57,8 +57,41 @@ El XML de interés está en `zeep_consulta_lote_sent_try*.xml`:
 - `SIFEN_SIGN_P12_PATH` (fallback: `SIFEN_MTLS_P12_PATH`)
 - `SIFEN_SIGN_P12_PASSWORD` (fallback: `SIFEN_MTLS_P12_PASSWORD`)
 
+Alternativa para servidor (sin interacción):
+- `SIFEN_SIGN_P12_PASSWORD_FILE` (fallback: `SIFEN_MTLS_P12_PASSWORD_FILE`)
+
 Opcional:
 - `OPENSSL_BIN` para forzar el binario `openssl` a usar en el fallback `-legacy`.
+
+## Deploy servidor (systemd)
+
+Ejemplo de unit:
+
+```
+[Service]
+EnvironmentFile=/etc/tesaka/tesaka.env
+ExecStart=/usr/bin/python -m uvicorn web.main:app --host 127.0.0.1 --port 8001
+WorkingDirectory=/opt/tesaka/tesaka-cv/tesaka-final
+User=tesaka
+Group=tesaka
+```
+
+En `/etc/tesaka/tesaka.env` (ejemplo):
+
+```
+SIFEN_ENV=prod
+SIFEN_SIGN_P12_PATH=/etc/tesaka/F1T_65478.p12
+SIFEN_SIGN_P12_PASSWORD_FILE=/etc/tesaka/sifen_sign_p12_password.txt
+```
+
+Permisos recomendados para el archivo secreto:
+
+```
+chmod 600 /etc/tesaka/sifen_sign_p12_password.txt
+chown root:tesaka /etc/tesaka/sifen_sign_p12_password.txt
+```
+
+No commitear esos archivos en el repo.
 
 ### Smoke test local (con cleanup)
 

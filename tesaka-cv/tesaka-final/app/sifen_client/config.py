@@ -14,6 +14,21 @@ except ImportError:
     pass
 
 
+def _get_secret(env_key: str, file_key: str) -> Optional[str]:
+    v = os.environ.get(env_key)
+    if v:
+        return v
+    fp = os.environ.get(file_key)
+    if fp:
+        try:
+            p = Path(fp)
+            if p.exists() and p.is_file():
+                return p.read_text(encoding="utf-8").strip()
+        except Exception:
+            return None
+    return None
+
+
 def get_cert_path_and_password() -> Tuple[str, str]:
     """
     Helper unificado para obtener certificado P12 y contraseña desde variables de entorno.
@@ -32,9 +47,14 @@ def get_cert_path_and_password() -> Tuple[str, str]:
     if not cert_path:
         raise RuntimeError("Falta SIFEN_CERT_PATH (o SIFEN_SIGN_P12_PATH) en el entorno")
     
-    cert_password = os.environ.get("SIFEN_CERT_PASSWORD") or os.environ.get("SIFEN_SIGN_P12_PASSWORD")
+    cert_password = (
+        os.environ.get("SIFEN_CERT_PASSWORD")
+        or _get_secret("SIFEN_SIGN_P12_PASSWORD", "SIFEN_SIGN_P12_PASSWORD_FILE")
+    )
     if not cert_password:
-        raise RuntimeError("Falta SIFEN_CERT_PASSWORD (o SIFEN_SIGN_P12_PASSWORD) en el entorno")
+        raise RuntimeError(
+            "Falta SIFEN_CERT_PASSWORD (o SIFEN_SIGN_P12_PASSWORD / SIFEN_SIGN_P12_PASSWORD_FILE) en el entorno"
+        )
     
     # Validar que el archivo existe
     if not os.path.exists(cert_path):
@@ -78,15 +98,18 @@ def get_mtls_cert_path_and_password() -> Tuple[str, Union[str, None]]:
         )
 
     p12_password = (
-        os.environ.get("SIFEN_MTLS_P12_PASSWORD")
+        _get_secret("SIFEN_MTLS_P12_PASSWORD", "SIFEN_MTLS_P12_PASSWORD_FILE")
         or os.environ.get("SIFEN_P12_PASSWORD")
-        or os.environ.get("SIFEN_SIGN_P12_PASSWORD")
+        or _get_secret("SIFEN_SIGN_P12_PASSWORD", "SIFEN_SIGN_P12_PASSWORD_FILE")
         or os.environ.get("SIFEN_CERT_PASSWORD")
     )
     if not p12_password:
         raise RuntimeError(
             "Falta password para P12: "
-            "SIFEN_MTLS_P12_PASSWORD / SIFEN_P12_PASSWORD / SIFEN_SIGN_P12_PASSWORD / SIFEN_CERT_PASSWORD"
+            "SIFEN_MTLS_P12_PASSWORD / SIFEN_MTLS_P12_PASSWORD_FILE / "
+            "SIFEN_P12_PASSWORD / "
+            "SIFEN_SIGN_P12_PASSWORD / SIFEN_SIGN_P12_PASSWORD_FILE / "
+            "SIFEN_CERT_PASSWORD"
         )
 
     if not os.path.exists(p12_path):
@@ -154,9 +177,9 @@ def get_mtls_config() -> Tuple[str, Optional[str], bool]:
         )
     
     p12_password = (
-        os.environ.get("SIFEN_MTLS_P12_PASSWORD")
+        _get_secret("SIFEN_MTLS_P12_PASSWORD", "SIFEN_MTLS_P12_PASSWORD_FILE")
         or os.environ.get("SIFEN_P12_PASSWORD")
-        or os.environ.get("SIFEN_SIGN_P12_PASSWORD")
+        or _get_secret("SIFEN_SIGN_P12_PASSWORD", "SIFEN_SIGN_P12_PASSWORD_FILE")
         or os.environ.get("SIFEN_CERT_PASSWORD")
     )
     
@@ -164,8 +187,10 @@ def get_mtls_config() -> Tuple[str, Optional[str], bool]:
         raise RuntimeError(
             "ERROR: Falta password para P12. Exporte una de:\n"
             "  - SIFEN_MTLS_P12_PASSWORD\n"
+            "  - SIFEN_MTLS_P12_PASSWORD_FILE\n"
             "  - SIFEN_P12_PASSWORD\n"
             "  - SIFEN_SIGN_P12_PASSWORD\n"
+            "  - SIFEN_SIGN_P12_PASSWORD_FILE\n"
             "  - SIFEN_CERT_PASSWORD"
         )
     
