@@ -1,0 +1,306 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Translate characters or replace substrings</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.strtoupper.html" class="navbar__link">« strtoupper</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.substr.html" class="navbar__link">substr »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ref.strings.html">String Functions</a></li>
+        <li>Translate characters or replace substrings</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="function.strtr" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">strtr</h1>
+  <p class="verinfo">(PHP 4, PHP 5, PHP 7, PHP 8)</p><p class="refpurpose"><span class="refname">strtr</span> &mdash; <span class="dc-title">Translate characters or replace substrings</span></p>
+
+ </div>
+ 
+ <div class="refsect1 description" id="refsect1-function.strtr-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="methodname"><strong>strtr</strong></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$string</code></span>, <span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$from</code></span>, <span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$to</code></span>): <span class="type"><a href="language.types.string.html" class="type string">string</a></span></div>
+
+  <p class="simpara">Alternative signature (not supported with named arguments):</p>
+  <div class="methodsynopsis dc-description"><span class="methodname"><strong>strtr</strong></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$string</code></span>, <span class="methodparam"><span class="type"><a href="language.types.array.html" class="type array">array</a></span> <code class="parameter">$replace_pairs</code></span>): <span class="type"><a href="language.types.string.html" class="type string">string</a></span></div>
+
+  <p class="para rdfs-comment">
+   If given three arguments, this function returns a copy of
+   <code class="parameter">string</code> where all occurrences of each (single-byte)
+   character in <code class="parameter">from</code> have been translated to the
+   corresponding character in <code class="parameter">to</code>, i.e., every
+   occurrence of <code class="literal">$from[$n]</code> has been replaced with
+   <code class="literal">$to[$n]</code>, where <code class="literal">$n</code> is a valid
+   offset in both arguments.
+  </p>
+  <p class="para">
+   If <code class="parameter">from</code> and <code class="parameter">to</code> have
+   different lengths, the extra characters in the longer of the two
+   are ignored. The length of <code class="parameter">string</code> will be the same as
+   the return value&#039;s.
+  </p>
+  <p class="para">
+   If given two arguments, the second should be an <span class="type"><a href="language.types.array.html" class="type array">array</a></span> in the
+   form <code class="literal">array(&#039;from&#039; =&gt; &#039;to&#039;, ...)</code>. The return value is
+   a <span class="type"><a href="language.types.string.html" class="type string">string</a></span> where all the occurrences of the array keys have been
+   replaced by the corresponding values. The longest keys will be tried first.
+   Once a substring has been replaced, its new value will not be searched
+   again.
+  </p>
+  <p class="para">
+   In this case, the keys and the values may have any length, provided that
+   there is no empty key; additionally, the length of the return value may
+   differ from that of <code class="parameter">string</code>.
+   However, this function will be the most efficient when all the keys have the
+   same size.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-function.strtr-parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+    
+     <dt><code class="parameter">string</code></dt>
+     <dd>
+      <p class="para">
+       The <span class="type"><a href="language.types.string.html" class="type string">string</a></span> being translated.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">from</code></dt>
+     <dd>
+      <p class="para">
+       The <span class="type"><a href="language.types.string.html" class="type string">string</a></span> being translated to <code class="parameter">to</code>.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">to</code></dt>
+     <dd>
+      <p class="para">
+       The <span class="type"><a href="language.types.string.html" class="type string">string</a></span> replacing <code class="parameter">from</code>.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">replace_pairs</code></dt>
+     <dd>
+      <p class="para">
+       The <code class="parameter">replace_pairs</code> parameter may be used instead of 
+       <code class="parameter">to</code> and <code class="parameter">from</code>, in which case it&#039;s an
+       <span class="type"><a href="language.types.array.html" class="type array">array</a></span> in the form <code class="literal">array(&#039;from&#039; =&gt; &#039;to&#039;, ...)</code>. 
+      </p>
+      <p class="para">
+       If <code class="parameter">replace_pairs</code> contains a key which is an empty
+       <span class="type"><a href="language.types.string.html" class="type string">string</a></span> (<code class="literal">&quot;&quot;</code>), the element is ignored;
+       as of PHP 8.0.0 <strong><code><a href="errorfunc.constants.html#constant.e-warning">E_WARNING</a></code></strong> is raised in this case.
+      </p>
+     </dd>
+    
+   </dl>
+  </p>
+ </div>
+
+ 
+ <div class="refsect1 returnvalues" id="refsect1-function.strtr-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns the translated <span class="type"><a href="language.types.string.html" class="type string">string</a></span>.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-function.strtr-examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   <div class="example" id="example-1">
+    <p><strong>Example #1 <span class="function"><strong>strtr()</strong></span> example</strong></p>
+    <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$addr </span><span style="color: #007700">= </span><span style="color: #DD0000">"The river å"</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">// In this form, strtr() does byte-by-byte translation<br />// Therefore, we are assuming a single-byte encoding here:<br /></span><span style="color: #0000BB">$addr </span><span style="color: #007700">= </span><span style="color: #0000BB">strtr</span><span style="color: #007700">(</span><span style="color: #0000BB">$addr</span><span style="color: #007700">, </span><span style="color: #DD0000">"äåö"</span><span style="color: #007700">, </span><span style="color: #DD0000">"aao"</span><span style="color: #007700">);<br />echo </span><span style="color: #0000BB">$addr</span><span style="color: #007700">, </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+   </div>
+  </p>
+  <p class="para">
+   The next example shows the behavior of <span class="function"><strong>strtr()</strong></span> when
+   called with only two arguments. Note the preference of the replacements
+   (<code class="literal">&quot;h&quot;</code> is not picked because there are longer matches)
+   and how replaced text was not searched again.
+  </p>
+  <div class="example" id="example-2">
+   <p><strong>Example #2 <span class="function"><strong>strtr()</strong></span> example with two arguments</strong></p>
+    <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$trans </span><span style="color: #007700">= array(</span><span style="color: #DD0000">"h" </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">"-"</span><span style="color: #007700">, </span><span style="color: #DD0000">"hello" </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">"hi"</span><span style="color: #007700">, </span><span style="color: #DD0000">"hi" </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">"hello"</span><span style="color: #007700">);<br />echo </span><span style="color: #0000BB">strtr</span><span style="color: #007700">(</span><span style="color: #DD0000">"hi all, I said hello"</span><span style="color: #007700">, </span><span style="color: #0000BB">$trans</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output:</p></div>
+    <div class="example-contents screen">
+<div class="annotation-interactive examplescode"><pre class="examplescode">hello all, I said hi</pre>
+</div>
+    </div>
+  </div>
+  <p class="para">
+   The two modes of behavior are substantially different. With three arguments,
+   <span class="function"><strong>strtr()</strong></span> will replace bytes; with two, it may replace
+   longer substrings.
+  </p>
+  <div class="example" id="example-3">
+   <p><strong>Example #3 <span class="function"><strong>strtr()</strong></span> behavior comparison</strong></p>
+    <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">strtr</span><span style="color: #007700">(</span><span style="color: #DD0000">"baab"</span><span style="color: #007700">, </span><span style="color: #DD0000">"ab"</span><span style="color: #007700">, </span><span style="color: #DD0000">"01"</span><span style="color: #007700">),</span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$trans </span><span style="color: #007700">= array(</span><span style="color: #DD0000">"ab" </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">"01"</span><span style="color: #007700">);<br />echo </span><span style="color: #0000BB">strtr</span><span style="color: #007700">(</span><span style="color: #DD0000">"baab"</span><span style="color: #007700">, </span><span style="color: #0000BB">$trans</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output:</p></div>
+    <div class="example-contents screen">
+<div class="annotation-interactive examplescode"><pre class="examplescode">1001
+ba01</pre>
+</div>
+    </div>
+  </div>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-function.strtr-seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li><span class="function"><a href="function.str-replace.html" class="function" rel="rdfs-seeAlso">str_replace()</a> - Replace all occurrences of the search string with the replacement string</span></li>
+    <li><span class="function"><a href="function.preg-replace.html" class="function" rel="rdfs-seeAlso">preg_replace()</a> - Perform a regular expression search and replace</span></li>
+   </ul>
+  </p>
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

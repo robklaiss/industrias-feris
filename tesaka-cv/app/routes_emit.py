@@ -68,6 +68,9 @@ def register_emit_routes(app, jinja_env: Environment):
                 fecha=data.get("fecha"),
                 hora=data.get("hora"),
                 csc=data.get("csc"),
+                receptor_ruc=data.get("receptor_ruc"),
+                receptor_dv=data.get("receptor_dv"),
+                receptor_nombre=data.get("receptor_nombre"),
                 env=env
             )
             

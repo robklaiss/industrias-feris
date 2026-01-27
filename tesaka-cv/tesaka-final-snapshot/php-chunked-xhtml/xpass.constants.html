@@ -1,0 +1,462 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Predefined Constants</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="xpass.installation.html" class="navbar__link">« Installation via PECL</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="ref.xpass.html" class="navbar__link">Xpass Functions »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.xpass.html">Xpass</a></li>
+        <li>Predefined Constants</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="xpass.constants" class="appendix">
+ <h1 class="title">Predefined Constants</h1>
+
+ <p class="simpara">
+The constants below are defined by this extension, and
+will only be available when the extension has either
+been compiled into PHP or dynamically loaded at runtime.
+</p>
+
+ <p class="simpara">
+  Xpass extension provides various set of constants.
+  Hash methods (<strong><code><a href="xpass.constants.html#constant.crypt-prefix-std-des">CRYPT_PREFIX_<span class="replaceable">*</span></a></code></strong>) for
+  <span class="function"><a href="function.crypt-gensalt.html" class="function">crypt_gensalt()</a></span> prefix parameter.
+  Error codes (<strong><code><a href="xpass.constants.html#constant.crypt-salt-ok">CRYPT_SALT_<span class="replaceable">*</span></a></code></strong>) returned by
+  <span class="function"><a href="function.crypt-checksalt.html" class="function">crypt_checksalt()</a></span>.
+  Password algorithms (<strong><code><a href="password.constants.html#constant.password-bcrypt">PASSWORD_<span class="replaceable">*</span></a></code></strong>) for
+  <span class="function"><a href="function.password-hash.html" class="function">password_hash()</a></span> algo parameter.
+ </p>
+
+ <dl id="xpass.constants.algo">
+  <strong class="title">Hashing methods</strong>
+  
+   <dt id="constant.crypt-prefix-std-des">
+    <strong><code><a href="xpass.constants.html#constant.crypt-prefix-std-des">CRYPT_PREFIX_STD_DES</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     The original hashing method from Unix V7, based on the DES block cipher.
+     Because DES is cheap on modern hardware,
+     because there are only <code class="literal">4096</code> possible salts and 2**56 distinct passphrases,
+     which it truncates to 8 characters,
+     it is feasible to discover any passphrase hashed with this method.
+     It should only be used when supporting old operating systems that support
+     no other hash generation algorithm, due to how weak DES hashes are.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.crypt-prefix-ext-des">
+    <strong><code><a href="xpass.constants.html#constant.crypt-prefix-ext-des">CRYPT_PREFIX_EXT_DES</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     An extension of traditional DES, which eliminates the length limit,
+     increases the salt size, and makes the time cost tunable.
+     It originates with BSDI BSD/OS and is also available on at least NetBSD,
+     OpenBSD, and FreeBSD due to the use of David Burren&#039;s FreeSec library.
+     It is much better than traditional DES and bigcrypt,
+     but still should not be used for new hashes.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.crypt-prefix-md5">
+    <strong><code><a href="xpass.constants.html#constant.crypt-prefix-md5">CRYPT_PREFIX_MD5</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     A hash based on the MD5 algorithm, originally developed by Poul-Henning Kamp for FreeBSD.
+     Supported on most free Unixes and newer versions of Solaris.
+     Not as weak as the DES-based hashes below,
+     but MD5 is so cheap on modern hardware that it should not be used for new hashes.
+     Processing cost is not adjustable.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.crypt-prefix-blowfish">
+    <strong><code><a href="xpass.constants.html#constant.crypt-prefix-blowfish">CRYPT_PREFIX_BLOWFISH</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     A hash based on the Blowfish block cipher, modified to have an extra-expensive key schedule.
+     Originally developed by Niels Provos and David Mazieres for OpenBSD and also supported on recent
+     versions of FreeBSD and NetBSD, on Solaris 10 and newer, and on several GNU/*/Linux distributions.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.crypt-prefix-sha256">
+    <strong><code><a href="xpass.constants.html#constant.crypt-prefix-sha256">CRYPT_PREFIX_SHA256</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     A hash based on SHA-2 with 256-bit output, originally developed by Ulrich Drepper for GNU libc.
+     Supported on Linux but not common elsewhere.
+     Acceptable for new hashes.
+     The default processing cost parameter is <code class="literal">5000</code>,
+     which is too low for modern hardware.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.crypt-prefix-sha512">
+    <strong><code><a href="xpass.constants.html#constant.crypt-prefix-sha512">CRYPT_PREFIX_SHA512</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     A hash based on SHA-2 with 512-bit output, originally developed by Ulrich Drepper for GNU libc.
+     Supported on Linux but not common elsewhere.
+     Acceptable for new hashes.
+     The default processing cost parameter is <code class="literal">5000</code>,
+     which is too low for modern hardware.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.crypt-prefix-scrypt">
+    <strong><code><a href="xpass.constants.html#constant.crypt-prefix-scrypt">CRYPT_PREFIX_SCRYPT</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Scrypt is a password-based key derivation function created by Colin Percival,
+     originally for the Tarsnap online backup service.
+     The algorithm was specifically designed to make it costly to perform
+     large-scale custom hardware attacks by requiring large amounts of memory.
+     In 2016, the scrypt algorithm was published by IETF as RFC 7914.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.crypt-prefix-gost-yescrypt">
+    <strong><code><a href="xpass.constants.html#constant.crypt-prefix-gost-yescrypt">CRYPT_PREFIX_GOST_YESCRYPT</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Gost-yescrypt uses the output from yescrypt as an input message to HMAC with the
+     GOST R 34.11-2012 (Streebog) hash function with a 256-bit digest.
+     Thus, yescrypt&#039;s cryptographic properties are superseded by those of the GOST hash function.
+     This hashing method is useful in applications that need modern passphrase hashing,
+     but have to rely on GOST algorithms.
+     The GOST R 34.11-2012 (Streebog) hash function has been published by the IETF as RFC 6986.
+     Acceptable for new hashes where required.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.crypt-prefix-yescrypt">
+    <strong><code><a href="xpass.constants.html#constant.crypt-prefix-yescrypt">CRYPT_PREFIX_YESCRYPT</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Yescrypt is a scalable passphrase hashing scheme designed by Solar Designer,
+     which is based on Colin Percival&#039;s scrypt.
+     While yescrypt&#039;s strength against password guessing attacks comes from its algorithm design,
+     its cryptographic security is guaranteed by its use of SHA-256 on the outer layer.
+     The SHA-256 hash function has been published by NIST in FIPS PUB 180-2
+     (and its subsequent revisions such as FIPS PUB 180-4) and by the IETF as RFC 4634
+     (and subsequently RFC 6234).
+     Recommended for new hashes.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.crypt-prefix-sm3crypt">
+    <strong><code><a href="xpass.constants.html#constant.crypt-prefix-sm3crypt">CRYPT_PREFIX_SM3CRYPT</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     A hash based on the ShangMi 3 hash function with 256-bit output,
+     that uses the same design as sha256crypt and/or sha512crypt.
+     Supported on EulerOS, Kylin, openEuler, and openKylin, but not common
+     elsewhere. Acceptable for new hashes where required. The default
+     processing cost parameter is 5000, which is too low for modern hardware.
+    </span>
+    <span class="simpara">
+     Available as of 1.2.0 with libcxcrypt &gt;= 4.5.0.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.crypt-prefix-sm3-yescrypt">
+    <strong><code><a href="xpass.constants.html#constant.crypt-prefix-sm3-yescrypt">CRYPT_PREFIX_SM3_YESCRYPT</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Sm3-yescrypt uses the output from yescrypt as an input message to HMAC
+     with the ShangMi 3 hash function with a 256-bit digest. Thus, yescrypt&#039;s
+     cryptographic properties are superseded by those of the ShangMi 3 hash
+     function. This hashing method is useful in applications that need modern
+     passphrase hashing, but have to rely on algorithms approved by the Chinese
+     Office of State Commercial Cryptography Administration (OSCCA). The ShangMi
+     3 hash function has been published in Part 3: &quot;Dedicated hash-functions&quot;
+     of the ISO/IEC 10118-3:2018. Acceptable for new hashes where required.
+    </span>
+    <span class="simpara">
+     Available as of 1.2.0 with libcxcrypt &gt;= 4.5.0.
+    </span>
+   </dd>
+  
+ </dl>
+
+ <dl id="xpass.constants.error">
+  <strong class="title">Error codes</strong>
+  
+   <dt id="constant.crypt-salt-ok">
+    <strong><code><a href="xpass.constants.html#constant.crypt-salt-ok">CRYPT_SALT_OK</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     No error.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.crypt-salt-invalid">
+    <strong><code><a href="xpass.constants.html#constant.crypt-salt-invalid">CRYPT_SALT_INVALID</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Unknown hashing method or invalid parameters.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.crypt-salt-method-disabled">
+    <strong><code><a href="xpass.constants.html#constant.crypt-salt-method-disabled">CRYPT_SALT_METHOD_DISABLED</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Hashing method is no longer allowed to be used.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.crypt-salt-method-legacy">
+    <strong><code><a href="xpass.constants.html#constant.crypt-salt-method-legacy">CRYPT_SALT_METHOD_LEGACY</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Hashing method is no longer considered strong enough.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.crypt-salt-too-cheap">
+    <strong><code><a href="xpass.constants.html#constant.crypt-salt-too-cheap">CRYPT_SALT_TOO_CHEAP</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Cost parameters are considered too cheap.
+    </span>
+   </dd>
+  
+ </dl>
+
+ <dl id="xpass.constants.password">
+  <strong class="title">Password algorithms</strong>
+  
+   <dt id="constant.password-sha512">
+    <strong><code><a href="xpass.constants.html#constant.password-sha512">PASSWORD_SHA512</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     <strong><code><a href="xpass.constants.html#constant.password-sha512">PASSWORD_SHA512</a></code></strong> is used to create new password
+     hashes using the <strong><code><a href="xpass.constants.html#constant.crypt-prefix-sha512">CRYPT_PREFIX_SHA512</a></code></strong> algorithm.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.password-yescrypt">
+    <strong><code><a href="xpass.constants.html#constant.password-yescrypt">PASSWORD_YESCRYPT</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     <strong><code><a href="xpass.constants.html#constant.password-yescrypt">PASSWORD_YESCRYPT</a></code></strong> is used to create new password
+     hashes using the <strong><code><a href="xpass.constants.html#constant.crypt-prefix-yescrypt">CRYPT_PREFIX_YESCRYPT</a></code></strong> algorithm.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.password-sm3crypt">
+    <strong><code><a href="xpass.constants.html#constant.password-sm3crypt">PASSWORD_SM3CRYPT</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     <strong><code><a href="xpass.constants.html#constant.password-sm3crypt">PASSWORD_SM3CRYPT</a></code></strong> is used to create new password
+     hashes using the <strong><code><a href="xpass.constants.html#constant.crypt-prefix-sm3crypt">CRYPT_PREFIX_SM3CRYPT</a></code></strong> algorithm.
+    </span>
+    <span class="simpara">
+     Available as of 1.2.0 with libcxcrypt &gt;= 4.5.0.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.password-sm3-yescrypt">
+    <strong><code><a href="xpass.constants.html#constant.password-sm3-yescrypt">PASSWORD_SM3_YESCRYPT</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     <strong><code><a href="xpass.constants.html#constant.password-sm3-yescrypt">PASSWORD_SM3_YESCRYPT</a></code></strong> is used to create new password
+     hashes using the <strong><code><a href="xpass.constants.html#constant.crypt-prefix-sm3-yescrypt">CRYPT_PREFIX_SM3_YESCRYPT</a></code></strong> algorithm.
+    </span>
+    <span class="simpara">
+     Available as of 1.2.0 with libcxcrypt &gt;= 4.5.0.
+    </span>
+   </dd>
+  
+ </dl>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

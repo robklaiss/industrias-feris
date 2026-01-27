@@ -1,0 +1,477 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Status Page</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="fpm.observability.html" class="navbar__link">« Observability</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="ref.fpm.html" class="navbar__link">FPM Functions »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="fpm.observability.html">Observability</a></li>
+        <li>Status Page</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="fpm.status" class="sect1">
+ <h2 class="title">Status Page</h2>
+ 
+ <p class="para">
+  This page provides information on the setup and contents of the FPM status page. See also
+  <span class="function"><a href="function.fpm-get-status.html" class="function">fpm_get_status()</a></span>.
+ </p>
+
+ <div class="sect2" id="fpm.status.configuration">
+  <h3 class="title">Configuration</h3>
+  
+  <p class="para">
+   The FPM status page can be enabled by setting the
+   <a href="install.fpm.configuration.html#pm.status-path" class="link">pm.status_path</a> configuration parameter in the FPM pool
+   configuration.
+  </p>
+
+  <div class="caution"><strong class="caution">Caution</strong>
+   <p class="para">
+    For security the FPM status page should be restricted to internal requests or known client IPs
+    only as the page reveals request URLs and information about available resources.
+   </p>
+  </div>
+  
+  <p class="para">
+   Depending on the web server configuration it might be needed to configure the web server to
+   allow requests directly to this path, bypassing any PHP scripts. An example of a configuration
+   for Apache with FPM listening on UDS and <code class="literal">pm.status_path</code> set to
+   <code class="literal">/fpm-status</code> would look like:
+  </p>
+
+  <div class="informalexample">
+   <div class="example-contents">
+    <div class="apache-confcode"><pre class="apache-confcode">&lt;LocationMatch &quot;/fpm-status&quot;&gt;
+ Order Allow,Deny
+ Allow from 127.0.0.1
+ ProxyPass &quot;unix:/var/run/php-fpm.sock|fcgi://localhost/fpm-status&quot;
+&lt;/LocationMatch&gt;</pre>
+</div>
+   </div>
+
+  </div>
+
+  <p class="para">
+   After reloading or restarting both FPM and the web server the status page will be accessible from
+   the browser (as long as the request comes from an allowed IP address if the IP restriction was
+   configured).
+  </p>
+ </div>
+
+ <div class="sect2" id="fpm.status.parameters">
+  <h3 class="title">Query Parameters</h3>
+
+  <p class="para">
+   The format of the status page output can be altered by specifying one of the following query
+   parameters:
+  </p>
+  
+  <ul class="simplelist">
+   <li><code class="literal">html</code></li>
+   <li><code class="literal">json</code></li>
+   <li><code class="literal">openmetrics</code></li>
+   <li><code class="literal">xml</code></li>
+  </ul>
+
+  <p class="para">
+   Additional information can also be returned using the <code class="literal">full</code> query parameter.
+  </p>
+  
+  <p class="para">
+   Example status page URLs:
+  </p>
+  
+  <ul class="simplelist">
+   <li>
+    <code class="literal">https://localhost/fpm-status</code>
+    - Brief output in the default text format
+   </li>
+   <li>
+    <code class="literal">https://localhost/fpm-status?full</code>
+    - Full output in the default text format
+   </li>
+   <li>
+    <code class="literal">https://localhost/fpm-status?json</code>
+    - Brief output in JSON format
+   </li>
+   <li>
+    <code class="literal">https://localhost/fpm-status?html&amp;full</code>
+    - Full output in HTML format
+   </li>
+  </ul>
+ </div>
+ 
+ <div class="sect2" id="fpm.status.contents">
+  <h3 class="title">Displayed Information</h3>
+
+  <p class="para">
+   Date/Time values use the unix timestamp format in JSON and XML output, otherwise they use
+   the format resulting in the following example date
+   <code class="literal">&quot;03/Jun/2021:07:21:46 +0100&quot;</code>.
+  </p>
+  
+  <table class="doctable table">
+   <caption><strong>Basic information - Always displayed on the status page</strong></caption>
+   
+    <thead>
+     <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+      <td>pool</td>
+      <td>The name of the FPM process pool.</td>
+     </tr>
+
+     <tr>
+      <td>proccess manager</td>
+      <td>The process manager type - static, dynamic or ondemand.</td>
+     </tr>
+
+     <tr>
+      <td>start time</td>
+      <td>The date/time that the process pool was last started.</td>
+     </tr>
+
+     <tr>
+      <td>start since</td>
+      <td>The time in seconds since the process pool was last started.</td>
+     </tr>
+
+     <tr>
+      <td>accepted conn</td>
+      <td>The total number of accepted connections.</td>
+     </tr>
+
+     <tr>
+      <td>listen queue</td>
+      <td>The number of requests (backlog) currently waiting for a free process.</td>
+     </tr>
+
+     <tr>
+      <td>max listen queue</td>
+      <td>The maximum number of requests seen in the listen queue at any one time.</td>
+     </tr>
+
+     <tr>
+      <td>listen queue len</td>
+      <td>The maximum allowed size of the listen queue.</td>
+     </tr>
+
+     <tr>
+      <td>idle processes</td>
+      <td>The number of processes that are currently idle (waiting for requests).</td>
+     </tr>
+
+     <tr>
+      <td>active processes</td>
+      <td>The number of processes that are currently processing requests.</td>
+     </tr>
+
+     <tr>
+      <td>total processes</td>
+      <td>The current total number of processes.</td>
+     </tr>
+
+     <tr>
+      <td>max active processes</td>
+      <td>The maximum number of concurrently active processes.</td>
+     </tr>
+
+     <tr>
+      <td>max children reached</td>
+      <td>
+       Has the maximum number of processes ever been reached? If so the displayed value is greater than or equal to
+       <code class="literal">1</code> otherwise the value is <code class="literal">0</code>.
+      </td>
+     </tr>
+
+     <tr>
+      <td>slow requests</td>
+      <td>
+       The total number of requests that have hit the configured
+       <code class="literal">request_slowlog_timeout</code>.
+      </td>
+     </tr>
+
+     <tr>
+      <td>memory peak</td>
+      <td>
+       The memory usage peak since FPM started.
+      </td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+
+  <table class="doctable table">
+   <caption><strong>Per-process information - only displayed in <code class="literal">full</code> output mode</strong></caption>
+   
+    <thead>
+     <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+      <td>pid</td>
+      <td>The system PID of the process.</td>
+     </tr>
+
+     <tr>
+      <td>state</td>
+      <td>The state of the process - Idle, Running, ...</td>
+     </tr>
+
+     <tr>
+      <td>start time</td>
+      <td>The date/time at which the process started.</td>
+     </tr>
+
+     <tr>
+      <td>start since</td>
+      <td>The number of seconds since the process started.</td>
+     </tr>
+
+     <tr>
+      <td>requests</td>
+      <td>The total number of requests served.</td>
+     </tr>
+
+     <tr>
+      <td>request duration</td>
+      <td>The total time in microseconds spent serving last request.</td>
+     </tr>
+
+     <tr>
+      <td>request method</td>
+      <td>The HTTP method of the last served request.</td>
+     </tr>
+
+     <tr>
+      <td>request uri</td>
+      <td>
+       The URI of the last served request (after webserver processing, it may always be
+       <code class="literal">/index.php</code> if you use a front controller pattern redirect).
+      </td>
+     </tr>
+
+     <tr>
+      <td>content length</td>
+      <td>The length of the request body, in bytes, of the last request.</td>
+     </tr>
+
+     <tr>
+      <td>user</td>
+      <td>The HTTP user (<code class="literal">PHP_AUTH_USER</code>) of the last request.</td>
+     </tr>
+
+     <tr>
+      <td>script</td>
+      <td>
+       The full path of the script executed by the last request. This will be
+       <code class="literal">&#039;-&#039;</code> if not applicable (eg. status page requests).
+      </td>
+     </tr>
+
+     <tr>
+      <td>last request cpu</td>
+      <td>
+       The %cpu of the last request. This will be 0 if the process is not Idle because the
+       calculation is done when the request processing is complete. 
+       The value can exceed 100%, because metric will tell which percentage of the total cpu time was used in the last request - 
+       takes processes on all cores into account, whereas the 100% is for one core only.
+      </td>
+     </tr>
+
+     <tr>
+      <td>last request memory</td>
+      <td>
+       The maximum amount of memory consumed by the last request. This will be 0 if the process is
+       not Idle because the calculation is done when the request processing is complete.
+      </td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <p class="para">
+    All values are specific to the pool and are reset when FPM is restarted.
+   </p>
+  </p></blockquote>
+
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <p class="para">
+    OpenMetrics format output uses different parameter types to better suit the OpenMetrics format.
+    The parameters and descriptions of their values are included in the OpenMetrics format output.
+   </p>
+  </p></blockquote>
+ </div>
+
+ <div class="sect2">
+  <h3 class="title">Changelog</h3>
+  <table class="doctable informaltable">
+   
+    <thead>
+     <tr>
+      <th>Version</th>
+      <th>Description</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+      <td>8.1.0</td>
+      <td>The openmetrics format was added.</td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+ </div>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

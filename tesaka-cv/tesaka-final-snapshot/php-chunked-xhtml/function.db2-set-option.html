@@ -1,0 +1,805 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Set options for connection or statement resources</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.db2-server-info.html" class="navbar__link">« db2_server_info</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.db2-special-columns.html" class="navbar__link">db2_special_columns »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ref.ibm-db2.html">IBM DB2 Functions</a></li>
+        <li>Set options for connection or statement resources</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="function.db2-set-option" class="refentry">
+  <div class="refnamediv">
+    <h1 class="refname">db2_set_option</h1>
+    <p class="verinfo">(PECL ibm_db2 &gt;= 1.0.0)</p><p class="refpurpose"><span class="refname">db2_set_option</span> &mdash; <span class="dc-title">Set options for connection or statement resources</span></p>
+
+  </div>
+  <div class="refsect1 description" id="refsect1-function.db2-set-option-description">
+    <h3 class="title">Description</h3>
+    <div class="methodsynopsis dc-description">
+      <span class="methodname"><strong>db2_set_option</strong></span>(<span class="methodparam"><span class="type"><a href="language.types.resource.html" class="type resource">resource</a></span> <code class="parameter">$resource</code></span>, <span class="methodparam"><span class="type"><a href="language.types.array.html" class="type array">array</a></span> <code class="parameter">$options</code></span>, <span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$type</code></span>): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+
+    <p class="simpara">
+     Sets options for a statement resource or a connection resource. You
+     cannot set options for result set resources.
+    </p>
+  </div>
+
+  <div class="refsect1 parameters" id="refsect1-function.db2-set-option-parameters">
+    <h3 class="title">Parameters</h3>
+    <dl>
+       
+         <dt><code class="parameter">resource</code></dt>
+         <dd>
+           <span class="simpara">
+            A valid statement resource as returned from
+            <span class="function"><a href="function.db2-prepare.html" class="function">db2_prepare()</a></span> or a valid connection resource as
+            returned from <span class="function"><a href="function.db2-connect.html" class="function">db2_connect()</a></span> or
+            <span class="function"><a href="function.db2-pconnect.html" class="function">db2_pconnect()</a></span>.
+           </span>
+         </dd>
+       
+       
+         <dt><code class="parameter">options</code></dt>
+         <dd>
+           <p class="para">
+            An associative array containing valid statement or connection
+            options. This parameter can be used to change autocommit values,
+            cursor types (scrollable or forward), and to specify the case of
+            the column names (lower, upper, or natural) that will appear in a
+            result set.
+             <dl>
+               
+                 <dt><code class="parameter">autocommit</code></dt>
+                 <dd>
+                   <span class="simpara">
+                    Passing <strong><code><a href="ibm-db2.constants.html#constant.db2-autocommit-on">DB2_AUTOCOMMIT_ON</a></code></strong> turns
+                    autocommit on for the specified connection resource.
+                   </span>
+                   <span class="simpara">
+                    Passing <strong><code><a href="ibm-db2.constants.html#constant.db2-autocommit-off">DB2_AUTOCOMMIT_OFF</a></code></strong> turns
+                    autocommit off for the specified connection resource.
+                   </span>
+                 </dd>
+               
+               
+                 <dt><code class="parameter">cursor</code></dt>
+                 <dd>
+                   <span class="simpara">
+                    Passing <strong><code><a href="ibm-db2.constants.html#constant.db2-forward-only">DB2_FORWARD_ONLY</a></code></strong> specifies a
+                    forward-only cursor for a statement resource. This is the
+                    default cursor type, and is supported by all database
+                    servers.
+                   </span>
+                   <span class="simpara">
+                    Passing <strong><code><a href="ibm-db2.constants.html#constant.db2-scrollable">DB2_SCROLLABLE</a></code></strong> specifies a
+                    scrollable cursor for a statement resource. Scrollable
+                    cursors enable result set rows to be accessed in
+                    non-sequential order, but are only supported by
+                    IBM DB2 Universal Database databases.
+                   </span>
+                 </dd>
+               
+               
+                 <dt><code class="parameter">binmode</code></dt>
+                 <dd>
+                   <span class="simpara">
+                    Passing <strong><code><a href="ibm-db2.constants.html#constant.db2-binary">DB2_BINARY</a></code></strong> specifies that
+                    binary data will be returned as is. This is the default
+                    mode. This is the equivalent of setting
+                    <code class="literal">ibm_db2.binmode=1</code> in <var class="filename">php.ini</var>.
+                   </span>
+                   <span class="simpara">
+                    Passing <strong><code><a href="ibm-db2.constants.html#constant.db2-convert">DB2_CONVERT</a></code></strong> specifies that
+                    binary data will be converted to hexadecimal encoding,
+                    and will be returned as such. This is the equivalent of
+                    setting <code class="literal">ibm_db2.binmode=2</code> in <var class="filename">php.ini</var>.
+                   </span>
+                   <span class="simpara">
+                    Passing <strong><code><a href="ibm-db2.constants.html#constant.db2-passthru">DB2_PASSTHRU</a></code></strong> specifies that
+                    binary data will be converted to <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong>. This is the
+                    equivalent of setting <code class="literal">ibm_db2.binmode=3</code>
+                    in <var class="filename">php.ini</var>.
+                   </span>
+                 </dd>
+               
+               
+                 <dt><code class="parameter">db2_attr_case</code></dt>
+                 <dd>
+                   <span class="simpara">
+                    Passing <strong><code><a href="ibm-db2.constants.html#constant.db2-case-lower">DB2_CASE_LOWER</a></code></strong> specifies that
+                    column names of the result set are returned in lower case.
+                   </span>
+                   <span class="simpara">
+                    Passing <strong><code><a href="ibm-db2.constants.html#constant.db2-case-upper">DB2_CASE_UPPER</a></code></strong> specifies that
+                    column names of the result set are returned in upper case.
+                   </span>
+                   <span class="simpara">
+                    Passing <strong><code><a href="ibm-db2.constants.html#constant.db2-case-natural">DB2_CASE_NATURAL</a></code></strong> specifies that
+                    column names of the result set are returned in natural
+                    case.
+                   </span>
+                 </dd>
+               
+               
+                <dt><code class="parameter">deferred_prepare</code></dt>
+                <dd>
+                 <span class="simpara">
+                  Passing <strong><code><a href="ibm-db2.constants.html#constant.db2-deferred-prepare-on">DB2_DEFERRED_PREPARE_ON</a></code></strong> turns deferred
+                  prepare on for the specified statement resource.
+                 </span>
+                 <span class="simpara">
+                  Passing <strong><code><a href="ibm-db2.constants.html#constant.db2-deferred-prepare-off">DB2_DEFERRED_PREPARE_OFF</a></code></strong> turns deferred
+                  prepare off for the specified statement resource.
+                 </span>
+                </dd>
+               
+             </dl>
+           </p>
+           <p class="para">
+            The following new i5/OS options are available in ibm_db2 version 1.5.1
+            and later. These options apply only when running PHP and ibm_db2 natively on i5 systems.
+             <dl>
+               
+                 <dt><code class="parameter">i5_fetch_only</code></dt>
+                 <dd>
+                   <span class="simpara">
+                    <code class="literal">DB2_I5_FETCH_ON</code> - Cursors are read-only
+                    and cannot be used for positioned updates or deletes. This
+                    is the default unless <code class="literal">SQL_ATTR_FOR_FETCH_ONLY</code>
+                    environment has been set to <code class="literal">SQL_FALSE</code>.
+                   </span>
+                   <span class="simpara">
+                    <code class="literal">DB2_I5_FETCH_OFF</code> - Cursors can be used
+                    for positioned updates and deletes.
+                   </span>
+                 </dd>
+               
+              </dl>
+           </p>
+           <p class="para">
+            The following new option is available in ibm_db2 version 1.8.0 and later.
+             <dl>
+               
+                 <dt><code class="parameter">rowcount</code></dt>
+                 <dd>
+                   <span class="simpara">
+                    <code class="literal">DB2_ROWCOUNT_PREFETCH_ON</code> - Client can request
+                    the full row count prior to fetching, which means that
+                    <span class="function"><a href="function.db2-num-rows.html" class="function">db2_num_rows()</a></span> returns the number of rows selected
+                    even when a <code class="literal">ROLLFORWARD_ONLY</code> cursor is used.
+                   </span>
+                   <span class="simpara">
+                    <code class="literal">DB2_ROWCOUNT_PREFETCH_OFF</code> - Client cannot request
+                    the full row count prior to fetching.
+                   </span>
+                 </dd>
+               
+             </dl>
+           </p>
+           <p class="para">
+            The following new options are available in ibm_db2 version 1.7.0 and later.
+             <dl>
+               
+                 <dt><code class="parameter">trusted_user</code></dt>
+                 <dd>
+                   <span class="simpara">
+                    To switch the user to a trusted user, pass the User ID (String)
+                    of the trusted user as the value of this key. This option can
+                    be set on a connection resource only. To use this option, trusted
+                    context must be enabled on the connection resource.
+                   </span>
+                 </dd>
+               
+               
+                 <dt><code class="parameter">trusted_password</code></dt>
+                 <dd>
+                   <span class="simpara">
+                    The password (String) that corresponds to the user specified
+                    by the trusted_user key.
+                   </span>
+                 </dd>
+               
+              </dl>
+           </p>
+           <p class="para">
+            The following new options are available in ibm_db2 version 1.6.0 and later.
+            These options provide useful tracking information that can be accessed during
+            execution with <span class="function"><a href="function.db2-get-option.html" class="function">db2_get_option()</a></span>.
+            <blockquote class="note"><p><strong class="note">Note</strong>: 
+             <span class="simpara">
+              When the value in each option is being set, some servers might not handle
+              the entire length provided and might truncate the value.
+             </span>
+             <span class="simpara">
+              To ensure that the data specified in each option is converted correctly
+              when transmitted to a host system, use only the characters A through Z,
+              0 through 9, and the underscore (_) or period (.).
+             </span>
+            </p></blockquote>
+            <dl>
+             
+              <dt><code class="parameter">userid</code></dt>
+              <dd>
+               <p class="para">
+                <code class="literal">SQL_ATTR_INFO_USERID</code> - A pointer to a null-terminated
+                character string used to identify the client user ID sent to the host
+                database server when using DB2 Connect.
+                <blockquote class="note"><p><strong class="note">Note</strong>: 
+                 <span class="simpara">
+                  DB2 for z/OS and OS/390 servers support up to a length of 16 characters.
+                  This user-id is not to be confused with the authentication user-id, it is for
+                  identification purposes only and is not used for any authorization.
+                 </span>
+                </p></blockquote>
+               </p>
+              </dd>
+             
+             
+              <dt><code class="parameter">acctstr</code></dt>
+              <dd>
+               <p class="para">
+                <code class="literal">SQL_ATTR_INFO_ACCTSTR</code> - A pointer to a null-terminated
+                character string used to identify the client accounting string sent to the
+                host database server when using DB2 Connect.
+                <blockquote class="note"><p><strong class="note">Note</strong>: 
+                 <span class="simpara">
+                  DB2 for z/OS and OS/390 servers support up to a length of 200 characters.
+                 </span>
+                </p></blockquote>
+               </p>
+              </dd>
+             
+             
+              <dt><code class="parameter">applname</code></dt>
+              <dd>
+               <p class="para">
+                <code class="literal">SQL_ATTR_INFO_APPLNAME</code> - A pointer to a null-terminated
+                character string used to identify the client application name sent to the
+                host database server when using DB2 Connect.
+                <blockquote class="note"><p><strong class="note">Note</strong>: 
+                 <span class="simpara">
+                  DB2 for z/OS and OS/390 servers support up to a length of 32 characters.
+                 </span>
+                </p></blockquote>
+               </p>
+              </dd>
+             
+             
+              <dt><code class="parameter">wrkstnname</code></dt>
+              <dd>
+               <p class="para">
+                <code class="literal">SQL_ATTR_INFO_WRKSTNNAME</code> - A pointer to a null-terminated
+                character string used to identify the client workstation name sent to the
+                host database server when using DB2 Connect.
+                <blockquote class="note"><p><strong class="note">Note</strong>: 
+                 <span class="simpara">
+                  DB2 for z/OS and OS/390 servers support up to a length of 18 characters.
+                 </span>
+                </p></blockquote>
+               </p>
+              </dd>
+             
+            </dl>
+           </p>
+         </dd>
+       
+       
+         <dt><code class="parameter">type</code></dt>
+         <dd>
+           <span class="simpara">
+            An integer value that specifies the type of resource that was
+            passed into the function. The type of resource and this value
+            must correspond.
+           </span>
+           <span class="simpara">
+            Passing <code class="literal">1</code> as the value specifies that
+            a connection resource has been passed into the function.
+           </span>
+           <span class="simpara">
+            Passing any integer not equal to <code class="literal">1</code> as
+            the value specifies that a statement resource has been
+            passed into the function.
+           </span>
+         </dd>
+       
+     </dl>
+    <p class="simpara">
+    </p>
+    <p class="para">
+     The following table specifies which options are compatible with
+     the available resource types:
+      <table class="doctable table">
+        <caption><strong>Resource-Parameter Matrix</strong></caption>
+        
+          <col style="text-align: center;" />
+          <col style="text-align: center;" />
+          <col style="text-align: center;" />
+          <col style="text-align: center;" />
+          <col style="text-align: center;" />
+
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Value</th>
+              <th colspan="3">Resource Type</th>
+            </tr>
+
+          </thead>
+
+
+          <tbody class="tbody">
+            <tr>
+              <td class="empty">&nbsp;</td><td class="empty">&nbsp;</td><td>Connection</td>
+              <td>Statement</td>
+              <td>Result Set</td>
+            </tr>
+
+            <tr>
+              <td>autocommit</td>
+              <td><strong><code><a href="ibm-db2.constants.html#constant.db2-autocommit-on">DB2_AUTOCOMMIT_ON</a></code></strong></td>
+              <td>X</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>autocommit</td>
+              <td><strong><code><a href="ibm-db2.constants.html#constant.db2-autocommit-off">DB2_AUTOCOMMIT_OFF</a></code></strong></td>
+              <td>X</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>cursor</td>
+              <td><strong><code><a href="ibm-db2.constants.html#constant.db2-scrollable">DB2_SCROLLABLE</a></code></strong></td>
+              <td>-</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>cursor</td>
+              <td><strong><code><a href="ibm-db2.constants.html#constant.db2-forward-only">DB2_FORWARD_ONLY</a></code></strong></td>
+              <td>-</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>binmode</td>
+              <td><strong><code><a href="ibm-db2.constants.html#constant.db2-binary">DB2_BINARY</a></code></strong></td>
+              <td>X</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>binmode</td>
+              <td><strong><code><a href="ibm-db2.constants.html#constant.db2-convert">DB2_CONVERT</a></code></strong></td>
+              <td>X</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>binmode</td>
+              <td><strong><code><a href="ibm-db2.constants.html#constant.db2-passthru">DB2_PASSTHRU</a></code></strong></td>
+              <td>X</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>db2_attr_case</td>
+              <td><strong><code><a href="ibm-db2.constants.html#constant.db2-case-lower">DB2_CASE_LOWER</a></code></strong></td>
+              <td>X</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>db2_attr_case</td>
+              <td><strong><code><a href="ibm-db2.constants.html#constant.db2-case-upper">DB2_CASE_UPPER</a></code></strong></td>
+              <td>X</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>db2_attr_case</td>
+              <td><strong><code><a href="ibm-db2.constants.html#constant.db2-case-natural">DB2_CASE_NATURAL</a></code></strong></td>
+              <td>X</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>deferred_prepare</td>
+              <td><strong><code><a href="ibm-db2.constants.html#constant.db2-deferred-prepare-on">DB2_DEFERRED_PREPARE_ON</a></code></strong></td>
+              <td>-</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>deferred_prepare</td>
+              <td><strong><code><a href="ibm-db2.constants.html#constant.db2-deferred-prepare-off">DB2_DEFERRED_PREPARE_OFF</a></code></strong></td>
+              <td>-</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>i5_fetch_only</td>
+              <td><code class="literal">DB2_I5_FETCH_ON</code></td>
+              <td>-</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>i5_fetch_only</td>
+              <td><code class="literal">DB2_I5_FETCH_OFF</code></td>
+              <td>-</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>rowcount</td>
+              <td><code class="literal">DB2_ROWCOUNT_PREFETCH_ON</code></td>
+              <td>-</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>rowcount</td>
+              <td><code class="literal">DB2_ROWCOUNT_PREFETCH_OFF</code></td>
+              <td>-</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>trusted_user</td>
+              <td><code class="literal">&lt;USER NAME&gt; (String)</code></td>
+              <td>X</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>trusted_password</td>
+              <td><code class="literal">&lt;PASSWORD&gt; (String)</code></td>
+              <td>X</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>userid</td>
+              <td><code class="literal">SQL_ATTR_INFO_USERID</code></td>
+              <td>X</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>acctstr</td>
+              <td><code class="literal">SQL_ATTR_INFO_ACCTSTR</code></td>
+              <td>X</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>applname</td>
+              <td><code class="literal">SQL_ATTR_INFO_APPLNAME</code></td>
+              <td>X</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+            <tr>
+              <td>wrkstnname</td>
+              <td><code class="literal">SQL_ATTR_INFO_WRKSTNNAME</code></td>
+              <td>X</td>
+              <td>X</td>
+              <td>-</td>
+            </tr>
+
+          </tbody>
+        
+      </table>
+
+    </p>
+  </div>
+
+
+  <div class="refsect1 returnvalues" id="refsect1-function.db2-set-option-returnvalues">
+    <h3 class="title">Return Values</h3>
+    <p class="simpara">
+     Returns <strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong> on success or <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong> on failure.
+    </p>
+  </div>
+
+  
+
+  
+  <div class="refsect1 examples" id="refsect1-function.db2-set-option-examples">
+    <h3 class="title">Examples</h3>
+    <p class="para">
+
+      <div class="example" id="example-1">
+        <p><strong>Example #1 Setting one parameter with a connection resource</strong></p>
+        <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/* Database Connection Parameters */<br /></span><span style="color: #0000BB">$database </span><span style="color: #007700">= </span><span style="color: #DD0000">'SAMPLE'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$hostname </span><span style="color: #007700">= </span><span style="color: #DD0000">'localhost'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$port </span><span style="color: #007700">= </span><span style="color: #0000BB">50000</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$protocol </span><span style="color: #007700">= </span><span style="color: #DD0000">'TCPIP'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$username </span><span style="color: #007700">= </span><span style="color: #DD0000">'db2inst1'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$password </span><span style="color: #007700">= </span><span style="color: #DD0000">'ibmdb2'</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">/* Connection String */<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">= </span><span style="color: #DD0000">"DRIVER={IBM DB2 ODBC DRIVER};DATABASE=</span><span style="color: #0000BB">$database</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">.= </span><span style="color: #DD0000">"HOSTNAME=</span><span style="color: #0000BB">$hostname</span><span style="color: #DD0000">;PORT=</span><span style="color: #0000BB">$port</span><span style="color: #DD0000">;PROTOCOL=</span><span style="color: #0000BB">$protocol</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">.= </span><span style="color: #DD0000">"UID=</span><span style="color: #0000BB">$username</span><span style="color: #DD0000">;PWD=</span><span style="color: #0000BB">$password</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">/* Obtain Connection Resource */<br /></span><span style="color: #0000BB">$conn </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_connect</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn_string</span><span style="color: #007700">, </span><span style="color: #DD0000">''</span><span style="color: #007700">, </span><span style="color: #DD0000">''</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Create the associative options array with valid key-value pairs */<br /></span><span style="color: #0000BB">$options </span><span style="color: #007700">= array(</span><span style="color: #DD0000">'autocommit' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_AUTOCOMMIT_ON</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Call the function using the correct resource, options array, and type values */<br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_set_option</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn</span><span style="color: #007700">, </span><span style="color: #0000BB">$options</span><span style="color: #007700">, </span><span style="color: #0000BB">1</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Check if all options could be set correctly */<br /></span><span style="color: #007700">if(</span><span style="color: #0000BB">$result</span><span style="color: #007700">)<br />{<br />  echo </span><span style="color: #DD0000">'Options Set Successfully'</span><span style="color: #007700">;<br />}<br />else<br />{<br />  echo </span><span style="color: #DD0000">'Could Not Set Options'</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+        </div>
+
+        <div class="example-contents"><p>The above example will output:</p></div>
+        <div class="example-contents screen"><div class="examplescode"><pre class="examplescode">Options Set Successfully</pre>
+</div></div>
+      </div>
+
+      <div class="example" id="example-2">
+        <p><strong>Example #2 Setting multiple parameters with a connection resource</strong></p>
+        <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/* Database Connection Parameters */<br /></span><span style="color: #0000BB">$database </span><span style="color: #007700">= </span><span style="color: #DD0000">'SAMPLE'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$hostname </span><span style="color: #007700">= </span><span style="color: #DD0000">'localhost'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$port </span><span style="color: #007700">= </span><span style="color: #0000BB">50000</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$protocol </span><span style="color: #007700">= </span><span style="color: #DD0000">'TCPIP'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$username </span><span style="color: #007700">= </span><span style="color: #DD0000">'db2inst1'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$password </span><span style="color: #007700">= </span><span style="color: #DD0000">'ibmdb2'</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">/* Connection String */<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">= </span><span style="color: #DD0000">"DRIVER={IBM DB2 ODBC DRIVER};DATABASE=</span><span style="color: #0000BB">$database</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">.= </span><span style="color: #DD0000">"HOSTNAME=</span><span style="color: #0000BB">$hostname</span><span style="color: #DD0000">;PORT=</span><span style="color: #0000BB">$port</span><span style="color: #DD0000">;PROTOCOL=</span><span style="color: #0000BB">$protocol</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">.= </span><span style="color: #DD0000">"UID=</span><span style="color: #0000BB">$username</span><span style="color: #DD0000">;PWD=</span><span style="color: #0000BB">$password</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">/* Obtain Connection Resource */<br /></span><span style="color: #0000BB">$conn </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_connect</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn_string</span><span style="color: #007700">, </span><span style="color: #DD0000">''</span><span style="color: #007700">, </span><span style="color: #DD0000">''</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Create the associative options array with valid key-value pairs */<br /></span><span style="color: #0000BB">$options </span><span style="color: #007700">= array(</span><span style="color: #DD0000">'autocommit' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_AUTOCOMMIT_OFF</span><span style="color: #007700">,<br />                    </span><span style="color: #DD0000">'binmode' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_PASSTHRU</span><span style="color: #007700">,<br />              </span><span style="color: #DD0000">'db2_attr_case' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_CASE_UPPER</span><span style="color: #007700">,<br />                     </span><span style="color: #DD0000">'cursor' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_SCROLLABLE</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Call the function using the correct resource, options array, and type values */<br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_set_option</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn</span><span style="color: #007700">, </span><span style="color: #0000BB">$options</span><span style="color: #007700">, </span><span style="color: #0000BB">1</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Check if all options could be set correctly */<br /></span><span style="color: #007700">if(</span><span style="color: #0000BB">$result</span><span style="color: #007700">)<br />{<br />  echo </span><span style="color: #DD0000">'Options Set Successfully'</span><span style="color: #007700">;<br />}<br />else<br />{<br />  echo </span><span style="color: #DD0000">'Could Not Set Options'</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+        </div>
+
+        <div class="example-contents"><p>The above example will output:</p></div>
+        <div class="example-contents screen"><div class="examplescode"><pre class="examplescode">Options Set Successfully</pre>
+</div></div>
+      </div>
+
+      
+      <div class="example" id="example-3">
+        <p><strong>Example #3 Setting multiple parameters with an invalid key</strong></p>
+        <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/* Database Connection Parameters */<br /></span><span style="color: #0000BB">$database </span><span style="color: #007700">= </span><span style="color: #DD0000">'SAMPLE'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$hostname </span><span style="color: #007700">= </span><span style="color: #DD0000">'localhost'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$port </span><span style="color: #007700">= </span><span style="color: #0000BB">50000</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$protocol </span><span style="color: #007700">= </span><span style="color: #DD0000">'TCPIP'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$username </span><span style="color: #007700">= </span><span style="color: #DD0000">'db2inst1'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$password </span><span style="color: #007700">= </span><span style="color: #DD0000">'ibmdb2'</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">/* Connection String */<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">= </span><span style="color: #DD0000">"DRIVER={IBM DB2 ODBC DRIVER};DATABASE=</span><span style="color: #0000BB">$database</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">.= </span><span style="color: #DD0000">"HOSTNAME=</span><span style="color: #0000BB">$hostname</span><span style="color: #DD0000">;PORT=</span><span style="color: #0000BB">$port</span><span style="color: #DD0000">;PROTOCOL=</span><span style="color: #0000BB">$protocol</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">.= </span><span style="color: #DD0000">"UID=</span><span style="color: #0000BB">$username</span><span style="color: #DD0000">;PWD=</span><span style="color: #0000BB">$password</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">/* Obtain Connection Resource */<br /></span><span style="color: #0000BB">$conn </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_connect</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn_string</span><span style="color: #007700">, </span><span style="color: #DD0000">''</span><span style="color: #007700">, </span><span style="color: #DD0000">''</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Create the associative options array with valid key-value pairs */<br /></span><span style="color: #0000BB">$options </span><span style="color: #007700">= array(</span><span style="color: #DD0000">'autocommit' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_AUTOCOMMIT_OFF</span><span style="color: #007700">,<br />             </span><span style="color: #DD0000">'MY_INVALID_KEY' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_PASSTHRU</span><span style="color: #007700">,<br />              </span><span style="color: #DD0000">'db2_attr_case' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_CASE_UPPER</span><span style="color: #007700">,<br />                     </span><span style="color: #DD0000">'cursor' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_SCROLLABLE</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Call the function using the correct resource, options array, and type values */<br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_set_option</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn</span><span style="color: #007700">, </span><span style="color: #0000BB">$options</span><span style="color: #007700">, </span><span style="color: #0000BB">1</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Check if all options could be set correctly */<br /></span><span style="color: #007700">if(</span><span style="color: #0000BB">$result</span><span style="color: #007700">)<br />{<br />  echo </span><span style="color: #DD0000">'Options Set Successfully'</span><span style="color: #007700">;<br />}<br />else<br />{<br />  echo </span><span style="color: #DD0000">'Could Not Set Options'</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+        </div>
+
+        <div class="example-contents"><p>The above example will output:</p></div>
+        <div class="example-contents screen"><div class="examplescode"><pre class="examplescode">Could Not Set Options</pre>
+</div></div>
+      </div>
+
+      
+      <div class="example" id="example-4">
+        <p><strong>Example #4 Setting multiple parameters with an invalid value</strong></p>
+        <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/* Database Connection Parameters */<br /></span><span style="color: #0000BB">$database </span><span style="color: #007700">= </span><span style="color: #DD0000">'SAMPLE'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$hostname </span><span style="color: #007700">= </span><span style="color: #DD0000">'localhost'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$port </span><span style="color: #007700">= </span><span style="color: #0000BB">50000</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$protocol </span><span style="color: #007700">= </span><span style="color: #DD0000">'TCPIP'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$username </span><span style="color: #007700">= </span><span style="color: #DD0000">'db2inst1'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$password </span><span style="color: #007700">= </span><span style="color: #DD0000">'ibmdb2'</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">/* Connection String */<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">= </span><span style="color: #DD0000">"DRIVER={IBM DB2 ODBC DRIVER};DATABASE=</span><span style="color: #0000BB">$database</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">.= </span><span style="color: #DD0000">"HOSTNAME=</span><span style="color: #0000BB">$hostname</span><span style="color: #DD0000">;PORT=</span><span style="color: #0000BB">$port</span><span style="color: #DD0000">;PROTOCOL=</span><span style="color: #0000BB">$protocol</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">.= </span><span style="color: #DD0000">"UID=</span><span style="color: #0000BB">$username</span><span style="color: #DD0000">;PWD=</span><span style="color: #0000BB">$password</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">/* Obtain Connection Resource */<br /></span><span style="color: #0000BB">$conn </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_connect</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn_string</span><span style="color: #007700">, </span><span style="color: #DD0000">''</span><span style="color: #007700">, </span><span style="color: #DD0000">''</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Create the associative options array with valid key-value pairs */<br /></span><span style="color: #0000BB">$options </span><span style="color: #007700">= array(</span><span style="color: #DD0000">'autocommit' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_AUTOCOMMIT_OFF</span><span style="color: #007700">,<br />                    </span><span style="color: #DD0000">'binmode' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'INVALID_VALUE'</span><span style="color: #007700">,<br />              </span><span style="color: #DD0000">'db2_attr_case' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_CASE_UPPER</span><span style="color: #007700">,<br />                     </span><span style="color: #DD0000">'cursor' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_SCROLLABLE</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Call the function using the correct resource, options array, and type values */<br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_set_option</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn</span><span style="color: #007700">, </span><span style="color: #0000BB">$options</span><span style="color: #007700">, </span><span style="color: #0000BB">1</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Check if all options could be set correctly */<br /></span><span style="color: #007700">if(</span><span style="color: #0000BB">$result</span><span style="color: #007700">)<br />{<br />  echo </span><span style="color: #DD0000">'Options Set Successfully'</span><span style="color: #007700">;<br />}<br />else<br />{<br />  echo </span><span style="color: #DD0000">'Could Not Set Options'</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+        </div>
+
+        <div class="example-contents"><p>The above example will output:</p></div>
+        <div class="example-contents screen"><div class="examplescode"><pre class="examplescode">Could Not Set Options</pre>
+</div></div>
+      </div>
+
+      <div class="example" id="example-5">
+        <p><strong>Example #5 Setting multiple parameters with a connection resource and the wrong type</strong></p>
+        <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/* Database Connection Parameters */<br /></span><span style="color: #0000BB">$database </span><span style="color: #007700">= </span><span style="color: #DD0000">'SAMPLE'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$hostname </span><span style="color: #007700">= </span><span style="color: #DD0000">'localhost'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$port </span><span style="color: #007700">= </span><span style="color: #0000BB">50000</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$protocol </span><span style="color: #007700">= </span><span style="color: #DD0000">'TCPIP'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$username </span><span style="color: #007700">= </span><span style="color: #DD0000">'db2inst1'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$password </span><span style="color: #007700">= </span><span style="color: #DD0000">'ibmdb2'</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">/* Connection String */<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">= </span><span style="color: #DD0000">"DRIVER={IBM DB2 ODBC DRIVER};DATABASE=</span><span style="color: #0000BB">$database</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">.= </span><span style="color: #DD0000">"HOSTNAME=</span><span style="color: #0000BB">$hostname</span><span style="color: #DD0000">;PORT=</span><span style="color: #0000BB">$port</span><span style="color: #DD0000">;PROTOCOL=</span><span style="color: #0000BB">$protocol</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">.= </span><span style="color: #DD0000">"UID=</span><span style="color: #0000BB">$username</span><span style="color: #DD0000">;PWD=</span><span style="color: #0000BB">$password</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">/* Obtain Connection Resource */<br /></span><span style="color: #0000BB">$conn </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_connect</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn_string</span><span style="color: #007700">, </span><span style="color: #DD0000">''</span><span style="color: #007700">, </span><span style="color: #DD0000">''</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Create the associative options array with valid key-value pairs */<br /></span><span style="color: #0000BB">$options </span><span style="color: #007700">= array(</span><span style="color: #DD0000">'autocommit' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_AUTOCOMMIT_OFF</span><span style="color: #007700">,<br />                    </span><span style="color: #DD0000">'binmode' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_PASSTHRU</span><span style="color: #007700">,<br />              </span><span style="color: #DD0000">'db2_attr_case' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_CASE_UPPER</span><span style="color: #007700">,<br />                     </span><span style="color: #DD0000">'cursor' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_SCROLLABLE</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Call the function using the correct resource, options array, and the wrong type value */<br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_set_option</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn</span><span style="color: #007700">, </span><span style="color: #0000BB">$options</span><span style="color: #007700">, </span><span style="color: #0000BB">2</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Check if all options could be set correctly */<br /></span><span style="color: #007700">if(</span><span style="color: #0000BB">$result</span><span style="color: #007700">)<br />{<br />  echo </span><span style="color: #DD0000">'Options Set Successfully'</span><span style="color: #007700">;<br />}<br />else<br />{<br />  echo </span><span style="color: #DD0000">'Could Not Set Options'</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+        </div>
+
+        <div class="example-contents"><p>The above example will output:</p></div>
+        <div class="example-contents screen"><div class="examplescode"><pre class="examplescode">Could Not Set Options</pre>
+</div></div>
+      </div>
+
+      <div class="example" id="example-6">
+        <p><strong>Example #6 Setting multiple parameters with the wrong resource</strong></p>
+        <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/* Database Connection Parameters */<br /></span><span style="color: #0000BB">$database </span><span style="color: #007700">= </span><span style="color: #DD0000">'SAMPLE'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$hostname </span><span style="color: #007700">= </span><span style="color: #DD0000">'localhost'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$port </span><span style="color: #007700">= </span><span style="color: #0000BB">50000</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$protocol </span><span style="color: #007700">= </span><span style="color: #DD0000">'TCPIP'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$username </span><span style="color: #007700">= </span><span style="color: #DD0000">'db2inst1'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$password </span><span style="color: #007700">= </span><span style="color: #DD0000">'ibmdb2'</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">/* Connection String */<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">= </span><span style="color: #DD0000">"DRIVER={IBM DB2 ODBC DRIVER};DATABASE=</span><span style="color: #0000BB">$database</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">.= </span><span style="color: #DD0000">"HOSTNAME=</span><span style="color: #0000BB">$hostname</span><span style="color: #DD0000">;PORT=</span><span style="color: #0000BB">$port</span><span style="color: #DD0000">;PROTOCOL=</span><span style="color: #0000BB">$protocol</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">.= </span><span style="color: #DD0000">"UID=</span><span style="color: #0000BB">$username</span><span style="color: #DD0000">;PWD=</span><span style="color: #0000BB">$password</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">/* Obtain Connection Resource */<br /></span><span style="color: #0000BB">$conn </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_connect</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn_string</span><span style="color: #007700">, </span><span style="color: #DD0000">''</span><span style="color: #007700">, </span><span style="color: #DD0000">''</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Create the associative options array with valid key-value pairs */<br /></span><span style="color: #0000BB">$options </span><span style="color: #007700">= array(</span><span style="color: #DD0000">'autocommit' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_AUTOCOMMIT_OFF</span><span style="color: #007700">,<br />                    </span><span style="color: #DD0000">'binmode' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_PASSTHRU</span><span style="color: #007700">,<br />              </span><span style="color: #DD0000">'db2_attr_case' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_CASE_UPPER</span><span style="color: #007700">,<br />                     </span><span style="color: #DD0000">'cursor' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_SCROLLABLE</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_prepare</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn</span><span style="color: #007700">, </span><span style="color: #DD0000">'SELECT * FROM EMPLOYEE'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Call the function using the wrong resource, and the correct options array, and type values */<br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_set_option</span><span style="color: #007700">(</span><span style="color: #0000BB">$stmt</span><span style="color: #007700">, </span><span style="color: #0000BB">$options</span><span style="color: #007700">, </span><span style="color: #0000BB">1</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Check if all options could be set correctly */<br /></span><span style="color: #007700">if(</span><span style="color: #0000BB">$result</span><span style="color: #007700">)<br />{<br />  echo </span><span style="color: #DD0000">'Options Set Successfully'</span><span style="color: #007700">;<br />}<br />else<br />{<br />  echo </span><span style="color: #DD0000">'Could Not Set Options'</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+        </div>
+
+        <div class="example-contents"><p>The above example will output:</p></div>
+        <div class="example-contents screen"><div class="examplescode"><pre class="examplescode">Could Not Set Options</pre>
+</div></div>
+      </div>
+
+      <div class="example" id="example-7">
+        <p><strong>Example #7 Putting it all together</strong></p>
+        <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/* Database Connection Parameters */<br /></span><span style="color: #0000BB">$database </span><span style="color: #007700">= </span><span style="color: #DD0000">'SAMPLE'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$hostname </span><span style="color: #007700">= </span><span style="color: #DD0000">'localhost'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$port </span><span style="color: #007700">= </span><span style="color: #0000BB">50000</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$protocol </span><span style="color: #007700">= </span><span style="color: #DD0000">'TCPIP'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$username </span><span style="color: #007700">= </span><span style="color: #DD0000">'db2inst1'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$password </span><span style="color: #007700">= </span><span style="color: #DD0000">'ibmdb2'</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">/* Connection String */<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">= </span><span style="color: #DD0000">"DRIVER={IBM DB2 ODBC DRIVER};DATABASE=</span><span style="color: #0000BB">$database</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">.= </span><span style="color: #DD0000">"HOSTNAME=</span><span style="color: #0000BB">$hostname</span><span style="color: #DD0000">;PORT=</span><span style="color: #0000BB">$port</span><span style="color: #DD0000">;PROTOCOL=</span><span style="color: #0000BB">$protocol</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$conn_string </span><span style="color: #007700">.= </span><span style="color: #DD0000">"UID=</span><span style="color: #0000BB">$username</span><span style="color: #DD0000">;PWD=</span><span style="color: #0000BB">$password</span><span style="color: #DD0000">;"</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">/* Obtain Connection Resource */<br /></span><span style="color: #0000BB">$conn </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_connect</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn_string</span><span style="color: #007700">, </span><span style="color: #DD0000">''</span><span style="color: #007700">, </span><span style="color: #DD0000">''</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Create the associative options array with valid key-value pairs */<br /></span><span style="color: #0000BB">$options </span><span style="color: #007700">= array(</span><span style="color: #DD0000">'db2_attr_case' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_CASE_LOWER</span><span style="color: #007700">,<br />                        </span><span style="color: #DD0000">'cursor' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">DB2_SCROLLABLE</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_prepare</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn</span><span style="color: #007700">, </span><span style="color: #DD0000">'SELECT * FROM EMPLOYEE WHERE EMPNO = ? OR EMPNO = ?'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/* Call the function using the correct resource, options array, and type values */<br /></span><span style="color: #0000BB">$option_result </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_set_option</span><span style="color: #007700">(</span><span style="color: #0000BB">$stmt</span><span style="color: #007700">, </span><span style="color: #0000BB">$options</span><span style="color: #007700">, </span><span style="color: #0000BB">2</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_execute</span><span style="color: #007700">(</span><span style="color: #0000BB">$stmt</span><span style="color: #007700">, array(</span><span style="color: #DD0000">'000130'</span><span style="color: #007700">, </span><span style="color: #DD0000">'000140'</span><span style="color: #007700">));<br /><br /></span><span style="color: #FF8000">/* Get Row 2 before Row 1 since Scrollable Cursor */<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">db2_fetch_assoc</span><span style="color: #007700">(</span><span style="color: #0000BB">$stmt</span><span style="color: #007700">, </span><span style="color: #0000BB">2</span><span style="color: #007700">));<br />print </span><span style="color: #DD0000">'&lt;br /&gt;&lt;br /&gt;'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">db2_fetch_assoc</span><span style="color: #007700">(</span><span style="color: #0000BB">$stmt</span><span style="color: #007700">, </span><span style="color: #0000BB">1</span><span style="color: #007700">));<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+        </div>
+
+        <div class="example-contents"><p>The above example will output:</p></div>
+        <div class="example-contents screen"><div class="examplescode"><pre class="examplescode">Array
+(
+    [empno] =&gt; 000140
+    [firstnme] =&gt; HEATHER
+    [midinit] =&gt; A
+    [lastname] =&gt; NICHOLLS
+    [workdept] =&gt; C01
+    [phoneno] =&gt; 1793
+    [hiredate] =&gt; 1976-12-15
+    [job] =&gt; ANALYST
+    [edlevel] =&gt; 18
+    [sex] =&gt; F
+    [birthdate] =&gt; 1946-01-19
+    [salary] =&gt; 28420.00
+    [bonus] =&gt; 600.00
+    [comm] =&gt; 2274.00
+)
+
+Array
+(
+    [empno] =&gt; 000130
+    [firstnme] =&gt; DELORES
+    [midinit] =&gt; M
+    [lastname] =&gt; QUINTANA
+    [workdept] =&gt; C01
+    [phoneno] =&gt; 4578
+    [hiredate] =&gt; 1971-07-28
+    [job] =&gt; ANALYST
+    [edlevel] =&gt; 16
+    [sex] =&gt; F
+    [birthdate] =&gt; 1925-09-15
+    [salary] =&gt; 23800.00
+    [bonus] =&gt; 500.00
+    [comm] =&gt; 1904.00
+)</pre>
+</div></div>
+      </div>
+      <div class="example" id="example-8">
+        <p><strong>Example #8 i5/OS cursors are read-only</strong></p>
+        <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />  $conn </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_connect</span><span style="color: #007700">(</span><span style="color: #DD0000">""</span><span style="color: #007700">, </span><span style="color: #DD0000">""</span><span style="color: #007700">, </span><span style="color: #DD0000">""</span><span style="color: #007700">, array(</span><span style="color: #DD0000">"i5_lib"</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">"nobody"</span><span style="color: #007700">));<br />  </span><span style="color: #0000BB">$stmt </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_prepare</span><span style="color: #007700">(</span><span style="color: #0000BB">$conn</span><span style="color: #007700">, </span><span style="color: #DD0000">'select * from names where first = ?'</span><span style="color: #007700">);<br />  </span><span style="color: #0000BB">$name </span><span style="color: #007700">= </span><span style="color: #DD0000">"first2"</span><span style="color: #007700">;<br />  </span><span style="color: #0000BB">db2_bind_param</span><span style="color: #007700">(</span><span style="color: #0000BB">$stmt</span><span style="color: #007700">, </span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #DD0000">"name"</span><span style="color: #007700">, </span><span style="color: #0000BB">DB2_PARAM_IN</span><span style="color: #007700">);<br />  </span><span style="color: #0000BB">$options </span><span style="color: #007700">= array(</span><span style="color: #DD0000">"i5_fetch_only"</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">DB2_I5_FETCH_ON</span><span style="color: #007700">);<br />  </span><span style="color: #0000BB">db2_set_option</span><span style="color: #007700">(</span><span style="color: #0000BB">$stmt</span><span style="color: #007700">,</span><span style="color: #0000BB">$options</span><span style="color: #007700">,</span><span style="color: #0000BB">0</span><span style="color: #007700">);<br />  if (</span><span style="color: #0000BB">db2_execute</span><span style="color: #007700">(</span><span style="color: #0000BB">$stmt</span><span style="color: #007700">)) {<br />    while (</span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">db2_fetch_array</span><span style="color: #007700">(</span><span style="color: #0000BB">$stmt</span><span style="color: #007700">)) {<br />      echo </span><span style="color: #DD0000">"</span><span style="color: #007700">{</span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #0000BB">0</span><span style="color: #007700">]}</span><span style="color: #DD0000"> </span><span style="color: #007700">{</span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #0000BB">1</span><span style="color: #007700">]}</span><span style="color: #DD0000">"</span><span style="color: #007700">;<br />    }<br />  }<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+        </div>
+
+        <div class="example-contents"><p>The above example will output:</p></div>
+        <div class="example-contents screen">
+<div class="examplescode"><pre class="examplescode">first2 last2</pre>
+</div>
+        </div>
+      </div>
+    </p>
+  </div>
+
+  <div class="refsect1 seealso" id="refsect1-function.db2-set-option-seealso">
+    <h3 class="title">See Also</h3>
+    <ul class="simplelist">
+       <li><span class="function"><a href="function.db2-connect.html" class="function" rel="rdfs-seeAlso">db2_connect()</a> - Returns a connection to a database</span></li>
+       <li><span class="function"><a href="function.db2-pconnect.html" class="function" rel="rdfs-seeAlso">db2_pconnect()</a> - Returns a persistent connection to a database</span></li>
+       <li><span class="function"><a href="function.db2-exec.html" class="function" rel="rdfs-seeAlso">db2_exec()</a> - Executes an SQL statement directly</span></li>
+       <li><span class="function"><a href="function.db2-prepare.html" class="function" rel="rdfs-seeAlso">db2_prepare()</a> - Prepares an SQL statement to be executed</span></li>
+       <li><span class="function"><a href="function.db2-cursor-type.html" class="function" rel="rdfs-seeAlso">db2_cursor_type()</a> - Returns the cursor type used by a statement resource</span></li>
+     </ul>
+  </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

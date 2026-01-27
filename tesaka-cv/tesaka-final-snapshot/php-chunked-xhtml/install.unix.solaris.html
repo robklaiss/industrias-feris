@@ -1,0 +1,239 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Solaris specific installation tips</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="install.unix.litespeed.html" class="navbar__link">« LiteSpeed Web Server/OpenLiteSpeed Web Server on Unix systems</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="install.macosx.html" class="navbar__link">Installation on macOS »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="install.unix.html">Installation on Unix systems</a></li>
+        <li>Solaris specific installation tips</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="install.unix.solaris" class="sect1">
+ <h2 class="title"><span class="productname">Solaris</span> specific installation tips</h2>
+ <p class="para">
+  This section contains notes and hints specific to installing
+  PHP on <span class="productname">Solaris</span> systems.
+ </p>
+ <div class="sect2" id="install.unix.solaris.required">
+  <h3 class="title">Required software</h3>
+  <p class="para">
+   <span class="productname">Solaris</span> installs often lack C compilers and their related tools.
+   Read <a href="faq.build.html#faq.installation.needgnu" class="link">this FAQ</a> 
+   for information on why using GNU versions for some of these
+   tools is necessary.
+  </p>
+  <p class="para">
+   For unpacking the PHP distribution you need
+   <ul class="itemizedlist">
+    <li class="listitem">
+     <span class="simpara">
+      tar
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      gzip or
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      bzip2
+     </span>
+    </li>
+   </ul>
+  </p>
+  <p class="para">
+   For compiling PHP you need
+   <ul class="itemizedlist">
+    <li class="listitem">
+     <span class="simpara">
+      gcc (recommended, other C compilers may work)
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      make
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      GNU sed
+     </span>
+    </li>
+   </ul>
+  </p>
+  <p class="para">
+   For building extra extensions or hacking the code of PHP you might also need
+   <ul class="itemizedlist">
+    <li class="listitem">
+     <span class="simpara">
+      re2c
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      bison
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      m4
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      autoconf
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      automake
+     </span>
+    </li>
+   </ul>
+    In addition, you will need to install (and possibly compile) any
+    additional software specific to your configuration, such as Oracle
+    or MySQL.
+  </p>     
+ </div>
+ <div class="sect2" id="install.unix.solaris.packages">
+  <h3 class="title">Using Packages</h3>
+  <p class="simpara">
+   You can simplify the <span class="productname">Solaris</span> install process by using pkgadd to
+   install most of your needed components. The Image Packaging System (IPS) for
+   <span class="productname">Solaris 11 Express</span> also contains most of the required components
+   for installation using the pkg command.
+  </p>
+ </div>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

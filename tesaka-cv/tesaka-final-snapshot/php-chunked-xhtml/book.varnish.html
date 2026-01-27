@@ -1,0 +1,193 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Varnish</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.tcpwrap-check.html" class="navbar__link">« tcpwrap_check</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="intro.varnish.html" class="navbar__link">Introduction »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="refs.remote.other.html">Other Services</a></li>
+        <li>Varnish</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="book.varnish" class="book">
+ 
+ <h1 class="title">Varnish</h1>
+ 
+
+ 
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+<ul class="chunklist chunklist_book"><li><a href="intro.varnish.html">Introduction</a></li><li><a href="varnish.setup.html">Installing/Configuring</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="varnish.requirements.html">Requirements</a></li><li><a href="varnish.installation.html">Installation</a></li></ul></li><li><a href="varnish.constants.html">Predefined Constants</a></li><li><a href="varnish.examples.html">Examples</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="varnish.example.admin.html">Basic VarnishAdmin usage</a></li><li><a href="varnish.example.stat.html">Basic VarnishStat usage</a></li><li><a href="varnish.example.log.html">Basic VarnishLog usage</a></li></ul></li><li><a href="class.varnishadmin.html">VarnishAdmin</a> — The VarnishAdmin class<ul class="chunklist chunklist_book chunklist_children"><li><a href="varnishadmin.auth.html">VarnishAdmin::auth</a> — Authenticate on a varnish instance</li><li><a href="varnishadmin.ban.html">VarnishAdmin::ban</a> — Ban URLs using a VCL expression</li><li><a href="varnishadmin.banurl.html">VarnishAdmin::banUrl</a> — Ban an URL using a VCL expression</li><li><a href="varnishadmin.clearpanic.html">VarnishAdmin::clearPanic</a> — Clear varnish instance panic messages</li><li><a href="varnishadmin.connect.html">VarnishAdmin::connect</a> — Connect to a varnish instance administration interface</li><li><a href="varnishadmin.construct.html">VarnishAdmin::__construct</a> — VarnishAdmin constructor</li><li><a href="varnishadmin.disconnect.html">VarnishAdmin::disconnect</a> — Disconnect from a varnish instance administration interface</li><li><a href="varnishadmin.getpanic.html">VarnishAdmin::getPanic</a> — Get the last panic message on a varnish instance</li><li><a href="varnishadmin.getparams.html">VarnishAdmin::getParams</a> — Fetch current varnish instance configuration parameters</li><li><a href="varnishadmin.isrunning.html">VarnishAdmin::isRunning</a> — Check if the varnish slave process is currently running</li><li><a href="varnishadmin.setcompat.html">VarnishAdmin::setCompat</a> — Set the class compat configuration param</li><li><a href="varnishadmin.sethost.html">VarnishAdmin::setHost</a> — Set the class host configuration param</li><li><a href="varnishadmin.setident.html">VarnishAdmin::setIdent</a> — Set the class ident configuration param</li><li><a href="varnishadmin.setparam.html">VarnishAdmin::setParam</a> — Set configuration param on the current varnish instance</li><li><a href="varnishadmin.setport.html">VarnishAdmin::setPort</a> — Set the class port configuration param</li><li><a href="varnishadmin.setsecret.html">VarnishAdmin::setSecret</a> — Set the class secret configuration param</li><li><a href="varnishadmin.settimeout.html">VarnishAdmin::setTimeout</a> — Set the class timeout configuration param</li><li><a href="varnishadmin.start.html">VarnishAdmin::start</a> — Start varnish worker process</li><li><a href="varnishadmin.stop.html">VarnishAdmin::stop</a> — Stop varnish worker process</li></ul></li><li><a href="class.varnishstat.html">VarnishStat</a> — The VarnishStat class<ul class="chunklist chunklist_book chunklist_children"><li><a href="varnishstat.construct.html">VarnishStat::__construct</a> — VarnishStat constructor</li><li><a href="varnishstat.getsnapshot.html">VarnishStat::getSnapshot</a> — Get the current varnish instance statistics snapshot</li></ul></li><li><a href="class.varnishlog.html">VarnishLog</a> — The VarnishLog class<ul class="chunklist chunklist_book chunklist_children"><li><a href="varnishlog.construct.html">VarnishLog::__construct</a> — Varnishlog constructor</li><li><a href="varnishlog.getline.html">VarnishLog::getLine</a> — Get next log line</li><li><a href="varnishlog.gettagname.html">VarnishLog::getTagName</a> — Get the log tag string representation by its index</li></ul></li></ul></div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

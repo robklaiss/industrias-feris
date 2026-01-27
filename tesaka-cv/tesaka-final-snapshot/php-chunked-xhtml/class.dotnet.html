@@ -1,0 +1,243 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>The dotnet class</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="com.construct.html" class="navbar__link">« com::__construct</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="dotnet.construct.html" class="navbar__link">dotnet::__construct »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.com.html">COM</a></li>
+        <li>The dotnet class</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="class.dotnet" class="reference">
+ 
+ <h1 class="title">The dotnet class</h1>
+ <div class="partintro"><p class="verinfo">(PHP 4 &gt;= 4.1.0, PHP 5, PHP 7, PHP 8)</p>
+
+
+  <div class="section" id="dotnet.intro">
+   <h2 class="title">Introduction</h2>
+   <p class="para">
+    The dotnet class allows you to instantiate a class from a .Net assembly and
+    call its methods and access its properties, if the class and the methods and
+    properties are <a href="https://docs.microsoft.com/dotnet/api/system.runtime.interopservices.comvisibleattribute" class="link external">&raquo;&nbsp;visible to COM</a>.
+   </p>
+   <p class="para">
+    Neither instantiating static classes nor calling static methods is supported.
+    Instantiating generic classes such as <code class="literal">System.Collections.Generic.List</code>
+    is not supported either.
+   </p>
+   <p class="para">
+    Some .Net classes do not implement IDispatch, so while they can be instantiated,
+    calling methods or accessing properties on these classes is not supported.
+   </p>
+   <blockquote class="note"><p><strong class="note">Note</strong>: 
+    <p class="para">
+     You need to install the .Net runtime on your web server to take advantage
+     of this feature.
+    </p>
+   </p></blockquote>
+   <blockquote class="note"><p><strong class="note">Note</strong>: 
+    <p class="para">
+     Prior to PHP 8.0.0, .Net framework 4.0 and later were not supported by the <span class="classname"><strong class="classname">dotnet</strong></span>
+     class. If assemblies had been registered with <strong class="command">regasm.exe</strong>,
+     the classes could be instantiated as <span class="classname"><a href="class.com.html" class="classname">com</a></span> objects, though.
+     As of PHP 8.0.0, .Net framework 4.0 and later are supported via the <var class="filename">php.ini</var>
+     directive <a href="com.configuration.html#ini.com.dotnet-version" class="link">com.dotnet_version</a>.
+    </p>
+   </p></blockquote>
+  </div>
+
+
+  <div class="section" id="dotnet.synopsis">
+   <h2 class="title">Class synopsis</h2>
+
+
+   <div class="classsynopsis"><div class="classsynopsisinfo">
+    
+     <span class="modifier">class</span> <strong class="classname"><strong class="classname">dotnet</strong></strong>
+    
+
+    
+     <span class="modifier">extends</span>
+      <a href="class.variant.html" class="classname">variant</a>
+     {</div>
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Methods */</div>
+    <div class="constructorsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><a href="dotnet.construct.html" class="methodname">__construct</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$assembly_name</code></span>, <span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$datatype_name</code></span>, <span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$codepage</code><span class="initializer"> = <strong><code><a href="com.constants.html#constant.cp-acp">CP_ACP</a></code></strong></span></span>)</div>
+
+   }</div>
+
+
+  </div>
+
+  <div class="section" id="class.dotnet.overloadedmethods">
+   <h2 class="title">Overloaded Methods</h2>
+   <p class="para">
+    The returned object is an overloaded object, which means that PHP does
+    not see any fixed methods as it does with regular classes; instead, any
+    property or method accesses are passed through to COM and from there to
+    DOTNET.  In other words, the .Net object is mapped through the COM
+    interoperability layer provided by the .Net runtime.
+   </p>
+   <p class="para">
+    Once you have created a dotnet object, PHP treats it identically to any
+    other COM object; all the same rules apply.
+   </p>
+  </div>
+
+  <div class="section" id="class.dotnet.examples">
+   <h2 class="title">dotnet examples</h2>
+   <p class="para">
+    <div class="example" id="example.dotnet">
+     <p><strong>Example #1 dotnet example</strong></p>
+     <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$stack </span><span style="color: #007700">= new </span><span style="color: #0000BB">dotnet</span><span style="color: #007700">(</span><span style="color: #DD0000">"mscorlib"</span><span style="color: #007700">, </span><span style="color: #DD0000">"System.Collections.Stack"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$stack</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Push</span><span style="color: #007700">(</span><span style="color: #DD0000">".Net"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$stack</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Push</span><span style="color: #007700">(</span><span style="color: #DD0000">"Hello "</span><span style="color: #007700">);<br />echo </span><span style="color: #0000BB">$stack</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Pop</span><span style="color: #007700">() . </span><span style="color: #0000BB">$stack</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">Pop</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+     </div>
+
+    </div>
+   </p>
+  </div>
+
+ </div>
+
+ 
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="dotnet.construct.html">dotnet::__construct</a> — dotnet class constructor</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

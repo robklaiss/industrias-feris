@@ -1,0 +1,196 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Escaping from HTML</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="language.basic-syntax.phptags.html" class="navbar__link">« PHP tags</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="language.basic-syntax.instruction-separation.html" class="navbar__link">Instruction separation »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="language.basic-syntax.html">Basic syntax</a></li>
+        <li>Escaping from HTML</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="language.basic-syntax.phpmode" class="sect1">
+   <h2 class="title">Escaping from HTML</h2>
+   <p class="para">
+    Everything outside of a pair of opening and closing tags is ignored by the
+    PHP parser which allows PHP files to have mixed content. This allows PHP
+    to be embedded in HTML documents, for example to create templates.
+   </p>
+   <p class="para">
+    <div class="example" id="example-1">
+     <p><strong>Example #1 Embedding PHP in HTML</strong></p>
+     <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000">&lt;p&gt;This is going to be ignored by PHP and displayed by the browser.&lt;/p&gt;<br /><span style="color: #0000BB">&lt;?php </span><span style="color: #007700">echo </span><span style="color: #DD0000">'While this is going to be parsed.'</span><span style="color: #007700">; </span><span style="color: #0000BB">?&gt;<br /></span>&lt;p&gt;This will also be ignored by PHP and displayed by the browser.&lt;/p&gt;</span></code></div>
+     </div>
+
+    </div>
+   </p>
+   <p class="para">
+    This works as expected, because when the PHP interpreter hits the ?&gt; closing
+    tags, it simply starts outputting whatever it finds (except for the
+    immediately following newline - see
+    <a href="language.basic-syntax.instruction-separation.html" class="link">instruction separation</a>)
+    until it hits another opening tag unless in the middle of a conditional
+    statement in which case the interpreter will determine the outcome of the
+    conditional before making a decision of what to skip over.
+    See the next example.
+   </p>
+   <p class="para">
+    Using structures with conditions
+    <div class="example" id="example-2">
+     <p><strong>Example #2 Advanced escaping using conditions</strong></p>
+     <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php </span><span style="color: #007700">if (</span><span style="color: #0000BB">$expression </span><span style="color: #007700">== </span><span style="color: #0000BB">true</span><span style="color: #007700">): </span><span style="color: #0000BB">?&gt;<br /></span>  This will show if the expression is true.<br /><span style="color: #0000BB">&lt;?php </span><span style="color: #007700">else: </span><span style="color: #0000BB">?&gt;<br /></span>  Otherwise this will show.<br /><span style="color: #0000BB">&lt;?php </span><span style="color: #007700">endif; </span><span style="color: #0000BB">?&gt;</span></span></code></div>
+     </div>
+
+    </div>
+    In this example PHP will skip the blocks where the condition is not met, even
+    though they are outside of the PHP open/close tags; PHP skips them according
+    to the condition since the PHP interpreter will jump over blocks contained
+    within a condition that is not met.
+   </p>
+   <p class="para">
+    For outputting large blocks of text, dropping out of PHP parsing mode is
+    generally more efficient than sending all of the text through
+    <span class="function"><a href="function.echo.html" class="function">echo</a></span> or <span class="function"><a href="function.print.html" class="function">print</a></span>.
+   </p>
+   <p class="para">
+    <blockquote class="note"><p><strong class="note">Note</strong>: 
+     <p class="para">
+      If PHP is embeded within XML or XHTML the normal PHP
+      <code class="code">&lt;?php ?&gt;</code> must be used to remain compliant
+      with the standards.
+     </p>
+    </p></blockquote>
+   </p>
+  </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

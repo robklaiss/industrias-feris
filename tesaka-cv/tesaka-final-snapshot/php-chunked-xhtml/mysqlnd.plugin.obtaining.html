@@ -1,0 +1,202 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Obtaining the mysqlnd plugin API</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="mysqlnd.plugin.mysql-proxy.html" class="navbar__link">« A comparison of mysqlnd plugins with MySQL Proxy</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="mysqlnd.plugin.architecture.html" class="navbar__link">MySQL Native Driver Plugin Architecture »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="mysqlnd.plugin.html">MySQL Native Driver Plugin API</a></li>
+        <li>Obtaining the mysqlnd plugin API</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="mysqlnd.plugin.obtaining" class="section">
+  <h2 class="title">Obtaining the mysqlnd plugin API</h2>
+  <p class="simpara">
+   The <code class="literal">mysqlnd</code> plugin API is simply part of the MySQL
+   Native Driver PHP extension, <code class="literal">ext/mysqlnd</code>.
+   Development started on the <code class="literal">mysqlnd</code> plugin API in
+   December 2009. It is developed as part of the PHP source repository,
+   and as such is available to the public either via Git, or through
+   source snapshot downloads.
+  </p>
+  <p class="simpara">
+   Plugin developers can determine the <code class="literal">mysqlnd</code>
+   version through accessing <code class="literal">MYSQLND_VERSION</code>, which
+   is a string of the format <q class="quote">mysqlnd 8.3.17</q>, or through
+   <code class="literal">MYSQLND_VERSION_ID</code>, which is an integer such as
+   50007. Developers can calculate the version number as follows:
+  </p>
+  <table id="mysqlnd.plugin.version-id" class="doctable table">
+   <caption><strong>MYSQLND_VERSION_ID calculation table</strong></caption>
+   
+    <thead>
+     <tr>
+      <th>Version (part)</th>
+      <th>Example</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+      <td>Major*10000</td>
+      <td>5*10000 = 50000</td>
+     </tr>
+
+     <tr>
+      <td>Minor*100</td>
+      <td>0*100 = 0</td>
+     </tr>
+
+     <tr>
+      <td>Patch</td>
+      <td>7 = 7</td>
+     </tr>
+
+     <tr>
+      <td>MYSQLND_VERSION_ID</td>
+      <td>50007</td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+  <p class="simpara">
+   During development, developers should refer to the
+   <code class="literal">mysqlnd</code> version number for compatibility and
+   version tests, as several iterations of <code class="literal">mysqlnd</code>
+   could occur during the lifetime of a PHP development branch with a
+   single PHP version number.
+  </p>
+ </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

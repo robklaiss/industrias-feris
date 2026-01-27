@@ -1,0 +1,238 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Parsing and lexing</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.commonmark-render-xml.html" class="navbar__link">« CommonMark\Render\XML</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="intro.parle.html" class="navbar__link">Introduction »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="refs.basic.text.html">Text Processing</a></li>
+        <li>Parsing and lexing</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="book.parle" class="book">
+ 
+ <h1 class="title">Parsing and lexing</h1>
+ 
+
+ 
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+<ul class="chunklist chunklist_book"><li><a href="intro.parle.html">Introduction</a></li><li><a href="parle.setup.html">Installing/Configuring</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="parle.requirements.html">Requirements</a></li><li><a href="parle.installation.html">Installation</a></li></ul></li><li><a href="parle.constants.html">Predefined Constants</a></li><li><a href="parle.pattern.matching.html">Pattern matching</a> — Parle pattern matching</li><li><a href="parle.examples.html">Examples</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="parle.examples.lexer.html">Lexer examples</a></li><li><a href="parle.examples.parser.html">Parser examples</a></li></ul></li><li><a href="class.parle-lexer.html">Parle\Lexer</a> — The Parle\Lexer class<ul class="chunklist chunklist_book chunklist_children"><li><a href="parle-lexer.advance.html">Parle\Lexer::advance</a> — Process next lexer rule</li><li><a href="parle-lexer.build.html">Parle\Lexer::build</a> — Finalize the lexer rule set</li><li><a href="parle-lexer.callout.html">Parle\Lexer::callout</a> — Define token callback</li><li><a href="parle-lexer.consume.html">Parle\Lexer::consume</a> — Pass the data for processing</li><li><a href="parle-lexer.dump.html">Parle\Lexer::dump</a> — Dump the state machine</li><li><a href="parle-lexer.gettoken.html">Parle\Lexer::getToken</a> — Retrieve the current token</li><li><a href="parle-lexer.insertmacro.html">Parle\Lexer::insertMacro</a> — Insert regex macro</li><li><a href="parle-lexer.push.html">Parle\Lexer::push</a> — Add a lexer rule</li><li><a href="parle-lexer.reset.html">Parle\Lexer::reset</a> — Reset lexer</li></ul></li><li><a href="class.parle-rlexer.html">Parle\RLexer</a> — The Parle\RLexer class<ul class="chunklist chunklist_book chunklist_children"><li><a href="parle-rlexer.advance.html">Parle\RLexer::advance</a> — Process next lexer rule</li><li><a href="parle-rlexer.build.html">Parle\RLexer::build</a> — Finalize the lexer rule set</li><li><a href="parle-rlexer.callout.html">Parle\RLexer::callout</a> — Define token callback</li><li><a href="parle-rlexer.consume.html">Parle\RLexer::consume</a> — Pass the data for processing</li><li><a href="parle-rlexer.dump.html">Parle\RLexer::dump</a> — Dump the state machine</li><li><a href="parle-rlexer.gettoken.html">Parle\RLexer::getToken</a> — Retrieve the current token</li><li><a href="parle-rlexer.insertmacro.html">Parle\RLexer::insertMacro</a> — Insert regex macro</li><li><a href="parle-rlexer.push.html">Parle\RLexer::push</a> — Add a lexer rule</li><li><a href="parle-rlexer.pushstate.html">Parle\RLexer::pushState</a> — Push a new start state</li><li><a href="parle-rlexer.reset.html">Parle\RLexer::reset</a> — Reset lexer</li></ul></li><li><a href="class.parle-parser.html">Parle\Parser</a> — The Parle\Parser class<ul class="chunklist chunklist_book chunklist_children"><li><a href="parle-parser.advance.html">Parle\Parser::advance</a> — Process next parser rule</li><li><a href="parle-parser.build.html">Parle\Parser::build</a> — Finalize the grammar rules</li><li><a href="parle-parser.consume.html">Parle\Parser::consume</a> — Consume the data for processing</li><li><a href="parle-parser.dump.html">Parle\Parser::dump</a> — Dump the grammar</li><li><a href="parle-parser.errorinfo.html">Parle\Parser::errorInfo</a> — Retrieve the error information</li><li><a href="parle-parser.left.html">Parle\Parser::left</a> — Declare a token with left-associativity</li><li><a href="parle-parser.nonassoc.html">Parle\Parser::nonassoc</a> — Declare a token with no associativity</li><li><a href="parle-parser.precedence.html">Parle\Parser::precedence</a> — Declare a precedence rule</li><li><a href="parle-parser.push.html">Parle\Parser::push</a> — Add a grammar rule</li><li><a href="parle-parser.reset.html">Parle\Parser::reset</a> — Reset parser state</li><li><a href="parle-parser.right.html">Parle\Parser::right</a> — Declare a token with right-associativity</li><li><a href="parle-parser.sigil.html">Parle\Parser::sigil</a> — Retrieve a matching part of a rule</li><li><a href="parle-parser.sigilcount.html">Parle\Parser::sigilCount</a> — Number of elements in matched rule</li><li><a href="parle-parser.sigilname.html">Parle\Parser::sigilName</a> — Retrieve a rule or token name</li><li><a href="parle-parser.token.html">Parle\Parser::token</a> — Declare a token</li><li><a href="parle-parser.tokenid.html">Parle\Parser::tokenId</a> — Get token id</li><li><a href="parle-parser.trace.html">Parle\Parser::trace</a> — Trace the parser operation</li><li><a href="parle-parser.validate.html">Parle\Parser::validate</a> — Validate input</li></ul></li><li><a href="class.parle-rparser.html">Parle\RParser</a> — The Parle\RParser class<ul class="chunklist chunklist_book chunklist_children"><li><a href="parle-rparser.advance.html">Parle\RParser::advance</a> — Process next parser rule</li><li><a href="parle-rparser.build.html">Parle\RParser::build</a> — Finalize the grammar rules</li><li><a href="parle-rparser.consume.html">Parle\RParser::consume</a> — Consume the data for processing</li><li><a href="parle-rparser.dump.html">Parle\RParser::dump</a> — Dump the grammar</li><li><a href="parle-rparser.errorinfo.html">Parle\RParser::errorInfo</a> — Retrieve the error information</li><li><a href="parle-rparser.left.html">Parle\RParser::left</a> — Declare a token with left-associativity</li><li><a href="parle-rparser.nonassoc.html">Parle\RParser::nonassoc</a> — Declare a token with no associativity</li><li><a href="parle-rparser.precedence.html">Parle\RParser::precedence</a> — Declare a precedence rule</li><li><a href="parle-rparser.push.html">Parle\RParser::push</a> — Add a grammar rule</li><li><a href="parle-rparser.reset.html">Parle\RParser::reset</a> — Reset parser state</li><li><a href="parle-rparser.right.html">Parle\RParser::right</a> — Declare a token with right-associativity</li><li><a href="parle-rparser.sigil.html">Parle\RParser::sigil</a> — Retrieve a matching part of a rule</li><li><a href="parle-rparser.sigilcount.html">Parle\RParser::sigilCount</a> — Number of elements in matched rule</li><li><a href="parle-rparser.sigilname.html">Parle\RParser::sigilName</a> — Retrieve a rule or token name</li><li><a href="parle-rparser.token.html">Parle\RParser::token</a> — Declare a token</li><li><a href="parle-rparser.tokenid.html">Parle\RParser::tokenId</a> — Get token id</li><li><a href="parle-rparser.trace.html">Parle\RParser::trace</a> — Trace the parser operation</li><li><a href="parle-rparser.validate.html">Parle\RParser::validate</a> — Validate input</li></ul></li><li><a href="class.parle-stack.html">Parle\Stack</a> — The Parle\Stack class<ul class="chunklist chunklist_book chunklist_children"><li><a href="parle-stack.pop.html">Parle\Stack::pop</a> — Pop an item from the stack</li><li><a href="parle-stack.push.html">Parle\Stack::push</a> — Push an item into the stack</li></ul></li><li><a href="class.parle-token.html">Parle\Token</a> — The Parle\Token class</li><li><a href="class.parle-errorinfo.html">Parle\ErrorInfo</a> — The Parle\ErrorInfo class</li><li><a href="class.parle-lexerexception.html">Parle\LexerException</a> — The Parle\LexerException class</li><li><a href="class.parle-parserexception.html">Parle\ParserException</a> — The Parle\ParserException class</li></ul></div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

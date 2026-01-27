@@ -5846,23 +5846,14 @@ def verify_xml_signature(xml_bytes: bytes) -> None:
 
 def _sifen_mod11_dv(base: str) -> str:
     """
-    DV módulo 11 (pesos 2..9 cíclicos, derecha->izquierda).
-    Convención: 11->0, 10->1
+    DV módulo 11 (SIFEN) - DELEGADO al módulo central tools.cdc_dv
+    para evitar divergencias con generate_cdc().
     """
-    total = 0
-    weight = 2
-    for ch in reversed(base):
-        total += int(ch) * weight
-        weight += 1
-        if weight > 9:
-            weight = 2
-    mod = total % 11
-    dv = 11 - mod
-    if dv == 11:
-        return "0"
-    if dv == 10:
-        return "1"
-    return str(dv)
+    from tools.cdc_dv import calc_cdc_dv
+    digits = "".join(c for c in str(base) if c.isdigit())
+    return str(calc_cdc_dv(digits))
+
+
 
 
 def _localname(tag: str) -> str:
@@ -6000,6 +5991,13 @@ def bump_doc_and_recalc_cdc(xml_path, bump_doc: int, artifacts_dir):
     for el in _find_all_by_local(root, "dCDC"):
         el.text = new_cdc
 
+
+    # Actualizar dDVId (debe coincidir con el último dígito del CDC)
+    ddvid_nodes = _find_all_by_local(root, "dDVId")
+    if not ddvid_nodes:
+        raise RuntimeError("bump_doc: no encontré <dDVId> para actualizar.")
+    for n in ddvid_nodes:
+        n.text = new_cdc[-1]
     # Guardar XML actualizado
     artifacts_dir.mkdir(parents=True, exist_ok=True)
     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")

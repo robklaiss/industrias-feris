@@ -8,6 +8,48 @@ from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 import os
 import sys
+import re
+
+
+
+def _normalizar_ruc_dv(valor_ruc, valor_dv=None):
+    """Normaliza RUC/DV.
+
+    Acepta:
+      - ruc="7524653", dv="8"
+      - ruc="7524653-8" (si dv no viene aparte)
+      - ruc="75246538" (DV concatenado al final)
+      - ruc con espacios/puntos
+
+    Devuelve (ruc, dv) como strings numéricos. No calcula DV.
+    """
+    if valor_ruc is None:
+        return None, None
+
+    ruc_raw = str(valor_ruc).strip()
+    dv_raw = None if valor_dv is None else str(valor_dv).strip()
+
+    ruc_raw = ruc_raw.replace(".", "").replace(" ", "")
+    if dv_raw is not None:
+        dv_raw = dv_raw.replace(".", "").replace(" ", "")
+
+    if "-" in ruc_raw and dv_raw is None:
+        a, b = ruc_raw.split("-", 1)
+        ruc_raw, dv_raw = a.strip(), b.strip()
+
+    ruc_digits = re.sub(r"\D", "", ruc_raw)
+    dv_digits = None if dv_raw is None else re.sub(r"\D", "", dv_raw)
+
+    if (dv_digits is None or dv_digits == "") and len(ruc_digits) >= 8:
+        dv_digits = ruc_digits[-1]
+        ruc_digits = ruc_digits[:-1]
+
+    if dv_digits is not None and dv_digits != "" and len(dv_digits) != 1:
+        raise ValueError(f"DV inválido (debe ser 1 dígito): ruc={valor_ruc!r} dv={valor_dv!r}")
+    if len(ruc_digits) < 5:
+        raise ValueError(f"RUC inválido (muy corto): ruc={valor_ruc!r}")
+
+    return ruc_digits, (dv_digits if dv_digits not in (None, "") else None)
 
 
 def generar_factura(datos_factura, output_file=None):
@@ -26,6 +68,15 @@ def generar_factura(datos_factura, output_file=None):
     env = Environment(loader=FileSystemLoader(template_dir))
     template = env.get_template('factura_template.xml')
     
+
+    # Normalizar receptor si viene en formatos variados
+    if "dRucRec" in datos_factura:
+        ruc, dv = _normalizar_ruc_dv(datos_factura.get("dRucRec"), datos_factura.get("dDVRec"))
+        if ruc:
+            datos_factura["dRucRec"] = ruc
+        if dv:
+            datos_factura["dDVRec"] = dv
+
     # Generar XML
     xml_factura = template.render(**datos_factura)
     

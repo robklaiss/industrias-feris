@@ -1,0 +1,235 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Whether an offset exists</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="class.arrayaccess.html" class="navbar__link">« ArrayAccess</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="arrayaccess.offsetget.html" class="navbar__link">ArrayAccess::offsetGet »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="class.arrayaccess.html">ArrayAccess</a></li>
+        <li>Whether an offset exists</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="arrayaccess.offsetexists" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">ArrayAccess::offsetExists</h1>
+  <p class="verinfo">(PHP 5, PHP 7, PHP 8)</p><p class="refpurpose"><span class="refname">ArrayAccess::offsetExists</span> &mdash; <span class="dc-title">Whether an offset exists</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-arrayaccess.offsetexists-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><strong>ArrayAccess::offsetExists</strong></span>(<span class="methodparam"><span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$offset</code></span>): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+
+  <p class="para rdfs-comment">
+   Whether or not an offset exists.
+  </p>
+  <p class="para">
+   This method is executed when using <span class="function"><a href="function.isset.html" class="function">isset()</a></span> or
+   <span class="function"><a href="function.empty.html" class="function">empty()</a></span> on objects implementing <span class="classname"><a href="class.arrayaccess.html" class="classname">ArrayAccess</a></span>.
+  </p>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <p class="para">
+    When using <span class="function"><a href="function.empty.html" class="function">empty()</a></span> <span class="function"><a href="arrayaccess.offsetget.html" class="function">ArrayAccess::offsetGet()</a></span> will
+    be called and checked if empty only if <span class="function"><strong>ArrayAccess::offsetExists()</strong></span>
+    returns <strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong>.
+   </p>
+  </p></blockquote>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-arrayaccess.offsetexists-parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+    <dt><code class="parameter">offset</code></dt>
+     <dd>
+      <p class="para">
+       An offset to check for.
+      </p>
+     </dd>
+    
+   </dl>
+  </p>
+
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-arrayaccess.offsetexists-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns <strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong> on success or <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong> on failure.
+  </p>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <p class="para">
+    The return value will be casted to <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span> if non-boolean was returned.
+   </p>
+  </p></blockquote>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-arrayaccess.offsetexists-examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   <div class="example" id="example-1">
+    <p><strong>Example #1 <span class="function"><strong>ArrayAccess::offsetExists()</strong></span> example</strong></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class </span><span style="color: #0000BB">obj </span><span style="color: #007700">implements </span><span style="color: #0000BB">ArrayAccess </span><span style="color: #007700">{<br />    public function </span><span style="color: #0000BB">offsetSet</span><span style="color: #007700">(</span><span style="color: #0000BB">$offset</span><span style="color: #007700">, </span><span style="color: #0000BB">$value</span><span style="color: #007700">): </span><span style="color: #0000BB">void </span><span style="color: #007700">{<br />        </span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">__METHOD__</span><span style="color: #007700">);<br />    }<br />    public function </span><span style="color: #0000BB">offsetExists</span><span style="color: #007700">(</span><span style="color: #0000BB">$var</span><span style="color: #007700">): </span><span style="color: #0000BB">bool </span><span style="color: #007700">{<br />        </span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">__METHOD__</span><span style="color: #007700">);<br />        if (</span><span style="color: #0000BB">$var </span><span style="color: #007700">== </span><span style="color: #DD0000">"foobar"</span><span style="color: #007700">) {<br />            return </span><span style="color: #0000BB">true</span><span style="color: #007700">;<br />        }<br />        return </span><span style="color: #0000BB">false</span><span style="color: #007700">;<br />    }<br />    public function </span><span style="color: #0000BB">offsetUnset</span><span style="color: #007700">(</span><span style="color: #0000BB">$var</span><span style="color: #007700">): </span><span style="color: #0000BB">void </span><span style="color: #007700">{<br />        </span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">__METHOD__</span><span style="color: #007700">);<br />    }<br />    #[</span><span style="color: #0000BB">\ReturnTypeWillChange</span><span style="color: #007700">]<br />    public function </span><span style="color: #0000BB">offsetGet</span><span style="color: #007700">(</span><span style="color: #0000BB">$var</span><span style="color: #007700">) {<br />        </span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">__METHOD__</span><span style="color: #007700">);<br />        return </span><span style="color: #DD0000">"value"</span><span style="color: #007700">;<br />    }<br />}<br /><br /></span><span style="color: #0000BB">$obj </span><span style="color: #007700">= new </span><span style="color: #0000BB">obj</span><span style="color: #007700">;<br /><br />echo </span><span style="color: #DD0000">"Runs obj::offsetExists()\n"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(isset(</span><span style="color: #0000BB">$obj</span><span style="color: #007700">[</span><span style="color: #DD0000">"foobar"</span><span style="color: #007700">]));<br /><br />echo </span><span style="color: #DD0000">"\nRuns obj::offsetExists() and obj::offsetGet()\n"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(empty(</span><span style="color: #0000BB">$obj</span><span style="color: #007700">[</span><span style="color: #DD0000">"foobar"</span><span style="color: #007700">]));<br /><br />echo </span><span style="color: #DD0000">"\nRuns obj::offsetExists(), *not* obj:offsetGet() as there is nothing to get\n"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(empty(</span><span style="color: #0000BB">$obj</span><span style="color: #007700">[</span><span style="color: #DD0000">"foobaz"</span><span style="color: #007700">]));<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+    <div class="example-contents screen">
+<div class="examplescode"><pre class="examplescode">Runs obj::offsetExists()
+string(17) &quot;obj::offsetExists&quot;
+bool(true)
+
+Runs obj::offsetExists() and obj::offsetGet()
+string(17) &quot;obj::offsetExists&quot;
+string(14) &quot;obj::offsetGet&quot;
+bool(false)
+
+Runs obj::offsetExists(), *not* obj:offsetGet() as there is nothing to get
+string(17) &quot;obj::offsetExists&quot;
+bool(true)</pre>
+</div>
+    </div>
+   </div>
+  </p>
+ </div>
+
+
+
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

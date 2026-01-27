@@ -1,0 +1,387 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Introduction</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="book.phpdbg.html" class="navbar__link">« phpdbg</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="phpdbg.setup.html" class="navbar__link">Installing/Configuring »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.phpdbg.html">phpdbg</a></li>
+        <li>Introduction</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="intro.phpdbg" class="preface">
+  <h1 class="title">Introduction</h1>
+  <p class="para">
+   Implemented as a SAPI module, phpdbg can exert complete control over the
+   environment without impacting the functionality or performance of your code.
+  </p>
+  <p class="para">
+   phpdbg aims to be a lightweight, powerful, easy to use debugging platform for PHP.
+   It offers the following features:
+   <ul class="itemizedlist">
+    <li class="listitem">
+     <span class="simpara">Step-Through Debugging</span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">Flexible Breakpoints (Class Method, Function, File:Line, Address, Opcode)</span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">Easy Access to PHP with built-in eval()</span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">Userland API</span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">SAPI Agnostic - Easily Integrated</span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">PHP Configuration File Support</span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">JIT Super Globals - Set Your Own !!</span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">Optional readline Support - Comfortable Terminal Operation</span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">Easy Operation - See Help :)</span>
+    </li>
+   </ul>
+  </p>
+
+  <p class="para">
+   <table class="doctable table">
+    <caption><strong>Command line options</strong></caption>
+    
+     <thead>
+      <tr>
+       <th>Option</th>
+       <th>Example Argument</th>
+       <th>Description</th>
+      </tr>
+
+     </thead>
+
+     <tbody class="tbody">
+      <tr>
+       <td>-c</td>
+       <td>-c/my/php.ini</td>
+       <td>
+        Set php.ini file to load
+       </td>
+      </tr>
+
+      <tr>
+       <td>-d</td>
+       <td>-dmemory_limit=4G</td>
+       <td>
+        Set a php.ini directive
+       </td>
+      </tr>
+
+      <tr>
+       <td>-n</td>
+       <td class="empty">&nbsp;</td>
+       <td>
+        Disable default php.ini
+       </td>
+      </tr>
+
+      <tr>
+       <td>-q</td>
+       <td class="empty">&nbsp;</td>
+       <td>
+        Suppress welcome banner
+       </td>
+      </tr>
+
+      <tr>
+       <td>-v</td>
+       <td class="empty">&nbsp;</td>
+       <td>
+        Enable oplog output
+       </td>
+      </tr>
+
+      <tr>
+       <td>-b</td>
+       <td class="empty">&nbsp;</td>
+       <td>
+        Disable color
+       </td>
+      </tr>
+
+      <tr>
+       <td>-i</td>
+       <td>-imy.init</td>
+       <td>
+        Set .phpdbginit file
+       </td>
+      </tr>
+
+      <tr>
+       <td>-I</td>
+       <td class="empty">&nbsp;</td>
+       <td>
+        Ignore default .phpdbginit
+       </td>
+      </tr>
+
+      <tr>
+       <td>-O</td>
+       <td>-Omy.oplog</td>
+       <td>
+        Set oplog output file
+       </td>
+      </tr>
+
+      <tr>
+       <td>-r</td>
+       <td class="empty">&nbsp;</td>
+       <td>
+        Run execution context
+       </td>
+      </tr>
+
+      <tr>
+       <td>-rr</td>
+       <td class="empty">&nbsp;</td>
+       <td>
+        Run execution context and quit after execution (not respecting breakpoints)
+       </td>
+      </tr>
+
+      <tr>
+       <td>-e</td>
+       <td class="empty">&nbsp;</td>
+       <td>
+        Generate extended information for debugger/profiler
+       </td>
+      </tr>
+
+      <tr>
+       <td>-E</td>
+       <td class="empty">&nbsp;</td>
+       <td>
+        Enable step through eval, careful!
+       </td>
+      </tr>
+
+      <tr>
+       <td>-s</td>
+       <td>-s=, -s=foo</td>
+       <td>
+        Read code to execute from stdin with an optional delimiter
+       </td>
+      </tr>
+
+      <tr>
+       <td>-S</td>
+       <td>-Scli</td>
+       <td>
+        Override SAPI name, careful!
+       </td>
+      </tr>
+
+      <tr>
+       <td class="empty">&nbsp;</td>
+       <td class="empty">&nbsp;</td>
+       <td>
+        <p class="para">
+        </p>
+       </td>
+      </tr>
+
+      <tr>
+       <td>-l</td>
+       <td>-l4000</td>
+       <td>
+        Setup remote console ports
+       </td>
+      </tr>
+
+      <tr>
+       <td>-a</td>
+       <td>-a192.168.0.3</td>
+       <td>
+        Setup remote console bind address
+       </td>
+      </tr>
+
+      <tr>
+       <td>-x</td>
+       <td class="empty">&nbsp;</td>
+       <td>
+        Enable xml output (instead of normal text output)
+       </td>
+      </tr>
+
+      <tr>
+       <td>-p</td>
+       <td>-p, -p=func, -p*</td>
+       <td>
+        Output opcodes and quit
+       </td>
+      </tr>
+
+      <tr>
+       <td>-h</td>
+       <td class="empty">&nbsp;</td>
+       <td>
+        Print the help overview
+       </td>
+      </tr>
+
+      <tr>
+       <td>-V</td>
+       <td class="empty">&nbsp;</td>
+       <td>
+        Print version number
+       </td>
+      </tr>
+
+      <tr>
+       <td>--</td>
+       <td>-- arg1 arg2</td>
+       <td>
+        Use to delimit phpdbg arguments and php $argv; append any $argv argument after it
+       </td>
+      </tr>
+
+     </tbody>
+     
+   </table>
+ 
+  </p>
+
+ </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

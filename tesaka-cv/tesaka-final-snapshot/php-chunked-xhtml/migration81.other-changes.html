@@ -1,0 +1,359 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Other Changes</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="migration81.deprecated.html" class="navbar__link">« Deprecated Features</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="migration80.html" class="navbar__link">Migrating from PHP 7.4.x to PHP 8.0.x »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="migration81.html">Migrating from PHP 8.0.x to PHP 8.1.x</a></li>
+        <li>Other Changes</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="migration81.other-changes" class="sect1">
+ <h2 class="title">Other Changes</h2>
+
+ <div class="sect2" id="migration81.other-changes.sapi">
+  <h3 class="title">Changes in SAPI Modules</h3>
+
+  <div class="sect3" id="migration81.other-changes.sapi.cli">
+   <h4 class="title">CLI</h4>
+
+   <p class="para">
+    Using <strong class="option unknown">-a</strong> without the <a href="book.readline.html" class="link">readline extension</a> will now result in an error.
+    Previously, <strong class="option unknown">-a</strong> without readline had the same behavior as
+    calling <strong class="command">php</strong> without any arguments, apart from printing an additional
+    <code class="literal">&quot;Interactive mode enabled&quot;</code> message.
+    This mode was <em>not</em> interactive.
+   </p>
+  </div>
+
+  <div class="sect3" id="migration81.other-changes.sapi.phpdbg">
+   <h4 class="title">PHPDBG</h4>
+
+   <p class="para">
+    Remote functionality from <a href="book.phpdbg.html" class="link">phpdbg</a> has been removed.
+   </p>
+  </div>
+ </div>
+
+ <div class="sect2" id="migration81.other-changes.functions">
+  <h3 class="title">Changed Functions</h3>
+
+  <div class="sect3" id="migration81.other-changes.functions.core">
+   <h4 class="title">Core</h4>
+
+   <p class="para">
+    The order of properties used in <a href="control-structures.foreach.html" class="link"><code class="literal">foreach</code></a>, <span class="function"><a href="function.var-dump.html" class="function">var_dump()</a></span>,
+    <span class="function"><a href="function.serialize.html" class="function">serialize()</a></span>, object comparison, etc. was changed.
+    Properties are now ordered naturally according to their declaration
+    and inheritance. Properties declared in a base class are going
+    to be before the child properties.
+   </p>
+   <p class="para">
+    This order is consistent with internal layout of properties in
+    <code class="code">zend_object</code> structure and repeats the order in
+    <code class="code">default_properties_table[]</code> and <code class="code">properties_info_table[]</code>.
+    The old order was not documented and was caused by class inheritance implementation details.
+   </p>
+  </div>
+
+  <div class="sect3" id="migration81.other-changes.functions.filter">
+   <h4 class="title">Filter</h4>
+
+   <p class="para">
+    The <strong><code><a href="filter.constants.html#constant.filter-flag-allow-octal">FILTER_FLAG_ALLOW_OCTAL</a></code></strong> flag of the
+    <strong><code><a href="filter.constants.html#constant.filter-validate-int">FILTER_VALIDATE_INT</a></code></strong> filter
+    now accept octal string with the leading octal prefix
+    (<code class="literal">&quot;0o&quot;</code>/<code class="literal">&quot;0O&quot;</code>).
+   </p>
+  </div>
+
+  <div class="sect3" id="migration81.other-changes.functions.gmp">
+   <h4 class="title">GMP</h4>
+
+   <p class="para">
+    All <a href="book.gmp.html" class="link">GMP</a> functions now accept octal string with the leading octal prefix
+    (<code class="literal">&quot;0o&quot;</code>/<code class="literal">&quot;0O&quot;</code>).
+   </p>
+  </div>
+
+  <div class="sect3" id="migration81.other-changes.functions.pdo-odbc">
+   <h4 class="title">PDO ODBC</h4>
+
+   <p class="para">
+    <span class="methodname"><a href="pdo.getattribute.html" class="methodname">PDO::getAttribute()</a></span> with
+    <strong><code><a href="pdo.constants.html#pdo.constants.attr-server-info">PDO::ATTR_SERVER_INFO</a></code></strong> and
+    <strong><code><a href="pdo.constants.html#pdo.constants.attr-server-version">PDO::ATTR_SERVER_VERSION</a></code></strong>
+    now return values instead of throwing <span class="classname"><a href="class.pdoexception.html" class="classname">PDOException</a></span>.
+   </p>
+  </div>
+
+  <div class="sect3" id="migration81.other-changes.functions.reflection">
+   <h4 class="title">Reflection</h4>
+
+   <p class="para">
+    <span class="methodname"><a href="reflectionproperty.setaccessible.html" class="methodname">ReflectionProperty::setAccessible()</a></span> and
+    <span class="methodname"><a href="reflectionmethod.setaccessible.html" class="methodname">ReflectionMethod::setAccessible()</a></span>
+    no longer have an effect.
+    Properties and methods are now always considered accessible via Reflection.
+   </p>
+  </div>
+
+  <div class="sect3" id="migration81.other-changes.functions.standard">
+   <h4 class="title">Standard</h4>
+
+   <p class="para">
+    <span class="function"><a href="function.syslog.html" class="function">syslog()</a></span> is now binary safe.
+   </p>
+  </div>
+ </div>
+
+ <div class="sect2" id="migration81.other-changes.extensions">
+  <h3 class="title">Other Changes to Extensions</h3>
+
+  <div class="sect3" id="migration81.other-changes.extensions.gd">
+   <h4 class="title">GD</h4>
+
+   <p class="para">
+    <span class="function"><a href="function.imagewebp.html" class="function">imagewebp()</a></span> can now do lossless WebP encoding
+    by passing <strong><code><a href="image.constants.html#constant.img-webp-lossless">IMG_WEBP_LOSSLESS</a></code></strong> as the quality.
+   </p>
+   <p class="para">
+    This constant is only defined, if the used libgd supports
+    lossless WebP encoding.
+   </p>
+  </div>
+
+  <div class="sect3" id="migration81.other-changes.extensions.mysqli">
+   <h4 class="title">MySQLi</h4>
+
+   <p class="para">
+    <span class="methodname"><a href="mysqli-stmt.next-result.html" class="methodname">mysqli_stmt::next_result()</a></span> and
+    <span class="methodname"><strong>mysqli::fetch_all()</strong></span>
+    are now available when linking against libmysqlclient.
+   </p>
+  </div>
+
+  <div class="sect3" id="migration81.other-changes.extensions.openssl">
+   <h4 class="title">OpenSSL</h4>
+
+   <ul class="itemizedlist">
+    <li class="listitem">
+     <p class="para">
+      The <a href="book.openssl.html" class="link">OpenSSL extension</a> now requires at least OpenSSL version 1.0.2.
+     </p>
+    </li>
+    <li class="listitem">
+     <p class="para">
+      OpenSSL 3.0 is now supported. Be aware that many ciphers are no longer
+      enabled by default (part of the legacy provider), and that parameter
+      validation (e.g. minimum key sizes) is stricter now.
+     </p>
+    </li>
+   </ul>
+  </div>
+
+  <div class="sect3" id="migration81.other-changes.extensions.phar">
+   <h4 class="title">Phar</h4>
+
+   <ul class="itemizedlist">
+    <li class="listitem">
+     <p class="para">
+      SHA256 is now used by default for signatures.
+     </p>
+    </li>
+    <li class="listitem">
+     <p class="para">
+      Added support for OpenSSL_SHA256 and OpenSSL_SHA512 signatures.
+     </p>
+    </li>
+   </ul>
+  </div>
+
+  <div class="sect3" id="migration81.other-changes.extensions.snmp">
+   <h4 class="title">SNMP</h4>
+
+   <ul class="itemizedlist">
+    <li class="listitem">
+     <p class="para">
+      Added support for SHA256 and SHA512 for the security protocol.
+     </p>
+    </li>
+   </ul>
+  </div>
+
+  <div class="sect3" id="migration81.other-changes.extensions.standard">
+   <h4 class="title">Standard</h4>
+
+   <p class="para">
+    <code class="code">--with-password-argon2</code> now uses pkg-config to detect libargon2.
+    As such, an alternative libargon2 location should now be specified using
+    <var class="envar">PKG_CONFIG_PATH</var>.
+   </p>
+  </div>
+ </div>
+
+ <div class="sect2" id="migration81.other-changes.ini">
+  <h3 class="title">Changes to INI File Handling</h3>
+
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <p class="para">
+     The <a href="errorfunc.configuration.html#ini.log-errors-max-len" class="link">log_errors_max_len</a>
+     INI directive has been removed.
+     It no longer had an effect since PHP 8.0.0.
+    </p>
+   </li>
+   <li class="listitem">
+    <p class="para">
+     A leading dollar in a quoted string can now be escaped: <code class="literal">&quot;\${&quot;</code> will now be
+     interpreted as a string with contents <code class="literal">${</code>.
+    </p>
+   </li>
+   <li class="listitem">
+    <p class="para">
+     Backslashes in double quoted strings are now more consistently treated as
+     escape characters. Previously, <code class="literal">&quot;foo\\&quot;</code> followed by
+     something other than a newline was not considered as a terminated string.
+     It is now interpreted as a string with contents <code class="literal">foo\</code>.
+     However, as an exception, the string <code class="literal">&quot;foo\&quot;</code>
+     followed by a newline will continue to be treated as a valid string with
+     contents <code class="literal">foo\</code> rather than an unterminated string.
+     This exception exists to support naive uses of Windows file paths such as
+     <code class="literal">&quot;C:\foo\&quot;</code>.
+    </p>
+   </li>
+  </ul>
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

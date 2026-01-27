@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Lotes SIFEN - Admin{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Lotes SIFEN</h1>
+    
+    <div class="filters" style="margin-bottom: 20px;">
+        <form method="get" style="display: inline-block;">
+            <label>Ambiente:</label>
+            <select name="env" onchange="this.form.submit()">
+                <option value="">Todos</option>
+                <option value="test" {% if env_filter == 'test' %}selected{% endif %}>Test</option>
+                <option value="prod" {% if env_filter == 'prod' %}selected{% endif %}>Prod</option>
+            </select>
+            
+            <label style="margin-left: 20px;">Estado:</label>
+            <select name="status" onchange="this.form.submit()">
+                <option value="">Todos</option>
+                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="processing" {% if status_filter == 'processing' %}selected{% endif %}>Processing</option>
+                <option value="done" {% if status_filter == 'done' %}selected{% endif %}>Done</option>
+                <option value="expired_window" {% if status_filter == 'expired_window' %}selected{% endif %}>Expired Window</option>
+                <option value="requires_cdc" {% if status_filter == 'requires_cdc' %}selected{% endif %}>Requires CDC</option>
+                <option value="error" {% if status_filter == 'error' %}selected{% endif %}>Error</option>
+            </select>
+        </form>
+    </div>
+    
+    {% if not lotes %}
+    <p>No hay lotes registrados.</p>
+    {% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ambiente</th>
+                <th>dProtConsLote</th>
+                <th>Estado</th>
+                <th>Código</th>
+                <th>Mensaje</th>
+                <th>Intentos</th>
+                <th>Creado</th>
+                <th>Última Consulta</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lote in lotes %}
+            <tr>
+                <td>{{ lote.id }}</td>
+                <td>{{ lote.env }}</td>
+                <td><code>{{ lote.d_prot_cons_lote }}</code></td>
+                <td>
+                    <span class="badge badge-{{ lote.status }}">
+                        {{ lote.status }}
+                    </span>
+                </td>
+                <td><code>{{ lote.last_cod_res_lot or '-' }}</code></td>
+                <td>{{ (lote.last_msg_res_lot or '-')[:50] }}{% if lote.last_msg_res_lot and lote.last_msg_res_lot|length > 50 %}...{% endif %}</td>
+                <td>{{ lote.attempts }}</td>
+                <td>{{ lote.created_at }}</td>
+                <td>{{ lote.last_checked_at or '-' }}</td>
+                <td>
+                    <a href="/admin/sifen/lotes/{{ lote.id }}" class="btn btn-sm">Ver</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    
+    <p style="margin-top: 20px;">
+        <a href="/">← Volver a documentos</a>
+    </p>
+</div>
+{% endblock %}
+

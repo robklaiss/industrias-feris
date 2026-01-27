@@ -1,0 +1,327 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Callables</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="language.types.resource.html" class="navbar__link">« Resources</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="language.types.mixed.html" class="navbar__link">Mixed »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="language.types.html">Types</a></li>
+        <li>Callables</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="language.types.callable" class="sect1">
+ <h2 class="title">Callables</h2>
+
+ <p class="simpara">
+  A callable is a reference to a function or method that is passed to
+  another function as an argument.
+  They are represented with the <span class="type"><a href="language.types.callable.html" class="type callable">callable</a></span> type declaration.
+ </p>
+ <div class="informalexample">
+  <div class="example-contents">
+<div class="annotation-non-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">function </span><span style="color: #0000BB">foo</span><span style="color: #007700">(callable </span><span style="color: #0000BB">$callback</span><span style="color: #007700">) {<br />    </span><span style="color: #0000BB">$callback</span><span style="color: #007700">();<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+  </div>
+
+ </div>
+
+ <p class="simpara">
+  Some functions accept callback functions as a parameter, e.g.
+  <span class="function"><a href="function.array-map.html" class="function">array_map()</a></span>, <span class="function"><a href="function.usort.html" class="function">usort()</a></span>, or
+  <span class="function"><a href="function.preg-replace-callback.html" class="function">preg_replace_callback()</a></span>.
+ </p>
+
+ <div class="sect2" id="language.types.callable.passing">
+  <h3 class="title">Creation of callables</h3>
+
+  <p class="simpara">
+   A callable is a type that represents something that can be invoked.
+   Callables can be passed as arguments to functions or methods which
+   expect a callback parameter or they can be invoked directly.
+   The <span class="type"><a href="language.types.callable.html" class="type callable">callable</a></span> type cannot be used as a type declaration for class
+   properties. Instead, use a <span class="classname"><a href="class.closure.html" class="classname">Closure</a></span> type declaration.
+  </p>
+
+  <p class="simpara">
+   Callables can be created in several different ways:
+  </p>
+
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara"><span class="classname"><a href="class.closure.html" class="classname">Closure</a></span> object</span>
+   </li>
+   <li class="listitem">
+    <span class="simpara"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> containing the name of a function or a method</span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="type"><a href="language.types.array.html" class="type array">array</a></span> containing a class name or an <span class="type"><a href="language.types.object.html" class="type object">object</a></span>
+     in index 0 and the method name in index 1
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="type"><a href="language.types.object.html" class="type object">object</a></span> implementing the <a href="language.oop5.magic.html#object.invoke" class="link">__invoke()</a>
+     magic method
+    </span>
+   </li>
+  </ul>
+
+  <p class="simpara">
+   A <span class="classname"><a href="class.closure.html" class="classname">Closure</a></span> object can be created using
+   <a href="functions.anonymous.html" class="link">anonymous function</a> syntax,
+   <a href="functions.arrow.html" class="link">arrow function</a> syntax,
+   <a href="functions.first_class_callable_syntax.html" class="link">first-class callable
+   syntax</a>, or the <span class="methodname"><a href="closure.fromcallable.html" class="methodname">Closure::fromCallable()</a></span> method.
+  </p>
+
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <span class="simpara">
+    The <a href="functions.first_class_callable_syntax.html" class="link">first-class
+    callable syntax</a> is only available as of PHP 8.1.0.
+   </span>
+  </p></blockquote>
+
+  <div class="example" id="example-1">
+   <p><strong>Example #1 
+    Callback example using a <span class="classname"><a href="class.closure.html" class="classname">Closure</a></span>
+   </strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">// Using anonymous function syntax<br /></span><span style="color: #0000BB">$double1 </span><span style="color: #007700">= function (</span><span style="color: #0000BB">$a</span><span style="color: #007700">) {<br />    return </span><span style="color: #0000BB">$a </span><span style="color: #007700">* </span><span style="color: #0000BB">2</span><span style="color: #007700">;<br />};<br /><br /></span><span style="color: #FF8000">// Using first-class callable syntax<br /></span><span style="color: #007700">function </span><span style="color: #0000BB">double_function</span><span style="color: #007700">(</span><span style="color: #0000BB">$a</span><span style="color: #007700">) {<br />    return </span><span style="color: #0000BB">$a </span><span style="color: #007700">* </span><span style="color: #0000BB">2</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">$double2 </span><span style="color: #007700">= </span><span style="color: #0000BB">double_function</span><span style="color: #007700">(...);<br /><br /></span><span style="color: #FF8000">// Using arrow function syntax<br /></span><span style="color: #0000BB">$double3 </span><span style="color: #007700">= fn(</span><span style="color: #0000BB">$a</span><span style="color: #007700">) =&gt; </span><span style="color: #0000BB">$a </span><span style="color: #007700">* </span><span style="color: #0000BB">2</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">// Using Closure::fromCallable<br /></span><span style="color: #0000BB">$double4 </span><span style="color: #007700">= </span><span style="color: #0000BB">Closure</span><span style="color: #007700">::</span><span style="color: #0000BB">fromCallable</span><span style="color: #007700">(</span><span style="color: #DD0000">'double_function'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">// Use the closure as a callback here to<br />// double the size of each element in our range<br /></span><span style="color: #0000BB">$new_numbers </span><span style="color: #007700">= </span><span style="color: #0000BB">array_map</span><span style="color: #007700">(</span><span style="color: #0000BB">$double1</span><span style="color: #007700">, </span><span style="color: #0000BB">range</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">5</span><span style="color: #007700">));<br />print </span><span style="color: #0000BB">implode</span><span style="color: #007700">(</span><span style="color: #DD0000">' '</span><span style="color: #007700">, </span><span style="color: #0000BB">$new_numbers</span><span style="color: #007700">) . </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$new_numbers </span><span style="color: #007700">= </span><span style="color: #0000BB">array_map</span><span style="color: #007700">(</span><span style="color: #0000BB">$double2</span><span style="color: #007700">, </span><span style="color: #0000BB">range</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">5</span><span style="color: #007700">));<br />print </span><span style="color: #0000BB">implode</span><span style="color: #007700">(</span><span style="color: #DD0000">' '</span><span style="color: #007700">, </span><span style="color: #0000BB">$new_numbers</span><span style="color: #007700">) . </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$new_numbers </span><span style="color: #007700">= </span><span style="color: #0000BB">array_map</span><span style="color: #007700">(</span><span style="color: #0000BB">$double3</span><span style="color: #007700">, </span><span style="color: #0000BB">range</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">5</span><span style="color: #007700">));<br />print </span><span style="color: #0000BB">implode</span><span style="color: #007700">(</span><span style="color: #DD0000">' '</span><span style="color: #007700">, </span><span style="color: #0000BB">$new_numbers</span><span style="color: #007700">) . </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$new_numbers </span><span style="color: #007700">= </span><span style="color: #0000BB">array_map</span><span style="color: #007700">(</span><span style="color: #0000BB">$double4</span><span style="color: #007700">, </span><span style="color: #0000BB">range</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">5</span><span style="color: #007700">));<br />print </span><span style="color: #0000BB">implode</span><span style="color: #007700">(</span><span style="color: #DD0000">' '</span><span style="color: #007700">, </span><span style="color: #0000BB">$new_numbers</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>Output of the above example in PHP 8.1:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+2 4 6 8 10
+2 4 6 8 10
+2 4 6 8 10
+2 4 6 8 10
+</pre></div>
+   </div>
+  </div>
+
+  <p class="simpara">
+   A callable can also be a string containing the name of a function or
+   a static method.
+   Any built-in or user-defined function can be used, except language constructs
+   such as: <span class="function"><a href="function.array.html" class="function">array()</a></span>, <span class="function"><a href="function.echo.html" class="function">echo</a></span>,
+   <span class="function"><a href="function.empty.html" class="function">empty()</a></span>, <span class="function"><a href="function.eval.html" class="function">eval()</a></span>,
+   <span class="function"><a href="function.isset.html" class="function">isset()</a></span>,
+   <span class="function"><a href="function.list.html" class="function">list()</a></span>, <span class="function"><a href="function.print.html" class="function">print</a></span> or
+   <span class="function"><a href="function.unset.html" class="function">unset()</a></span>.
+  </p>
+
+  <p class="simpara">
+   Static class methods can be used without instantiating an
+   <span class="type"><a href="language.types.object.html" class="type object">object</a></span> of that class by either, creating an array with
+   the class name at index 0 and the method name at index 1, or by using
+   the special syntax with the scope resolution operator
+   <code class="literal">::</code>, as in <code class="literal">&#039;ClassName::methodName&#039;</code>.
+  </p>
+
+  <p class="simpara">
+   A method of an instantiated <span class="type"><a href="language.types.object.html" class="type object">object</a></span> can be a callable
+   when provided as an array with the <span class="type"><a href="language.types.object.html" class="type object">object</a></span> at index 0 and
+   the method name at index 1.
+  </p>
+
+  <p class="simpara">
+   The main difference between a <span class="classname"><a href="class.closure.html" class="classname">Closure</a></span> object and the
+   <span class="type"><a href="language.types.callable.html" class="type callable">callable</a></span> type is that a <span class="classname"><a href="class.closure.html" class="classname">Closure</a></span> object is
+   scope-independent and can always be invoked, whereas a callable type may be
+   scope-dependent and may not be directly invoked.
+   <span class="classname"><a href="class.closure.html" class="classname">Closure</a></span> is the preferred way to create callables.
+  </p>
+
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <span class="simpara">
+    While <span class="classname"><a href="class.closure.html" class="classname">Closure</a></span> objects are bound to the scope
+    where they are created, callables referencing class methods as strings
+    or arrays are resolved in the scope where they are called.
+    To create a callable from a private or protected method, which can then be
+    invoked from outside the class scope, use
+    <span class="methodname"><a href="closure.fromcallable.html" class="methodname">Closure::fromCallable()</a></span> or the
+    <a href="functions.first_class_callable_syntax.html" class="link">first-class callable
+    syntax</a>.
+   </span>
+  </p></blockquote>
+
+  <p class="simpara">
+   PHP allows the creation of callables which can be used as a callback argument
+   but cannot be called directly.
+   These are context-dependent callables which reference a class method in the
+   inheritance hierarchy of a class, e.g.
+   <code class="literal">&#039;parent::method&#039;</code> or <code class="literal">[&quot;static&quot;, &quot;method&quot;]</code>.
+  </p>
+
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <span class="simpara">
+    As of PHP 8.2.0, context-dependent callables
+    are deprecated. Remove the context dependency by replacing
+    <code class="literal">&#039;parent::method&#039;</code> with
+    <code class="literal">parent::class . &#039;::method&#039;</code> or use the
+    <a href="functions.first_class_callable_syntax.html" class="link">first-class callable
+    syntax</a>.
+   </span>
+  </p></blockquote>
+
+  <div class="example" id="example-2">
+   <p><strong>Example #2 
+    Calling various types of callables with <span class="function"><strong>call_user_function()</strong></span>
+   </strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #FF8000">// An example callback function<br /></span><span style="color: #007700">function </span><span style="color: #0000BB">my_callback_function</span><span style="color: #007700">() {<br />    echo </span><span style="color: #DD0000">'hello world!'</span><span style="color: #007700">, </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />}<br /><br /></span><span style="color: #FF8000">// An example callback method<br /></span><span style="color: #007700">class </span><span style="color: #0000BB">MyClass </span><span style="color: #007700">{<br />    static function </span><span style="color: #0000BB">myCallbackMethod</span><span style="color: #007700">() {<br />        echo </span><span style="color: #DD0000">'Hello World!'</span><span style="color: #007700">, </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />    }<br />}<br /><br /></span><span style="color: #FF8000">// Type 1: Simple callback<br /></span><span style="color: #0000BB">call_user_func</span><span style="color: #007700">(</span><span style="color: #DD0000">'my_callback_function'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">// Type 2: Static class method call<br /></span><span style="color: #0000BB">call_user_func</span><span style="color: #007700">([</span><span style="color: #DD0000">'MyClass'</span><span style="color: #007700">, </span><span style="color: #DD0000">'myCallbackMethod'</span><span style="color: #007700">]);<br /><br /></span><span style="color: #FF8000">// Type 3: Object method call<br /></span><span style="color: #0000BB">$obj </span><span style="color: #007700">= new </span><span style="color: #0000BB">MyClass</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">call_user_func</span><span style="color: #007700">([</span><span style="color: #0000BB">$obj</span><span style="color: #007700">, </span><span style="color: #DD0000">'myCallbackMethod'</span><span style="color: #007700">]);<br /><br /></span><span style="color: #FF8000">// Type 4: Static class method call<br /></span><span style="color: #0000BB">call_user_func</span><span style="color: #007700">(</span><span style="color: #DD0000">'MyClass::myCallbackMethod'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">// Type 5: Static class method call using ::class keyword<br /></span><span style="color: #0000BB">call_user_func</span><span style="color: #007700">([</span><span style="color: #0000BB">MyClass</span><span style="color: #007700">::class, </span><span style="color: #DD0000">'myCallbackMethod'</span><span style="color: #007700">]);<br /><br /></span><span style="color: #FF8000">// Type 6: Relative static class method call<br /></span><span style="color: #007700">class </span><span style="color: #0000BB">A </span><span style="color: #007700">{<br />    public static function </span><span style="color: #0000BB">who</span><span style="color: #007700">() {<br />        echo </span><span style="color: #DD0000">'A'</span><span style="color: #007700">, </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />    }<br />}<br /><br />class </span><span style="color: #0000BB">B </span><span style="color: #007700">extends </span><span style="color: #0000BB">A </span><span style="color: #007700">{<br />    public static function </span><span style="color: #0000BB">who</span><span style="color: #007700">() {<br />        echo </span><span style="color: #DD0000">'B'</span><span style="color: #007700">, </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />    }<br />}<br /><br /></span><span style="color: #0000BB">call_user_func</span><span style="color: #007700">([</span><span style="color: #DD0000">'B'</span><span style="color: #007700">, </span><span style="color: #DD0000">'parent::who'</span><span style="color: #007700">]); </span><span style="color: #FF8000">// deprecated as of PHP 8.2.0<br /><br />// Type 7: Objects implementing __invoke can be used as callables<br /></span><span style="color: #007700">class </span><span style="color: #0000BB">C </span><span style="color: #007700">{<br />    public function </span><span style="color: #0000BB">__invoke</span><span style="color: #007700">(</span><span style="color: #0000BB">$name</span><span style="color: #007700">) {<br />        echo </span><span style="color: #DD0000">'Hello '</span><span style="color: #007700">, </span><span style="color: #0000BB">$name</span><span style="color: #007700">;<br />    }<br />}<br /><br /></span><span style="color: #0000BB">$c </span><span style="color: #007700">= new </span><span style="color: #0000BB">C</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">call_user_func</span><span style="color: #007700">(</span><span style="color: #0000BB">$c</span><span style="color: #007700">, </span><span style="color: #DD0000">'PHP!'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+hello world!
+Hello World!
+Hello World!
+Hello World!
+Hello World!
+
+Deprecated: Callables of the form [&quot;B&quot;, &quot;parent::who&quot;] are deprecated in script on line 41
+A
+Hello PHP!
+</pre></div>
+   </div>
+  </div>
+
+  <blockquote class="note"><p><strong class="note">Note</strong>: <p class="para">Callbacks registered
+with functions such as <span class="function"><a href="function.call-user-func.html" class="function">call_user_func()</a></span> and <span class="function"><a href="function.call-user-func-array.html" class="function">call_user_func_array()</a></span> will not be
+called if there is an uncaught exception thrown in a previous callback.</p></p></blockquote>
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

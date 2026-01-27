@@ -1,0 +1,342 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>foreach</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="control-structures.for.html" class="navbar__link">« for</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="control-structures.break.html" class="navbar__link">break »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="language.control-structures.html">Control Structures</a></li>
+        <li>foreach</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="control-structures.foreach" class="sect1">
+ <h2 class="title">foreach</h2>
+ <p class="verinfo">(PHP 4, PHP 5, PHP 7, PHP 8)</p>
+ <p class="para">
+  The <code class="literal">foreach</code> construct provides an easy way to
+  iterate over <span class="type"><a href="language.types.array.html" class="type array">array</a></span>s and <span class="interfacename"><a href="class.traversable.html" class="interfacename">Traversable</a></span> objects.
+  <code class="literal">foreach</code> will issue an error when used with
+  a variable containing a different data type or with an uninitialized variable.
+  <div class="informalexample">
+   <p class="simpara">
+    <code class="literal">foreach</code> can optionally get the <code class="literal">key</code> of each element:
+   </p>
+   <div class="example-contents">
+<div class="cdata"><pre>
+foreach (iterable_expression as $value) {
+    statement_list
+}
+
+foreach (iterable_expression as $key =&gt; $value) {
+    statement_list
+}
+</pre></div>
+   </div>
+
+  </div>
+ </p>
+ <p class="simpara">
+  The first form traverses the iterable given by
+  <code class="literal">iterable_expression</code>. On each iteration, the value of
+  the current element is assigned to <code class="literal">$value</code>.
+ </p>
+ <p class="simpara">
+  The second form will additionally assign the current element&#039;s key to
+  the <code class="literal">$key</code> variable on each iteration.
+ </p>
+ <p class="simpara">
+  Note that <code class="literal">foreach</code> does not modify the internal array
+  pointer, which is used by functions such as <span class="function"><a href="function.current.html" class="function">current()</a></span>
+  and <span class="function"><a href="function.key.html" class="function">key()</a></span>.
+ </p>
+ <p class="simpara">
+  It is possible to
+  <a href="language.oop5.iterations.html" class="link">customize object iteration</a>.
+ </p>
+
+ <div class="example" id="example-1">
+  <p><strong>Example #1 Common <code class="literal">foreach</code> usages</strong></p>
+  <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #FF8000">/* Example: value only */<br /></span><span style="color: #0000BB">$array </span><span style="color: #007700">= [</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">2</span><span style="color: #007700">, </span><span style="color: #0000BB">3</span><span style="color: #007700">, </span><span style="color: #0000BB">17</span><span style="color: #007700">];<br /><br />foreach (</span><span style="color: #0000BB">$array </span><span style="color: #007700">as </span><span style="color: #0000BB">$value</span><span style="color: #007700">) {<br />    echo </span><span style="color: #DD0000">"Current element of \$array: </span><span style="color: #0000BB">$value</span><span style="color: #DD0000">.\n"</span><span style="color: #007700">;<br />}<br /><br /></span><span style="color: #FF8000">/* Example: key and value */<br /></span><span style="color: #0000BB">$array </span><span style="color: #007700">= [<br />    </span><span style="color: #DD0000">"one" </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">1</span><span style="color: #007700">,<br />    </span><span style="color: #DD0000">"two" </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">2</span><span style="color: #007700">,<br />    </span><span style="color: #DD0000">"three" </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">3</span><span style="color: #007700">,<br />    </span><span style="color: #DD0000">"seventeen" </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">17<br /></span><span style="color: #007700">];<br /><br />foreach (</span><span style="color: #0000BB">$array </span><span style="color: #007700">as </span><span style="color: #0000BB">$key </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">$value</span><span style="color: #007700">) {<br />    echo </span><span style="color: #DD0000">"Key: </span><span style="color: #0000BB">$key</span><span style="color: #DD0000"> =&gt; Value: </span><span style="color: #0000BB">$value</span><span style="color: #DD0000">\n"</span><span style="color: #007700">;<br />}<br /><br /></span><span style="color: #FF8000">/* Example: multi-dimensional key-value arrays */<br /></span><span style="color: #0000BB">$grid </span><span style="color: #007700">= [];<br /></span><span style="color: #0000BB">$grid</span><span style="color: #007700">[</span><span style="color: #0000BB">0</span><span style="color: #007700">][</span><span style="color: #0000BB">0</span><span style="color: #007700">] = </span><span style="color: #DD0000">"a"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$grid</span><span style="color: #007700">[</span><span style="color: #0000BB">0</span><span style="color: #007700">][</span><span style="color: #0000BB">1</span><span style="color: #007700">] = </span><span style="color: #DD0000">"b"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$grid</span><span style="color: #007700">[</span><span style="color: #0000BB">1</span><span style="color: #007700">][</span><span style="color: #0000BB">0</span><span style="color: #007700">] = </span><span style="color: #DD0000">"y"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$grid</span><span style="color: #007700">[</span><span style="color: #0000BB">1</span><span style="color: #007700">][</span><span style="color: #0000BB">1</span><span style="color: #007700">] = </span><span style="color: #DD0000">"z"</span><span style="color: #007700">;<br /><br />foreach (</span><span style="color: #0000BB">$grid </span><span style="color: #007700">as </span><span style="color: #0000BB">$y </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">$row</span><span style="color: #007700">) {<br />    foreach (</span><span style="color: #0000BB">$row </span><span style="color: #007700">as </span><span style="color: #0000BB">$x </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">$value</span><span style="color: #007700">) {<br />        echo </span><span style="color: #DD0000">"Value at position x=</span><span style="color: #0000BB">$x</span><span style="color: #DD0000"> and y=</span><span style="color: #0000BB">$y</span><span style="color: #DD0000">: </span><span style="color: #0000BB">$value</span><span style="color: #DD0000">\n"</span><span style="color: #007700">;<br />    }<br />}<br /><br /></span><span style="color: #FF8000">/* Example: dynamic arrays */<br /></span><span style="color: #007700">foreach (</span><span style="color: #0000BB">range</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">5</span><span style="color: #007700">) as </span><span style="color: #0000BB">$value</span><span style="color: #007700">) {<br />    echo </span><span style="color: #DD0000">"</span><span style="color: #0000BB">$value</span><span style="color: #DD0000">\n"</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+  </div>
+
+ </div>
+ <blockquote class="note"><p><strong class="note">Note</strong>: 
+  <p class="para">
+   <code class="literal">foreach</code> does not support the ability to
+   suppress error messages using the
+   <a href="language.operators.errorcontrol.html" class="link"><code class="literal">@</code></a>.
+  </p>
+ </p></blockquote>
+
+ <div class="sect2" id="control-structures.foreach.list">
+  <h3 class="title">Unpacking nested arrays</h3>
+  <p class="verinfo">(PHP 5 &gt;= 5.5.0, PHP 7, PHP 8)</p>
+  <p class="para">
+   It is possible to iterate over an array of arrays and unpack the nested array
+   into loop variables by using either
+   <a href="language.types.array.html#language.types.array.syntax.destructuring" class="link">array destructuring</a>
+   via <code class="literal">[]</code> or by using the <span class="function"><a href="function.list.html" class="function">list()</a></span> language
+   construct as the value.
+
+   <blockquote class="note"><p><strong class="note">Note</strong>: 
+    <span class="simpara">
+     Please note that
+     <a href="language.types.array.html#language.types.array.syntax.destructuring" class="link">array destructuring</a>
+     via <code class="literal">[]</code> is only possible as of PHP 7.1.0
+    </span>
+   </p></blockquote>
+  </p>
+
+  <p class="para">
+   <div class="informalexample">
+    <p class="simpara">
+     In both of the following examples <code class="literal">$a</code> will be set to
+     the first element of the nested array and <code class="literal">$b</code> will
+     contain the second element:
+    </p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$array </span><span style="color: #007700">= [<br />    [</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">2</span><span style="color: #007700">],<br />    [</span><span style="color: #0000BB">3</span><span style="color: #007700">, </span><span style="color: #0000BB">4</span><span style="color: #007700">],<br />];<br /><br />foreach (</span><span style="color: #0000BB">$array </span><span style="color: #007700">as [</span><span style="color: #0000BB">$a</span><span style="color: #007700">, </span><span style="color: #0000BB">$b</span><span style="color: #007700">]) {<br />    echo </span><span style="color: #DD0000">"A: </span><span style="color: #0000BB">$a</span><span style="color: #DD0000">; B: </span><span style="color: #0000BB">$b</span><span style="color: #DD0000">\n"</span><span style="color: #007700">;<br />}<br /><br />foreach (</span><span style="color: #0000BB">$array </span><span style="color: #007700">as list(</span><span style="color: #0000BB">$a</span><span style="color: #007700">, </span><span style="color: #0000BB">$b</span><span style="color: #007700">)) {<br />    echo </span><span style="color: #DD0000">"A: </span><span style="color: #0000BB">$a</span><span style="color: #DD0000">; B: </span><span style="color: #0000BB">$b</span><span style="color: #DD0000">\n"</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <p class="para">The above example will output:</p>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+A: 1; B: 2
+A: 3; B: 4
+</pre></div>
+    </div>
+   </div>
+  </p>
+
+  <p class="para">
+   When providing fewer variables than there are elements in the array,
+   the remaining elements will be ignored.
+   Similarly, elements can be skipped over by using a comma:
+   <div class="informalexample">
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$array </span><span style="color: #007700">= [<br />    [</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">2</span><span style="color: #007700">, </span><span style="color: #0000BB">5</span><span style="color: #007700">],<br />    [</span><span style="color: #0000BB">3</span><span style="color: #007700">, </span><span style="color: #0000BB">4</span><span style="color: #007700">, </span><span style="color: #0000BB">6</span><span style="color: #007700">],<br />];<br /><br />foreach (</span><span style="color: #0000BB">$array </span><span style="color: #007700">as [</span><span style="color: #0000BB">$a</span><span style="color: #007700">, </span><span style="color: #0000BB">$b</span><span style="color: #007700">]) {<br />    </span><span style="color: #FF8000">// Note that there is no $c here.<br />    </span><span style="color: #007700">echo </span><span style="color: #DD0000">"</span><span style="color: #0000BB">$a</span><span style="color: #DD0000"> </span><span style="color: #0000BB">$b</span><span style="color: #DD0000">\n"</span><span style="color: #007700">;<br />}<br /><br />foreach (</span><span style="color: #0000BB">$array </span><span style="color: #007700">as [, , </span><span style="color: #0000BB">$c</span><span style="color: #007700">]) {<br />    </span><span style="color: #FF8000">// Skipping over $a and $b<br />    </span><span style="color: #007700">echo </span><span style="color: #DD0000">"</span><span style="color: #0000BB">$c</span><span style="color: #DD0000">\n"</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <p class="para">The above example will output:</p>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+1 2
+3 4
+5
+6
+</pre></div>
+    </div>
+   </div>
+  </p>
+
+  <p class="para">
+   A notice will be generated if there aren&#039;t enough array elements to fill
+   the <span class="function"><a href="function.list.html" class="function">list()</a></span>:
+
+   <div class="informalexample">
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$array </span><span style="color: #007700">= [<br />    [</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">2</span><span style="color: #007700">],<br />    [</span><span style="color: #0000BB">3</span><span style="color: #007700">, </span><span style="color: #0000BB">4</span><span style="color: #007700">],<br />];<br /><br />foreach (</span><span style="color: #0000BB">$array </span><span style="color: #007700">as [</span><span style="color: #0000BB">$a</span><span style="color: #007700">, </span><span style="color: #0000BB">$b</span><span style="color: #007700">, </span><span style="color: #0000BB">$c</span><span style="color: #007700">]) {<br />    echo </span><span style="color: #DD0000">"A: </span><span style="color: #0000BB">$a</span><span style="color: #DD0000">; B: </span><span style="color: #0000BB">$b</span><span style="color: #DD0000">; C: </span><span style="color: #0000BB">$c</span><span style="color: #DD0000">\n"</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <p class="para">The above example will output:</p>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+Notice: Undefined offset: 2 in example.php on line 7
+A: 1; B: 2; C:
+
+Notice: Undefined offset: 2 in example.php on line 7
+A: 3; B: 4; C:
+</pre></div>
+    </div>
+   </div>
+  </p>
+ </div>
+
+ <div class="sect2" id="control-structures.foreach.reference">
+  <h3 class="title">foreach and references</h3>
+  <p class="para">
+   It is possible to directly modify array elements within a loop by preceding
+   <code class="literal">$value</code> with <code class="literal">&amp;</code>.
+   In that case the value will be assigned by
+   <a href="language.references.html" class="link">reference</a>.
+   <div class="informalexample">
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$arr </span><span style="color: #007700">= [</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">2</span><span style="color: #007700">, </span><span style="color: #0000BB">3</span><span style="color: #007700">, </span><span style="color: #0000BB">4</span><span style="color: #007700">];<br />foreach (</span><span style="color: #0000BB">$arr </span><span style="color: #007700">as &amp;</span><span style="color: #0000BB">$value</span><span style="color: #007700">) {<br />    </span><span style="color: #0000BB">$value </span><span style="color: #007700">= </span><span style="color: #0000BB">$value </span><span style="color: #007700">* </span><span style="color: #0000BB">2</span><span style="color: #007700">;<br />}<br /></span><span style="color: #FF8000">// $arr is now [2, 4, 6, 8]<br /></span><span style="color: #007700">unset(</span><span style="color: #0000BB">$value</span><span style="color: #007700">); </span><span style="color: #FF8000">// break the reference with the last element<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+   </div>
+  </p>
+  <div class="warning"><strong class="warning">Warning</strong>
+   <p class="simpara">
+    Reference to a <code class="literal">$value</code> of the last array element
+    remain even after the <code class="literal">foreach</code> loop. It is recommended
+    to destroy these using <span class="function"><a href="function.unset.html" class="function">unset()</a></span>.
+    Otherwise, the following behavior will occur:
+   </p>
+   <div class="informalexample">
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$arr </span><span style="color: #007700">= [</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">2</span><span style="color: #007700">, </span><span style="color: #0000BB">3</span><span style="color: #007700">, </span><span style="color: #0000BB">4</span><span style="color: #007700">];<br />foreach (</span><span style="color: #0000BB">$arr </span><span style="color: #007700">as &amp;</span><span style="color: #0000BB">$value</span><span style="color: #007700">) {<br />    </span><span style="color: #0000BB">$value </span><span style="color: #007700">= </span><span style="color: #0000BB">$value </span><span style="color: #007700">* </span><span style="color: #0000BB">2</span><span style="color: #007700">;<br />}<br /></span><span style="color: #FF8000">// $arr is now [2, 4, 6, 8]<br /><br />// without an unset($value), $value is still a reference to the last item: $arr[3]<br /><br /></span><span style="color: #007700">foreach (</span><span style="color: #0000BB">$arr </span><span style="color: #007700">as </span><span style="color: #0000BB">$key </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">$value</span><span style="color: #007700">) {<br />    </span><span style="color: #FF8000">// $arr[3] will be updated with each value from $arr...<br />    </span><span style="color: #007700">echo </span><span style="color: #DD0000">"</span><span style="color: #007700">{</span><span style="color: #0000BB">$key</span><span style="color: #007700">}</span><span style="color: #DD0000"> =&gt; </span><span style="color: #007700">{</span><span style="color: #0000BB">$value</span><span style="color: #007700">}</span><span style="color: #DD0000"> "</span><span style="color: #007700">;<br />    </span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$arr</span><span style="color: #007700">);<br />}<br /></span><span style="color: #FF8000">// ...until ultimately the second-to-last value is copied onto the last value<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <p class="para">The above example will output:</p>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+0 =&gt; 2 Array ( [0] =&gt; 2, [1] =&gt; 4, [2] =&gt; 6, [3] =&gt; 2 )
+1 =&gt; 4 Array ( [0] =&gt; 2, [1] =&gt; 4, [2] =&gt; 6, [3] =&gt; 4 )
+2 =&gt; 6 Array ( [0] =&gt; 2, [1] =&gt; 4, [2] =&gt; 6, [3] =&gt; 6 )
+3 =&gt; 6 Array ( [0] =&gt; 2, [1] =&gt; 4, [2] =&gt; 6, [3] =&gt; 6 )
+</pre></div>
+    </div>
+   </div>
+  </div>
+  <div class="example" id="example-2">
+  <p><strong>Example #2 Iterate a constant array&#039;s values by reference</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">foreach ([</span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">2</span><span style="color: #007700">, </span><span style="color: #0000BB">3</span><span style="color: #007700">, </span><span style="color: #0000BB">4</span><span style="color: #007700">] as &amp;</span><span style="color: #0000BB">$value</span><span style="color: #007700">) {<br />    </span><span style="color: #0000BB">$value </span><span style="color: #007700">= </span><span style="color: #0000BB">$value </span><span style="color: #007700">* </span><span style="color: #0000BB">2</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </div>
+
+ <div class="sect2">
+  <h3 class="title">See Also</h3>
+  <ul class="simplelist">
+   <li><a href="language.types.array.html" class="link">array</a></li>
+   <li><span class="interfacename"><a href="class.traversable.html" class="interfacename">Traversable</a></span></li>
+   <li><a href="language.types.iterable.html" class="link">iterable</a></li>
+   <li><span class="function"><a href="function.list.html" class="function">list()</a></span></li>
+  </ul>
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

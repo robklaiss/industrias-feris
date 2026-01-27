@@ -1,0 +1,317 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Handling of binary column data</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.odbc-autocommit.html" class="navbar__link">« odbc_autocommit</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.odbc-close.html" class="navbar__link">odbc_close »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ref.uodbc.html">ODBC Functions</a></li>
+        <li>Handling of binary column data</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="function.odbc-binmode" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">odbc_binmode</h1>
+  <p class="verinfo">(PHP 4, PHP 5, PHP 7, PHP 8)</p><p class="refpurpose"><span class="refname">odbc_binmode</span> &mdash; <span class="dc-title">Handling of binary column data</span></p>
+
+ </div>
+ <div class="refsect1 description" id="refsect1-function.odbc-binmode-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="methodname"><strong>odbc_binmode</strong></span>(<span class="methodparam"><span class="type">Odbc\Result</span> <code class="parameter">$statement</code></span>, <span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$mode</code></span>): <span class="type"><a href="language.types.singleton.html" class="type true">true</a></span></div>
+
+  <p class="para rdfs-comment">
+   Controls handling of binary column data. ODBC SQL types affected are
+   <code class="literal">BINARY</code>, <code class="literal">VARBINARY</code>, and
+   <code class="literal">LONGVARBINARY</code>.
+   The default mode can be set using the
+   <a href="odbc.configuration.html#ini.uodbc.defaultbinmode" class="link">uodbc.defaultbinmode</a> <var class="filename">php.ini</var> directive.
+  </p>
+  <p class="para">
+   When binary SQL data is converted to character C data (<strong><code><a href="uodbc.constants.html#constant.odbc-binmode-convert">ODBC_BINMODE_CONVERT</a></code></strong>), each byte
+   (8 bits) of source data is represented as two ASCII characters.
+   These characters are the ASCII character representation of the
+   number in its hexadecimal form. For example, a binary
+   <code class="literal">00000001</code> is converted to
+   <code class="literal">&quot;01&quot;</code> and a binary <code class="literal">11111111</code>
+   is converted to <code class="literal">&quot;FF&quot;</code>.
+  </p>
+  <p class="para">
+   While the handling of <code class="literal">BINARY</code> and <code class="literal">VARBINARY</code>
+   columns only depend on the binmode, the handling of <code class="literal">LONGVARBINARY</code>
+   columns also depends on the longreadlen as well:
+   <table class="doctable table">
+    <caption><strong>LONGVARBINARY handling</strong></caption>
+    
+     <thead>
+      <tr>
+       <th>binmode</th>
+       <th>longreadlen</th>
+       <th>result</th>
+      </tr>
+
+     </thead>
+
+     <tbody class="tbody">
+      <tr>
+       <td><strong><code><a href="uodbc.constants.html#constant.odbc-binmode-passthru">ODBC_BINMODE_PASSTHRU</a></code></strong></td>
+       <td>0</td>
+       <td>passthru</td>
+      </tr>
+
+      <tr>
+       <td><strong><code><a href="uodbc.constants.html#constant.odbc-binmode-return">ODBC_BINMODE_RETURN</a></code></strong></td>
+       <td>0</td>
+       <td>passthru</td>
+      </tr>
+
+      <tr>
+       <td><strong><code><a href="uodbc.constants.html#constant.odbc-binmode-convert">ODBC_BINMODE_CONVERT</a></code></strong></td>
+       <td>0</td>
+       <td>passthru</td>
+      </tr>
+
+      <tr>
+       <td><strong><code><a href="uodbc.constants.html#constant.odbc-binmode-passthru">ODBC_BINMODE_PASSTHRU</a></code></strong></td>
+       <td>&gt;0</td>
+       <td>passthru</td>
+      </tr>
+
+      <tr>
+       <td><strong><code><a href="uodbc.constants.html#constant.odbc-binmode-return">ODBC_BINMODE_RETURN</a></code></strong></td>
+       <td>&gt;0</td>
+       <td>return as is</td>
+      </tr>
+
+      <tr>
+       <td><strong><code><a href="uodbc.constants.html#constant.odbc-binmode-convert">ODBC_BINMODE_CONVERT</a></code></strong></td>
+       <td>&gt;0</td>
+       <td>return as char</td>
+      </tr>
+
+     </tbody>
+    
+   </table>
+
+  </p>
+  <p class="para">
+   If <span class="function"><a href="function.odbc-fetch-into.html" class="function">odbc_fetch_into()</a></span> is used, passthru means that an
+   empty string is returned for these columns.
+   If <span class="function"><a href="function.odbc-result.html" class="function">odbc_result()</a></span> is used, passthru means that the data are
+   sent directly to the client (i.e. printed).
+  </p>
+ </div>
+
+ <div class="refsect1 parameters" id="refsect1-function.odbc-binmode-parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+    
+     <dt><code class="parameter">statement</code></dt>
+     <dd>
+      <p class="para">
+       The ODBC result object.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">mode</code></dt>
+     <dd>
+      <p class="para">
+       Possible values for <code class="parameter">mode</code> are:
+       <ul class="itemizedlist">
+        <li class="listitem">
+         <span class="simpara">
+          <strong><code><a href="uodbc.constants.html#constant.odbc-binmode-passthru">ODBC_BINMODE_PASSTHRU</a></code></strong>: Passthru BINARY data
+         </span>
+        </li>
+        <li class="listitem">
+         <span class="simpara">
+          <strong><code><a href="uodbc.constants.html#constant.odbc-binmode-return">ODBC_BINMODE_RETURN</a></code></strong>: Return as is
+         </span>
+        </li>
+        <li class="listitem">
+         <span class="simpara">
+          <strong><code><a href="uodbc.constants.html#constant.odbc-binmode-convert">ODBC_BINMODE_CONVERT</a></code></strong>: Convert to char and return
+         </span>
+        </li>
+       </ul>
+       <blockquote class="note"><p><strong class="note">Note</strong>: 
+        <span class="simpara">
+         Handling of binary long
+         columns is also affected by <span class="function"><a href="function.odbc-longreadlen.html" class="function">odbc_longreadlen()</a></span>.
+        </span>
+       </p></blockquote>
+      </p>
+     </dd>
+    
+   </dl>
+  </p>
+ </div>
+
+ <div class="refsect1 returnvalues" id="refsect1-function.odbc-binmode-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Always returns <strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong>.
+  </p>
+ </div>
+
+
+ <div class="refsect1 changelog" id="refsect1-function.odbc-binmode-changelog">
+  <h3 class="title">Changelog</h3>
+  <table class="doctable informaltable">
+   
+    <thead>
+     <tr>
+      <th>Version</th>
+      <th>Description</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+ <td>8.4.0</td>
+ <td>
+  <code class="parameter">statement</code> expects an <span class="classname"><strong class="classname">Odbc\Result</strong></span>
+  instance now; previously, a <span class="type"><a href="language.types.resource.html" class="type resource">resource</a></span> was expected.
+ </td>
+</tr>
+
+    </tbody>
+   
+  </table>
+
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Documento {{ doc.id }} - TESAKA-SIFEN{% endblock %}
+
+{% block content %}
+<div class="doc-detail">
+    <div class="doc-header">
+        <h2>Documento #{{ doc.id }}</h2>
+        <a href="/" class="btn-back">← Volver</a>
+    </div>
+
+    <div class="doc-metadata">
+        <h3>Información General</h3>
+        <table class="metadata-table">
+            <tr>
+                <th>ID:</th>
+                <td>{{ doc.id }}</td>
+            </tr>
+            <tr>
+                <th>Fecha de Creación:</th>
+                <td>{{ doc.created_at if doc.created_at else 'N/A' }}</td>
+            </tr>
+            <tr>
+                <th>CDC:</th>
+                <td><code>{{ doc.cdc or 'N/A' }}</code></td>
+            </tr>
+            <tr>
+                <th>RUC Emisor:</th>
+                <td>{{ doc.ruc_emisor or 'N/A' }}</td>
+            </tr>
+            <tr>
+                <th>Timbrado:</th>
+                <td>{{ doc.timbrado or 'N/A' }}</td>
+            </tr>
+            <tr>
+                <th>Estado:</th>
+                <td>
+                    <span class="status-badge status-{{ doc.last_status|lower|replace(' ', '-') if doc.last_status else 'unknown' }}">
+                        {{ doc.last_status or 'N/A' }}
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <th>Código:</th>
+                <td><code>{{ doc.last_code or 'N/A' }}</code></td>
+            </tr>
+            <tr>
+                <th>Mensaje:</th>
+                <td>{{ doc.last_message or 'N/A' }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="doc-xmls">
+        <h3>Contenido XML</h3>
+
+        <details class="xml-block">
+            <summary>DE (Documento Electrónico)</summary>
+            <pre class="xml-content">{% if doc.de_xml %}{{ doc.de_xml }}{% else %}(vacío){% endif %}</pre>
+        </details>
+
+        <details class="xml-block">
+            <summary>siRecepDE (Envío a SIFEN)</summary>
+            <pre class="xml-content">{% if doc.sirecepde_xml %}{{ doc.sirecepde_xml }}{% else %}(vacío){% endif %}</pre>
+        </details>
+
+        <details class="xml-block">
+            <summary>Signed (Firmado)</summary>
+            <pre class="xml-content">{% if doc.signed_xml %}{{ doc.signed_xml }}{% else %}(vacío){% endif %}</pre>
+        </details>
+    </div>
+</div>
+{% endblock %}
+

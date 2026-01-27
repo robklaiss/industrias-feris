@@ -1,0 +1,211 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Examples</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="quickhash.installation.html" class="navbar__link">« Installation</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="class.quickhashintset.html" class="navbar__link">QuickHashIntSet »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.quickhash.html">Quickhash</a></li>
+        <li>Examples</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="quickhash.examples" class="chapter">
+ <h1 class="title">Examples</h1>
+
+ <div class="example" id="example-1">
+  <p><strong>Example #1 Quickhash Example</strong></p>
+  <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$set </span><span style="color: #007700">= new </span><span style="color: #0000BB">QuickHashIntSet</span><span style="color: #007700">( </span><span style="color: #0000BB">1024</span><span style="color: #007700">, </span><span style="color: #0000BB">QuickHashIntSet</span><span style="color: #007700">::</span><span style="color: #0000BB">CHECK_FOR_DUPES </span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">( </span><span style="color: #0000BB">1 </span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">( </span><span style="color: #0000BB">3 </span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">( </span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">exists</span><span style="color: #007700">( </span><span style="color: #0000BB">3 </span><span style="color: #007700">) );<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">( </span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">exists</span><span style="color: #007700">( </span><span style="color: #0000BB">4 </span><span style="color: #007700">) );<br /><br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">saveToFile</span><span style="color: #007700">( </span><span style="color: #DD0000">"/tmp/test-set.set" </span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$newSet </span><span style="color: #007700">= </span><span style="color: #0000BB">QuickHashIntSet</span><span style="color: #007700">::</span><span style="color: #0000BB">loadFromFile</span><span style="color: #007700">(<br />    </span><span style="color: #DD0000">"/tmp/test-set.set"<br /></span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">( </span><span style="color: #0000BB">$newSet</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">exists</span><span style="color: #007700">( </span><span style="color: #0000BB">3 </span><span style="color: #007700">) );<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">( </span><span style="color: #0000BB">$newSet</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">exists</span><span style="color: #007700">( </span><span style="color: #0000BB">4 </span><span style="color: #007700">) );<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+  </div>
+
+  <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+  <div class="example-contents screen">
+<div class="cdata"><pre>
+bool(true)
+bool(false)
+bool(true)
+bool(false)
+</pre></div>
+  </div>
+ </div>
+ <div class="example" id="example-2">
+  <p><strong>Example #2 Quickhash ArrayAccess Example</strong></p>
+  <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$hash </span><span style="color: #007700">= new </span><span style="color: #0000BB">QuickHashIntHash</span><span style="color: #007700">( </span><span style="color: #0000BB">64 </span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">// Adding and updating hash entries.<br /></span><span style="color: #0000BB">$hash</span><span style="color: #007700">[</span><span style="color: #0000BB">3</span><span style="color: #007700">] = </span><span style="color: #0000BB">145926</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$hash</span><span style="color: #007700">[</span><span style="color: #0000BB">3</span><span style="color: #007700">] = </span><span style="color: #0000BB">1415926</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$hash</span><span style="color: #007700">[</span><span style="color: #0000BB">2</span><span style="color: #007700">] = </span><span style="color: #0000BB">72</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">// Checking if keys exist<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">( isset( </span><span style="color: #0000BB">$hash</span><span style="color: #007700">[</span><span style="color: #0000BB">3</span><span style="color: #007700">] ) );<br /><br /></span><span style="color: #FF8000">// Removing hash entries<br /></span><span style="color: #007700">unset( </span><span style="color: #0000BB">$hash</span><span style="color: #007700">[</span><span style="color: #0000BB">2</span><span style="color: #007700">] );<br /><br /></span><span style="color: #FF8000">// Retrieving the value stored for a hash<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$hash</span><span style="color: #007700">[</span><span style="color: #0000BB">3</span><span style="color: #007700">], </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+  </div>
+
+  <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+  <div class="example-contents screen">
+<div class="cdata"><pre>
+bool(true)
+1415926
+</pre></div>
+  </div>
+ </div>
+ <div class="example" id="example-3">
+  <p><strong>Example #3 Quickhash Iterator Example</strong></p>
+  <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$hash </span><span style="color: #007700">= new </span><span style="color: #0000BB">QuickHashIntHash</span><span style="color: #007700">( </span><span style="color: #0000BB">64 </span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">// Adding hash entries.<br /></span><span style="color: #0000BB">$hash</span><span style="color: #007700">[</span><span style="color: #0000BB">1</span><span style="color: #007700">] = </span><span style="color: #0000BB">145926</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$hash</span><span style="color: #007700">[</span><span style="color: #0000BB">2</span><span style="color: #007700">] = </span><span style="color: #0000BB">1415926</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$hash</span><span style="color: #007700">[</span><span style="color: #0000BB">3</span><span style="color: #007700">] = </span><span style="color: #0000BB">72</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$hash</span><span style="color: #007700">[</span><span style="color: #0000BB">4</span><span style="color: #007700">] = </span><span style="color: #0000BB">712314</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$hash</span><span style="color: #007700">[</span><span style="color: #0000BB">5</span><span style="color: #007700">] = -</span><span style="color: #0000BB">4234</span><span style="color: #007700">;<br /><br />foreach( </span><span style="color: #0000BB">$hash </span><span style="color: #007700">as </span><span style="color: #0000BB">$key </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">$value </span><span style="color: #007700">)<br />{<br />    echo </span><span style="color: #0000BB">$key</span><span style="color: #007700">, </span><span style="color: #DD0000">' =&gt; '</span><span style="color: #007700">, </span><span style="color: #0000BB">$value</span><span style="color: #007700">, </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+  </div>
+
+  <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+  <div class="example-contents screen">
+<div class="cdata"><pre>
+5 =&gt; -4234
+4 =&gt; 712314
+1 =&gt; 145926
+2 =&gt; 1415926
+3 =&gt; 72
+</pre></div>
+  </div>
+ </div>
+ <div class="example" id="example-4">
+  <p><strong>Example #4 Quickhash String Values Example</strong></p>
+  <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$hash </span><span style="color: #007700">= new </span><span style="color: #0000BB">QuickHashIntStringHash</span><span style="color: #007700">( </span><span style="color: #0000BB">64 </span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">// Adding hash entries.<br /></span><span style="color: #0000BB">$hash</span><span style="color: #007700">[</span><span style="color: #0000BB">1</span><span style="color: #007700">] = </span><span style="color: #DD0000">"one million four hundred fifteen thousand nine hundred twenty six"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$hash</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">( </span><span style="color: #0000BB">2</span><span style="color: #007700">, </span><span style="color: #DD0000">"one more" </span><span style="color: #007700">);<br /><br />foreach( </span><span style="color: #0000BB">$hash </span><span style="color: #007700">as </span><span style="color: #0000BB">$key </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">$value </span><span style="color: #007700">)<br />{<br />    echo </span><span style="color: #0000BB">$key</span><span style="color: #007700">, </span><span style="color: #DD0000">' =&gt; '</span><span style="color: #007700">, </span><span style="color: #0000BB">$value</span><span style="color: #007700">, </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+  </div>
+
+  <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+  <div class="example-contents screen">
+<div class="cdata"><pre>
+1 =&gt; one million four hundred fifteen thousand nine hundred twenty six
+2 =&gt; one more
+</pre></div>
+  </div>
+ </div>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

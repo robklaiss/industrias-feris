@@ -1,0 +1,235 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>The parallel\Events class</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="parallel-channel.close.html" class="navbar__link">« parallel\Channel::close</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="parallel-events.setblocking.html" class="navbar__link">parallel\Events::setBlocking »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.parallel.html">parallel</a></li>
+        <li>The parallel\Events class</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="class.parallel-events" class="reference">
+
+ <h1 class="title">The parallel\Events class</h1>
+ 
+
+ <div class="partintro"><p class="verinfo">(0.9.0)</p>
+  <div class="section">
+    <h2 class="title">The Event Loop</h2>
+    <p class="simpara">
+     The Event loop monitors the state of sets of futures and or channels (targets) in order to perform read (<span class="methodname"><a href="parallel-future.value.html" class="methodname">parallel\Future::value()</a></span>, <span class="methodname"><a href="parallel-channel.recv.html" class="methodname">parallel\Channel::recv()</a></span>) and write (<span class="methodname"><a href="parallel-channel.send.html" class="methodname">parallel\Channel::send()</a></span>) operations as the targets become available and the operations may be performed without blocking the event loop.
+    </p>
+  </div>
+  <div class="section" id="parallel-events.synopsis">
+   <h2 class="title">Class synopsis</h2>
+
+
+   <div class="classsynopsis">
+    <span class="ooclass"><strong class="classname"></strong></span>
+
+
+    <div class="classsynopsisinfo">
+     <span class="ooclass">
+      <span class="modifier">final</span>
+      <span class="modifier">class</span> <strong class="classname">parallel\Events</strong>
+     </span>
+     <span class="oointerface"><span class="modifier">implements</span> 
+       <a href="class.countable.html" class="interfacename">Countable</a></span><span class="oointerface">,  <a href="class.traversable.html" class="interfacename">Traversable</a></span> {</div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Input */</div>
+    <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><a href="parallel-events.setinput.html" class="methodname">setInput</a></span>(<span class="methodparam"><span class="type">Input</span> <code class="parameter">$input</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Targets */</div>
+    <div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="parallel-events.addchannel.html" class="methodname">addChannel</a></span>(<span class="methodparam"><span class="type"><a href="class.parallel-channel.html" class="type parallel\Channel">parallel\Channel</a></span> <code class="parameter">$channel</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="parallel-events.addfuture.html" class="methodname">addFuture</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$name</code></span>, <span class="methodparam"><span class="type"><a href="class.parallel-future.html" class="type parallel\Future">parallel\Future</a></span> <code class="parameter">$future</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="parallel-events.remove.html" class="methodname">remove</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$target</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Behaviour */</div>
+    <div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="parallel-events.setblocking.html" class="methodname">setBlocking</a></span>(<span class="methodparam"><span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span> <code class="parameter">$blocking</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="parallel-events.settimeout.html" class="methodname">setTimeout</a></span>(<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$timeout</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Polling */</div>
+    <div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="parallel-events.poll.html" class="methodname">poll</a></span>(): <span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="class.parallel-events-event.html" class="type parallel\Events\Event">parallel\Events\Event</a></span></span></div>
+
+   }</div>
+
+
+  </div>
+
+ </div>
+
+  
+
+
+
+
+  
+
+
+
+
+  
+
+
+
+
+  
+
+
+
+
+  
+
+
+
+
+  
+
+
+
+
+  
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="parallel-events.setblocking.html">parallel\Events::setBlocking</a> — Behaviour</li><li><a href="parallel-events.settimeout.html">parallel\Events::setTimeout</a> — Behaviour</li><li><a href="parallel-events.setinput.html">parallel\Events::setInput</a> — Input</li><li><a href="parallel-events.addchannel.html">parallel\Events::addChannel</a> — Targets</li><li><a href="parallel-events.addfuture.html">parallel\Events::addFuture</a> — Targets</li><li><a href="parallel-events.remove.html">parallel\Events::remove</a> — Targets</li><li><a href="parallel-events.poll.html">parallel\Events::poll</a> — Polling</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

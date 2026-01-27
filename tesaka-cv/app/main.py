@@ -83,6 +83,11 @@ register_emit_routes(app, jinja_env)
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
+    return render_template("home.html", request)
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard(request: Request):
     """Muestra el dashboard con estadísticas del sistema"""
     conn = get_db()
     cursor = conn.cursor()

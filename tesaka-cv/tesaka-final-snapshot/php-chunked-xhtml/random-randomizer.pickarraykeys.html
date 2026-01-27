@@ -1,0 +1,269 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Select random array keys</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="random-randomizer.nextint.html" class="navbar__link">« Random\Randomizer::nextInt</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="random-randomizer.serialize.html" class="navbar__link">Random\Randomizer::__serialize »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="class.random-randomizer.html">Random\Randomizer</a></li>
+        <li>Select random array keys</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="random-randomizer.pickarraykeys" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">Random\Randomizer::pickArrayKeys</h1>
+  <p class="verinfo">(PHP 8 &gt;= 8.2.0)</p><p class="refpurpose"><span class="refname">Random\Randomizer::pickArrayKeys</span> &mdash; <span class="dc-title">Select random array keys</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-random-randomizer.pickarraykeys-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><strong>Random\Randomizer::pickArrayKeys</strong></span>(<span class="methodparam"><span class="type"><a href="language.types.array.html" class="type array">array</a></span> <code class="parameter">$array</code></span>, <span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$num</code></span>): <span class="type"><a href="language.types.array.html" class="type array">array</a></span></div>
+
+  <p class="para rdfs-comment">
+   Uniformly selects <code class="parameter">num</code> distinct array keys of the input <code class="parameter">array</code>.
+  </p>
+  <p class="para">
+   Each key of the input <code class="parameter">array</code> is equally likely to be returned.
+  </p>
+  <div class="caution"><strong class="caution">Caution</strong>
+   <p class="para">
+    The selection of the array keys depends on the internal structure of the input
+    <code class="parameter">array</code>. The returned array keys might be different for
+    two equal input arrays and two <span class="classname"><a href="class.random-engine.html" class="classname">Random\Engine</a></span>s with
+    identical state, depending on how the input arrays have been created.
+   </p>
+  </div>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-random-randomizer.pickarraykeys-parameters">
+  <h3 class="title">Parameters</h3>
+  <dl>
+   
+    <dt><code class="parameter">array</code></dt>
+    <dd>
+     <p class="para">
+      The array whose array keys are selected.
+     </p>
+    </dd>
+   
+   
+    <dt><code class="parameter">num</code></dt>
+    <dd>
+     <p class="para">
+      The number of array keys to return; must be between <code class="literal">1</code>
+      and the number of elements in <code class="parameter">array</code>.
+     </p>
+    </dd>
+   
+  </dl>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-random-randomizer.pickarraykeys-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   An <span class="type"><a href="language.types.array.html" class="type array">array</a></span> containing <code class="parameter">num</code> distinct array keys of <code class="parameter">array</code>.
+  </p>
+  <p class="para">
+   The returned <span class="type"><a href="language.types.array.html" class="type array">array</a></span> will be a list (<span class="function"><a href="function.array-is-list.html" class="function">array_is_list()</a></span>). It will be a subset
+   of the <span class="type"><a href="language.types.array.html" class="type array">array</a></span> returned by <span class="function"><a href="function.array-keys.html" class="function">array_keys()</a></span>.
+  </p>
+ </div>
+
+
+ <div class="refsect1 errors" id="refsect1-random-randomizer.pickarraykeys-errors">
+  <h3 class="title">Errors/Exceptions</h3>
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     If <code class="parameter">num</code> is less than <code class="literal">1</code> or
+     greater than the number of elements in <code class="parameter">array</code>, a
+     <span class="classname"><a href="class.valueerror.html" class="classname">ValueError</a></span> will be thrown.
+    </span>
+   </li>
+   
+ <li class="listitem">
+  <span class="simpara">
+   Any <span class="classname"><a href="class.throwable.html" class="classname">Throwable</a></span>s thrown by the <span class="methodname"><a href="random-engine.generate.html" class="methodname">Random\Engine::generate()</a></span> method
+   of the underlying <a href="class.random-randomizer.html#random-randomizer.props.engine" class="link"><code class="literal">Random\Randomizer::$engine</code></a>.
+  </span>
+ </li>
+
+  </ul>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-random-randomizer.pickarraykeys-examples">
+  <h3 class="title">Examples</h3>
+  <div class="example" id="example-1">
+   <p><strong>Example #1 <span class="function"><strong>Random\Randomizer::pickArrayKeys()</strong></span> example</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$r </span><span style="color: #007700">= new </span><span style="color: #0000BB">\Random\Randomizer</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">$fruits </span><span style="color: #007700">= [ </span><span style="color: #DD0000">'red' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'🍎'</span><span style="color: #007700">, </span><span style="color: #DD0000">'green' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'🥝'</span><span style="color: #007700">, </span><span style="color: #DD0000">'yellow' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'🍌'</span><span style="color: #007700">, </span><span style="color: #DD0000">'pink' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'🍑'</span><span style="color: #007700">, </span><span style="color: #DD0000">'purple' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'🍇' </span><span style="color: #007700">];<br /><br /></span><span style="color: #FF8000">// Pick 2 random array keys:<br /></span><span style="color: #007700">echo </span><span style="color: #DD0000">"Keys: "</span><span style="color: #007700">, </span><span style="color: #0000BB">implode</span><span style="color: #007700">(</span><span style="color: #DD0000">', '</span><span style="color: #007700">, </span><span style="color: #0000BB">$r</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">pickArrayKeys</span><span style="color: #007700">(</span><span style="color: #0000BB">$fruits</span><span style="color: #007700">, </span><span style="color: #0000BB">2</span><span style="color: #007700">)), </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">// Pick another 3:<br /></span><span style="color: #007700">echo </span><span style="color: #DD0000">"Keys: "</span><span style="color: #007700">, </span><span style="color: #0000BB">implode</span><span style="color: #007700">(</span><span style="color: #DD0000">', '</span><span style="color: #007700">, </span><span style="color: #0000BB">$r</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">pickArrayKeys</span><span style="color: #007700">(</span><span style="color: #0000BB">$fruits</span><span style="color: #007700">, </span><span style="color: #0000BB">3</span><span style="color: #007700">)), </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive examplescode"><pre class="examplescode">Keys: yellow, purple
+Keys: red, green, yellow</pre>
+</div>
+   </div>
+  </div>
+  <div class="example" id="example-2">
+   <p><strong>Example #2 Picking random values</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$r </span><span style="color: #007700">= new </span><span style="color: #0000BB">\Random\Randomizer</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">$fruits </span><span style="color: #007700">= [ </span><span style="color: #DD0000">'red' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'🍎'</span><span style="color: #007700">, </span><span style="color: #DD0000">'green' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'🥝'</span><span style="color: #007700">, </span><span style="color: #DD0000">'yellow' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'🍌'</span><span style="color: #007700">, </span><span style="color: #DD0000">'pink' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'🍑'</span><span style="color: #007700">, </span><span style="color: #DD0000">'purple' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'🍇' </span><span style="color: #007700">];<br /><br /></span><span style="color: #0000BB">$keys </span><span style="color: #007700">= </span><span style="color: #0000BB">$r</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">pickArrayKeys</span><span style="color: #007700">(</span><span style="color: #0000BB">$fruits</span><span style="color: #007700">, </span><span style="color: #0000BB">2</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">// Look up the values for the picked keys.<br /></span><span style="color: #0000BB">$selection </span><span style="color: #007700">= </span><span style="color: #0000BB">array_map</span><span style="color: #007700">(<br />    static fn (</span><span style="color: #0000BB">$key</span><span style="color: #007700">) =&gt; </span><span style="color: #0000BB">$fruits</span><span style="color: #007700">[</span><span style="color: #0000BB">$key</span><span style="color: #007700">],<br />    </span><span style="color: #0000BB">$keys<br /></span><span style="color: #007700">);<br /><br />echo </span><span style="color: #DD0000">"Values: "</span><span style="color: #007700">, </span><span style="color: #0000BB">implode</span><span style="color: #007700">(</span><span style="color: #DD0000">', '</span><span style="color: #007700">, </span><span style="color: #0000BB">$selection</span><span style="color: #007700">), </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive examplescode"><pre class="examplescode">Values: 🍎, 🍇</pre>
+</div>
+   </div>
+  </div>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-random-randomizer.pickarraykeys-seealso">
+  <h3 class="title">See Also</h3>
+  <ul class="simplelist">
+   <li><span class="function"><a href="function.array-keys.html" class="function" rel="rdfs-seeAlso">array_keys()</a> - Return all the keys or a subset of the keys of an array</span></li>
+  </ul>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

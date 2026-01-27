@@ -33,6 +33,9 @@ def build_de_xml(
     hora: Optional[str] = None,
     csc: Optional[str] = None,
     env: str = "test",
+    receptor_ruc: Optional[str] = None,
+    receptor_dv: Optional[str] = None,
+    receptor_nombre: Optional[str] = None,
 ) -> str:
     """
     Genera un XML DE crudo (elemento DE de tipo tDE) que valida contra DE_v150.xsd
@@ -181,6 +184,55 @@ def build_de_xml(
         if not d_nom_emi:
             d_nom_emi = "Emisor"
     
+    # Receptor (parámetros + env vars como fallback)
+    rec_ruc_env = (os.getenv("SIFEN_REC_RUC") or os.getenv("SIFEN_RECEPTOR_RUC") or "80012345")
+    rec_dv_env = (os.getenv("SIFEN_REC_DV") or os.getenv("SIFEN_RECEPTOR_DV") or "7")
+    rec_nombre_env = (os.getenv("SIFEN_REC_NOMBRE") or os.getenv("SIFEN_RECEPTOR_NOMBRE") or "Cliente de Prueba")
+
+    rec_ruc_raw = (receptor_ruc or rec_ruc_env).strip()
+    rec_dv_in = (receptor_dv or "").strip()
+    rec_nombre = (receptor_nombre or rec_nombre_env).strip() or "Cliente de Prueba"
+
+    # Permitir formato "RUC-DV" (ej: "7524653-8")
+    if "-" in rec_ruc_raw:
+        a, b = rec_ruc_raw.split("-", 1)
+        rec_ruc_raw = a.strip()
+        if not rec_dv_in:
+            rec_dv_in = b.strip()
+
+    # Guardrail + normalización: receptor_ruc solo puede contener dígitos y separadores simples
+    rec_ruc_digits = ""
+    for ch in rec_ruc_raw:
+        if ch.isdigit():
+            rec_ruc_digits += ch
+        elif ch in " .-_/":
+            # Separadores permitidos, se ignoran
+            continue
+        else:
+            raise ValueError(
+                f"receptor_ruc contiene carácter inválido {ch!r}. Solo se permiten dígitos y separadores simples."
+            )
+
+    if not rec_ruc_digits:
+        raise ValueError(f"receptor_ruc debe contener al menos un dígito. Valor recibido: {rec_ruc_raw!r}")
+
+    # Quitar ceros a la izquierda para dRucRec
+    d_ruc_rec = rec_ruc_digits.lstrip("0") or "0"
+
+    # Normalizar DV receptor
+    rec_dv_digits = "".join(c for c in rec_dv_in if c.isdigit())
+    if rec_dv_digits:
+        if len(rec_dv_digits) != 1:
+            raise ValueError(
+                f"DV del receptor debe ser exactamente 1 dígito. Valor recibido: {rec_dv_in!r}"
+            )
+        d_dv_rec = rec_dv_digits
+    else:
+        env_dv_digits = "".join(c for c in rec_dv_env if c.isdigit())
+        d_dv_rec = env_dv_digits[:1] if env_dv_digits else "7"
+
+    d_nom_rec = rec_nombre
+
     # Normalizar campos numéricos para CDC
     establecimiento_norm = str(establecimiento).zfill(3)[-3:]  # 3 dígitos
     punto_expedicion_norm = str(punto_expedicion).zfill(3)[-3:]  # 3 dígitos
@@ -232,9 +284,9 @@ def build_de_xml(
             <iTiOpe>1</iTiOpe>
             <cPaisRec>PRY</cPaisRec>
             <dDesPaisRec>Paraguay</dDesPaisRec>
-            <dRucRec>80012345</dRucRec>
-            <dDVRec>7</dDVRec>
-            <dNomRec>Cliente de Prueba</dNomRec>
+            <dRucRec>{d_ruc_rec}</dRucRec>
+            <dDVRec>{d_dv_rec}</dDVRec>
+            <dNomRec>{d_nom_rec}</dNomRec>
             <dDirRec>Asunción</dDirRec>
             <dNumCasRec>5678</dNumCasRec>
             <cDepRec>1</cDepRec>

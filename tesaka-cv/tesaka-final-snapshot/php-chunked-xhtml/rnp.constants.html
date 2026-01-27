@@ -1,0 +1,489 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Predefined Constants</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="rnp.installation.html" class="navbar__link">« Installation</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="rnp.examples.html" class="navbar__link">Examples »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.rnp.html">Rnp</a></li>
+        <li>Predefined Constants</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="rnp.constants" class="appendix">
+ <h1 class="title">Predefined Constants</h1>
+
+ <p class="simpara">
+The constants below are defined by this extension, and
+will only be available when the extension has either
+been compiled into PHP or dynamically loaded at runtime.
+</p>
+ <p class="para">
+  <dl>
+   
+    <dt id="constant.rnp-keystore-gpg">
+     <strong><code><a href="rnp.constants.html#constant.rnp-keystore-gpg">RNP_KEYSTORE_GPG</a></code></strong>
+     (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Keystore format &quot;GPG&quot;.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-keystore-kbx">
+     <strong><code><a href="rnp.constants.html#constant.rnp-keystore-kbx">RNP_KEYSTORE_KBX</a></code></strong>
+     (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Keystore format &quot;KBX&quot;. For public keys only.
+      A keybox is a file format used to store public keys along with meta information and indices.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-keystore-g10">
+     <strong><code><a href="rnp.constants.html#constant.rnp-keystore-g10">RNP_KEYSTORE_G10</a></code></strong>
+     (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Keystore format &quot;G10&quot;. For private keys.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-load-save-public-keys">
+     <strong><code><a href="rnp.constants.html#constant.rnp-load-save-public-keys">RNP_LOAD_SAVE_PUBLIC_KEYS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Load or save public keys only. Can be OR-ed with <strong><code><a href="rnp.constants.html#constant.rnp-load-save-secret-keys">RNP_LOAD_SAVE_SECRET_KEYS</a></code></strong>
+      to load both public and private keys to the FFI context or save them from the context.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-load-save-secret-keys">
+     <strong><code><a href="rnp.constants.html#constant.rnp-load-save-secret-keys">RNP_LOAD_SAVE_SECRET_KEYS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Load or save secret keys only. Can be OR-ed with <strong><code><a href="rnp.constants.html#constant.rnp-load-save-public-keys">RNP_LOAD_SAVE_PUBLIC_KEYS</a></code></strong>
+      to load both public and private keys to the FFI context or save them from the context.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-load-save-permissive">
+     <strong><code><a href="rnp.constants.html#constant.rnp-load-save-permissive">RNP_LOAD_SAVE_PERMISSIVE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Allows to ignore bad signature/key/subkey packets during key import.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-load-save-single">
+     <strong><code><a href="rnp.constants.html#constant.rnp-load-save-single">RNP_LOAD_SAVE_SINGLE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      If set, only the first key will be loaded.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-load-save-base64">
+     <strong><code><a href="rnp.constants.html#constant.rnp-load-save-base64">RNP_LOAD_SAVE_BASE64</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Allow import of base64-encoded keys (autocrypt ones).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-feature-symm-alg">
+     <strong><code><a href="rnp.constants.html#constant.rnp-feature-symm-alg">RNP_FEATURE_SYMM_ALG</a></code></strong>
+     (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      List available symmetric encryption algorithms.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-feature-aead-alg">
+     <strong><code><a href="rnp.constants.html#constant.rnp-feature-aead-alg">RNP_FEATURE_AEAD_ALG</a></code></strong>
+     (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      List available AEAD algorithms.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-feature-prot-mode">
+     <strong><code><a href="rnp.constants.html#constant.rnp-feature-prot-mode">RNP_FEATURE_PROT_MODE</a></code></strong>
+     (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      List available protection modes.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-feature-pk-alg">
+     <strong><code><a href="rnp.constants.html#constant.rnp-feature-pk-alg">RNP_FEATURE_PK_ALG</a></code></strong>
+     (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      List available public key algorithms.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-feature-hash-alg">
+     <strong><code><a href="rnp.constants.html#constant.rnp-feature-hash-alg">RNP_FEATURE_HASH_ALG</a></code></strong>
+     (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      List available hash algorithms.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-feature-comp-alg">
+     <strong><code><a href="rnp.constants.html#constant.rnp-feature-comp-alg">RNP_FEATURE_COMP_ALG</a></code></strong>
+     (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      List available compression algorithms.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-feature-curve">
+     <strong><code><a href="rnp.constants.html#constant.rnp-feature-curve">RNP_FEATURE_CURVE</a></code></strong>
+     (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      List available elliptic curves.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-dump-mpi">
+     <strong><code><a href="rnp.constants.html#constant.rnp-dump-mpi">RNP_DUMP_MPI</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Dump MPI (Multi-precision integer) values.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-dump-raw">
+     <strong><code><a href="rnp.constants.html#constant.rnp-dump-raw">RNP_DUMP_RAW</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Dump raw packet contents as well.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-dump-grip">
+     <strong><code><a href="rnp.constants.html#constant.rnp-dump-grip">RNP_DUMP_GRIP</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Dump key fingerprints and grips.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-json-dump-mpi">
+     <strong><code><a href="rnp.constants.html#constant.rnp-json-dump-mpi">RNP_JSON_DUMP_MPI</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Dump MPI (Multi-precision integer) values.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-json-dump-raw">
+     <strong><code><a href="rnp.constants.html#constant.rnp-json-dump-raw">RNP_JSON_DUMP_RAW</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Dump raw packet contents as well.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-json-dump-grip">
+     <strong><code><a href="rnp.constants.html#constant.rnp-json-dump-grip">RNP_JSON_DUMP_GRIP</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Dump key fingerprints and grips.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-encrypt-nowrap">
+     <strong><code><a href="rnp.constants.html#constant.rnp-encrypt-nowrap">RNP_ENCRYPT_NOWRAP</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Allows encryption of signed message. Message is not wrapped
+      into literal data packet.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-key-export-armored">
+     <strong><code><a href="rnp.constants.html#constant.rnp-key-export-armored">RNP_KEY_EXPORT_ARMORED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Enable ASCII-armoring of exported data.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-key-export-public">
+     <strong><code><a href="rnp.constants.html#constant.rnp-key-export-public">RNP_KEY_EXPORT_PUBLIC</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Export public key.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-key-export-secret">
+     <strong><code><a href="rnp.constants.html#constant.rnp-key-export-secret">RNP_KEY_EXPORT_SECRET</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Export secret key.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-key-export-subkeys">
+     <strong><code><a href="rnp.constants.html#constant.rnp-key-export-subkeys">RNP_KEY_EXPORT_SUBKEYS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      If primary key is being exported, all subkeys will be exported too.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-key-export-base64">
+     <strong><code><a href="rnp.constants.html#constant.rnp-key-export-base64">RNP_KEY_EXPORT_BASE64</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Export base64-encoded autocrypt key instead of binary.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-key-remove-public">
+     <strong><code><a href="rnp.constants.html#constant.rnp-key-remove-public">RNP_KEY_REMOVE_PUBLIC</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Remove public key.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-key-remove-secret">
+     <strong><code><a href="rnp.constants.html#constant.rnp-key-remove-secret">RNP_KEY_REMOVE_SECRET</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Remove secret key.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.rnp-key-remove-subkeys">
+     <strong><code><a href="rnp.constants.html#constant.rnp-key-remove-subkeys">RNP_KEY_REMOVE_SUBKEYS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type integer">integer</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      If primary key is being deleted, all of its subkeys will be removed too.
+     </span>
+    </dd>
+   
+  </dl>
+ </p>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

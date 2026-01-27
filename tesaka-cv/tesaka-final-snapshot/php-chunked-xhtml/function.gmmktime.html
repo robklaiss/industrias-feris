@@ -1,0 +1,320 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Get Unix timestamp for a GMT date</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.gmdate.html" class="navbar__link">« gmdate</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.gmstrftime.html" class="navbar__link">gmstrftime »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ref.datetime.html">Date/Time Functions</a></li>
+        <li>Get Unix timestamp for a GMT date</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="function.gmmktime" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">gmmktime</h1>
+  <p class="verinfo">(PHP 4, PHP 5, PHP 7, PHP 8)</p><p class="refpurpose"><span class="refname">gmmktime</span> &mdash; <span class="dc-title">Get Unix timestamp for a GMT date</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-function.gmmktime-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="methodname"><strong>gmmktime</strong></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$hour</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.integer.html" class="type int">int</a></span></span> <code class="parameter">$minute</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.integer.html" class="type int">int</a></span></span> <code class="parameter">$second</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.integer.html" class="type int">int</a></span></span> <code class="parameter">$month</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.integer.html" class="type int">int</a></span></span> <code class="parameter">$day</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.integer.html" class="type int">int</a></span></span> <code class="parameter">$year</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span><br>): <span class="type"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+
+  <p class="para rdfs-comment">
+   Identical to <span class="function"><a href="function.mktime.html" class="function">mktime()</a></span> except the passed parameters represents a 
+   GMT date. <span class="function"><strong>gmmktime()</strong></span> internally uses <span class="function"><a href="function.mktime.html" class="function">mktime()</a></span>
+   so only times valid in derived local time can be used.
+  </p>
+  <p class="para">
+   Like <span class="function"><a href="function.mktime.html" class="function">mktime()</a></span>, optional arguments may be left out in
+   order from right to left, with any omitted arguments being set to the
+   current corresponding GMT value.
+  </p>
+  <p class="simpara">
+   Calling <span class="function"><strong>gmmktime()</strong></span> without any arguments is not
+   supported, and will result in an <span class="classname"><a href="class.argumentcounterror.html" class="classname">ArgumentCountError</a></span>.
+   <span class="function"><a href="function.time.html" class="function">time()</a></span> can be used to get the current timestamp.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-function.gmmktime-parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+    
+     <dt><code class="parameter">hour</code></dt>
+     <dd>
+      <p class="para">
+       The number of the hour relative to the start of the day determined by
+       <code class="parameter">month</code>, <code class="parameter">day</code> and <code class="parameter">year</code>.
+       Negative values reference the hour before midnight of the day in question.
+       Values greater than 23 reference the appropriate hour in the following day(s).
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">minute</code></dt>
+     <dd>
+      <p class="para">
+       The number of the minute relative to the start of the <code class="parameter">hour</code>.
+       Negative values reference the minute in the previous hour.
+       Values greater than 59 reference the appropriate minute in the following hour(s).
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">second</code></dt>
+     <dd>
+      <p class="para">
+       The number of seconds relative to the start of the <code class="parameter">minute</code>.
+       Negative values reference the second in the previous minute.
+       Values greater than 59 reference the appropriate second in the following minute(s).
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">month</code></dt>
+     <dd>
+      <p class="para">
+       The number of the month relative to the end of the previous year.
+       Values 1 to 12 reference the normal calendar months of the year in question.
+       Values less than 1 (including negative values) reference the months in the previous year in reverse order, so 0 is December, -1 is November, etc.
+       Values greater than 12 reference the appropriate month in the following year(s).
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">day</code></dt>
+     <dd>
+      <p class="para">
+       The number of the day relative to the end of the previous month.
+       Values 1 to 28, 29, 30 or 31 (depending upon the month) reference the normal days in the relevant month.
+       Values less than 1 (including negative values) reference the days in the previous month, so 0 is the last day of the previous month, -1 is the day before that, etc.
+       Values greater than the number of days in the relevant month reference the appropriate day in the following month(s).
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">year</code></dt>
+     <dd>
+      <p class="para">
+       The year
+      </p>
+     </dd>
+    
+   </dl>
+  </p>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-function.gmmktime-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns a <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> Unix timestamp on success, or <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong> if the
+   timestamp doesn&#039;t fit in a PHP integer.
+  </p>
+ </div>
+
+
+ <div class="refsect1 changelog" id="refsect1-function.gmmktime-changelog">
+  <h3 class="title">Changelog</h3>
+  <p class="para">
+   <table class="doctable informaltable">
+    
+     <thead>
+      <tr>
+       <th>Version</th>
+       <th>Description</th>
+      </tr>
+
+     </thead>
+
+     <tbody class="tbody">
+      <tr>
+       <td>8.0.0</td>
+       <td>
+        <code class="parameter">hour</code> is no longer optional. If you need a Unix
+        timestamp, use <span class="function"><a href="function.time.html" class="function">time()</a></span>.
+       </td>
+      </tr>
+
+      <tr>
+       <td>8.0.0</td>
+       <td>
+        <code class="parameter">minute</code>, <code class="parameter">second</code>, <code class="parameter">month</code>,
+        <code class="parameter">day</code> and <code class="parameter">year</code> are nullable now.
+       </td>
+      </tr>
+
+     </tbody>
+    
+   </table>
+
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-function.gmmktime-examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   <div class="example" id="example-1">
+    <p><strong>Example #1 <span class="function"><strong>gmmktime()</strong></span> basic example</strong></p>
+    <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />date_default_timezone_set</span><span style="color: #007700">(</span><span style="color: #DD0000">"Indian/Maldives"</span><span style="color: #007700">);<br /><br />echo </span><span style="color: #DD0000">"July 1, 2000 is on a " </span><span style="color: #007700">. </span><span style="color: #0000BB">date</span><span style="color: #007700">(</span><span style="color: #DD0000">"l"</span><span style="color: #007700">, </span><span style="color: #0000BB">gmmktime</span><span style="color: #007700">(</span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">7</span><span style="color: #007700">, </span><span style="color: #0000BB">1</span><span style="color: #007700">, </span><span style="color: #0000BB">2000</span><span style="color: #007700">));</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output:</p></div>
+    <div class="example-contents screen">
+<div class="annotation-interactive examplescode"><pre class="examplescode">July 1, 2000 is on a Saturday</pre>
+</div>
+    </div>
+   </div>
+  </p>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-function.gmmktime-seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li>The <span class="classname"><a href="class.datetimeimmutable.html" class="classname">DateTimeImmutable</a></span> class</li>
+    <li><span class="function"><a href="function.mktime.html" class="function" rel="rdfs-seeAlso">mktime()</a> - Get Unix timestamp for a date</span></li>
+    <li><span class="function"><a href="function.date.html" class="function" rel="rdfs-seeAlso">date()</a> - Format a Unix timestamp</span></li>
+    <li><span class="function"><a href="function.time.html" class="function" rel="rdfs-seeAlso">time()</a> - Return current Unix timestamp</span></li>
+   </ul>
+  </p>
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

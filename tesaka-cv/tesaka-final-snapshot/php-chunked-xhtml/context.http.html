@@ -1,0 +1,420 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>HTTP context option listing</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="context.socket.html" class="navbar__link">« Socket context options</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="context.ftp.html" class="navbar__link">FTP context options »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="context.html">Context options and parameters</a></li>
+        <li>HTTP context option listing</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="context.http" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">HTTP context options</h1>
+  <p class="refpurpose"><span class="refname">HTTP context options</span> &mdash; <span class="dc-title">HTTP context option listing</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-context.http-description">
+  <h3 class="title">Description</h3>
+  <p class="para">
+   Context options for <code class="literal">http://</code> and <code class="literal">https://</code>
+   transports.
+  </p>
+ </div>
+
+
+ <div class="refsect1 options" id="refsect1-context.http-options">
+  <h3 class="title">Options</h3>
+  <p class="para">
+   <dl>
+    
+     <dt id="context.http.method">
+      <code class="parameter">method</code>
+      <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       <strong><code>GET</code></strong>, <strong><code>POST</code></strong>, or
+       any other HTTP method supported by the remote server.
+      </p>
+      <p class="para">
+       Defaults to <strong><code>GET</code></strong>.
+      </p>
+     </dd>
+    
+    
+     <dt id="context.http.header">
+      <code class="parameter">header</code>
+      <span class="type"><a href="language.types.array.html" class="type array">array</a></span> or <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       Additional headers to be sent during request. Values
+       in this option will override other values (such as
+       <code class="literal">User-agent:</code>, <code class="literal">Host:</code>,
+       and <code class="literal">Authentication:</code>),
+       even when following <code class="literal">Location:</code> redirects.
+       Thus it is not recommended to set a <code class="literal">Host:</code> header,
+       if <code class="parameter">follow_location</code> is enabled.
+      </p>
+      <p class="para">
+       String value should be <code class="literal">Key: value</code> pairs delimited by
+       <code class="literal">\r\n</code>, e.g.
+       <code class="literal">&quot;Content-Type: application/json\r\nConnection: close&quot;</code>.
+       Array value should be a list of <code class="literal">Key: value</code> pairs, e.g.
+       <code class="literal">[&quot;Content-Type: application/json&quot;, &quot;Connection: close&quot;]</code>.
+      </p>
+     </dd>
+    
+    
+     <dt id="context.http.user-agent">
+      <code class="parameter">user_agent</code>
+      <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       Value to send with <code class="literal">User-Agent:</code> header. This value will
+       only be used if user-agent is <em>not</em> specified
+       in the <code class="literal">header</code> context option above.
+      </p>
+      <p class="para">
+       By default the
+       <a href="filesystem.configuration.html#ini.user-agent" class="link">user_agent</a>
+       <var class="filename">php.ini</var> setting is used.
+      </p>
+     </dd>
+    
+    
+     <dt id="context.http.content">
+      <code class="parameter">content</code>
+      <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       Additional data to be sent after the headers. Typically used
+       with POST or PUT requests.
+      </p>
+     </dd>
+    
+    
+     <dt id="context.http.proxy">
+      <code class="parameter">proxy</code>
+      <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       URI specifying address of proxy server (e.g.
+       <code class="literal">tcp://proxy.example.com:5100</code>).
+      </p>
+     </dd>
+    
+    
+     <dt id="context.http.request-fulluri">
+      <code class="parameter">request_fulluri</code>
+      <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       When set to <strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong>, the entire URI will be used when
+       constructing the request (e.g.
+       <code class="literal">GET http://www.example.com/path/to/file.html HTTP/1.0</code>).
+       While this is a non-standard request format, some
+       proxy servers require it.
+      </p>
+      <p class="para">
+       Defaults to <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong>.
+      </p>
+     </dd>
+    
+    
+     <dt id="context.http.follow-location">
+      <code class="parameter">follow_location</code>
+      <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       Follow <code class="literal">Location</code> header redirects. Set to
+       <code class="literal">0</code> to disable.
+      </p>
+      <p class="para">
+       Defaults to <code class="literal">1</code>.
+      </p>
+     </dd>
+    
+    
+     <dt id="context.http.max-redirects">
+      <code class="parameter">max_redirects</code>
+      <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       The max number of redirects to follow. Value <code class="literal">1</code> or
+       less means that no redirects are followed.
+      </p>
+      <p class="para">
+       Defaults to <code class="literal">20</code>.
+      </p>
+     </dd>
+    
+    
+     <dt id="context.http.protocol-version">
+      <code class="parameter">protocol_version</code>
+      <span class="type"><a href="language.types.float.html" class="type float">float</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       HTTP protocol version.
+      </p>
+      <p class="para">
+       Defaults to <code class="literal">1.1</code> as of PHP 8.0.0;
+       prior to that version the default was <code class="literal">1.0</code>.
+      </p>
+     </dd>
+    
+    
+     <dt id="context.http.timeout">
+      <code class="parameter">timeout</code>
+      <span class="type"><a href="language.types.float.html" class="type float">float</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       Read timeout in seconds, specified by a <span class="type"><a href="language.types.float.html" class="type float">float</a></span>
+       (e.g. <code class="literal">10.5</code>).
+      </p>
+      <p class="para">
+       By default the
+       <a href="filesystem.configuration.html#ini.default-socket-timeout" class="link">default_socket_timeout</a>
+       <var class="filename">php.ini</var> setting is used.
+      </p>
+     </dd>
+    
+    
+     <dt id="context.http.ignore-errors">
+      <code class="parameter">ignore_errors</code>
+      <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       Fetch the content even on failure status codes.
+      </p>
+      <p class="para">
+       Defaults to <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong>.
+      </p>
+     </dd>
+    
+   </dl>
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-context.http-examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   <div class="example" id="context.http.example-post">
+    <p><strong>Example #1 Fetch a page and send POST data</strong></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br />$postdata </span><span style="color: #007700">= </span><span style="color: #0000BB">http_build_query</span><span style="color: #007700">(<br />    [<br />        </span><span style="color: #DD0000">'var1' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'some content'</span><span style="color: #007700">,<br />        </span><span style="color: #DD0000">'var2' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'doh'</span><span style="color: #007700">,<br />    ]<br />);<br /><br /></span><span style="color: #0000BB">$opts </span><span style="color: #007700">= [<br />    </span><span style="color: #DD0000">'http' </span><span style="color: #007700">=&gt; [<br />        </span><span style="color: #DD0000">'method'  </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'POST'</span><span style="color: #007700">,<br />        </span><span style="color: #DD0000">'header'  </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'Content-type: application/x-www-form-urlencoded'</span><span style="color: #007700">,<br />        </span><span style="color: #DD0000">'content' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">$postdata</span><span style="color: #007700">,<br />    ]<br />];<br /><br /></span><span style="color: #0000BB">$context </span><span style="color: #007700">= </span><span style="color: #0000BB">stream_context_create</span><span style="color: #007700">(</span><span style="color: #0000BB">$opts</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">file_get_contents</span><span style="color: #007700">(</span><span style="color: #DD0000">'http://example.com/submit.php'</span><span style="color: #007700">, </span><span style="color: #0000BB">false</span><span style="color: #007700">, </span><span style="color: #0000BB">$context</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+   </div>
+  </p>
+  <p class="para">
+   <div class="example" id="context.http.example-fetch-ignore-redirect">
+    <p><strong>Example #2 Ignore redirects but fetch headers and content</strong></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br />$url </span><span style="color: #007700">= </span><span style="color: #DD0000">"http://www.example.org/header.php"</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$opts </span><span style="color: #007700">= [<br />    </span><span style="color: #DD0000">'http' </span><span style="color: #007700">=&gt; [<br />        </span><span style="color: #DD0000">'method'        </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'GET'</span><span style="color: #007700">,<br />        </span><span style="color: #DD0000">'max_redirects' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'0'</span><span style="color: #007700">,<br />        </span><span style="color: #DD0000">'ignore_errors' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'1'</span><span style="color: #007700">,<br />    ]<br />];<br /><br /></span><span style="color: #0000BB">$context </span><span style="color: #007700">= </span><span style="color: #0000BB">stream_context_create</span><span style="color: #007700">(</span><span style="color: #0000BB">$opts</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$stream </span><span style="color: #007700">= </span><span style="color: #0000BB">fopen</span><span style="color: #007700">(</span><span style="color: #0000BB">$url</span><span style="color: #007700">, </span><span style="color: #DD0000">'r'</span><span style="color: #007700">, </span><span style="color: #0000BB">false</span><span style="color: #007700">, </span><span style="color: #0000BB">$context</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">// header information as well as meta data<br />// about the stream<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">stream_get_meta_data</span><span style="color: #007700">(</span><span style="color: #0000BB">$stream</span><span style="color: #007700">));<br /><br /></span><span style="color: #FF8000">// actual data at $url<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">stream_get_contents</span><span style="color: #007700">(</span><span style="color: #0000BB">$stream</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">fclose</span><span style="color: #007700">(</span><span style="color: #0000BB">$stream</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+   </div>
+  </p>
+ </div>
+
+
+ <div class="refsect1 notes" id="refsect1-context.http-notes">
+  <h3 class="title">Notes</h3>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <strong>Underlying socket stream context options</strong><br />
+   <span class="simpara">
+    Additional context options may be supported by the
+    <a href="transports.inet.html" class="link">underlying transport</a>
+    For <code class="literal">http://</code> streams, refer to context
+    options for the <code class="literal">tcp://</code> transport.  For
+    <code class="literal">https://</code> streams, refer to context options
+    for the <code class="literal">ssl://</code> transport.
+   </span>
+  </p></blockquote>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <strong>HTTP status line</strong><br />
+   <span class="simpara">
+    When this stream wrapper follows a redirect, the
+    <code class="literal">wrapper_data</code> returned by
+    <span class="function"><a href="function.stream-get-meta-data.html" class="function">stream_get_meta_data()</a></span> might not necessarily contain
+    the HTTP status line that actually applies to the content data at index
+    <code class="literal">0</code>.
+   </span>
+   <div class="example-contents screen">
+<div class="notescode"><pre class="notescode">array (
+  &#039;wrapper_data&#039; =&gt;
+  array (
+    0 =&gt; &#039;HTTP/1.0 301 Moved Permanently&#039;,
+    1 =&gt; &#039;Cache-Control: no-cache&#039;,
+    2 =&gt; &#039;Connection: close&#039;,
+    3 =&gt; &#039;Location: http://example.com/foo.jpg&#039;,
+    4 =&gt; &#039;HTTP/1.1 200 OK&#039;,
+    ...</pre>
+</div>
+   </div>
+   <span class="simpara">
+    The first request returned a <code class="literal">301</code> (permanent redirect),
+    so the stream wrapper automatically followed the redirect to get a
+    <code class="literal">200</code> response (index = <code class="literal">4</code>).
+   </span>
+  </p></blockquote>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-context.http-seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li><a href="wrappers.http.html" class="xref">http://</a></li>
+    <li><a href="context.socket.html" class="xref">Socket context options</a></li>
+    <li><a href="context.ssl.html" class="xref">SSL context options</a></li>
+   </ul>
+  </p>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

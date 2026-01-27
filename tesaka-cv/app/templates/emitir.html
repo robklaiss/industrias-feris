@@ -172,9 +172,27 @@
                             <option value="prod">Producción</option>
                         </select>
                     </div>
-                </div>
                 
-                <button type="submit">Emitir Factura</button>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="receptor_ruc">RUC Receptor:</label>
+                        <input type="text" id="receptor_ruc" name="receptor_ruc" value="7524653">
+                    </div>
+                    <div class="form-group">
+                        <label for="receptor_dv">DV Receptor:</label>
+                        <input type="text" id="receptor_dv" name="receptor_dv" value="8">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="receptor_nombre">Nombre Receptor:</label>
+                        <input type="text" id="receptor_nombre" name="receptor_nombre" value="ROBIN KLAISS">
+                    </div>
+                </div>
+
+
+              <button type=\"submit\">Emitir Factura</button>
                 <button type="button" onclick="limpiarForm()">Limpiar</button>
             </form>
         </div>
@@ -187,7 +205,9 @@
   "establecimiento": "001",
   "punto_expedicion": "001",
   "numero_documento": "0000001",
-  "env": "test"
+  "env": "test",
+  "receptor_ruc": "7524653-8",
+  "receptor_nombre": "ROBIN KLAISS"
 }'></textarea>
             <br><br>
             <button onclick="emitirDesdeJSON()">Emitir desde JSON</button>

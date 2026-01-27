@@ -1,0 +1,194 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>MySQL Drivers and Plugins</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="mongodb.exceptions.tree.html" class="navbar__link">« Class Tree</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="mysql.html" class="navbar__link">Overview of the MySQL PHP drivers »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="refs.database.vendors.html">Vendor Specific Database Extensions</a></li>
+        <li>MySQL Drivers and Plugins</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="set.mysqlinfo" class="set">
+ <h1 class="title">MySQL Drivers and Plugins</h1>
+ 
+
+ <div class="info">
+  <div class="abstract">
+   <p class="simpara">
+    PHP offers several MySQL drivers and plugins for accessing and
+    handling MySQL.
+   </p>
+   <p class="simpara">
+    The differences and functionality of the MySQL extensions are described
+    within the overview of this section.
+   </p>
+   <p class="simpara">
+    The extensions listed support the MySQL protocol.
+    Examples of compatible database servers are
+    <a href="http://www.mariadb.org/" class="link external">&raquo;&nbsp;MariaDB Server</a>,
+    <a href="http://www.mysql.com/" class="link external">&raquo;&nbsp;MySQL Server</a>,
+    <a href="https://www.percona.com/mysql/software/percona-server-for-mysql" class="link external">&raquo;&nbsp;Percona Server for MySQL</a>,
+    and
+    <a href="https://www.pingcap.com/tidb/" class="link external">&raquo;&nbsp;TiDB</a>.
+   </p>
+  </div>
+ </div>
+
+ 
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+<ul class="chunklist chunklist_set"><li><a href="mysql.html">Overview of the MySQL PHP drivers</a><ul class="chunklist chunklist_set chunklist_children"><li><a href="mysqlinfo.intro.html">Introduction</a></li><li><a href="mysqlinfo.terminology.html">Terminology overview</a></li><li><a href="mysqlinfo.api.choosing.html">Choosing an API</a></li><li><a href="mysqlinfo.library.choosing.html">Choosing a library</a></li><li><a href="mysqlinfo.concepts.html">Concepts</a></li></ul></li><li><a href="book.mysqli.html">MySQLi</a> — MySQL Improved Extension<ul class="chunklist chunklist_set chunklist_children"><li><a href="intro.mysqli.html">Introduction</a></li><li><a href="mysqli.overview.html">Overview</a></li><li><a href="mysqli.quickstart.html">Quick start guide</a></li><li><a href="mysqli.setup.html">Installing/Configuring</a></li><li><a href="mysqli.persistconns.html">The mysqli Extension and Persistent Connections</a></li><li><a href="mysqli.constants.html">Predefined Constants</a></li><li><a href="mysqli.notes.html">Notes</a></li><li><a href="mysqli.summary.html">The MySQLi Extension Function Summary</a></li><li><a href="class.mysqli.html">mysqli</a> — The mysqli class</li><li><a href="class.mysqli-stmt.html">mysqli_stmt</a> — The mysqli_stmt class</li><li><a href="class.mysqli-result.html">mysqli_result</a> — The mysqli_result class</li><li><a href="class.mysqli-driver.html">mysqli_driver</a> — The mysqli_driver class</li><li><a href="class.mysqli-warning.html">mysqli_warning</a> — The mysqli_warning class</li><li><a href="class.mysqli-sql-exception.html">mysqli_sql_exception</a> — The mysqli_sql_exception class</li><li><a href="ref.mysqli.html">Aliases and deprecated Mysqli Functions</a></li><li><a href="changelog.mysqli.html">Changelog</a></li></ul></li><li><a href="book.mysql-xdevapi.html">Mysql_xdevapi</a><ul class="chunklist chunklist_set chunklist_children"><li><a href="intro.mysql-xdevapi.html">Introduction</a></li><li><a href="mysql-xdevapi.setup.html">Installing/Configuring</a></li><li><a href="mysql-xdevapi.constants.html">Predefined Constants</a></li><li><a href="changelog.mysql_xdevapi.html">Changelog</a></li><li><a href="mysql-xdevapi.examples.html">Examples</a></li><li><a href="ref.mysql-xdevapi.html">Mysql_xdevapi Functions</a></li><li><a href="class.mysql-xdevapi-baseresult.html">mysql_xdevapi\BaseResult</a> — BaseResult interface</li><li><a href="class.mysql-xdevapi-client.html">mysql_xdevapi\Client</a> — Client class</li><li><a href="class.mysql-xdevapi-collection.html">mysql_xdevapi\Collection</a> — Collection class</li><li><a href="class.mysql-xdevapi-collectionadd.html">mysql_xdevapi\CollectionAdd</a> — CollectionAdd class</li><li><a href="class.mysql-xdevapi-collectionfind.html">mysql_xdevapi\CollectionFind</a> — CollectionFind class</li><li><a href="class.mysql-xdevapi-collectionmodify.html">mysql_xdevapi\CollectionModify</a> — CollectionModify class</li><li><a href="class.mysql-xdevapi-collectionremove.html">mysql_xdevapi\CollectionRemove</a> — CollectionRemove class</li><li><a href="class.mysql-xdevapi-columnresult.html">mysql_xdevapi\ColumnResult</a> — ColumnResult class</li><li><a href="class.mysql-xdevapi-crudoperationbindable.html">mysql_xdevapi\CrudOperationBindable</a> — CrudOperationBindable interface</li><li><a href="class.mysql-xdevapi-crudoperationlimitable.html">mysql_xdevapi\CrudOperationLimitable</a> — CrudOperationLimitable interface</li><li><a href="class.mysql-xdevapi-crudoperationskippable.html">mysql_xdevapi\CrudOperationSkippable</a> — CrudOperationSkippable interface</li><li><a href="class.mysql-xdevapi-crudoperationsortable.html">mysql_xdevapi\CrudOperationSortable</a> — CrudOperationSortable interface</li><li><a href="class.mysql-xdevapi-databaseobject.html">mysql_xdevapi\DatabaseObject</a> — DatabaseObject interface</li><li><a href="class.mysql-xdevapi-docresult.html">mysql_xdevapi\DocResult</a> — DocResult class</li><li><a href="class.mysql-xdevapi-exception.html">mysql_xdevapi\Exception</a> — Exception class</li><li><a href="class.mysql-xdevapi-executable.html">mysql_xdevapi\Executable</a> — Executable interface</li><li><a href="class.mysql-xdevapi-executionstatus.html">mysql_xdevapi\ExecutionStatus</a> — ExecutionStatus class</li><li><a href="class.mysql-xdevapi-expression.html">mysql_xdevapi\Expression</a> — Expression class</li><li><a href="class.mysql-xdevapi-result.html">mysql_xdevapi\Result</a> — Result class</li><li><a href="class.mysql-xdevapi-rowresult.html">mysql_xdevapi\RowResult</a> — RowResult class</li><li><a href="class.mysql-xdevapi-schema.html">mysql_xdevapi\Schema</a> — Schema class</li><li><a href="class.mysql-xdevapi-schemaobject.html">mysql_xdevapi\SchemaObject</a> — SchemaObject interface</li><li><a href="class.mysql-xdevapi-session.html">mysql_xdevapi\Session</a> — Session class</li><li><a href="class.mysql-xdevapi-sqlstatement.html">mysql_xdevapi\SqlStatement</a> — SqlStatement class</li><li><a href="class.mysql-xdevapi-sqlstatementresult.html">mysql_xdevapi\SqlStatementResult</a> — SqlStatementResult class</li><li><a href="class.mysql-xdevapi-statement.html">mysql_xdevapi\Statement</a> — Statement class</li><li><a href="class.mysql-xdevapi-table.html">mysql_xdevapi\Table</a> — Table class</li><li><a href="class.mysql-xdevapi-tabledelete.html">mysql_xdevapi\TableDelete</a> — TableDelete class</li><li><a href="class.mysql-xdevapi-tableinsert.html">mysql_xdevapi\TableInsert</a> — TableInsert class</li><li><a href="class.mysql-xdevapi-tableselect.html">mysql_xdevapi\TableSelect</a> — TableSelect class</li><li><a href="class.mysql-xdevapi-tableupdate.html">mysql_xdevapi\TableUpdate</a> — TableUpdate class</li><li><a href="class.mysql-xdevapi-warning.html">mysql_xdevapi\Warning</a> — Warning class</li></ul></li><li><a href="book.mysql.html">MySQL (Original)</a> — Original MySQL API<ul class="chunklist chunklist_set chunklist_children"><li><a href="intro.mysql.html">Introduction</a></li><li><a href="mysql.setup.html">Installing/Configuring</a></li><li><a href="changelog.mysql.html">Changelog</a></li><li><a href="mysql.constants.html">Predefined Constants</a></li><li><a href="mysql.examples.html">Examples</a></li><li><a href="ref.mysql.html">MySQL Functions</a></li></ul></li><li><a href="book.mysqlnd.html">Mysqlnd</a> — MySQL Native Driver<ul class="chunklist chunklist_set chunklist_children"><li><a href="intro.mysqlnd.html">Introduction</a></li><li><a href="mysqlnd.overview.html">Overview</a></li><li><a href="mysqlnd.install.html">Installation</a></li><li><a href="mysqlnd.config.html">Runtime Configuration</a></li><li><a href="mysqlnd.incompatibilities.html">Incompatibilities</a></li><li><a href="mysqlnd.persist.html">Persistent Connections</a></li><li><a href="mysqlnd.stats.html">Statistics</a></li><li><a href="mysqlnd.notes.html">Notes</a></li><li><a href="mysqlnd.memory.html">Memory management</a></li><li><a href="mysqlnd.plugin.html">MySQL Native Driver Plugin API</a></li></ul></li></ul></div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

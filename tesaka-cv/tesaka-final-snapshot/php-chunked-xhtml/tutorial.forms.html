@@ -1,0 +1,216 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Dealing with Forms</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="tutorial.useful.html" class="navbar__link">« Something Useful</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="tutorial.whatsnext.html" class="navbar__link">What's next? »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="tutorial.html">A simple tutorial</a></li>
+        <li>Dealing with Forms</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="tutorial.forms" class="section">
+   <div class="info"><h1 class="title">Dealing with Forms</h1></div>
+   <p class="para">
+    One of the most powerful features of PHP is the way it handles HTML
+    forms. The basic concept that is important to understand is that any
+    form element will automatically be available to your PHP
+    scripts.  Please read the manual section on
+    <a href="language.variables.external.html" class="link">Variables from external
+    sources</a> for more information and examples on using forms
+    with PHP.  Here is an example HTML form:
+   </p>
+   <p class="para">
+    <div class="example" id="example-1">
+     <div class="info"><p><strong>Example #1 A simple HTML form</strong></p></div>
+     <div class="example-contents">
+<div class="htmlcode"><pre class="htmlcode">&lt;form action=&quot;action.php&quot; method=&quot;post&quot;&gt;
+    &lt;label for=&quot;name&quot;&gt;Your name:&lt;/label&gt;
+    &lt;input name=&quot;name&quot; id=&quot;name&quot; type=&quot;text&quot;&gt;
+
+    &lt;label for=&quot;age&quot;&gt;Your age:&lt;/label&gt;
+    &lt;input name=&quot;age&quot; id=&quot;age&quot; type=&quot;number&quot;&gt;
+
+    &lt;button type=&quot;submit&quot;&gt;Submit&lt;/button&gt;
+&lt;/form&gt;</pre>
+</div>
+     </div>
+
+    </div>
+   </p>
+   <p class="para">
+    There is nothing special about this form. It is a straight HTML form
+    with no special tags of any kind. When the user fills in this form
+    and hits the submit button, the <var class="filename">action.php</var> page
+    is called. In this file you would write something like this:
+   </p>
+   <p class="para">
+    <div class="example" id="example-2">
+     <div class="info"><p><strong>Example #2 Printing data from our form</strong></p></div>
+     <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000">Hi <span style="color: #0000BB">&lt;?php </span><span style="color: #007700">echo </span><span style="color: #0000BB">htmlspecialchars</span><span style="color: #007700">(</span><span style="color: #0000BB">$_POST</span><span style="color: #007700">[</span><span style="color: #DD0000">'name'</span><span style="color: #007700">]); </span><span style="color: #0000BB">?&gt;</span>.<br />You are <span style="color: #0000BB">&lt;?php </span><span style="color: #007700">echo (int) </span><span style="color: #0000BB">$_POST</span><span style="color: #007700">[</span><span style="color: #DD0000">'age'</span><span style="color: #007700">]; </span><span style="color: #0000BB">?&gt;</span> years old.</span></code></div>
+     </div>
+
+     <div class="example-contents"><p>
+      A sample output of this script may be:
+     </p></div>
+     <div class="example-contents screen">
+<div class="cdata"><pre>
+Hi Joe. You are 22 years old.
+</pre></div>
+     </div>
+    </div>
+   </p>
+   <p class="para">
+    Apart from the <span class="function"><a href="function.htmlspecialchars.html" class="function">htmlspecialchars()</a></span> and
+    <code class="literal">(int)</code> parts, it should be obvious what this does.
+    <span class="function"><a href="function.htmlspecialchars.html" class="function">htmlspecialchars()</a></span> makes sure any characters that are
+    special in html are properly encoded so people can&#039;t inject HTML tags
+    or Javascript into your page.  For the age field, since we know it is a
+    number, we can just <a href="language.types.type-juggling.html#language.types.typecasting" class="link">convert</a>
+    it to an <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> which will automatically get rid of any
+    stray characters.  You can also have PHP do this for you automatically by
+    using the <a href="ref.filter.html" class="link">filter</a> extension.
+    The <var class="varname"><a href="reserved.variables.post.html" class="classname">$_POST['name']</a></var> and <var class="varname"><a href="reserved.variables.post.html" class="classname">$_POST['age']</a></var>
+    variables are automatically set for you by PHP.  Earlier we
+    used the <var class="varname"><a href="reserved.variables.server.html" class="classname">$_SERVER</a></var> superglobal; above we just
+    introduced the <var class="varname"><a href="reserved.variables.post.html" class="classname">$_POST</a></var>
+    superglobal which contains all POST data.  Notice how the
+    <em>method</em> of our form is POST.  If we used the
+    method <em>GET</em> then our form information would live in
+    the <var class="varname"><a href="reserved.variables.get.html" class="classname">$_GET</a></var> superglobal instead.
+    You may also use the <var class="varname"><a href="reserved.variables.request.html" class="classname">$_REQUEST</a></var>
+    superglobal, if you do not care about the source of your request data. It
+    contains the merged information of GET, POST and COOKIE data.
+   </p>
+  </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

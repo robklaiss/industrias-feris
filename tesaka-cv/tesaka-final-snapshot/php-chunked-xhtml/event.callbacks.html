@@ -1,0 +1,269 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Event callbacks</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="event.persistence.html" class="navbar__link">« About event persistence</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="event.constructing.signal.events.html" class="navbar__link">Constructing signal events »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.event.html">Event</a></li>
+        <li>Event callbacks</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="event.callbacks" class="chapter">
+ <h1 class="title">Event callbacks</h1>
+
+ <p class="para">
+  If a callback is registered for an event, it will be called when the event
+  becomes active. To associate a callback with event one can pass a
+  <span class="type"><a href="language.types.callable.html" class="type callable">callable</a></span>
+  to either
+  <span class="methodname"><a href="event.construct.html" class="methodname">Event::__construct()</a></span>,
+  or
+  <span class="methodname"><a href="event.set.html" class="methodname">Event::set()</a></span>,
+  or one of the factory methods like
+  <span class="methodname"><a href="event.timer.html" class="methodname">Event::timer()</a></span>.
+ </p>
+ <p class="para">
+  An event callback should match the following prototype:
+ </p>
+ <div class="methodsynopsis dc-description"><span class="methodname"><strong>callback</strong></span>(<span class="methodparam">
+   
+   <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$fd</code>
+   <span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span>
+  </span>, <span class="methodparam">
+   
+   <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$what</code>
+  <span class="initializer"> = ?</span></span>, <span class="methodparam">
+   
+   <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$arg</code>
+   <span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span>
+  </span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+ <dl>
+  
+   <dt>
+    <code class="parameter">fd</code>
+   </dt>
+   <dd>
+    <p class="para">
+     The file descriptor, stream resource or socket associated with the
+     event. For signal event
+     <code class="parameter">fd</code>
+     is equal to the signal number.
+    </p>
+   </dd>
+  
+  
+   <dt>
+    <code class="parameter">what</code>
+   </dt>
+   <dd>
+    <p class="para">
+     Bit mask of
+     <em>all</em>
+     events triggered.
+    </p>
+   </dd>
+  
+  
+   <dt>
+    <code class="parameter">arg</code>
+   </dt>
+   <dd>
+    <p class="para">
+     User custom data.
+    </p>
+   </dd>
+  
+ </dl>
+ <p class="para">
+  <span class="methodname"><a href="event.timer.html" class="methodname">Event::timer()</a></span>
+  expects the callback to match the following prototype:
+ </p>
+ <div class="methodsynopsis dc-description"><span class="methodname"><strong>callback</strong></span>(<span class="methodparam">
+   
+   <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$arg</code>
+   <span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span>
+  </span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+ <dl>
+  
+   <dt>
+    <code class="parameter">arg</code>
+   </dt>
+   <dd>
+    <p class="para">
+     User custom data.
+    </p>
+   </dd>
+  
+ </dl>
+ <p class="para">
+  <span class="methodname"><a href="event.signal.html" class="methodname">Event::signal()</a></span>
+  expects the callback to match the following prototype:
+ </p>
+ <div class="methodsynopsis dc-description"><span class="methodname"><strong>callback</strong></span>(<span class="methodparam">
+   
+   <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$signum</code>
+  <span class="initializer"> = ?</span></span>, <span class="methodparam">
+   
+   <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$arg</code>
+   <span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span>
+  </span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+ <dl>
+  
+   <dt>
+    <code class="parameter">signum</code>
+   </dt>
+   <dd>
+    <p class="para">
+     The number of the triggered signal(e.g.
+     <strong><code><a href="pcntl.constants.html#constant.sigterm">SIGTERM</a></code></strong>
+     ).
+    </p>
+   </dd>
+  
+  
+   <dt>
+    <code class="parameter">arg</code>
+   </dt>
+   <dd>
+    <p class="para">
+     User custom data.
+    </p>
+   </dd>
+  
+ </dl>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

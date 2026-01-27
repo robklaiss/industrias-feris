@@ -1,0 +1,159 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>XML Tag Mapping Example</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="example.xml-structure.html" class="navbar__link">« XML Element Structure Example</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="example.xml-external-entity.html" class="navbar__link">XML External Entity Example »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="xml.examples.html">Examples</a></li>
+        <li>XML Tag Mapping Example</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="example.xml-map-tags" class="section">
+  <h2 class="title">XML Tag Mapping Example</h2>
+  <p class="para">
+   <div class="example" id="example-1">
+    <p><strong>Example #1 Map XML to HTML</strong></p>
+    <div class="example-contents"><p>
+     This example maps tags in an XML document directly to HTML
+     tags.  Elements not found in the &quot;map array&quot; are ignored.  Of
+     course, this example will only work with a specific XML
+     document type.
+    </p></div>
+    <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$file </span><span style="color: #007700">= </span><span style="color: #DD0000">"examples/book.xml"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$map_array </span><span style="color: #007700">= array(<br />    </span><span style="color: #DD0000">"BOLD"     </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">"B"</span><span style="color: #007700">,<br />    </span><span style="color: #DD0000">"EMPHASIS" </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">"I"</span><span style="color: #007700">,<br />    </span><span style="color: #DD0000">"LITERAL"  </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">"TT"<br /></span><span style="color: #007700">);<br /><br />function </span><span style="color: #0000BB">startElement</span><span style="color: #007700">(</span><span style="color: #0000BB">$parser</span><span style="color: #007700">, </span><span style="color: #0000BB">$name</span><span style="color: #007700">, </span><span style="color: #0000BB">$attrs</span><span style="color: #007700">)<br />{<br />    global </span><span style="color: #0000BB">$map_array</span><span style="color: #007700">;<br />    if (isset(</span><span style="color: #0000BB">$map_array</span><span style="color: #007700">[</span><span style="color: #0000BB">$name</span><span style="color: #007700">])) {<br />        echo </span><span style="color: #DD0000">"&lt;</span><span style="color: #0000BB">$map_array</span><span style="color: #007700">[</span><span style="color: #0000BB">$name</span><span style="color: #007700">]</span><span style="color: #DD0000">&gt;"</span><span style="color: #007700">;<br />    }<br />}<br /><br />function </span><span style="color: #0000BB">endElement</span><span style="color: #007700">(</span><span style="color: #0000BB">$parser</span><span style="color: #007700">, </span><span style="color: #0000BB">$name</span><span style="color: #007700">)<br />{<br />    global </span><span style="color: #0000BB">$map_array</span><span style="color: #007700">;<br />    if (isset(</span><span style="color: #0000BB">$map_array</span><span style="color: #007700">[</span><span style="color: #0000BB">$name</span><span style="color: #007700">])) {<br />        echo </span><span style="color: #DD0000">"&lt;/</span><span style="color: #0000BB">$map_array</span><span style="color: #007700">[</span><span style="color: #0000BB">$name</span><span style="color: #007700">]</span><span style="color: #DD0000">&gt;"</span><span style="color: #007700">;<br />    }<br />}<br /><br />function </span><span style="color: #0000BB">characterData</span><span style="color: #007700">(</span><span style="color: #0000BB">$parser</span><span style="color: #007700">, </span><span style="color: #0000BB">$data</span><span style="color: #007700">)<br />{<br />    echo </span><span style="color: #0000BB">$data</span><span style="color: #007700">;<br />}<br /><br /></span><span style="color: #0000BB">$xml_parser </span><span style="color: #007700">= </span><span style="color: #0000BB">xml_parser_create</span><span style="color: #007700">();<br /></span><span style="color: #FF8000">// use case-folding so we are sure to find the tag in $map_array<br /></span><span style="color: #0000BB">xml_parser_set_option</span><span style="color: #007700">(</span><span style="color: #0000BB">$xml_parser</span><span style="color: #007700">, </span><span style="color: #0000BB">XML_OPTION_CASE_FOLDING</span><span style="color: #007700">, </span><span style="color: #0000BB">true</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">xml_set_element_handler</span><span style="color: #007700">(</span><span style="color: #0000BB">$xml_parser</span><span style="color: #007700">, </span><span style="color: #DD0000">"startElement"</span><span style="color: #007700">, </span><span style="color: #DD0000">"endElement"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">xml_set_character_data_handler</span><span style="color: #007700">(</span><span style="color: #0000BB">$xml_parser</span><span style="color: #007700">, </span><span style="color: #DD0000">"characterData"</span><span style="color: #007700">);<br />if (!(</span><span style="color: #0000BB">$fp </span><span style="color: #007700">= </span><span style="color: #0000BB">fopen</span><span style="color: #007700">(</span><span style="color: #0000BB">$file</span><span style="color: #007700">, </span><span style="color: #DD0000">"r"</span><span style="color: #007700">))) {<br />    die(</span><span style="color: #DD0000">"could not open XML input"</span><span style="color: #007700">);<br />}<br /><br />while (</span><span style="color: #0000BB">$data </span><span style="color: #007700">= </span><span style="color: #0000BB">fread</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">, </span><span style="color: #0000BB">4096</span><span style="color: #007700">)) {<br />    if (!</span><span style="color: #0000BB">xml_parse</span><span style="color: #007700">(</span><span style="color: #0000BB">$xml_parser</span><span style="color: #007700">, </span><span style="color: #0000BB">$data</span><span style="color: #007700">, </span><span style="color: #0000BB">feof</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">))) {<br />        die(</span><span style="color: #0000BB">sprintf</span><span style="color: #007700">(</span><span style="color: #DD0000">"XML error: %s at line %d"</span><span style="color: #007700">,<br />                    </span><span style="color: #0000BB">xml_error_string</span><span style="color: #007700">(</span><span style="color: #0000BB">xml_get_error_code</span><span style="color: #007700">(</span><span style="color: #0000BB">$xml_parser</span><span style="color: #007700">)),<br />                    </span><span style="color: #0000BB">xml_get_current_line_number</span><span style="color: #007700">(</span><span style="color: #0000BB">$xml_parser</span><span style="color: #007700">)));<br />    }<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+   </div>
+  </p>
+ </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

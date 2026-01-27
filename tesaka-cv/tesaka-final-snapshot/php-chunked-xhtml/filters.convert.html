@@ -1,0 +1,226 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Conversion Filters</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="filters.string.html" class="navbar__link">« String Filters</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="filters.compression.html" class="navbar__link">Compression Filters »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="filters.html">List of Available Filters</a></li>
+        <li>Conversion Filters</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="filters.convert" class="section">
+  <h2 class="title">Conversion Filters</h2>
+
+  <p class="simpara">
+   Like the string.* filters, the convert.* filters perform actions
+   similar to their names.
+   For more information on a given filter, refer to the manual page for
+   the corresponding function.
+  </p>
+
+  <div class="section" id="filters.convert.base64">
+   <h2 class="title">convert.base64-encode and convert.base64-decode</h2>
+   <p class="simpara">
+    Use of these filters are equivalent to processing all stream data through
+    the <span class="function"><a href="function.base64-encode.html" class="function">base64_encode()</a></span> and <span class="function"><a href="function.base64-decode.html" class="function">base64_decode()</a></span>
+    functions respectively.
+    <code class="literal">convert.base64-encode</code> supports parameters given as
+    an associative array.  If <code class="parameter">line-length</code> is given, the
+    base64 output will be split into chunks of <code class="parameter">line-length</code>
+    characters each.  If <code class="parameter">line-break-chars</code> is given, each
+    chunk will be delimited by the characters given.  These parameters give the
+    same effect as using <span class="function"><a href="function.base64-encode.html" class="function">base64_encode()</a></span> with
+    <span class="function"><a href="function.chunk-split.html" class="function">chunk_split()</a></span>.
+   </p>
+   <div class="example" id="example-1">
+    <p><strong>Example #1 
+     convert.base64-encode &amp;
+     convert.base64-decode
+    </strong></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$fp </span><span style="color: #007700">= </span><span style="color: #0000BB">fopen</span><span style="color: #007700">(</span><span style="color: #DD0000">'php://output'</span><span style="color: #007700">, </span><span style="color: #DD0000">'w'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">stream_filter_append</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">, </span><span style="color: #DD0000">'convert.base64-encode'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">fwrite</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">, </span><span style="color: #DD0000">"This is a test.\n"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">fclose</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">/* Outputs:  VGhpcyBpcyBhIHRlc3QuCg==  */<br /><br /></span><span style="color: #0000BB">$param </span><span style="color: #007700">= array(</span><span style="color: #DD0000">'line-length' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">8</span><span style="color: #007700">, </span><span style="color: #DD0000">'line-break-chars' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">"\r\n"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$fp </span><span style="color: #007700">= </span><span style="color: #0000BB">fopen</span><span style="color: #007700">(</span><span style="color: #DD0000">'php://output'</span><span style="color: #007700">, </span><span style="color: #DD0000">'w'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">stream_filter_append</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">, </span><span style="color: #DD0000">'convert.base64-encode'</span><span style="color: #007700">, </span><span style="color: #0000BB">STREAM_FILTER_WRITE</span><span style="color: #007700">, </span><span style="color: #0000BB">$param</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">fwrite</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">, </span><span style="color: #DD0000">"This is a test.\n"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">fclose</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">/* Outputs:  VGhpcyBp<br />          :  cyBhIHRl<br />          :  c3QuCg==  */<br /><br /></span><span style="color: #0000BB">$fp </span><span style="color: #007700">= </span><span style="color: #0000BB">fopen</span><span style="color: #007700">(</span><span style="color: #DD0000">'php://output'</span><span style="color: #007700">, </span><span style="color: #DD0000">'w'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">stream_filter_append</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">, </span><span style="color: #DD0000">'convert.base64-decode'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">fwrite</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">, </span><span style="color: #DD0000">"VGhpcyBpcyBhIHRlc3QuCg=="</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">fclose</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">/* Outputs:  This is a test.  */<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+   </div>
+  </div>
+
+  <div class="section" id="filters.covert.quoted-printable">
+   <h2 class="title">convert.quoted-printable-encode and convert.quoted-printable-decode</h2>
+   <p class="simpara">
+    Use of the decode version of this filter is equivalent to processing all stream 
+    data through the <span class="function"><a href="function.quoted-printable-decode.html" class="function">quoted_printable_decode()</a></span> function.
+    There is no function equivalent to <code class="literal">convert.quoted-printable-encode</code>.
+    <code class="literal">convert.quoted-printable-encode</code> supports parameters given as
+    an associative array.  In addition to the parameters supported by 
+    <code class="literal">convert.base64-encode</code>, <code class="literal">convert.quoted-printable-encode</code>
+    also supports boolean arguments <code class="parameter">binary</code> and
+    <code class="parameter">force-encode-first</code>.
+    <code class="literal">convert.base64-decode</code> only supports the
+    <code class="parameter">line-break-chars</code> parameter as a type-hint
+    for stripping from the encoded payload.
+   </p>
+   <div class="example" id="example-2">
+    <p><strong>Example #2 
+     convert.quoted-printable-encode &amp;
+     convert.quoted-printable-decode
+    </strong></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$fp </span><span style="color: #007700">= </span><span style="color: #0000BB">fopen</span><span style="color: #007700">(</span><span style="color: #DD0000">'php://output'</span><span style="color: #007700">, </span><span style="color: #DD0000">'w'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">stream_filter_append</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">, </span><span style="color: #DD0000">'convert.quoted-printable-encode'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">fwrite</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">, </span><span style="color: #DD0000">"This is a test.\n"</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">/* Outputs:  =This is a test.=0A  */<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+   </div>
+  </div>
+
+  <div class="section" id="filters.convert.iconv">
+   <h2 class="title">convert.iconv.*</h2>
+   <p class="simpara">
+    The <code class="literal">convert.iconv.*</code> filters are available, if
+    <a href="book.iconv.html" class="link">iconv</a> support is enabled, and their use is
+    equivalent to processing all stream data with <span class="function"><a href="function.iconv.html" class="function">iconv()</a></span>.
+    These filters do not support parameters, but instead expect the input and
+    output encodings to be given as part of the filter name, i.e. either as
+    <code class="literal">convert.iconv.&lt;input-encoding&gt;.&lt;output-encoding&gt;</code> or
+    <code class="literal">convert.iconv.&lt;input-encoding&gt;/&lt;output-encoding&gt;</code>
+    (both notations are semantically equivalent).
+   </p>
+
+   <div class="example" id="example-3">
+    <p><strong>Example #3 convert.iconv.*</strong></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$fp </span><span style="color: #007700">= </span><span style="color: #0000BB">fopen</span><span style="color: #007700">(</span><span style="color: #DD0000">'php://output'</span><span style="color: #007700">, </span><span style="color: #DD0000">'w'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">stream_filter_append</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">, </span><span style="color: #DD0000">'convert.iconv.utf-16le.utf-8'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">fwrite</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">, </span><span style="color: #DD0000">"T\0h\0i\0s\0 \0i\0s\0 \0a\0 \0t\0e\0s\0t\0.\0\n\0"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">fclose</span><span style="color: #007700">(</span><span style="color: #0000BB">$fp</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">/* Outputs: This is a test. */<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+   </div>
+  </div>
+ </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

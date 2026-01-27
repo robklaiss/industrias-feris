@@ -1,0 +1,177 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Text Processing</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="sessionupdatetimestamphandlerinterface.validateid.html" class="navbar__link">« SessionUpdateTimestampHandlerInterface::validateId</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="book.cmark.html" class="navbar__link">CommonMark »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="funcref.html">Function Reference</a></li>
+        <li>Text Processing</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="refs.basic.text" class="set">
+   <h1 class="title">Text Processing</h1>
+   
+
+
+
+
+   
+
+
+
+
+
+
+
+   
+
+
+
+
+
+
+
+   
+
+
+
+   
+
+
+
+
+
+
+
+  <ul class="chunklist chunklist_set"><li><a href="book.cmark.html">CommonMark</a><ul class="chunklist chunklist_set chunklist_children"><li><a href="intro.cmark.html">Introduction</a></li><li><a href="cmark.setup.html">Installing/Configuring</a></li><li><a href="cmark.constants.html">Predefined Constants</a></li><li><a href="class.commonmark-node-document.html">CommonMark\Node\Document</a> — Document concrete CommonMark\Node</li><li><a href="class.commonmark-node-heading.html">CommonMark\Node\Heading</a> — Heading concrete CommonMark\Node</li><li><a href="class.commonmark-node-paragraph.html">CommonMark\Node\Paragraph</a> — Paragraph concrete CommonMark\Node</li><li><a href="class.commonmark-node-blockquote.html">CommonMark\Node\BlockQuote</a> — BlockQuote concrete CommonMark\Node</li><li><a href="class.commonmark-node-bulletlist.html">CommonMark\Node\BulletList</a> — BulletList concrete CommonMark\Node</li><li><a href="class.commonmark-node-orderedlist.html">CommonMark\Node\OrderedList</a> — OrderedList concrete CommonMark\Node</li><li><a href="class.commonmark-node-item.html">CommonMark\Node\Item</a> — Item concrete CommonMark\Node</li><li><a href="class.commonmark-node-text.html">CommonMark\Node\Text</a> — Text concrete CommonMark\Node</li><li><a href="class.commonmark-node-text-strong.html">CommonMark\Node\Text\Strong</a> — Strong concrete CommonMark\Node</li><li><a href="class.commonmark-node-text-emphasis.html">CommonMark\Node\Text\Emphasis</a> — Emphasis concrete CommonMark\Node</li><li><a href="class.commonmark-node-thematicbreak.html">CommonMark\Node\ThematicBreak</a> — ThematicBreak concrete CommonMark\Node</li><li><a href="class.commonmark-node-softbreak.html">CommonMark\Node\SoftBreak</a> — SoftBreak concrete CommonMark\Node</li><li><a href="class.commonmark-node-linebreak.html">CommonMark\Node\LineBreak</a> — LineBreak concrete CommonMark\Node</li><li><a href="class.commonmark-node-code.html">CommonMark\Node\Code</a> — Code concrete CommonMark\Node</li><li><a href="class.commonmark-node-codeblock.html">CommonMark\Node\CodeBlock</a> — CodeBlock concrete CommonMark\Node</li><li><a href="class.commonmark-node-htmlblock.html">CommonMark\Node\HTMLBlock</a> — HTMLBlock concrete CommonMark\Node</li><li><a href="class.commonmark-node-htmlinline.html">CommonMark\Node\HTMLInline</a> — HTMLInline concrete CommonMark\Node</li><li><a href="class.commonmark-node-image.html">CommonMark\Node\Image</a> — Image concrete CommonMark\Node</li><li><a href="class.commonmark-node-link.html">CommonMark\Node\Link</a> — Link concrete CommonMark\Node</li><li><a href="class.commonmark-node-customblock.html">CommonMark\Node\CustomBlock</a> — CustomBlock concrete CommonMark\Node</li><li><a href="class.commonmark-node-custominline.html">CommonMark\Node\CustomInline</a> — CustomInline concrete CommonMark\Node</li><li><a href="class.commonmark-node.html">CommonMark\Node</a> — Abstract CommonMark\Node</li><li><a href="class.commonmark-interfaces-ivisitor.html">CommonMark\Interfaces\IVisitor</a> — The CommonMark\Interfaces\IVisitor interface</li><li><a href="class.commonmark-interfaces-ivisitable.html">CommonMark\Interfaces\IVisitable</a> — The CommonMark\Interfaces\IVisitable interface</li><li><a href="class.commonmark-parser.html">CommonMark\Parser</a> — The CommonMark\Parser class</li><li><a href="class.commonmark-cql.html">CommonMark\CQL</a> — The CommonMark\CQL class</li><li><a href="ref.cmark.html">CommonMark Functions</a></li></ul></li><li><a href="book.parle.html">Parle</a> — Parsing and lexing<ul class="chunklist chunklist_set chunklist_children"><li><a href="intro.parle.html">Introduction</a></li><li><a href="parle.setup.html">Installing/Configuring</a></li><li><a href="parle.constants.html">Predefined Constants</a></li><li><a href="parle.pattern.matching.html">Pattern matching</a> — Parle pattern matching</li><li><a href="parle.examples.html">Examples</a></li><li><a href="class.parle-lexer.html">Parle\Lexer</a> — The Parle\Lexer class</li><li><a href="class.parle-rlexer.html">Parle\RLexer</a> — The Parle\RLexer class</li><li><a href="class.parle-parser.html">Parle\Parser</a> — The Parle\Parser class</li><li><a href="class.parle-rparser.html">Parle\RParser</a> — The Parle\RParser class</li><li><a href="class.parle-stack.html">Parle\Stack</a> — The Parle\Stack class</li><li><a href="class.parle-token.html">Parle\Token</a> — The Parle\Token class</li><li><a href="class.parle-errorinfo.html">Parle\ErrorInfo</a> — The Parle\ErrorInfo class</li><li><a href="class.parle-lexerexception.html">Parle\LexerException</a> — The Parle\LexerException class</li><li><a href="class.parle-parserexception.html">Parle\ParserException</a> — The Parle\ParserException class</li></ul></li><li><a href="book.pcre.html">PCRE</a> — Regular Expressions (Perl-Compatible)<ul class="chunklist chunklist_set chunklist_children"><li><a href="intro.pcre.html">Introduction</a></li><li><a href="pcre.setup.html">Installing/Configuring</a></li><li><a href="pcre.constants.html">Predefined Constants</a></li><li><a href="pcre.examples.html">Examples</a></li><li><a href="pcre.pattern.html">PCRE Patterns</a></li><li><a href="ref.pcre.html">PCRE Functions</a></li></ul></li><li><a href="book.ssdeep.html">ssdeep</a> — ssdeep Fuzzy Hashing<ul class="chunklist chunklist_set chunklist_children"><li><a href="intro.ssdeep.html">Introduction</a></li><li><a href="ssdeep.setup.html">Installing/Configuring</a></li><li><a href="ref.ssdeep.html">ssdeep Functions</a></li></ul></li><li><a href="book.strings.html">Strings</a><ul class="chunklist chunklist_set chunklist_children"><li><a href="intro.strings.html">Introduction</a></li><li><a href="strings.setup.html">Installing/Configuring</a></li><li><a href="string.constants.html">Predefined Constants</a></li><li><a href="ref.strings.html">String Functions</a></li><li><a href="changelog.strings.html">Changelog</a></li></ul></li></ul></div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

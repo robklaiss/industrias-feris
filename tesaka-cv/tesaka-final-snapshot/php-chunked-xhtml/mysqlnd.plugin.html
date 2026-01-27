@@ -1,0 +1,322 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>MySQL Native Driver Plugin API</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="mysqlnd.memory.html" class="navbar__link">« Memory management</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="mysqlnd.plugin.mysql-proxy.html" class="navbar__link">A comparison of mysqlnd plugins with MySQL Proxy »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.mysqlnd.html">Mysqlnd</a></li>
+        <li>MySQL Native Driver Plugin API</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="mysqlnd.plugin" class="chapter">
+ <h1 class="title">MySQL Native Driver Plugin API</h1>
+<h2>Table of Contents</h2><ul class="chunklist chunklist_chapter"><li><a href="mysqlnd.plugin.mysql-proxy.html">A comparison of mysqlnd plugins with MySQL Proxy</a></li><li><a href="mysqlnd.plugin.obtaining.html">Obtaining the mysqlnd plugin API</a></li><li><a href="mysqlnd.plugin.architecture.html">MySQL Native Driver Plugin Architecture</a></li><li><a href="mysqlnd.plugin.api.html">The mysqlnd plugin API</a></li><li><a href="mysqlnd.plugin.developing.html">Getting started building a mysqlnd plugin</a></li></ul>
+
+ <p class="simpara">
+  The MySQL Native Driver Plugin API is a feature of MySQL Native
+  Driver, or <code class="literal">mysqlnd</code>. <code class="literal">Mysqlnd</code>
+  plugins operate in the layer between PHP applications and the MySQL
+  server. This is comparable to MySQL Proxy. MySQL Proxy operates on a
+  layer between any MySQL client application, for example, a PHP
+  application and, the MySQL server. <code class="literal">Mysqlnd</code> plugins
+  can undertake typical MySQL Proxy tasks such as load balancing,
+  monitoring and performance optimizations. Due to the different
+  architecture and location, <code class="literal">mysqlnd</code> plugins do not
+  have some of MySQL Proxy&#039;s disadvantages. For example, with plugins,
+  there is no single point of failure, no dedicated proxy server to
+  deploy, and no new programming language to learn (Lua).
+ </p>
+ <p class="simpara">
+  A <code class="literal">mysqlnd</code> plugin can be thought of as an extension
+  to <code class="literal">mysqlnd</code>. Plugins can intercept the majority of
+  <code class="literal">mysqlnd</code> functions. The <code class="literal">mysqlnd</code>
+  functions are called by the PHP MySQL extensions such as
+  <code class="literal">ext/mysql</code>, <code class="literal">ext/mysqli</code>, and
+  <code class="literal">PDO_MYSQL</code>. As a result, it is possible for a
+  <code class="literal">mysqlnd</code> plugin to intercept all calls made to these
+  extensions from the client application.
+ </p>
+ <p class="simpara">
+  Internal <code class="literal">mysqlnd</code> function calls can also be
+  intercepted, or replaced. There are no restrictions on manipulating
+  <code class="literal">mysqlnd</code> internal function tables. It is possible to
+  set things up so that when certain <code class="literal">mysqlnd</code>
+  functions are called by the extensions that use
+  <code class="literal">mysqlnd</code>, the call is directed to the appropriate
+  function in the <code class="literal">mysqlnd</code> plugin. The ability to
+  manipulate <code class="literal">mysqlnd</code> internal function tables in this
+  way allows maximum flexibility for plugins.
+ </p>
+ <p class="simpara">
+  <code class="literal">Mysqlnd</code> plugins are in fact PHP Extensions, written
+  in C, that use the <code class="literal">mysqlnd</code> plugin API (which is
+  built into MySQL Native Driver, <code class="literal">mysqlnd</code>). Plugins
+  can be made 100% transparent to PHP applications. No application
+  changes are needed because plugins operate on a different layer. The
+  <code class="literal">mysqlnd</code> plugin can be thought of as operating in a
+  layer below <code class="literal">mysqlnd</code>.
+ </p>
+ <p class="simpara">
+  The following list represents some possible applications of
+  <code class="literal">mysqlnd</code> plugins.
+ </p>
+ <ul class="itemizedlist">
+  <li class="listitem">
+   <span class="simpara">
+    Load Balancing
+   </span>
+   <ul class="itemizedlist">
+    <li class="listitem">
+     <span class="simpara">
+      Read/Write Splitting. An example of this is the PECL/mysqlnd_ms
+      (Master Slave) extension. This extension splits read/write queries
+      for a replication setup.
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      Failover
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      Round-Robin, least loaded
+     </span>
+    </li>
+   </ul>
+  </li>
+  <li class="listitem">
+   <span class="simpara">
+    Monitoring
+   </span>
+   <ul class="itemizedlist">
+    <li class="listitem">
+     <span class="simpara">
+      Query Logging
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      Query Analysis
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      Query Auditing. An example of this is the PECL/mysqlnd_sip (SQL
+      Injection Protection) extension. This extension inspects queries
+      and executes only those that are allowed according to a ruleset.
+     </span>
+    </li>
+   </ul>
+  </li>
+  <li class="listitem">
+   <span class="simpara">
+    Performance
+   </span>
+   <ul class="itemizedlist">
+    <li class="listitem">
+     <span class="simpara">
+      Caching. An example of this is the PECL/mysqlnd_qc (Query Cache)
+      extension.
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      Throttling
+     </span>
+    </li>
+    <li class="listitem">
+     <span class="simpara">
+      Sharding. An example of this is the PECL/mysqlnd_mc (Multi
+      Connect) extension. This extension will attempt to split a SELECT
+      statement into n-parts, using SELECT ... LIMIT part_1, SELECT
+      LIMIT part_n. It sends the queries to distinct MySQL servers and
+      merges the result at the client.
+     </span>
+    </li>
+   </ul>
+  </li>
+ </ul>
+ <p class="simpara">
+  <strong>MySQL Native Driver Plugins Available</strong>
+ </p>
+ <p class="simpara">
+  There are a number of mysqlnd plugins already available. These
+  include:
+ </p>
+ <ul class="itemizedlist">
+  <li class="listitem">
+   <span class="simpara">
+    <strong>PECL/mysqlnd_mc</strong> - Multi Connect
+    plugin.
+   </span>
+  </li>
+  <li class="listitem">
+   <span class="simpara">
+    <strong>PECL/mysqlnd_ms</strong> - Master Slave
+    plugin.
+   </span>
+  </li>
+  <li class="listitem">
+   <span class="simpara">
+    <strong>PECL/mysqlnd_qc</strong> - Query Cache
+    plugin.
+   </span>
+  </li>
+  <li class="listitem">
+   <span class="simpara">
+    <strong>PECL/mysqlnd_pscache</strong> - Prepared
+    Statement Handle Cache plugin.
+   </span>
+  </li>
+  <li class="listitem">
+   <span class="simpara">
+    <strong>PECL/mysqlnd_sip</strong> - SQL Injection
+    Protection plugin.
+   </span>
+  </li>
+  <li class="listitem">
+   <span class="simpara">
+    <strong>PECL/mysqlnd_uh</strong> - User Handler
+    plugin.
+   </span>
+  </li>
+ </ul>
+ 
+ 
+ 
+ 
+ 
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

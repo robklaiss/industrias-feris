@@ -1,0 +1,337 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>The MongoDB\Driver\BulkWriteCommand class</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="mongodb-driver-bulkwrite.update.html" class="navbar__link">« MongoDB\Driver\BulkWrite::update</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="mongodb-driver-bulkwritecommand.construct.html" class="navbar__link">MongoDB\Driver\BulkWriteCommand::__construct »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="mongodb.mongodb.html">MongoDB\Driver</a></li>
+        <li>The MongoDB\Driver\BulkWriteCommand class</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="class.mongodb-driver-bulkwritecommand" class="reference">
+
+ <h1 class="title">The MongoDB\Driver\BulkWriteCommand class</h1>
+ 
+
+ <div class="partintro"><p class="verinfo">(mongodb &gt;=2.1.0)</p>
+
+
+  <div class="section" id="mongodb-driver-bulkwritecommand.intro">
+   <h2 class="title">Introduction</h2>
+   <p class="para">
+    <span class="classname"><strong class="classname">MongoDB\Driver\BulkWriteCommand</strong></span> collects one or more
+    write operations that should be sent to the server using the
+    <a href="https://www.mongodb.com/docs/manual/reference/command/bulkWrite" class="link external">&raquo;&nbsp;bulkWrite</a>
+    command introduced in MongoDB 8.0. After adding any number of insert,
+    update, and delete operations, the command may be executed via
+    <span class="methodname"><a href="mongodb-driver-manager.executebulkwritecommand.html" class="methodname">MongoDB\Driver\Manager::executeBulkWriteCommand()</a></span>.
+   </p>
+   <p class="para">
+    Unlike <span class="classname"><a href="class.mongodb-driver-bulkwrite.html" class="classname">MongoDB\Driver\BulkWrite</a></span>, where all write
+    operations must target the same collection, each write operation within
+    <span class="classname"><strong class="classname">MongoDB\Driver\BulkWriteCommand</strong></span> may target a
+    different collection.
+   </p>
+   <p class="para">
+    Write operations may either be ordered (default) or unordered. Ordered write
+    operations are sent to the server, in the order provided, for serial
+    execution. If a write fails, any remaining operations will be aborted.
+    Unordered operations are sent to the server in an arbitrary order
+    where they may be executed in parallel. Any errors that occur are reported
+    after all operations have been attempted.
+   </p>
+  </div>
+
+
+  <div class="section" id="mongodb-driver-bulkwritecommand.synopsis">
+   <h2 class="title">Class synopsis</h2>
+
+
+   <div class="classsynopsis">
+    <span class="ooclass"><strong class="classname"></strong></span>
+
+
+    <div class="classsynopsisinfo">
+     <span class="modifier">final</span>
+     <span class="ooclass">
+      <span class="modifier">class</span> <strong class="classname">MongoDB\Driver\BulkWriteCommand</strong>
+     </span>
+
+     <span class="oointerface"><span class="modifier">implements</span> 
+       <a href="class.countable.html" class="interfacename">Countable</a></span> {</div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Methods */</div>
+    <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-bulkwritecommand.construct.html" class="methodname">__construct</a></span>(<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.array.html" class="type array">array</a></span></span> <code class="parameter">$options</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>)</div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-bulkwritecommand.count.html" class="methodname">count</a></span>(): <span class="type"><a href="language.types.integer.html" class="type int">int</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-bulkwritecommand.deletemany.html" class="methodname">deleteMany</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$namespace</code></span>, <span class="methodparam"><span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span> <code class="parameter">$filter</code></span>, <span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.array.html" class="type array">array</a></span></span> <code class="parameter">$options</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-bulkwritecommand.deleteone.html" class="methodname">deleteOne</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$namespace</code></span>, <span class="methodparam"><span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span> <code class="parameter">$filter</code></span>, <span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.array.html" class="type array">array</a></span></span> <code class="parameter">$options</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-bulkwritecommand.insertone.html" class="methodname">insertOne</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$namespace</code></span>, <span class="methodparam"><span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span> <code class="parameter">$document</code></span>): <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-bulkwritecommand.replaceone.html" class="methodname">replaceOne</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$namespace</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span> <code class="parameter">$filter</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span> <code class="parameter">$replacement</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.array.html" class="type array">array</a></span></span> <code class="parameter">$options</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span><br>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-bulkwritecommand.updatemany.html" class="methodname">updateMany</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$namespace</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span> <code class="parameter">$filter</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span> <code class="parameter">$update</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.array.html" class="type array">array</a></span></span> <code class="parameter">$options</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span><br>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-bulkwritecommand.updateone.html" class="methodname">updateOne</a></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$namespace</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span> <code class="parameter">$filter</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span> <code class="parameter">$update</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.array.html" class="type array">array</a></span></span> <code class="parameter">$options</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span><br>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+   }</div>
+
+
+  </div>
+
+  <div class="section" id="mongodb-driver-bulkwritecommand.examples">
+   <h2 class="title">Examples</h2>
+
+   <div class="example" id="example-1">
+    <p><strong>Example #1 Mixed write operations</strong></p>
+    <div class="example-contents"><p>
+     Mixed write operations (i.e. inserts, updates, and deletes) will be sent
+     to the server using a single
+     <a href="https://www.mongodb.com/docs/manual/reference/command/bulkWrite" class="link external">&raquo;&nbsp;bulkWrite</a>
+     command.
+    </p></div>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br />$manager </span><span style="color: #007700">= new </span><span style="color: #0000BB">MongoDB\Driver\Manager</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$bulk </span><span style="color: #007700">= new </span><span style="color: #0000BB">MongoDB\Driver\BulkWriteCommand</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">// Delete documents from both collections<br /></span><span style="color: #0000BB">$bulk</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">deleteMany</span><span style="color: #007700">(</span><span style="color: #DD0000">'db.coll_one'</span><span style="color: #007700">, []);<br /></span><span style="color: #0000BB">$bulk</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">deleteMany</span><span style="color: #007700">(</span><span style="color: #DD0000">'db.coll_two'</span><span style="color: #007700">, []);<br /><br /></span><span style="color: #FF8000">// Insert documents into two collections<br /></span><span style="color: #0000BB">$bulk</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">insertOne</span><span style="color: #007700">(</span><span style="color: #DD0000">'db.coll_one'</span><span style="color: #007700">, [</span><span style="color: #DD0000">'_id' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">1</span><span style="color: #007700">]);<br /></span><span style="color: #0000BB">$bulk</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">insertOne</span><span style="color: #007700">(</span><span style="color: #DD0000">'db.coll_two'</span><span style="color: #007700">, [</span><span style="color: #DD0000">'_id' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">2</span><span style="color: #007700">]);<br /></span><span style="color: #0000BB">$bulk</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">insertOne</span><span style="color: #007700">(</span><span style="color: #DD0000">'db.coll_two'</span><span style="color: #007700">, [</span><span style="color: #DD0000">'_id' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">3</span><span style="color: #007700">]);<br /><br /></span><span style="color: #FF8000">// Update a document in "coll_one"<br /></span><span style="color: #0000BB">$bulk</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">updateOne</span><span style="color: #007700">(</span><span style="color: #DD0000">'db.coll_one'</span><span style="color: #007700">, [</span><span style="color: #DD0000">'_id' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">1</span><span style="color: #007700">], [</span><span style="color: #DD0000">'$set' </span><span style="color: #007700">=&gt; [</span><span style="color: #DD0000">'x' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">1</span><span style="color: #007700">]]);<br /><br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">$manager</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">executeBulkWriteCommand</span><span style="color: #007700">(</span><span style="color: #0000BB">$bulk</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">printf</span><span style="color: #007700">(</span><span style="color: #DD0000">"Inserted %d document(s)\n"</span><span style="color: #007700">, </span><span style="color: #0000BB">$result</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getInsertedCount</span><span style="color: #007700">());<br /></span><span style="color: #0000BB">printf</span><span style="color: #007700">(</span><span style="color: #DD0000">"Updated  %d document(s)\n"</span><span style="color: #007700">, </span><span style="color: #0000BB">$result</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getModifiedCount</span><span style="color: #007700">());<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output:</p></div>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+Inserted 3 document(s)
+Updated  1 document(s)
+</pre></div>
+    </div>
+   </div>
+   <div class="example" id="example-2">
+    <p><strong>Example #2 Ordered write operations causing an error</strong></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br />$manager </span><span style="color: #007700">= new </span><span style="color: #0000BB">MongoDB\Driver\Manager</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$bulk </span><span style="color: #007700">= new </span><span style="color: #0000BB">MongoDB\Driver\BulkWriteCommand</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$bulk</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">deleteMany</span><span style="color: #007700">(</span><span style="color: #DD0000">'db.coll'</span><span style="color: #007700">, []);<br /></span><span style="color: #0000BB">$bulk</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">insertOne</span><span style="color: #007700">(</span><span style="color: #DD0000">'db.coll'</span><span style="color: #007700">, [</span><span style="color: #DD0000">'_id' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">1</span><span style="color: #007700">]);<br /></span><span style="color: #0000BB">$bulk</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">insertOne</span><span style="color: #007700">(</span><span style="color: #DD0000">'db.coll'</span><span style="color: #007700">, [</span><span style="color: #DD0000">'_id' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">2</span><span style="color: #007700">]);<br /></span><span style="color: #0000BB">$bulk</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">insertOne</span><span style="color: #007700">(</span><span style="color: #DD0000">'db.coll'</span><span style="color: #007700">, [</span><span style="color: #DD0000">'_id' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">1</span><span style="color: #007700">]);<br /></span><span style="color: #0000BB">$bulk</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">insertOne</span><span style="color: #007700">(</span><span style="color: #DD0000">'db.coll'</span><span style="color: #007700">, [</span><span style="color: #DD0000">'_id' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">3</span><span style="color: #007700">]);<br /><br />try {<br />    </span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">$manager</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">executeBulkWriteCommand</span><span style="color: #007700">(</span><span style="color: #0000BB">$bulk</span><span style="color: #007700">);<br />} catch (</span><span style="color: #0000BB">MongoDB\Driver\Exception\BulkWriteCommandException $e</span><span style="color: #007700">) {<br />    </span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">$e</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getPartialResult</span><span style="color: #007700">();<br /><br />    </span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$e</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getWriteErrors</span><span style="color: #007700">());<br />}<br /><br /></span><span style="color: #0000BB">printf</span><span style="color: #007700">(</span><span style="color: #DD0000">"Inserted %d document(s)\n"</span><span style="color: #007700">, </span><span style="color: #0000BB">$result</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getInsertedCount</span><span style="color: #007700">());<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+array(1) {
+  [3]=&gt;
+  object(MongoDB\Driver\WriteError)#5 (4) {
+    [&quot;message&quot;]=&gt;
+    string(78) &quot;E11000 duplicate key error collection: db.coll index: _id_ dup key: { _id: 1 }&quot;
+    [&quot;code&quot;]=&gt;
+    int(11000)
+    [&quot;index&quot;]=&gt;
+    int(3)
+    [&quot;info&quot;]=&gt;
+    object(stdClass)#6 (0) {
+    }
+  }
+}
+Inserted 2 document(s)
+</pre></div>
+    </div>
+   </div>
+  </div>
+
+  <div class="section" id="mongodb-driver-bulkwritecommand.seealso">
+   <h2 class="title">See Also</h2>
+   <ul class="simplelist">
+    <li><span class="methodname"><a href="mongodb-driver-manager.executebulkwritecommand.html" class="methodname">MongoDB\Driver\Manager::executeBulkWriteCommand()</a></span></li>
+    <li><span class="classname"><a href="class.mongodb-driver-bulkwritecommandresult.html" class="classname">MongoDB\Driver\BulkWriteCommandResult</a></span></li>
+    <li><span class="classname"><a href="class.mongodb-driver-exception-bulkwritecommandexception.html" class="classname">MongoDB\Driver\Exception\BulkWriteCommandException</a></span></li>
+    <li><span class="classname"><a href="class.mongodb-driver-writeconcern.html" class="classname">MongoDB\Driver\WriteConcern</a></span></li>
+    <li><span class="classname"><a href="class.mongodb-driver-writeconcernerror.html" class="classname">MongoDB\Driver\WriteConcernError</a></span></li>
+    <li><span class="classname"><a href="class.mongodb-driver-writeerror.html" class="classname">MongoDB\Driver\WriteError</a></span></li>
+   </ul>
+  </div>
+
+ </div>
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="mongodb-driver-bulkwritecommand.construct.html">MongoDB\Driver\BulkWriteCommand::__construct</a> — Create a new BulkWriteCommand</li><li><a href="mongodb-driver-bulkwritecommand.count.html">MongoDB\Driver\BulkWriteCommand::count</a> — Count number of write operations in the BulkWriteCommand</li><li><a href="mongodb-driver-bulkwritecommand.deletemany.html">MongoDB\Driver\BulkWriteCommand::deleteMany</a> — Add a deleteMany operation</li><li><a href="mongodb-driver-bulkwritecommand.deleteone.html">MongoDB\Driver\BulkWriteCommand::deleteOne</a> — Add a deleteOne operation</li><li><a href="mongodb-driver-bulkwritecommand.insertone.html">MongoDB\Driver\BulkWriteCommand::insertOne</a> — Add an insertOne operation</li><li><a href="mongodb-driver-bulkwritecommand.replaceone.html">MongoDB\Driver\BulkWriteCommand::replaceOne</a> — Add a replaceOne operation</li><li><a href="mongodb-driver-bulkwritecommand.updatemany.html">MongoDB\Driver\BulkWriteCommand::updateMany</a> — Add an updateMany operation</li><li><a href="mongodb-driver-bulkwritecommand.updateone.html">MongoDB\Driver\BulkWriteCommand::updateOne</a> — Add an updateOne operation</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

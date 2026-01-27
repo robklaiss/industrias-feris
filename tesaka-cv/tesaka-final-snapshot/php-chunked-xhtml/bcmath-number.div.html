@@ -1,0 +1,348 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Divides by an arbitrary precision number</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="bcmath-number.construct.html" class="navbar__link">« BcMath\Number::__construct</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="bcmath-number.divmod.html" class="navbar__link">BcMath\Number::divmod »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="class.bcmath-number.html">BcMath\Number</a></li>
+        <li>Divides by an arbitrary precision number</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="bcmath-number.div" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">BcMath\Number::div</h1>
+  <p class="verinfo">(PHP 8 &gt;= 8.4.0)</p><p class="refpurpose"><span class="refname">BcMath\Number::div</span> &mdash; <span class="dc-title">Divides by an arbitrary precision number</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-bcmath-number.div-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><strong>BcMath\Number::div</strong></span>(<span class="methodparam"><span class="type"><span class="type"><a href="class.bcmath-number.html" class="type BcMath\Number">BcMath\Number</a></span>|<span class="type"><a href="language.types.string.html" class="type string">string</a></span>|<span class="type"><a href="language.types.integer.html" class="type int">int</a></span></span> <code class="parameter">$num</code></span>, <span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.integer.html" class="type int">int</a></span></span> <code class="parameter">$scale</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>): <span class="type"><a href="class.bcmath-number.html" class="type BcMath\Number">BcMath\Number</a></span></div>
+
+  <p class="simpara">
+   Divides <var class="varname">$this</var> by <code class="parameter">num</code>.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-bcmath-number.div-parameters">
+  <h3 class="title">Parameters</h3>
+  <dl>
+   
+    <dt><code class="parameter">num</code></dt>
+    <dd>
+     <span class="simpara">
+      The divisor.
+     </span>
+    </dd>
+   
+   
+    <dt><code class="parameter">scale</code></dt>
+    <dd>
+     <span class="simpara">
+      <span class="property"><a href="class.bcmath-number.html#bcmath-number.props.scale">BcMath\Number::scale</a></span> explicitly specified for calculation results.
+      If <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong>, the <span class="property"><a href="class.bcmath-number.html#bcmath-number.props.scale">BcMath\Number::scale</a></span> of the calculation result will be set automatically.
+     </span>
+    </dd>
+   
+  </dl>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-bcmath-number.div-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="simpara">
+   Returns the result of division as a new <span class="classname"><a href="class.bcmath-number.html" class="classname">BcMath\Number</a></span> object.
+  </p>
+  <p class="simpara">
+   When the <span class="property"><a href="class.bcmath-number.html#bcmath-number.props.scale">BcMath\Number::scale</a></span> of the result object is automatically set,
+   the <span class="property"><a href="class.bcmath-number.html#bcmath-number.props.scale">BcMath\Number::scale</a></span> of the dividend is used. However, in cases such
+   as indivisible division, the <span class="property"><a href="class.bcmath-number.html#bcmath-number.props.scale">BcMath\Number::scale</a></span> of the result is expanded.
+   Expansion is done only as needed, up to a maximum of <code class="literal">+10</code>.
+  </p>
+  <p class="simpara">
+   That is, if the <span class="property"><a href="class.bcmath-number.html#bcmath-number.props.scale">BcMath\Number::scale</a></span> of the dividend is <code class="literal">5</code>,
+   the <span class="property"><a href="class.bcmath-number.html#bcmath-number.props.scale">BcMath\Number::scale</a></span> of the result is between <code class="literal">5</code> and
+   <code class="literal">15</code>.
+  </p>
+  <p class="simpara">
+   Even in indivisible calculations, the <span class="property"><a href="class.bcmath-number.html#bcmath-number.props.scale">BcMath\Number::scale</a></span> will not always be
+   <code class="literal">+10</code>.
+   A <code class="literal">0</code> at the end of the result is considered not to need expansion, so the
+   <span class="property"><a href="class.bcmath-number.html#bcmath-number.props.scale">BcMath\Number::scale</a></span> is reduced by that amount.
+   The <span class="property"><a href="class.bcmath-number.html#bcmath-number.props.scale">BcMath\Number::scale</a></span> will never be less than the
+   <span class="property"><a href="class.bcmath-number.html#bcmath-number.props.scale">BcMath\Number::scale</a></span> before expansion.
+   See also the <a href="bcmath-number.div.html#bcmath-number.div.example.expansion-scale" class="link">code example</a>.
+  </p>
+ </div>
+
+
+ <div class="refsect1 errors" id="refsect1-bcmath-number.div-errors">
+  <h3 class="title">Errors/Exceptions</h3>
+  <p class="para">
+   This method throws a <span class="exceptionname"><a href="class.valueerror.html" class="exceptionname">ValueError</a></span> in the following cases:
+   <ul class="simplelist">
+    <li><code class="parameter">num</code> is <span class="type"><a href="language.types.string.html" class="type string">string</a></span> and not a well-formed BCMath numeric string</li>
+    <li><code class="parameter">scale</code> is outside the valid range</li>
+    <li><span class="property"><a href="class.bcmath-number.html#bcmath-number.props.scale">BcMath\Number::scale</a></span> of the result object is outside the valid range</li>
+   </ul>
+  </p>
+  <p class="simpara">
+   This method throws a <span class="exceptionname"><a href="class.divisionbyzeroerror.html" class="exceptionname">DivisionByZeroError</a></span> exception if
+   <code class="parameter">num</code> is <code class="literal">0</code>.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-bcmath-number.div-examples">
+  <h3 class="title">Examples</h3>
+  <div class="example" id="example-1">
+   <p><strong>Example #1 <span class="methodname"><strong>BcMath\Number::div()</strong></span> example when <code class="parameter">scale</code> is not specified</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$number </span><span style="color: #007700">= new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'0.002'</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$ret1 </span><span style="color: #007700">= </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">div</span><span style="color: #007700">(new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'2.000'</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">$ret2 </span><span style="color: #007700">= </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">div</span><span style="color: #007700">(</span><span style="color: #DD0000">'-3'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$ret3 </span><span style="color: #007700">= </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">div</span><span style="color: #007700">(</span><span style="color: #0000BB">32</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$number</span><span style="color: #007700">, </span><span style="color: #0000BB">$ret1</span><span style="color: #007700">, </span><span style="color: #0000BB">$ret2</span><span style="color: #007700">, </span><span style="color: #0000BB">$ret3</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="examplescode"><pre class="examplescode">object(BcMath\Number)#1 (2) {
+  [&quot;value&quot;]=&gt;
+  string(5) &quot;0.002&quot;
+  [&quot;scale&quot;]=&gt;
+  int(3)
+}
+object(BcMath\Number)#3 (2) {
+  [&quot;value&quot;]=&gt;
+  string(5) &quot;0.001&quot;
+  [&quot;scale&quot;]=&gt;
+  int(3)
+}
+object(BcMath\Number)#2 (2) {
+  [&quot;value&quot;]=&gt;
+  string(16) &quot;-0.0006666666666&quot;
+  [&quot;scale&quot;]=&gt;
+  int(13)
+}
+object(BcMath\Number)#4 (2) {
+  [&quot;value&quot;]=&gt;
+  string(9) &quot;0.0000625&quot;
+  [&quot;scale&quot;]=&gt;
+  int(7)
+}</pre>
+</div>
+   </div>
+  </div>
+
+  <div class="example" id="example-2">
+   <p><strong>Example #2 <span class="methodname"><strong>BcMath\Number::div()</strong></span> example of explicitly specifying <code class="parameter">scale</code></strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$number </span><span style="color: #007700">= new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'0.002'</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$ret1 </span><span style="color: #007700">= </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">div</span><span style="color: #007700">(new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'2.000'</span><span style="color: #007700">), </span><span style="color: #0000BB">15</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$ret2 </span><span style="color: #007700">= </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">div</span><span style="color: #007700">(</span><span style="color: #DD0000">'-3'</span><span style="color: #007700">, </span><span style="color: #0000BB">5</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$ret3 </span><span style="color: #007700">= </span><span style="color: #0000BB">$number</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">div</span><span style="color: #007700">(</span><span style="color: #0000BB">32</span><span style="color: #007700">, </span><span style="color: #0000BB">2</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$number</span><span style="color: #007700">, </span><span style="color: #0000BB">$ret1</span><span style="color: #007700">, </span><span style="color: #0000BB">$ret2</span><span style="color: #007700">, </span><span style="color: #0000BB">$ret3</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="examplescode"><pre class="examplescode">object(BcMath\Number)#1 (2) {
+  [&quot;value&quot;]=&gt;
+  string(5) &quot;0.002&quot;
+  [&quot;scale&quot;]=&gt;
+  int(3)
+}
+object(BcMath\Number)#3 (2) {
+  [&quot;value&quot;]=&gt;
+  string(17) &quot;0.001000000000000&quot;
+  [&quot;scale&quot;]=&gt;
+  int(15)
+}
+object(BcMath\Number)#2 (2) {
+  [&quot;value&quot;]=&gt;
+  string(8) &quot;-0.00066&quot;
+  [&quot;scale&quot;]=&gt;
+  int(5)
+}
+object(BcMath\Number)#4 (2) {
+  [&quot;value&quot;]=&gt;
+  string(4) &quot;0.00&quot;
+  [&quot;scale&quot;]=&gt;
+  int(2)
+}</pre>
+</div>
+   </div>
+  </div>
+
+  <div class="example" id="bcmath-number.div.example.expansion-scale">
+   <p><strong>Example #3 <span class="methodname"><strong>BcMath\Number::div()</strong></span> example of expansioning <span class="property"><a href="class.bcmath-number.html#bcmath-number.props.scale">BcMath\Number::scale</a></span> of result object</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />var_dump</span><span style="color: #007700">(<br />    new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'0.001'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">div</span><span style="color: #007700">(</span><span style="color: #DD0000">'10001'</span><span style="color: #007700">),<br />    new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'0.001'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">div</span><span style="color: #007700">(</span><span style="color: #DD0000">'10001'</span><span style="color: #007700">, </span><span style="color: #0000BB">13</span><span style="color: #007700">),<br />    new </span><span style="color: #0000BB">BcMath\Number</span><span style="color: #007700">(</span><span style="color: #DD0000">'0.001'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">div</span><span style="color: #007700">(</span><span style="color: #DD0000">'100000000000001'</span><span style="color: #007700">),<br />);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="examplescode"><pre class="examplescode">object(BcMath\Number)#2 (2) {
+  [&quot;value&quot;]=&gt;
+  string(13) &quot;0.00000009999&quot;
+  [&quot;scale&quot;]=&gt;
+  int(11)
+}
+object(BcMath\Number)#3 (2) {
+  [&quot;value&quot;]=&gt;
+  string(15) &quot;0.0000000999900&quot;
+  [&quot;scale&quot;]=&gt;
+  int(13)
+}
+object(BcMath\Number)#4 (2) {
+  [&quot;value&quot;]=&gt;
+  string(5) &quot;0.000&quot;
+  [&quot;scale&quot;]=&gt;
+  int(3)
+}</pre>
+</div>
+   </div>
+  </div>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-bcmath-number.div-seealso">
+  <h3 class="title">See Also</h3>
+  <ul class="simplelist">
+   <li><span class="function"><a href="function.bcdiv.html" class="function" rel="rdfs-seeAlso">bcdiv()</a> - Divide two arbitrary precision numbers</span></li>
+   <li><span class="methodname"><a href="bcmath-number.divmod.html" class="methodname" rel="rdfs-seeAlso">BcMath\Number::divmod()</a> - Gets the quotient and modulus of an arbitrary precision number</span></li>
+   <li><span class="methodname"><a href="bcmath-number.mod.html" class="methodname" rel="rdfs-seeAlso">BcMath\Number::mod()</a> - Gets the modulus of an arbitrary precision number</span></li>
+   <li><span class="methodname"><a href="bcmath-number.sqrt.html" class="methodname" rel="rdfs-seeAlso">BcMath\Number::sqrt()</a> - Gets the square root of an arbitrary precision number</span></li>
+   <li><span class="methodname"><a href="bcmath-number.pow.html" class="methodname" rel="rdfs-seeAlso">BcMath\Number::pow()</a> - Raises an arbitrary precision number</span></li>
+   <li><span class="methodname"><a href="bcmath-number.mul.html" class="methodname" rel="rdfs-seeAlso">BcMath\Number::mul()</a> - Multiplies an arbitrary precision number</span></li>
+  </ul>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

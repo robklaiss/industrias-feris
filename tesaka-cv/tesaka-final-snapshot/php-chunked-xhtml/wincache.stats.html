@@ -1,0 +1,180 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>WinCache Statistics Script</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="wincache.configuration.html" class="navbar__link">« Runtime Configuration</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="wincache.sessionhandler.html" class="navbar__link">WinCache Session Handler »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="wincache.setup.html">Installing/Configuring</a></li>
+        <li>WinCache Statistics Script</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="wincache.stats" class="section">
+  <h2 class="title">WinCache Statistics Script</h2>
+  <p class="para">
+   The installation package for WinCache includes a PHP script,
+   <var class="filename">wincache.php</var>, that can be used to obtain cache information
+   and statistics.
+  </p>
+  <p class="para">
+   If the WinCache extension was installed via the Microsoft Web Platform Installer,
+   then this script is located in
+   <var class="filename">%SystemDrive%\Program Files\IIS\Windows Cache for PHP\</var>.
+   On a 64-bit version of the Windows Server operating system, the script is located in
+   <var class="filename">%SystemDrive%\Program Files (x86)\IIS\Windows Cache for PHP</var>.
+   If the extension was installed manually, then the <var class="filename">wincache.php</var>
+   will be located in the same folder from which the content of the installation package was extracted.
+  </p>
+  <p class="para">
+   To use <var class="filename">wincache.php</var>, copy it into a root folder of a Web site or
+   into any subfolder. To protect the script, open it in any text editor and replace the values for
+   <em>USERNAME</em> and <em>PASSWORD</em> constants.
+   If any other IIS authentication is enabled on the server, then
+   follow the instructions in the comments:
+   <div class="example" id="example-1">
+    <p><strong>Example #1 Authentication configuration for <var class="filename">wincache.php</var></strong></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/**<br /> * ======================== CONFIGURATION SETTINGS ==============================<br /> * If you do not want to use authentication for this page, set USE_AUTHENTICATION to 0.<br /> * If you use authentication then replace the default password.<br /> */<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'USE_AUTHENTICATION'</span><span style="color: #007700">, </span><span style="color: #0000BB">1</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'USERNAME'</span><span style="color: #007700">, </span><span style="color: #DD0000">'wincache'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'PASSWORD'</span><span style="color: #007700">, </span><span style="color: #DD0000">'wincache'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/**<br /> * The Basic PHP authentication will work only when IIS is configured to support<br /> * Anonymous Authentication' and nothing else. If IIS is configured to support/use<br /> * any other kind of authentication like Basic/Negotiate/Digest etc, this will not work.<br /> * In that case use the array below to define the names of users in your<br /> * domain/network/workgroup which you want to grant access to.<br /> */<br /></span><span style="color: #0000BB">$user_allowed </span><span style="color: #007700">= array(</span><span style="color: #DD0000">'DOMAIN\user1'</span><span style="color: #007700">, </span><span style="color: #DD0000">'DOMAIN\user2'</span><span style="color: #007700">, </span><span style="color: #DD0000">'DOMAIN\user3'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">/**<br /> * If the array contains string 'all', then all the users authenticated by IIS<br /> * will have access to the page. Uncomment the below line and comment above line<br /> * to grant access to all users who gets authenticated by IIS.<br /> */<br />/* $user_allowed = array('all'); */<br /><br />/** ===================== END OF CONFIGURATION SETTINGS ========================== */<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+   </div>
+   <blockquote class="note"><p><strong class="note">Note</strong>: 
+    <span class="simpara">
+     Always protect the <var class="filename">wincache.php</var> script by using either
+     the built-in authentication or the server&#039;s authentication mechanism.
+     Leaving this script unprotected may compromise the security of your
+     web application and web server.
+    </span>
+   </p></blockquote>
+  </p>
+ </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

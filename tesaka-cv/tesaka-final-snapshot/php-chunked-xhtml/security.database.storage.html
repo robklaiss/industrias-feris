@@ -1,0 +1,190 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Encrypted Storage Model</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="security.database.connection.html" class="navbar__link">« Connecting to Database</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="security.database.sql-injection.html" class="navbar__link">SQL Injection »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="security.database.html">Database Security</a></li>
+        <li>Encrypted Storage Model</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="security.database.storage" class="sect1">
+    <h2 class="title">Encrypted Storage Model</h2>
+    <p class="simpara">
+     SSL/SSH protects data travelling from the client to the server: SSL/SSH
+     does not protect persistent data stored in a database. SSL is an
+     on-the-wire protocol.
+    </p>
+    <p class="simpara">
+     Once an attacker gains access to your database directly (bypassing the
+     webserver), stored sensitive data may be exposed or misused, unless
+     the information is protected by the database itself. Encrypting the data
+     is a good way to mitigate this threat, but very few databases offer this
+     type of data encryption.
+    </p>
+    <p class="simpara">
+     The easiest way to work around this problem is to first create your own
+     encryption package, and then use it from within your <abbr title="PHP: Hypertext Preprocessor">PHP</abbr> scripts. <abbr title="PHP: Hypertext Preprocessor">PHP</abbr>
+     can assist you in this with several extensions, such as <a href="book.openssl.html" class="link">OpenSSL</a> and <a href="book.sodium.html" class="link">Sodium</a>, covering a wide variety of encryption
+     algorithms. The script encrypts the data before inserting it into the database, and decrypts
+     it when retrieving. See the references for further examples of how
+     encryption works.
+    </p>
+
+    <div class="sect2" id="security.database.storage.hashing">
+    <h3 class="title">Hashing</h3>
+     <p class="simpara">
+      In the case of truly hidden data, if its raw representation is not needed
+      (i.e. will not be displayed), hashing should be taken into consideration.
+      The well-known example for hashing is storing the cryptographic hash of a
+      password in a database, instead of the password itself.
+     </p>
+     <p class="simpara">
+      The <a href="ref.password.html" class="link">password</a> functions
+      provide a convenient way to hash sensitive data and work with these hashes.
+     </p>
+     <p class="simpara">
+      <span class="function"><a href="function.password-hash.html" class="function">password_hash()</a></span> is used to hash a given string using the
+      strongest algorithm currently available and <span class="function"><a href="function.password-verify.html" class="function">password_verify()</a></span>
+      checks whether the given password matches the hash stored in database.
+     </p>
+     <div class="example" id="example-1">
+      <p><strong>Example #1 Hashing password field</strong></p>
+      <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #FF8000">// storing password hash<br /></span><span style="color: #0000BB">$query  </span><span style="color: #007700">= </span><span style="color: #0000BB">sprintf</span><span style="color: #007700">(</span><span style="color: #DD0000">"INSERT INTO users(name,pwd) VALUES('%s','%s');"</span><span style="color: #007700">,<br />            </span><span style="color: #0000BB">pg_escape_string</span><span style="color: #007700">(</span><span style="color: #0000BB">$username</span><span style="color: #007700">),<br />            </span><span style="color: #0000BB">password_hash</span><span style="color: #007700">(</span><span style="color: #0000BB">$password</span><span style="color: #007700">, </span><span style="color: #0000BB">PASSWORD_DEFAULT</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">pg_query</span><span style="color: #007700">(</span><span style="color: #0000BB">$connection</span><span style="color: #007700">, </span><span style="color: #0000BB">$query</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">// querying if user submitted the right password<br /></span><span style="color: #0000BB">$query </span><span style="color: #007700">= </span><span style="color: #0000BB">sprintf</span><span style="color: #007700">(</span><span style="color: #DD0000">"SELECT pwd FROM users WHERE name='%s';"</span><span style="color: #007700">,<br />            </span><span style="color: #0000BB">pg_escape_string</span><span style="color: #007700">(</span><span style="color: #0000BB">$username</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">$row </span><span style="color: #007700">= </span><span style="color: #0000BB">pg_fetch_assoc</span><span style="color: #007700">(</span><span style="color: #0000BB">pg_query</span><span style="color: #007700">(</span><span style="color: #0000BB">$connection</span><span style="color: #007700">, </span><span style="color: #0000BB">$query</span><span style="color: #007700">));<br /><br />if (</span><span style="color: #0000BB">$row </span><span style="color: #007700">&amp;&amp; </span><span style="color: #0000BB">password_verify</span><span style="color: #007700">(</span><span style="color: #0000BB">$password</span><span style="color: #007700">, </span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #DD0000">'pwd'</span><span style="color: #007700">])) {<br />    echo </span><span style="color: #DD0000">'Welcome, ' </span><span style="color: #007700">. </span><span style="color: #0000BB">htmlspecialchars</span><span style="color: #007700">(</span><span style="color: #0000BB">$username</span><span style="color: #007700">) . </span><span style="color: #DD0000">'!'</span><span style="color: #007700">;<br />} else {<br />    echo </span><span style="color: #DD0000">'Authentication failed for ' </span><span style="color: #007700">. </span><span style="color: #0000BB">htmlspecialchars</span><span style="color: #007700">(</span><span style="color: #0000BB">$username</span><span style="color: #007700">) . </span><span style="color: #DD0000">'.'</span><span style="color: #007700">;<br />}<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+      </div>
+
+     </div>
+    </div>
+   </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

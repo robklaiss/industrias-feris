@@ -1,0 +1,204 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>PHP tags</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="language.basic-syntax.html" class="navbar__link">« Basic syntax</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="language.basic-syntax.phpmode.html" class="navbar__link">Escaping from HTML »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="language.basic-syntax.html">Basic syntax</a></li>
+        <li>PHP tags</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="language.basic-syntax.phptags" class="sect1">
+   <h2 class="title">PHP tags</h2>
+   <p class="para">
+    When PHP processes a file, it recognizes the opening and closing
+    tags, <code class="literal">&lt;?php</code> and <code class="literal">?&gt;</code>, to
+    define the boundaries of PHP code execution. Content outside these
+    tags is ignored by the PHP parser, allowing PHP to seamlessly embed
+    in various document types.
+   </p>
+
+   <p class="para">
+    A whitespace character (space, tab, or newline) must follow
+    <code class="literal">&lt;?php</code> to ensure proper token separation.
+    Omitting this whitespace will result in a syntax error.
+   </p>
+
+   <p class="para">
+    PHP also includes the short echo tag <code class="literal">&lt;?=</code>,
+    which is shorthand for <code class="code">&lt;?php echo</code>.
+   </p>
+   <p class="para">
+    <div class="example" id="example-1">
+     <p><strong>Example #1 PHP Opening and Closing Tags</strong></p>
+     <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000">1.  <span style="color: #0000BB">&lt;?php </span><span style="color: #007700">echo </span><span style="color: #DD0000">'if you want to serve PHP code in XHTML or XML documents,<br />                use these tags'</span><span style="color: #007700">; </span><span style="color: #0000BB">?&gt;<br /></span><br />2.  You can use the short echo tag to <span style="color: #0000BB">&lt;?= </span><span style="color: #DD0000">'print this string' </span><span style="color: #0000BB">?&gt;</span>.<br />    It's equivalent to <span style="color: #0000BB">&lt;?php </span><span style="color: #007700">echo </span><span style="color: #DD0000">'print this string' </span><span style="color: #0000BB">?&gt;</span>.<br /><br />3.  &lt;? echo 'this code is within short tags, but will only work '.<br />            'if short_open_tag is enabled'; ?&gt;</span></code></div>
+     </div>
+
+    </div>
+   </p>
+
+   <p class="para">
+    Short tags (example three) are available by default but can be disabled
+    either via the <a href="ini.core.html#ini.short-open-tag" class="link">short_open_tag</a>
+    <var class="filename">php.ini</var> configuration file directive, or are disabled by default if
+    PHP is built with the <strong class="option unknown">--disable-short-tags</strong> configuration.
+   </p>
+   <p class="para">
+    <blockquote class="note"><p><strong class="note">Note</strong>: 
+     <p class="para">
+      As short tags can be disabled it is recommended to only use the normal
+      tags (<code class="code">&lt;?php ?&gt;</code> and <code class="code">&lt;?= ?&gt;</code>) to
+      maximise compatibility.
+     </p>
+    </p></blockquote>
+   </p>
+
+   <p class="para">
+    If a file ends with PHP code, it is preferable to omit the PHP closing tag
+    at the end of the file. This prevents accidental whitespace or new lines
+    being added after the PHP closing tag, which may cause unwanted effects
+    because PHP will start output buffering when there is no intention from
+    the programmer to send any output at that point in the script.
+   </p>
+   <p class="para">
+    <div class="example" id="example-2">
+     <p><strong>Example #2 PHP Code Only File</strong></p>
+     <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">echo </span><span style="color: #DD0000">"Hello world\n"</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">// ... more code<br /><br /></span><span style="color: #007700">echo </span><span style="color: #DD0000">"Last statement\n"</span><span style="color: #007700">;<br /><br /></span><span style="color: #FF8000">// the script ends here with no PHP closing tag</span></span></code></div>
+     </div>
+
+    </div>
+   </p>
+  </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

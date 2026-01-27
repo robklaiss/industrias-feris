@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Lote SIFEN #{{ lote.id }} - Admin{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Lote SIFEN #{{ lote.id }}</h1>
+    
+    <div class="lote-info" style="margin-bottom: 30px;">
+        <h2>Información General</h2>
+        <table class="table">
+            <tr>
+                <th>ID</th>
+                <td>{{ lote.id }}</td>
+            </tr>
+            <tr>
+                <th>Ambiente</th>
+                <td>{{ lote.env }}</td>
+            </tr>
+            <tr>
+                <th>dProtConsLote</th>
+                <td><code>{{ lote.d_prot_cons_lote }}</code></td>
+            </tr>
+            <tr>
+                <th>Estado</th>
+                <td>
+                    <span class="badge badge-{{ lote.status }}">
+                        {{ lote.status }}
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <th>Código Respuesta</th>
+                <td><code>{{ lote.last_cod_res_lot or '-' }}</code></td>
+            </tr>
+            <tr>
+                <th>Mensaje Respuesta</th>
+                <td>{{ lote.last_msg_res_lot or '-' }}</td>
+            </tr>
+            <tr>
+                <th>Intentos</th>
+                <td>{{ lote.attempts }}</td>
+            </tr>
+            <tr>
+                <th>Creado</th>
+                <td>{{ lote.created_at }}</td>
+            </tr>
+            <tr>
+                <th>Última Consulta</th>
+                <td>{{ lote.last_checked_at or '-' }}</td>
+            </tr>
+            {% if lote.de_document_id %}
+            <tr>
+                <th>Documento Relacionado</th>
+                <td><a href="/de/{{ lote.de_document_id }}">Ver documento #{{ lote.de_document_id }}</a></td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+    
+    {% if lote.last_response_xml %}
+    <div class="xml-response" style="margin-bottom: 30px;">
+        <h2>XML de Respuesta</h2>
+        <details>
+            <summary>Ver XML completo</summary>
+            <pre style="background: #f5f5f5; padding: 15px; overflow-x: auto; max-height: 500px;"><code>{{ lote.last_response_xml }}</code></pre>
+        </details>
+    </div>
+    {% endif %}
+    
+    <div class="actions" style="margin-top: 20px;">
+        <form method="post" action="/admin/sifen/lotes/{{ lote.id }}/check" style="display: inline;">
+            <button type="submit" class="btn">Consultar Estado Ahora</button>
+        </form>
+    </div>
+    
+    <p style="margin-top: 20px;">
+        <a href="/admin/sifen/lotes">← Volver a lista de lotes</a> |
+        <a href="/">← Volver a documentos</a>
+    </p>
+</div>
+{% endblock %}
+

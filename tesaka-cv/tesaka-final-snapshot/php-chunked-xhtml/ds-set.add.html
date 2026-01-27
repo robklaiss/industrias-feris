@@ -1,0 +1,265 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Adds values to the set</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="class.ds-set.html" class="navbar__link">« Ds\Set</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="ds-set.allocate.html" class="navbar__link">Ds\Set::allocate »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="class.ds-set.html">Ds\Set</a></li>
+        <li>Adds values to the set</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="ds-set.add" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">Ds\Set::add</h1>
+  <p class="verinfo">(PECL ds &gt;= 1.0.0)</p><p class="refpurpose"><span class="refname">Ds\Set::add</span> &mdash; <span class="dc-title">Adds values to the set</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-ds-set.add-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><strong>Ds\Set::add</strong></span>(<span class="methodparam"><span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">...$values</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+  <p class="para rdfs-comment">
+    Adds all given values to the set that haven&#039;t already been added.
+  </p>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+    <p class="para">
+        Values of type <span class="type"><a href="language.types.object.html" class="type object">object</a></span> are supported.
+
+        If an object implements <span class="classname"><a href="class.ds-hashable.html" class="classname">Ds\Hashable</a></span>,
+        equality will be determined by the object&#039;s <code class="code">equals</code> function.
+
+        If an object does not implement <span class="classname"><a href="class.ds-hashable.html" class="classname">Ds\Hashable</a></span>,
+        objects must be references to the same instance to be considered equal.
+    </p>
+  </p></blockquote>
+  <div class="caution"><strong class="caution">Caution</strong>
+    <p class="para">
+        All comparisons are strict (type and value).
+    </p>
+  </div>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-ds-set.add-parameters">
+  <h3 class="title">Parameters</h3>
+  <dl>
+   
+    <dt><code class="parameter">values</code></dt>
+    <dd>
+     <p class="para">
+        Values to add to the set.
+     </p>
+    </dd>
+   
+  </dl>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-ds-set.add-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+    No value is returned.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-ds-set.add-examples">
+  <h3 class="title">Examples</h3>
+  <div class="example" id="example-1">
+   <p><strong>Example #1 <span class="function"><strong>Ds\Set::add()</strong></span> example using integers</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$set </span><span style="color: #007700">= new </span><span style="color: #0000BB">\Ds\Set</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">(</span><span style="color: #0000BB">2</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">(</span><span style="color: #0000BB">3</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">// Strict comparison would not treat these the same as int(1)<br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">(</span><span style="color: #DD0000">"1"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">(</span><span style="color: #0000BB">true</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$set</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+   <div class="example-contents screen">
+<div class="examplescode"><pre class="examplescode">object(Ds\Set)#1 (5) {
+  [0]=&gt;
+  int(1)
+  [1]=&gt;
+  int(2)
+  [2]=&gt;
+  int(3)
+  [3]=&gt;
+  string(1) &quot;1&quot;
+  [4]=&gt;
+  bool(true)
+}</pre>
+</div>
+   </div>
+  </div>
+  <div class="example" id="example-2">
+   <p><strong>Example #2 <span class="function"><strong>Ds\Set::add()</strong></span> example using objects</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class </span><span style="color: #0000BB">HashableObject </span><span style="color: #007700">implements </span><span style="color: #0000BB">\Ds\Hashable<br /></span><span style="color: #007700">{<br />    </span><span style="color: #FF8000">/**<br />     * An arbitrary value to use as the hash value. Does not define equality.<br />     */<br />    </span><span style="color: #007700">private </span><span style="color: #0000BB">$value</span><span style="color: #007700">;<br /><br />    public function </span><span style="color: #0000BB">__construct</span><span style="color: #007700">(</span><span style="color: #0000BB">$value</span><span style="color: #007700">)<br />    {<br />        </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">value </span><span style="color: #007700">= </span><span style="color: #0000BB">$value</span><span style="color: #007700">;<br />    }<br /><br />    public function </span><span style="color: #0000BB">hash</span><span style="color: #007700">()<br />    {<br />        return </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">value</span><span style="color: #007700">;<br />    }<br /><br />    public function </span><span style="color: #0000BB">equals</span><span style="color: #007700">(</span><span style="color: #0000BB">$obj</span><span style="color: #007700">): </span><span style="color: #0000BB">bool<br />    </span><span style="color: #007700">{<br />        return </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">value </span><span style="color: #007700">=== </span><span style="color: #0000BB">$obj</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">value</span><span style="color: #007700">;<br />    }<br />}<br /><br /></span><span style="color: #0000BB">$set </span><span style="color: #007700">= new </span><span style="color: #0000BB">\Ds\Set</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">$obj </span><span style="color: #007700">= new </span><span style="color: #0000BB">\ArrayIterator</span><span style="color: #007700">([]);<br /><br /></span><span style="color: #FF8000">// Adding the same instance multiple times will only add the first.<br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">(</span><span style="color: #0000BB">$obj</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">(</span><span style="color: #0000BB">$obj</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">// Adding multiple instances of the same object will add them all.<br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">(new </span><span style="color: #0000BB">\stdClass</span><span style="color: #007700">());<br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">(new </span><span style="color: #0000BB">\stdClass</span><span style="color: #007700">());<br /><br /></span><span style="color: #FF8000">// Adding multiple instances of equal hashable objects will only add the first.<br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">(new </span><span style="color: #0000BB">\HashableObject</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">(new </span><span style="color: #0000BB">\HashableObject</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">(new </span><span style="color: #0000BB">\HashableObject</span><span style="color: #007700">(</span><span style="color: #0000BB">2</span><span style="color: #007700">));<br /></span><span style="color: #0000BB">$set</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">(new </span><span style="color: #0000BB">\HashableObject</span><span style="color: #007700">(</span><span style="color: #0000BB">2</span><span style="color: #007700">));<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$set</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+   <div class="example-contents screen">
+<div class="examplescode"><pre class="examplescode">object(Ds\Set)#1 (5) {
+  [0]=&gt;
+  object(ArrayIterator)#2 (1) {
+    [&quot;storage&quot;:&quot;ArrayIterator&quot;:private]=&gt;
+    array(0) {
+    }
+  }
+  [1]=&gt;
+  object(stdClass)#3 (0) {
+  }
+  [2]=&gt;
+  object(stdClass)#4 (0) {
+  }
+  [3]=&gt;
+  object(HashableObject)#5 (1) {
+    [&quot;value&quot;:&quot;HashableObject&quot;:private]=&gt;
+    int(1)
+  }
+  [4]=&gt;
+  object(HashableObject)#6 (1) {
+    [&quot;value&quot;:&quot;HashableObject&quot;:private]=&gt;
+    int(2)
+  }
+}</pre>
+</div>
+   </div>
+  </div>
+ </div>
+
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

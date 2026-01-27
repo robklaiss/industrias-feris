@@ -1,0 +1,305 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>PCNTL Functions</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="enum.pcntl-qosclass.html" class="navbar__link">« Pcntl\QosClass</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.pcntl-alarm.html" class="navbar__link">pcntl_alarm »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.pcntl.html">PCNTL</a></li>
+        <li>PCNTL Functions</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="ref.pcntl" class="reference">
+ <h1 class="title">PCNTL Functions</h1>
+
+ <div class="partintro">
+  <h1 class="title">See Also</h1>
+  <p class="para">
+   A look at the section about
+   <a href="ref.posix.html" class="link">POSIX functions</a>
+   may be useful.
+  </p>
+ </div>
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="function.pcntl-alarm.html">pcntl_alarm</a> — Set an alarm clock for delivery of a signal</li><li><a href="function.pcntl-async-signals.html">pcntl_async_signals</a> — Enable/disable asynchronous signal handling or return the old setting</li><li><a href="function.pcntl-errno.html">pcntl_errno</a> — Alias of pcntl_get_last_error</li><li><a href="function.pcntl-exec.html">pcntl_exec</a> — Executes specified program in current process space</li><li><a href="function.pcntl-fork.html">pcntl_fork</a> — Forks the currently running process</li><li><a href="function.pcntl-get-last-error.html">pcntl_get_last_error</a> — Retrieve the error number set by the last pcntl function which failed</li><li><a href="function.pcntl-getcpuaffinity.html">pcntl_getcpuaffinity</a> — Get the cpu affinity of a process</li><li><a href="function.pcntl-getpriority.html">pcntl_getpriority</a> — Get the priority of any process</li><li><a href="function.pcntl-rfork.html">pcntl_rfork</a> — Manipulates process resources</li><li><a href="function.pcntl-setcpuaffinity.html">pcntl_setcpuaffinity</a> — Set the cpu affinity of a process</li><li><a href="function.pcntl-setpriority.html">pcntl_setpriority</a> — Change the priority of any process</li><li><a href="function.pcntl-signal.html">pcntl_signal</a> — Installs a signal handler</li><li><a href="function.pcntl-signal-dispatch.html">pcntl_signal_dispatch</a> — Calls signal handlers for pending signals</li><li><a href="function.pcntl-signal-get-handler.html">pcntl_signal_get_handler</a> — Get the current handler for specified signal</li><li><a href="function.pcntl-sigprocmask.html">pcntl_sigprocmask</a> — Sets and retrieves blocked signals</li><li><a href="function.pcntl-sigtimedwait.html">pcntl_sigtimedwait</a> — Waits for signals, with a timeout</li><li><a href="function.pcntl-sigwaitinfo.html">pcntl_sigwaitinfo</a> — Waits for signals</li><li><a href="function.pcntl-strerror.html">pcntl_strerror</a> — Retrieve the system error message associated with the given errno</li><li><a href="function.pcntl-unshare.html">pcntl_unshare</a> — Dissociates parts of the process execution context</li><li><a href="function.pcntl-wait.html">pcntl_wait</a> — Waits on or returns the status of a forked child</li><li><a href="function.pcntl-waitid.html">pcntl_waitid</a> — Waits for a child process to change state</li><li><a href="function.pcntl-waitpid.html">pcntl_waitpid</a> — Waits on or returns the status of a forked child</li><li><a href="function.pcntl-wexitstatus.html">pcntl_wexitstatus</a> — Returns the return code of a terminated child</li><li><a href="function.pcntl-wifexited.html">pcntl_wifexited</a> — Checks if status code represents a normal exit</li><li><a href="function.pcntl-wifsignaled.html">pcntl_wifsignaled</a> — Checks whether the status code represents a termination due to a signal</li><li><a href="function.pcntl-wifstopped.html">pcntl_wifstopped</a> — Checks whether the child process is currently stopped</li><li><a href="function.pcntl-wstopsig.html">pcntl_wstopsig</a> — Returns the signal which caused the child to stop</li><li><a href="function.pcntl-wtermsig.html">pcntl_wtermsig</a> — Returns the signal which caused the child to terminate</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

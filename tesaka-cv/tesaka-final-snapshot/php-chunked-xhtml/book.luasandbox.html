@@ -1,0 +1,213 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>LuaSandbox</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="luaclosure.invoke.html" class="navbar__link">« LuaClosure::__invoke</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="intro.luasandbox.html" class="navbar__link">Introduction »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="refs.basic.other.html">Other Basic Extensions</a></li>
+        <li>LuaSandbox</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="book.luasandbox" class="book">
+ 
+ <h1 class="title">LuaSandbox</h1>
+ 
+
+ 
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+<ul class="chunklist chunklist_book"><li><a href="intro.luasandbox.html">Introduction</a></li><li><a href="luasandbox.setup.html">Installing/Configuring</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="luasandbox.requirements.html">Requirements</a></li><li><a href="luasandbox.installation.html">Installation</a></li></ul></li><li><a href="reference.luasandbox.differences.html">Differences from Standard Lua</a></li><li><a href="luasandbox.examples.html">Examples</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="luasandbox.examples-basic.html">Basic usage for LuaSandbox</a></li></ul></li><li><a href="class.luasandbox.html">LuaSandbox</a> — The LuaSandbox class<ul class="chunklist chunklist_book chunklist_children"><li><a href="luasandbox.callfunction.html">LuaSandbox::callFunction</a> — Call a function in a Lua global variable</li><li><a href="luasandbox.disableprofiler.html">LuaSandbox::disableProfiler</a> — Disable the profiler</li><li><a href="luasandbox.enableprofiler.html">LuaSandbox::enableProfiler</a> — Enable the profiler.</li><li><a href="luasandbox.getcpuusage.html">LuaSandbox::getCPUUsage</a> — Fetch the current CPU time usage of the Lua environment</li><li><a href="luasandbox.getmemoryusage.html">LuaSandbox::getMemoryUsage</a> — Fetch the current memory usage of the Lua environment</li><li><a href="luasandbox.getpeakmemoryusage.html">LuaSandbox::getPeakMemoryUsage</a> — Fetch the peak memory usage of the Lua environment</li><li><a href="luasandbox.getprofilerfunctionreport.html">LuaSandbox::getProfilerFunctionReport</a> — Fetch profiler data</li><li><a href="luasandbox.getversioninfo.html">LuaSandbox::getVersionInfo</a> — Return the versions of LuaSandbox and Lua</li><li><a href="luasandbox.loadbinary.html">LuaSandbox::loadBinary</a> — Load a precompiled binary chunk into the Lua environment</li><li><a href="luasandbox.loadstring.html">LuaSandbox::loadString</a> — Load Lua code into the Lua environment</li><li><a href="luasandbox.pauseusagetimer.html">LuaSandbox::pauseUsageTimer</a> — Pause the CPU usage timer</li><li><a href="luasandbox.registerlibrary.html">LuaSandbox::registerLibrary</a> — Register a set of PHP functions as a Lua library</li><li><a href="luasandbox.setcpulimit.html">LuaSandbox::setCPULimit</a> — Set the CPU time limit for the Lua environment</li><li><a href="luasandbox.setmemorylimit.html">LuaSandbox::setMemoryLimit</a> — Set the memory limit for the Lua environment</li><li><a href="luasandbox.unpauseusagetimer.html">LuaSandbox::unpauseUsageTimer</a> — Unpause the timer paused by LuaSandbox::pauseUsageTimer</li><li><a href="luasandbox.wrapphpfunction.html">LuaSandbox::wrapPhpFunction</a> — Wrap a PHP callable in a LuaSandboxFunction</li></ul></li><li><a href="class.luasandboxfunction.html">LuaSandboxFunction</a> — The LuaSandboxFunction class<ul class="chunklist chunklist_book chunklist_children"><li><a href="luasandboxfunction.call.html">LuaSandboxFunction::call</a> — Call a Lua function</li><li><a href="luasandboxfunction.construct.html">LuaSandboxFunction::__construct</a> — Unused</li><li><a href="luasandboxfunction.dump.html">LuaSandboxFunction::dump</a> — Dump the function as a binary blob</li></ul></li><li><a href="class.luasandboxerror.html">LuaSandboxError</a> — The LuaSandboxError class</li><li><a href="class.luasandboxerrorerror.html">LuaSandboxErrorError</a> — The LuaSandboxErrorError class</li><li><a href="class.luasandboxfatalerror.html">LuaSandboxFatalError</a> — The LuaSandboxFatalError class</li><li><a href="class.luasandboxmemoryerror.html">LuaSandboxMemoryError</a> — The LuaSandboxMemoryError class</li><li><a href="class.luasandboxruntimeerror.html">LuaSandboxRuntimeError</a> — The LuaSandboxRuntimeError class</li><li><a href="class.luasandboxsyntaxerror.html">LuaSandboxSyntaxError</a> — The LuaSandboxSyntaxError class</li><li><a href="class.luasandboxtimeouterror.html">LuaSandboxTimeoutError</a> — The LuaSandboxTimeoutError class</li></ul></div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

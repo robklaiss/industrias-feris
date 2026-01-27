@@ -1,0 +1,186 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Componere</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="apcuiterator.valid.html" class="navbar__link">« APCUIterator::valid</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="intro.componere.html" class="navbar__link">Introduction »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="refs.basic.php.html">Affecting PHP's Behaviour</a></li>
+        <li>Componere</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="book.componere" class="book">
+ 
+ <h1 class="title">Componere</h1>
+ 
+
+ 
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+<ul class="chunklist chunklist_book"><li><a href="intro.componere.html">Introduction</a></li><li><a href="componere.setup.html">Installing/Configuring</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="componere.requirements.html">Requirements</a></li><li><a href="componere.installation.html">Installation</a></li></ul></li><li><a href="class.componere-abstract-definition.html">Componere\Abstract\Definition</a> — The Componere\Abstract\Definition class<ul class="chunklist chunklist_book chunklist_children"><li><a href="componere-abstract-definition.addinterface.html">Componere\Abstract\Definition::addInterface</a> — Add Interface</li><li><a href="componere-abstract-definition.addmethod.html">Componere\Abstract\Definition::addMethod</a> — Add Method</li><li><a href="componere-abstract-definition.addtrait.html">Componere\Abstract\Definition::addTrait</a> — Add Trait</li><li><a href="componere-abstract-definition.getreflector.html">Componere\Abstract\Definition::getReflector</a> — Reflection</li></ul></li><li><a href="class.componere-definition.html">Componere\Definition</a> — The Componere\Definition class<ul class="chunklist chunklist_book chunklist_children"><li><a href="componere-definition.construct.html">Componere\Definition::__construct</a> — Definition Construction</li><li><a href="componere-definition.addconstant.html">Componere\Definition::addConstant</a> — Add Constant</li><li><a href="componere-definition.addproperty.html">Componere\Definition::addProperty</a> — Add Property</li><li><a href="componere-definition.register.html">Componere\Definition::register</a> — Registration</li><li><a href="componere-definition.isregistered.html">Componere\Definition::isRegistered</a> — State Detection</li><li><a href="componere-definition.getclosure.html">Componere\Definition::getClosure</a> — Get Closure</li><li><a href="componere-definition.getclosures.html">Componere\Definition::getClosures</a> — Get Closures</li></ul></li><li><a href="class.componere-patch.html">Componere\Patch</a> — The Componere\Patch class<ul class="chunklist chunklist_book chunklist_children"><li><a href="componere-patch.construct.html">Componere\Patch::__construct</a> — Patch Construction</li><li><a href="componere-patch.apply.html">Componere\Patch::apply</a> — Application</li><li><a href="componere-patch.revert.html">Componere\Patch::revert</a> — Reversal</li><li><a href="componere-patch.isapplied.html">Componere\Patch::isApplied</a> — State Detection</li><li><a href="componere-patch.derive.html">Componere\Patch::derive</a> — Patch Derivation</li><li><a href="componere-patch.getclosure.html">Componere\Patch::getClosure</a> — Get Closure</li><li><a href="componere-patch.getclosures.html">Componere\Patch::getClosures</a> — Get Closures</li></ul></li><li><a href="class.componere-method.html">Componere\Method</a> — The Componere\Method class<ul class="chunklist chunklist_book chunklist_children"><li><a href="componere-method.construct.html">Componere\Method::__construct</a> — Method Construction</li><li><a href="componere-method.setprivate.html">Componere\Method::setPrivate</a> — Accessibility Modification</li><li><a href="componere-method.setprotected.html">Componere\Method::setProtected</a> — Accessibility Modification</li><li><a href="componere-method.setstatic.html">Componere\Method::setStatic</a> — Accessibility Modification</li><li><a href="componere-method.getreflector.html">Componere\Method::getReflector</a> — Reflection</li></ul></li><li><a href="class.componere-value.html">Componere\Value</a> — The Componere\Value class<ul class="chunklist chunklist_book chunklist_children"><li><a href="componere-value.construct.html">Componere\Value::__construct</a> — Value Construction</li><li><a href="componere-value.setprivate.html">Componere\Value::setPrivate</a> — Accessibility Modification</li><li><a href="componere-value.setprotected.html">Componere\Value::setProtected</a> — Accessibility Modification</li><li><a href="componere-value.setstatic.html">Componere\Value::setStatic</a> — Accessibility Modification</li><li><a href="componere-value.isprivate.html">Componere\Value::isPrivate</a> — Accessibility Detection</li><li><a href="componere-value.isprotected.html">Componere\Value::isProtected</a> — Accessibility Detection</li><li><a href="componere-value.isstatic.html">Componere\Value::isStatic</a> — Accessibility Detection</li><li><a href="componere-value.hasdefault.html">Componere\Value::hasDefault</a> — Value Interaction</li></ul></li><li><a href="reference.componere.html">Componere Functions</a><ul class="chunklist chunklist_book chunklist_children"><li><a href="componere.cast.html">Componere\cast</a> — Casting</li><li><a href="componere.cast_by_ref.html">Componere\cast_by_ref</a> — Casting</li></ul></li></ul></div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

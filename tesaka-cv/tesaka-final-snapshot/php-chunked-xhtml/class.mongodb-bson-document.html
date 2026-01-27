@@ -1,0 +1,342 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>The MongoDB\BSON\Document class</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.mongodb.bson-torelaxedextendedjson.html" class="navbar__link">« MongoDB\BSON\toRelaxedExtendedJSON</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="mongodb-bson-document.construct.html" class="navbar__link">MongoDB\BSON\Document::__construct »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="mongodb.bson.html">MongoDB\BSON</a></li>
+        <li>The MongoDB\BSON\Document class</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="class.mongodb-bson-document" class="reference">
+
+ <h1 class="title">The MongoDB\BSON\Document class</h1>
+ 
+
+ <div class="partintro"><p class="verinfo">(mongodb &gt;=1.16.0)</p>
+
+
+  <div class="section" id="mongodb-bson-document.intro">
+   <h2 class="title">Introduction</h2>
+   <p class="para">
+    Represents a BSON document. This class is used when reading data as raw BSON
+    and cannot be modified.
+   </p>
+  </div>
+
+
+  <div class="section" id="mongodb-bson-document.synopsis">
+   <h2 class="title">Class synopsis</h2>
+
+
+   <div class="classsynopsis">
+    <span class="ooclass"><strong class="classname"></strong></span>
+
+
+    <div class="classsynopsisinfo">
+     <span class="modifier">final</span>
+     <span class="ooclass">
+      <span class="modifier">class</span> <strong class="classname">MongoDB\BSON\Document</strong>
+     </span>
+
+     <span class="oointerface"><span class="modifier">implements</span> 
+       <a href="class.mongodb-bson-type.html" class="interfacename">MongoDB\BSON\Type</a></span><span class="oointerface">,  <a href="class.arrayaccess.html" class="interfacename">ArrayAccess</a></span><span class="oointerface">,  <a href="class.iteratoraggregate.html" class="interfacename">IteratorAggregate</a></span> {</div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Methods */</div>
+    <div class="methodsynopsis dc-description">
+   <span class="modifier">final</span> <span class="modifier">private</span> <span class="methodname"><a href="mongodb-bson-document.construct.html" class="methodname">__construct</a></span>()</div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span> <span class="modifier">static</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-bson-document.frombson.html" class="methodname">fromBSON</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$bson</code></span>): <span class="type"><a href="class.mongodb-bson-document.html" class="type MongoDB\BSON\Document">MongoDB\BSON\Document</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span> <span class="modifier">static</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-bson-document.fromjson.html" class="methodname">fromJSON</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$json</code></span>): <span class="type"><a href="class.mongodb-bson-document.html" class="type MongoDB\BSON\Document">MongoDB\BSON\Document</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span> <span class="modifier">static</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-bson-document.fromphp.html" class="methodname">fromPHP</a></span>(<span class="methodparam"><span class="type"><span class="type"><a href="language.types.object.html" class="type object">object</a></span>|<span class="type"><a href="language.types.array.html" class="type array">array</a></span></span> <code class="parameter">$value</code></span>): <span class="type"><a href="class.mongodb-bson-document.html" class="type MongoDB\BSON\Document">MongoDB\BSON\Document</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-bson-document.get.html" class="methodname">get</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$key</code></span>): <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-bson-document.getiterator.html" class="methodname">getIterator</a></span>(): <span class="type"><a href="class.mongodb-bson-iterator.html" class="type MongoDB\BSON\Iterator">MongoDB\BSON\Iterator</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-bson-document.has.html" class="methodname">has</a></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$key</code></span>): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-bson-document.offsetexists.html" class="methodname">offsetExists</a></span>(<span class="methodparam"><span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$key</code></span>): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-bson-document.offsetget.html" class="methodname">offsetGet</a></span>(<span class="methodparam"><span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$key</code></span>): <span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-bson-document.offsetset.html" class="methodname">offsetSet</a></span>(<span class="methodparam"><span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$key</code></span>, <span class="methodparam"><span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$value</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-bson-document.offsetunset.html" class="methodname">offsetUnset</a></span>(<span class="methodparam"><span class="type"><a href="language.types.mixed.html" class="type mixed">mixed</a></span> <code class="parameter">$key</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-bson-document.tocanonicalextendedjson.html" class="methodname">toCanonicalExtendedJSON</a></span>(): <span class="type"><a href="language.types.string.html" class="type string">string</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-bson-document.tophp.html" class="methodname">toPHP</a></span>(<span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.array.html" class="type array">array</a></span></span> <code class="parameter">$typeMap</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>): <span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.object.html" class="type object">object</a></span></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-bson-document.torelaxedextendedjson.html" class="methodname">toRelaxedExtendedJSON</a></span>(): <span class="type"><a href="language.types.string.html" class="type string">string</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">final</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-bson-document.tostring.html" class="methodname">__toString</a></span>(): <span class="type"><a href="language.types.string.html" class="type string">string</a></span></div>
+
+   }</div>
+
+
+  </div>
+
+  <div class="section">
+   <h2 class="title">Changelog</h2>
+   <p class="para">
+    <table class="doctable informaltable">
+     
+      <thead>
+       <tr>
+        <th>Version</th>
+        <th>Description</th>
+       </tr>
+
+      </thead>
+
+      <tbody class="tbody">
+       
+       <tr>
+        <td>PECL mongodb 2.0.0</td>
+        <td>
+         <p class="para">
+          This class no longer implements the
+          <span class="interfacename"><a href="class.serializable.html" class="interfacename">Serializable</a></span> interface.
+         </p>
+        </td>
+       </tr>
+
+
+       <tr>
+        <td>PECL mongodb 1.17.0</td>
+        <td>
+         Implements <span class="interfacename"><a href="class.mongodb-bson-type.html" class="interfacename">MongoDB\BSON\Type</a></span>.
+        </td>
+       </tr>
+
+      </tbody>
+     
+    </table>
+
+   </p>
+  </div>
+
+ </div>
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="mongodb-bson-document.construct.html">MongoDB\BSON\Document::__construct</a> — Construct a new BSON document (unused)</li><li><a href="mongodb-bson-document.frombson.html">MongoDB\BSON\Document::fromBSON</a> — Construct a new document instance from a BSON string</li><li><a href="mongodb-bson-document.fromjson.html">MongoDB\BSON\Document::fromJSON</a> — Construct a new document instance from a JSON string</li><li><a href="mongodb-bson-document.fromphp.html">MongoDB\BSON\Document::fromPHP</a> — Construct a new document instance from PHP data</li><li><a href="mongodb-bson-document.get.html">MongoDB\BSON\Document::get</a> — Returns the value of a key in the document</li><li><a href="mongodb-bson-document.getiterator.html">MongoDB\BSON\Document::getIterator</a> — Returns an iterator for the BSON document</li><li><a href="mongodb-bson-document.has.html">MongoDB\BSON\Document::has</a> — Returns whether a key is present in the document</li><li><a href="mongodb-bson-document.offsetexists.html">MongoDB\BSON\Document::offsetExists</a> — Returns whether a key is present in the document</li><li><a href="mongodb-bson-document.offsetget.html">MongoDB\BSON\Document::offsetGet</a> — Returns the value of a key in the document</li><li><a href="mongodb-bson-document.offsetset.html">MongoDB\BSON\Document::offsetSet</a> — Implementation of ArrayAccess</li><li><a href="mongodb-bson-document.offsetunset.html">MongoDB\BSON\Document::offsetUnset</a> — Implementation of ArrayAccess</li><li><a href="mongodb-bson-document.tocanonicalextendedjson.html">MongoDB\BSON\Document::toCanonicalExtendedJSON</a> — Returns the Canonical Extended JSON representation of the BSON document</li><li><a href="mongodb-bson-document.tophp.html">MongoDB\BSON\Document::toPHP</a> — Returns the PHP representation of the BSON document</li><li><a href="mongodb-bson-document.torelaxedextendedjson.html">MongoDB\BSON\Document::toRelaxedExtendedJSON</a> — Returns the Relaxed Extended JSON representation of the BSON document</li><li><a href="mongodb-bson-document.tostring.html">MongoDB\BSON\Document::__toString</a> — Returns the string representation of this BSON Document</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

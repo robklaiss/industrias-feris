@@ -1,0 +1,259 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Gets the current resource usages</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.getopt.html" class="navbar__link">« getopt</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.ini-alter.html" class="navbar__link">ini_alter »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ref.info.html">PHP Options/Info Functions</a></li>
+        <li>Gets the current resource usages</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="function.getrusage" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">getrusage</h1>
+  <p class="verinfo">(PHP 4, PHP 5, PHP 7, PHP 8)</p><p class="refpurpose"><span class="refname">getrusage</span> &mdash; <span class="dc-title">Gets the current resource usages</span></p>
+
+ </div>
+ 
+ <div class="refsect1 description" id="refsect1-function.getrusage-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="methodname"><strong>getrusage</strong></span>(<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$mode</code><span class="initializer"> = 0</span></span>): <span class="type"><span class="type"><a href="language.types.array.html" class="type array">array</a></span>|<span class="type"><a href="language.types.singleton.html" class="type false">false</a></span></span></div>
+
+  <p class="para rdfs-comment">
+   This is an interface to <strong class="command">getrusage(2)</strong>. It gets data returned
+   from the system call. 
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-function.getrusage-parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+    
+     <dt><code class="parameter">mode</code></dt>
+     <dd>
+      <p class="para">
+       If <code class="parameter">mode</code> is 1, getrusage will be called with
+       <strong><code>RUSAGE_CHILDREN</code></strong>.
+      </p>
+     </dd>
+    
+   </dl>
+  </p>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-function.getrusage-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns an associative array containing the data returned from the system
+   call. All entries are accessible by using their documented field names.
+   Returns <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong> on failure.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-function.getrusage-examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   <div class="example" id="example-1">
+    <p><strong>Example #1 <span class="function"><strong>getrusage()</strong></span> example</strong></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$dat </span><span style="color: #007700">= </span><span style="color: #0000BB">getrusage</span><span style="color: #007700">();<br />echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_oublock"</span><span style="color: #007700">];       </span><span style="color: #FF8000">// number of block output operations<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_inblock"</span><span style="color: #007700">];       </span><span style="color: #FF8000">// number of block input operations<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_msgsnd"</span><span style="color: #007700">];        </span><span style="color: #FF8000">// number of IPC messages sent<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_msgrcv"</span><span style="color: #007700">];        </span><span style="color: #FF8000">// number of IPC messages received<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_maxrss"</span><span style="color: #007700">];        </span><span style="color: #FF8000">// maximum resident set size<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_ixrss"</span><span style="color: #007700">];         </span><span style="color: #FF8000">// integral shared memory size<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_idrss"</span><span style="color: #007700">];         </span><span style="color: #FF8000">// integral unshared data size<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_minflt"</span><span style="color: #007700">];        </span><span style="color: #FF8000">// number of page reclaims (soft page faults)<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_majflt"</span><span style="color: #007700">];        </span><span style="color: #FF8000">// number of page faults (hard page faults)<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_nsignals"</span><span style="color: #007700">];      </span><span style="color: #FF8000">// number of signals received<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_nvcsw"</span><span style="color: #007700">];         </span><span style="color: #FF8000">// number of voluntary context switches<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_nivcsw"</span><span style="color: #007700">];        </span><span style="color: #FF8000">// number of involuntary context switches<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_nswap"</span><span style="color: #007700">];         </span><span style="color: #FF8000">// number of swaps<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_utime.tv_usec"</span><span style="color: #007700">]; </span><span style="color: #FF8000">// user time used (microseconds)<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_utime.tv_sec"</span><span style="color: #007700">];  </span><span style="color: #FF8000">// user time used (seconds)<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_stime.tv_usec"</span><span style="color: #007700">]; </span><span style="color: #FF8000">// system time used (microseconds)<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">$dat</span><span style="color: #007700">[</span><span style="color: #DD0000">"ru_stime.tv_sec"</span><span style="color: #007700">];  </span><span style="color: #FF8000">// system time used (seconds)<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+   </div>
+  </p>
+ </div>
+
+
+ <div class="refsect1 notes" id="refsect1-function.getrusage-notes">
+  <h3 class="title">Notes</h3>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <p class="para">
+    On Windows <span class="function"><strong>getrusage()</strong></span> will only return the following 
+    members:
+   </p>
+   <p class="para">
+    <ul class="simplelist">
+     <li><code class="literal">&quot;ru_stime.tv_sec&quot;</code></li>
+     <li><code class="literal">&quot;ru_stime.tv_usec&quot;</code></li>
+     <li><code class="literal">&quot;ru_utime.tv_sec&quot;</code></li>
+     <li><code class="literal">&quot;ru_utime.tv_usec&quot;</code></li>
+     <li>
+      <code class="literal">&quot;ru_majflt&quot;</code> (only if <code class="parameter">mode</code> is 
+      <strong><code>RUSAGE_SELF</code></strong>)
+     </li>
+     <li>
+      <code class="literal">&quot;ru_maxrss&quot;</code> (only if <code class="parameter">mode</code> is 
+      <strong><code>RUSAGE_SELF</code></strong>)
+     </li>
+    </ul>
+   </p>
+   <p class="para">
+    If <span class="function"><strong>getrusage()</strong></span> is called with <code class="parameter">mode</code> 
+    set to <code class="literal">1</code> (<strong><code>RUSAGE_CHILDREN</code></strong>), then 
+    resource usage for threads are collected (meaning that internally the function 
+    is called with <strong><code>RUSAGE_THREAD</code></strong>).
+   </p>
+  </p></blockquote>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <p class="para">
+    on BeOS 2000, only the following members are returned:
+   </p>
+   <p class="para">
+    <ul class="simplelist">
+     <li><code class="literal">&quot;ru_stime.tv_sec&quot;</code></li>
+     <li><code class="literal">&quot;ru_stime.tv_usec&quot;</code></li>
+     <li><code class="literal">&quot;ru_utime.tv_sec&quot;</code></li>
+     <li><code class="literal">&quot;ru_utime.tv_usec&quot;</code></li>
+    </ul>
+   </p>
+  </p></blockquote>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-function.getrusage-seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li>Your system's man page on <strong class="command">getrusage(2)</strong></li>
+   </ul>
+  </p>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

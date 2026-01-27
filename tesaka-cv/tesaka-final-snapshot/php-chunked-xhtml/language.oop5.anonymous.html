@@ -1,0 +1,252 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Anonymous classes</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="language.oop5.traits.html" class="navbar__link">« Traits</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="language.oop5.overloading.html" class="navbar__link">Overloading »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="language.oop5.html">Classes and Objects</a></li>
+        <li>Anonymous classes</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="language.oop5.anonymous" class="sect1">
+ <h2 class="title">Anonymous classes</h2>
+
+ <p class="para">
+  Anonymous classes are useful when simple, one-off objects need to be created.
+ </p>
+
+ <div class="informalexample">
+  <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #FF8000">// Using an explicit class<br /></span><span style="color: #007700">class </span><span style="color: #0000BB">Logger<br /></span><span style="color: #007700">{<br />    public function </span><span style="color: #0000BB">log</span><span style="color: #007700">(</span><span style="color: #0000BB">$msg</span><span style="color: #007700">)<br />    {<br />        echo </span><span style="color: #0000BB">$msg</span><span style="color: #007700">;<br />    }<br />}<br /><br /></span><span style="color: #0000BB">$util</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">setLogger</span><span style="color: #007700">(new </span><span style="color: #0000BB">Logger</span><span style="color: #007700">());<br /><br /></span><span style="color: #FF8000">// Using an anonymous class<br /></span><span style="color: #0000BB">$util</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">setLogger</span><span style="color: #007700">(new class {<br />    public function </span><span style="color: #0000BB">log</span><span style="color: #007700">(</span><span style="color: #0000BB">$msg</span><span style="color: #007700">)<br />    {<br />        echo </span><span style="color: #0000BB">$msg</span><span style="color: #007700">;<br />    }<br />});</span></span></code></div>
+  </div>
+
+ </div>
+
+ <p class="para">
+  They can pass arguments through to their constructors, extend other classes,
+  implement interfaces, and use traits just like a normal class can:
+ </p>
+
+ <div class="informalexample">
+  <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #007700">class </span><span style="color: #0000BB">SomeClass </span><span style="color: #007700">{}<br />interface </span><span style="color: #0000BB">SomeInterface </span><span style="color: #007700">{}<br />trait </span><span style="color: #0000BB">SomeTrait </span><span style="color: #007700">{}<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(new class(</span><span style="color: #0000BB">10</span><span style="color: #007700">) extends </span><span style="color: #0000BB">SomeClass </span><span style="color: #007700">implements </span><span style="color: #0000BB">SomeInterface </span><span style="color: #007700">{<br />    private </span><span style="color: #0000BB">$num</span><span style="color: #007700">;<br /><br />    public function </span><span style="color: #0000BB">__construct</span><span style="color: #007700">(</span><span style="color: #0000BB">$num</span><span style="color: #007700">)<br />    {<br />        </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">num </span><span style="color: #007700">= </span><span style="color: #0000BB">$num</span><span style="color: #007700">;<br />    }<br /><br />    use </span><span style="color: #0000BB">SomeTrait</span><span style="color: #007700">;<br />});</span></span></code></div>
+  </div>
+
+  <p class="para">The above example will output:</p>
+  <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+object(class@anonymous)#1 (1) {
+  [&quot;Command line code0x104c5b612&quot;:&quot;class@anonymous&quot;:private]=&gt;
+  int(10)
+}
+</pre></div>
+  </div>
+ </div>
+
+ <p class="para">
+  Nesting an anonymous class within another class does not give it access to
+  any private or protected methods or properties of that outer class. In order
+  to use the outer class&#039; protected properties or methods, the anonymous class
+  can extend the outer class. To use the private properties of
+  the outer class in the anonymous class, they must be passed through its
+  constructor:
+ </p>
+
+ <div class="informalexample">
+  <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #007700">class </span><span style="color: #0000BB">Outer<br /></span><span style="color: #007700">{<br />    private </span><span style="color: #0000BB">$prop </span><span style="color: #007700">= </span><span style="color: #0000BB">1</span><span style="color: #007700">;<br />    protected </span><span style="color: #0000BB">$prop2 </span><span style="color: #007700">= </span><span style="color: #0000BB">2</span><span style="color: #007700">;<br /><br />    protected function </span><span style="color: #0000BB">func1</span><span style="color: #007700">()<br />    {<br />        return </span><span style="color: #0000BB">3</span><span style="color: #007700">;<br />    }<br /><br />    public function </span><span style="color: #0000BB">func2</span><span style="color: #007700">()<br />    {<br />        return new class(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">prop</span><span style="color: #007700">) extends </span><span style="color: #0000BB">Outer </span><span style="color: #007700">{<br />            private </span><span style="color: #0000BB">$prop3</span><span style="color: #007700">;<br /><br />            public function </span><span style="color: #0000BB">__construct</span><span style="color: #007700">(</span><span style="color: #0000BB">$prop</span><span style="color: #007700">)<br />            {<br />                </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">prop3 </span><span style="color: #007700">= </span><span style="color: #0000BB">$prop</span><span style="color: #007700">;<br />            }<br /><br />            public function </span><span style="color: #0000BB">func3</span><span style="color: #007700">()<br />            {<br />                return </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">prop2 </span><span style="color: #007700">+ </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">prop3 </span><span style="color: #007700">+ </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">func1</span><span style="color: #007700">();<br />            }<br />        };<br />    }<br />}<br /><br />echo (new </span><span style="color: #0000BB">Outer</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">func2</span><span style="color: #007700">()-&gt;</span><span style="color: #0000BB">func3</span><span style="color: #007700">();</span></span></code></div>
+  </div>
+
+  <p class="para">The above example will output:</p>
+  <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+6
+</pre></div>
+  </div>
+ </div>
+
+ <p class="para">
+  All objects created by the same anonymous class declaration are instances of
+  that very class.
+ </p>
+
+ <div class="informalexample">
+  <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">function </span><span style="color: #0000BB">anonymous_class</span><span style="color: #007700">()<br />{<br />    return new class {};<br />}<br /><br />if (</span><span style="color: #0000BB">get_class</span><span style="color: #007700">(</span><span style="color: #0000BB">anonymous_class</span><span style="color: #007700">()) === </span><span style="color: #0000BB">get_class</span><span style="color: #007700">(</span><span style="color: #0000BB">anonymous_class</span><span style="color: #007700">())) {<br />    echo </span><span style="color: #DD0000">'same class'</span><span style="color: #007700">;<br />} else {<br />    echo </span><span style="color: #DD0000">'different class'</span><span style="color: #007700">;<br />}</span></span></code></div>
+ </div>
+
+ <p class="para">The above example will output:</p>
+ <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+same class
+</pre></div>
+  </div>
+ </div>
+
+ <blockquote class="note"><p><strong class="note">Note</strong>: 
+  <p class="para">
+   Note that anonymous classes are assigned a name by the engine, as
+   demonstrated in the following example. This name has to be regarded an
+   implementation detail, which should not be relied upon.
+  </p>
+  <div class="informalexample">
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">echo </span><span style="color: #0000BB">get_class</span><span style="color: #007700">(new class {});</span></span></code></div>
+  </div>
+
+  <p class="para">The above example will output
+something similar to:</p>
+  <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+class@anonymous/in/oNi1A0x7f8636ad2021
+</pre></div>
+   </div>
+  </div>
+ </p></blockquote>
+
+ <div class="sect2" id="language.oop5.anonymous.readonly">
+  <h3 class="title">Readonly anonymous classes</h3>
+  <p class="simpara">
+   As of PHP 8.3.0, the <code class="literal">readonly</code> modifier can
+   be applied to anonymous classes.
+  </p>
+  <div class="example" id="language.oop5.anonymous.readonly.example">
+   <p><strong>Example #1 Defining a readonly anonymous class</strong></p>
+   <div class="example-contents">
+    <div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">// Using an anonymous class<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(new readonly class(</span><span style="color: #DD0000">'[DEBUG]'</span><span style="color: #007700">) {<br />    public function </span><span style="color: #0000BB">__construct</span><span style="color: #007700">(private </span><span style="color: #0000BB">string $prefix</span><span style="color: #007700">)<br />    {<br />    }<br /><br />    public function </span><span style="color: #0000BB">log</span><span style="color: #007700">(</span><span style="color: #0000BB">$msg</span><span style="color: #007700">)<br />    {<br />        echo </span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">prefix </span><span style="color: #007700">. </span><span style="color: #DD0000">' ' </span><span style="color: #007700">. </span><span style="color: #0000BB">$msg</span><span style="color: #007700">;<br />    }<br />});</span></span></code></div>
+   </div>
+
+  </div>
+ </div>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

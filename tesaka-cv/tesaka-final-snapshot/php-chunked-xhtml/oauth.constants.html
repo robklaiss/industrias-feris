@@ -1,0 +1,474 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Predefined Constants</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="oauth.installation.html" class="navbar__link">« Installation</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="oauth.examples.html" class="navbar__link">Examples »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.oauth.html">OAuth</a></li>
+        <li>Predefined Constants</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="oauth.constants" class="appendix">
+ <h1 class="title">Predefined Constants</h1>
+
+ <p class="simpara">
+The constants below are defined by this extension, and
+will only be available when the extension has either
+been compiled into PHP or dynamically loaded at runtime.
+</p>
+ <p class="simpara">
+  Most of these constants involve problems, which are also described within the official
+  OAuth <a href="http://wiki.oauth.net/ProblemReporting" class="link external">&raquo;&nbsp;Problem Reporting</a>
+  documentation. Note however, that these constant names are specific to PHP, although
+  the naming scheme is similar.
+ </p>
+ <dl>
+  
+  
+   <dt id="constant.oauth-sig-method-rsasha1">
+    <strong><code><a href="oauth.constants.html#constant.oauth-sig-method-rsasha1">OAUTH_SIG_METHOD_RSASHA1</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     OAuth <em>RSA-SHA1</em> signature method.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-sig-method-hmacsha1">
+    <strong><code><a href="oauth.constants.html#constant.oauth-sig-method-hmacsha1">OAUTH_SIG_METHOD_HMACSHA1</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     OAuth <em>HMAC-SHA1</em> signature method.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-sig-method-hmacsha256">
+    <strong><code><a href="oauth.constants.html#constant.oauth-sig-method-hmacsha256">OAUTH_SIG_METHOD_HMACSHA256</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     OAuth <em>HMAC-SHA256</em> signature method.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-auth-type-authorization">
+    <strong><code><a href="oauth.constants.html#constant.oauth-auth-type-authorization">OAUTH_AUTH_TYPE_AUTHORIZATION</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     This constant represents putting OAuth parameters in the
+     <code class="literal">Authorization</code> header.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-auth-type-none">
+    <strong><code><a href="oauth.constants.html#constant.oauth-auth-type-none">OAUTH_AUTH_TYPE_NONE</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     This constant indicates a NoAuth OAuth request.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-auth-type-uri">
+    <strong><code><a href="oauth.constants.html#constant.oauth-auth-type-uri">OAUTH_AUTH_TYPE_URI</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     This constant represents putting OAuth parameters in the request
+     <abbr title="Uniform Resource Identifier">URI</abbr>.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-auth-type-form">
+    <strong><code><a href="oauth.constants.html#constant.oauth-auth-type-form">OAUTH_AUTH_TYPE_FORM</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     This constant represents putting OAuth parameters as part of the
+     HTTP POST body.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-http-method-get">
+    <strong><code><a href="oauth.constants.html#constant.oauth-http-method-get">OAUTH_HTTP_METHOD_GET</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Use the <em>GET</em> method for the OAuth request.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-http-method-post">
+    <strong><code><a href="oauth.constants.html#constant.oauth-http-method-post">OAUTH_HTTP_METHOD_POST</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Use the <em>POST</em> method for the OAuth request.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-http-method-put">
+    <strong><code><a href="oauth.constants.html#constant.oauth-http-method-put">OAUTH_HTTP_METHOD_PUT</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Use the <em>PUT</em> method for the OAuth request.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-http-method-head">
+    <strong><code><a href="oauth.constants.html#constant.oauth-http-method-head">OAUTH_HTTP_METHOD_HEAD</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Use the <em>HEAD</em> method for the OAuth request.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-http-method-delete">
+    <strong><code><a href="oauth.constants.html#constant.oauth-http-method-delete">OAUTH_HTTP_METHOD_DELETE</a></code></strong>
+    (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Use the <em>DELETE</em> method for the OAuth request.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-reqengine-streams">
+    <strong><code><a href="oauth.constants.html#constant.oauth-reqengine-streams">OAUTH_REQENGINE_STREAMS</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Used by <span class="methodname"><a href="oauth.setrequestengine.html" class="methodname">OAuth::setRequestEngine()</a></span> to set the engine to
+     <a href="book.stream.html" class="link">PHP streams</a>,
+     as opposed to <strong><code><a href="oauth.constants.html#constant.oauth-reqengine-curl">OAUTH_REQENGINE_CURL</a></code></strong> for
+     <a href="book.curl.html" class="link">Curl</a>.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-reqengine-curl">
+    <strong><code><a href="oauth.constants.html#constant.oauth-reqengine-curl">OAUTH_REQENGINE_CURL</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Used by <span class="methodname"><a href="oauth.setrequestengine.html" class="methodname">OAuth::setRequestEngine()</a></span> to set the engine to
+     <a href="book.curl.html" class="link">Curl</a>, as opposed to
+     <strong><code><a href="oauth.constants.html#constant.oauth-reqengine-streams">OAUTH_REQENGINE_STREAMS</a></code></strong> for <a href="book.stream.html" class="link">PHP streams</a>.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-ok">
+    <strong><code><a href="oauth.constants.html#constant.oauth-ok">OAUTH_OK</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Life is good.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-bad-nonce">
+    <strong><code><a href="oauth.constants.html#constant.oauth-bad-nonce">OAUTH_BAD_NONCE</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+      The <em>oauth_nonce</em> value was used in a previous request,
+      therefore it cannot be used now.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-bad-timestamp">
+    <strong><code><a href="oauth.constants.html#constant.oauth-bad-timestamp">OAUTH_BAD_TIMESTAMP</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+      The <em>oauth_timestamp</em> value was not accepted by the service provider. In
+      this case, the response should also contain the <em>oauth_acceptable_timestamps</em>
+      parameter.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-consumer-key-unknown">
+    <strong><code><a href="oauth.constants.html#constant.oauth-consumer-key-unknown">OAUTH_CONSUMER_KEY_UNKNOWN</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     The <em>oauth_consumer_key</em> is temporarily unacceptable to the service provider.
+     For example, the service provider may be throttling the consumer.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-consumer-key-refused">
+    <strong><code><a href="oauth.constants.html#constant.oauth-consumer-key-refused">OAUTH_CONSUMER_KEY_REFUSED</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     The consumer key was refused.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-invalid-signature">
+    <strong><code><a href="oauth.constants.html#constant.oauth-invalid-signature">OAUTH_INVALID_SIGNATURE</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+      The <em>oauth_signature</em> is invalid, as it does not match the
+      signature computed by the service provider.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-token-used">
+    <strong><code><a href="oauth.constants.html#constant.oauth-token-used">OAUTH_TOKEN_USED</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     The <em>oauth_token</em> has been consumed. It can no longer be
+     used because it has already been used in the previous request(s).
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-token-expired">
+    <strong><code><a href="oauth.constants.html#constant.oauth-token-expired">OAUTH_TOKEN_EXPIRED</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     The <em>oauth_token</em> has expired.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-token-revoked">
+    <strong><code><a href="oauth.constants.html#constant.oauth-token-revoked">OAUTH_TOKEN_REVOKED</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     The <em>oauth_token</em> has been revoked, and will never be accepted.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-token-rejected">
+    <strong><code><a href="oauth.constants.html#constant.oauth-token-rejected">OAUTH_TOKEN_REJECTED</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     The <em>oauth_token</em> was not accepted by the service provider.
+     The reason is not known, but it might be because the token was never issued,
+     already consumed, expired, and/or forgotten by the service provider.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-verifier-invalid">
+    <strong><code><a href="oauth.constants.html#constant.oauth-verifier-invalid">OAUTH_VERIFIER_INVALID</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     The <em>oauth_verifier</em> is incorrect.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-parameter-absent">
+    <strong><code><a href="oauth.constants.html#constant.oauth-parameter-absent">OAUTH_PARAMETER_ABSENT</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     A required parameter was not received. In this case, the response should also
+     contain the <em>oauth_parameters_absent</em> parameter.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.oauth-signature-method-rejected">
+    <strong><code><a href="oauth.constants.html#constant.oauth-signature-method-rejected">OAUTH_SIGNATURE_METHOD_REJECTED</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     The <em>oauth_signature_method</em> was not accepted by service provider.
+    </span>
+   </dd>
+  
+ </dl>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

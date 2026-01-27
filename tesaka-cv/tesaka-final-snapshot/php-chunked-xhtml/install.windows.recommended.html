@@ -1,0 +1,202 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Recommended configuration on Windows systems</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="install.windows.html" class="navbar__link">« Installation on Windows systems</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="install.windows.manual.html" class="navbar__link">Manual installation of pre-built binaries »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="install.windows.html">Installation on Windows systems</a></li>
+        <li>Recommended configuration on Windows systems</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="install.windows.recommended" class="sect1">
+ <h2 class="title">Recommended configuration on Windows systems</h2>
+ <div class="sect2">
+  <h3 class="title">OpCache</h3>
+  <p class="para">
+   It is highly recommended to enable OpCache.
+   This extension is included with PHP for Windows.
+   It compiles and optimizes PHP scripts and caches them in memory so that
+   they aren&#039;t compiled every time the page is loaded.
+  </p>
+  <p class="para">
+   Set the <var class="filename">php.ini</var> to:
+   <div class="example" id="example-1">
+    <p><strong>Example #1 Recommended OpCache configuration</strong></p>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+opcache.enable=On
+opcache.enable_cli=On
+</pre></div>
+    </div>
+   </div>
+   And restart the web server.
+
+   For more info, see: <a href="opcache.configuration.html" class="link">OpCache Configuration</a>
+  </p>
+ </div>
+ <div class="sect2">
+  <h3 class="title">WinCache</h3>
+  <p class="para">
+   It is recommended to use WinCache if using IIS, especially if in a shared
+   web hosting environment or using networked file storage (NAS).
+
+   All PHP Applications automatically benefit from WinCache&#039;s file cache feature. File system operations are cached in memory.
+
+   WinCache also can cache user objects in memory and share them between <var class="varname">php.exe</var> or <var class="varname">php-cgi.exe</var> processes (share objects between requests).
+
+   Many major web applications have a plugin or extension or configuration option to make use of the WinCache user object cache.
+
+   If high performance is needed, use the object cache in the applications.
+
+   See: <a href="https://pecl.php.net/package/WinCache" class="link external">&raquo;&nbsp;https://pecl.php.net/package/WinCache</a>
+   to download a WinCache DLL (or <var class="filename">WINCACHE_<span class="replaceable">*</span>.tgz</var>)
+   to the PHP extensions directory
+   (<a href="ini.core.html#ini.extension-dir" class="link">extension_dir</a> in the <var class="filename">php.ini</var>).
+
+   Set the <var class="filename">php.ini</var> to:
+   <div class="example" id="example-2">
+    <p><strong>Example #2 Recommended WinCache configuration</strong></p>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+extension=php_wincache.dll
+wincache.fcenabled=1
+wincache.ocenabled=1 ; removed as of wincache 2.0.0.0
+</pre></div>
+    </div>
+   </div>
+   For more info, see:
+   <a href="wincache.configuration.html" class="link">WinCache Configuration</a>
+  </p>
+ </div>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

@@ -1,0 +1,305 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>The MongoDB\Driver\Monitoring\SDAMSubscriber interface</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="mongodb-driver-monitoring-logsubscriber.log.html" class="navbar__link">« MongoDB\Driver\Monitoring\LogSubscriber::log</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="mongodb-driver-monitoring-sdamsubscriber.serverchanged.html" class="navbar__link">MongoDB\Driver\Monitoring\SDAMSubscriber::serverChanged »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="mongodb.monitoring.html">MongoDB\Driver\Monitoring</a></li>
+        <li>The MongoDB\Driver\Monitoring\SDAMSubscriber interface</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="class.mongodb-driver-monitoring-sdamsubscriber" class="reference">
+
+ <h1 class="title">The MongoDB\Driver\Monitoring\SDAMSubscriber interface</h1>
+ 
+
+ <div class="partintro"><p class="verinfo">(mongodb &gt;=1.13.0)</p>
+
+
+  <div class="section" id="mongodb-driver-monitoring-sdamsubscriber.intro">
+   <h2 class="title">Introduction</h2>
+   <p class="para">
+    Classes may implement this interface to register an event subscriber that is
+    notified for various SDAM events. See the
+    <a href="https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring.md" class="link external">&raquo;&nbsp;Server Discovery and Monitoring</a>
+    and <a href="https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring-logging-and-monitoring.md" class="link external">&raquo;&nbsp;SDAM Monitoring</a>
+    specifications for additional information.
+   </p>
+  </div>
+
+
+  <div class="section" id="mongodb-driver-monitoring-sdamsubscriber.synopsis">
+   <h2 class="title">Interface synopsis</h2>
+
+
+   <div class="classsynopsis">
+    <span class="ooclass"><strong class="classname"></strong></span>
+
+
+    <div class="classsynopsisinfo">
+     <span class="ooclass">
+      <span class="modifier">class</span> <strong class="classname">MongoDB\Driver\Monitoring\SDAMSubscriber</strong>
+     </span>
+
+     <span class="oointerface"><span class="modifier">implements</span> 
+       <a href="class.mongodb-driver-monitoring-subscriber.html" class="interfacename">MongoDB\Driver\Monitoring\Subscriber</a></span> {</div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Methods */</div>
+    <div class="methodsynopsis dc-description">
+   <span class="modifier">abstract</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-monitoring-sdamsubscriber.serverchanged.html" class="methodname">serverChanged</a></span>(<span class="methodparam"><span class="type"><a href="class.mongodb-driver-monitoring-serverchangedevent.html" class="type MongoDB\Driver\Monitoring\ServerChangedEvent">MongoDB\Driver\Monitoring\ServerChangedEvent</a></span> <code class="parameter">$event</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">abstract</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-monitoring-sdamsubscriber.serverclosed.html" class="methodname">serverClosed</a></span>(<span class="methodparam"><span class="type"><a href="class.mongodb-driver-monitoring-serverclosedevent.html" class="type MongoDB\Driver\Monitoring\ServerClosedEvent">MongoDB\Driver\Monitoring\ServerClosedEvent</a></span> <code class="parameter">$event</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">abstract</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-monitoring-sdamsubscriber.serverheartbeatfailed.html" class="methodname">serverHeartbeatFailed</a></span>(<span class="methodparam"><span class="type"><a href="class.mongodb-driver-monitoring-serverheartbeatfailedevent.html" class="type MongoDB\Driver\Monitoring\ServerHeartbeatFailedEvent">MongoDB\Driver\Monitoring\ServerHeartbeatFailedEvent</a></span> <code class="parameter">$event</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">abstract</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-monitoring-sdamsubscriber.serverheartbeatstarted.html" class="methodname">serverHeartbeatStarted</a></span>(<span class="methodparam"><span class="type"><a href="class.mongodb-driver-monitoring-serverheartbeatstartedevent.html" class="type MongoDB\Driver\Monitoring\ServerHeartbeatStartedEvent">MongoDB\Driver\Monitoring\ServerHeartbeatStartedEvent</a></span> <code class="parameter">$event</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">abstract</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-monitoring-sdamsubscriber.serverheartbeatsucceeded.html" class="methodname">serverHeartbeatSucceeded</a></span>(<span class="methodparam"><span class="type"><a href="class.mongodb-driver-monitoring-serverheartbeatsucceededevent.html" class="type MongoDB\Driver\Monitoring\ServerHeartbeatSucceededEvent">MongoDB\Driver\Monitoring\ServerHeartbeatSucceededEvent</a></span> <code class="parameter">$event</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">abstract</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-monitoring-sdamsubscriber.serveropening.html" class="methodname">serverOpening</a></span>(<span class="methodparam"><span class="type"><a href="class.mongodb-driver-monitoring-serveropeningevent.html" class="type MongoDB\Driver\Monitoring\ServerOpeningEvent">MongoDB\Driver\Monitoring\ServerOpeningEvent</a></span> <code class="parameter">$event</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">abstract</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-monitoring-sdamsubscriber.topologychanged.html" class="methodname">topologyChanged</a></span>(<span class="methodparam"><span class="type"><a href="class.mongodb-driver-monitoring-topologychangedevent.html" class="type MongoDB\Driver\Monitoring\TopologyChangedEvent">MongoDB\Driver\Monitoring\TopologyChangedEvent</a></span> <code class="parameter">$event</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">abstract</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-monitoring-sdamsubscriber.topologyclosed.html" class="methodname">topologyClosed</a></span>(<span class="methodparam"><span class="type"><a href="class.mongodb-driver-monitoring-topologyclosedevent.html" class="type MongoDB\Driver\Monitoring\TopologyClosedEvent">MongoDB\Driver\Monitoring\TopologyClosedEvent</a></span> <code class="parameter">$event</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">abstract</span> <span class="modifier">public</span> <span class="methodname"><a href="mongodb-driver-monitoring-sdamsubscriber.topologyopening.html" class="methodname">topologyOpening</a></span>(<span class="methodparam"><span class="type"><a href="class.mongodb-driver-monitoring-topologyopeningevent.html" class="type MongoDB\Driver\Monitoring\TopologyOpeningEvent">MongoDB\Driver\Monitoring\TopologyOpeningEvent</a></span> <code class="parameter">$event</code></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+   }</div>
+
+
+  </div>
+
+  <div class="section">
+   <h2 class="title">Changelog</h2>
+   <p class="para">
+    <table class="doctable informaltable">
+     
+      <thead>
+       <tr>
+        <th>Version</th>
+        <th>Description</th>
+       </tr>
+
+      </thead>
+
+      <tbody class="tbody">
+       
+       <tr>
+        <td>PECL mongodb 2.0.0</td>
+        <td>
+         Return types previously declared as tentative are now enforced.
+        </td>
+       </tr>
+
+
+       
+       <tr>
+        <td>PECL mongodb 1.15.0</td>
+        <td>
+         Return types for methods are declared as tentative on PHP 8.0 and newer,
+         triggering deprecation notices in code that implements this interface
+         without declaring the appropriate return types. The <code class="code">#[ReturnTypeWillChange]</code>
+         attribute can be added to silence the deprecation notice.
+        </td>
+       </tr>
+
+
+      </tbody>
+     
+    </table>
+
+   </p>
+  </div>
+ </div>
+
+   
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="mongodb-driver-monitoring-sdamsubscriber.serverchanged.html">MongoDB\Driver\Monitoring\SDAMSubscriber::serverChanged</a> — Notification method for a server description change</li><li><a href="mongodb-driver-monitoring-sdamsubscriber.serverclosed.html">MongoDB\Driver\Monitoring\SDAMSubscriber::serverClosed</a> — Notification method for closing a server</li><li><a href="mongodb-driver-monitoring-sdamsubscriber.serverheartbeatfailed.html">MongoDB\Driver\Monitoring\SDAMSubscriber::serverHeartbeatFailed</a> — Notification method for a failed server heartbeat</li><li><a href="mongodb-driver-monitoring-sdamsubscriber.serverheartbeatstarted.html">MongoDB\Driver\Monitoring\SDAMSubscriber::serverHeartbeatStarted</a> — Notification method for a started server heartbeat</li><li><a href="mongodb-driver-monitoring-sdamsubscriber.serverheartbeatsucceeded.html">MongoDB\Driver\Monitoring\SDAMSubscriber::serverHeartbeatSucceeded</a> — Notification method for a successful server heartbeat</li><li><a href="mongodb-driver-monitoring-sdamsubscriber.serveropening.html">MongoDB\Driver\Monitoring\SDAMSubscriber::serverOpening</a> — Notification method for opening a server</li><li><a href="mongodb-driver-monitoring-sdamsubscriber.topologychanged.html">MongoDB\Driver\Monitoring\SDAMSubscriber::topologyChanged</a> — Notification method for a topology description change</li><li><a href="mongodb-driver-monitoring-sdamsubscriber.topologyclosed.html">MongoDB\Driver\Monitoring\SDAMSubscriber::topologyClosed</a> — Notification method for closing the topology</li><li><a href="mongodb-driver-monitoring-sdamsubscriber.topologyopening.html">MongoDB\Driver\Monitoring\SDAMSubscriber::topologyOpening</a> — Notification method for opening the topology</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

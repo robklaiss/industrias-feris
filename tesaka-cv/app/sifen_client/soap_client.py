@@ -580,7 +580,7 @@ class SoapClient:
         try:
             session = self.transport.session if hasattr(self, "transport") else Session()
             resp = session.get(
-                wsdl_url,
+                wsdl_fetch_url,
                 timeout=(self.connect_timeout, self.read_timeout),
                 allow_redirects=False  # No seguir redirects automáticamente para detectarlos
             )
@@ -3521,6 +3521,10 @@ class SoapClient:
         cert_pair = (cert_path, key_path) if cert_path and key_path else None
 
         wsdl_url = self.config.get_soap_service_url("consulta_lote")
+        # FIX: para DESCARGAR el WSDL usar ?wsdl (SIFEN test a veces devuelve body vacío sin ?wsdl)
+        wsdl_fetch_url = wsdl_url
+        if wsdl_fetch_url.endswith(".wsdl") and "?wsdl" not in wsdl_fetch_url:
+            wsdl_fetch_url = wsdl_fetch_url + "?wsdl"
         # Para consulta-lote, el endpoint POST debe incluir .wsdl (como recibe-lote y consulta-ruc)
         # NO quitamos .wsdl porque SIFEN espera el POST exactamente a /consulta-lote.wsdl
         endpoint_candidates = [wsdl_url]
@@ -3543,7 +3547,7 @@ class SoapClient:
             try:
                 print(f"🔍 Intentando descargar WSDL (intento {wsdl_attempts}/{max_wsdl_attempts})...")
                 wsdl_response = session.get(
-                    wsdl_url,
+                    wsdl_fetch_url,
                     cert=cert_pair,
                     verify=(self.config.ca_bundle_path or True),
                     timeout=10
@@ -3568,7 +3572,8 @@ class SoapClient:
                     wsdl_delay *= 2
         
         if wsdl_attempts >= max_wsdl_attempts:
-            raise SifenClientError("No se pudo descargar WSDL después de varios intentos (viene vacío)")
+            
+            print("⚠️ WSDL vacío tras reintentos; continuando igual con POST a consulta-lote.wsdl (modo resiliente)")
 
         for endpoint in endpoint_candidates:
             for content_type in content_type_variants:

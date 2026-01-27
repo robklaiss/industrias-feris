@@ -1,0 +1,258 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Error Reporting</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="security.database.sql-injection.html" class="navbar__link">« SQL Injection</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="security.variables.html" class="navbar__link">User Submitted Data »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="security.html">Security</a></li>
+        <li>Error Reporting</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="security.errors" class="chapter">
+   <h1 class="title">Error Reporting</h1>
+
+   <p class="para">
+    With PHP security, there are two sides to error reporting. One is
+    beneficial to increasing security, the other is detrimental.
+   </p>
+   <p class="para">
+    A standard attack tactic involves profiling a system by feeding
+    it improper data, and checking for the kinds, and contexts, of the
+    errors which are returned. This allows the system cracker to probe
+    for information about the server, to determine possible weaknesses.
+    For example, if an attacker had gleaned information about a page
+    based on a prior form submission, they may attempt to override
+    variables, or modify them:
+    <div class="example" id="example-1">
+     <p><strong>Example #1 Attacking Variables with a custom HTML page</strong></p>
+     <div class="example-contents">
+<div class="htmlcode"><pre class="htmlcode">&lt;form method=&quot;post&quot; action=&quot;attacktarget?username=badfoo&amp;amp;password=badfoo&quot;&gt;
+&lt;input type=&quot;hidden&quot; name=&quot;username&quot; value=&quot;badfoo&quot; /&gt;
+&lt;input type=&quot;hidden&quot; name=&quot;password&quot; value=&quot;badfoo&quot; /&gt;
+&lt;/form&gt;</pre>
+</div>
+     </div>
+
+    </div>
+   </p>
+   <p class="para">
+    The PHP errors which are normally returned can be quite helpful to a
+    developer who is trying to debug a script, indicating such things
+    as the function or file that failed, the PHP file it failed in,
+    and the line number which the failure occurred in. This is all
+    information that can be exploited.  It is not uncommon for a php
+    developer to use <span class="function"><a href="function.show-source.html" class="function">show_source()</a></span>,
+    <span class="function"><a href="function.highlight-string.html" class="function">highlight_string()</a></span>, or
+    <span class="function"><a href="function.highlight-file.html" class="function">highlight_file()</a></span> as a debugging measure, but in
+    a live site, this can expose hidden variables, unchecked syntax,
+    and other dangerous information. Especially dangerous is running
+    code from known sources with built-in debugging handlers, or using
+    common debugging techniques. If the attacker can determine what
+    general technique you are using, they may try to brute-force a page,
+    by sending various common debugging strings:
+    <div class="example" id="example-2">
+     <p><strong>Example #2 Exploiting common debugging variables</strong></p>
+     <div class="example-contents">
+<div class="htmlcode"><pre class="htmlcode">&lt;form method=&quot;post&quot; action=&quot;attacktarget?errors=Y&amp;amp;showerrors=1&amp;amp;debug=1&quot;&gt;
+&lt;input type=&quot;hidden&quot; name=&quot;errors&quot; value=&quot;Y&quot; /&gt;
+&lt;input type=&quot;hidden&quot; name=&quot;showerrors&quot; value=&quot;1&quot; /&gt;
+&lt;input type=&quot;hidden&quot; name=&quot;debug&quot; value=&quot;1&quot; /&gt;
+&lt;/form&gt;</pre>
+</div>
+     </div>
+
+    </div>
+   </p>
+   <p class="para">
+    Regardless of the method of error handling, the ability to probe a
+    system for errors leads to providing an attacker with more
+    information.
+   </p>
+   <p class="para">
+    For example, the very style of a generic PHP error indicates a system
+    is running PHP. If the attacker was looking at an <code class="literal">.html</code> page, and
+    wanted to probe for the back-end (to look for known weaknesses in
+    the system), by feeding it the wrong data they may be able to
+    determine that a system was built with PHP.
+   </p>
+   <p class="para">
+    A function error can indicate whether a system may be running a
+    specific database engine, or give clues as to how a web page or
+    programmed or designed. This allows for deeper investigation into
+    open database ports, or to look for specific bugs or weaknesses
+    in a web page. By feeding different pieces of bad data, for example,
+    an attacker can determine the order of authentication in a script,
+    (from the line number errors) as well as probe for exploits that
+    may be exploited in different locations in the script.
+   </p>
+   <p class="para">
+    A filesystem or general PHP error can indicate what permissions
+    the web server has, as well as the structure and organization of
+    files on the web server. Developer written error code can aggravate
+    this problem, leading to easy exploitation of formerly &quot;hidden&quot;
+    information.
+   </p>
+   <p class="para">
+    There are three major solutions to this issue. The first is to
+    scrutinize all functions, and attempt to compensate for the bulk
+    of the errors. The second is to disable error reporting entirely
+    on the running code. The third is to use PHP&#039;s custom error
+    handling functions to create your own error handler. Depending
+    on your security policy, you may find all three to be applicable
+    to your situation.
+   </p>
+   <p class="para">
+    One way of catching this issue ahead of time is to make use of
+    PHP&#039;s own <span class="function"><a href="function.error-reporting.html" class="function">error_reporting()</a></span>, to help you
+    secure your code and find variable usage that may be dangerous.
+    By testing your code, prior to deployment, with <strong><code><a href="errorfunc.constants.html#constant.e-all">E_ALL</a></code></strong>,
+    you can quickly find areas where your variables may be open to poisoning
+    or modification in other ways. Once you are ready for deployment,
+    you should either disable error reporting completely by setting
+    <span class="function"><a href="function.error-reporting.html" class="function">error_reporting()</a></span> to 0, or turn off the error
+    display using the <var class="filename">php.ini</var> option <code class="literal">display_errors</code>,
+    to insulate your code from probing. If you choose to do the latter,
+    you should also define the path to your log file using the
+    <code class="literal">error_log</code> ini directive, and turn
+    <code class="literal">log_errors</code> on.
+    <div class="example" id="example-3">
+     <p><strong>Example #3 Finding dangerous variables with E_ALL</strong></p>
+     <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">if (</span><span style="color: #0000BB">$username</span><span style="color: #007700">) {  </span><span style="color: #FF8000">// Not initialized or checked before usage<br />    </span><span style="color: #0000BB">$good_login </span><span style="color: #007700">= </span><span style="color: #0000BB">1</span><span style="color: #007700">;<br />}<br />if (</span><span style="color: #0000BB">$good_login </span><span style="color: #007700">== </span><span style="color: #0000BB">1</span><span style="color: #007700">) { </span><span style="color: #FF8000">// If above test fails, not initialized or checked before usage<br />    </span><span style="color: #0000BB">readfile </span><span style="color: #007700">(</span><span style="color: #DD0000">"/highly/sensitive/data/index.html"</span><span style="color: #007700">);<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+     </div>
+
+    </div>
+   </p>
+  </div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

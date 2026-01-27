@@ -1,0 +1,187 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>LDAP Controls</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="ldap.examples-basic.html" class="navbar__link">« Basic usage</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="ref.ldap.html" class="navbar__link">LDAP Functions »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ldap.examples.html">Examples</a></li>
+        <li>LDAP Controls</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="ldap.examples-controls" class="section">
+  <h2 class="title">LDAP Controls</h2>
+  <p class="para">
+   Here are some examples of using LDAP Controls with PHP &gt;= 7.3.0.
+  </p>
+
+  <div class="example" id="example-1">
+   <p><strong>Example #1 Bind with policy information</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br />$user   </span><span style="color: #007700">= </span><span style="color: #DD0000">'cn=admin,dc=example,dc=com'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$passwd </span><span style="color: #007700">= </span><span style="color: #DD0000">'adminpassword'</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$ds </span><span style="color: #007700">= </span><span style="color: #0000BB">ldap_connect</span><span style="color: #007700">(</span><span style="color: #DD0000">'ldap://localhost'</span><span style="color: #007700">);<br /><br />if (</span><span style="color: #0000BB">$ds</span><span style="color: #007700">) {<br />    </span><span style="color: #0000BB">$r </span><span style="color: #007700">= </span><span style="color: #0000BB">ldap_bind_ext</span><span style="color: #007700">(</span><span style="color: #0000BB">$ds</span><span style="color: #007700">, </span><span style="color: #0000BB">$user</span><span style="color: #007700">, </span><span style="color: #0000BB">$passwd</span><span style="color: #007700">, [[</span><span style="color: #DD0000">'oid' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">LDAP_CONTROL_PASSWORDPOLICYREQUEST</span><span style="color: #007700">]]);<br /><br />    if (</span><span style="color: #0000BB">ldap_parse_result</span><span style="color: #007700">(</span><span style="color: #0000BB">$ds</span><span style="color: #007700">, </span><span style="color: #0000BB">$r</span><span style="color: #007700">, </span><span style="color: #0000BB">$errcode</span><span style="color: #007700">, </span><span style="color: #0000BB">$matcheddn</span><span style="color: #007700">, </span><span style="color: #0000BB">$errmsg</span><span style="color: #007700">, </span><span style="color: #0000BB">$referrals</span><span style="color: #007700">, </span><span style="color: #0000BB">$ctrls</span><span style="color: #007700">)) {<br />        if (</span><span style="color: #0000BB">$errcode </span><span style="color: #007700">!= </span><span style="color: #0000BB">0</span><span style="color: #007700">) {<br />            die(</span><span style="color: #DD0000">"Error: </span><span style="color: #0000BB">$errmsg</span><span style="color: #DD0000"> (</span><span style="color: #0000BB">$errcode</span><span style="color: #DD0000">)"</span><span style="color: #007700">);<br />        }<br />        if (isset(</span><span style="color: #0000BB">$ctrls</span><span style="color: #007700">[</span><span style="color: #0000BB">LDAP_CONTROL_PASSWORDPOLICYRESPONSE</span><span style="color: #007700">])) {<br />            </span><span style="color: #0000BB">$value </span><span style="color: #007700">= </span><span style="color: #0000BB">$ctrls</span><span style="color: #007700">[</span><span style="color: #0000BB">LDAP_CONTROL_PASSWORDPOLICYRESPONSE</span><span style="color: #007700">][</span><span style="color: #DD0000">'value'</span><span style="color: #007700">];<br />            echo </span><span style="color: #DD0000">"Expires in: "</span><span style="color: #007700">.</span><span style="color: #0000BB">$value</span><span style="color: #007700">[</span><span style="color: #DD0000">'expire'</span><span style="color: #007700">].</span><span style="color: #DD0000">" seconds\n"</span><span style="color: #007700">;<br />            echo </span><span style="color: #DD0000">"Number of auth left: "</span><span style="color: #007700">.</span><span style="color: #0000BB">$value</span><span style="color: #007700">[</span><span style="color: #DD0000">'grace'</span><span style="color: #007700">].</span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />            if (isset(</span><span style="color: #0000BB">$value</span><span style="color: #007700">[</span><span style="color: #DD0000">'error'</span><span style="color: #007700">])) {<br />                echo </span><span style="color: #DD0000">"Policy error code: "</span><span style="color: #007700">.</span><span style="color: #0000BB">$value</span><span style="color: #007700">[</span><span style="color: #DD0000">'error'</span><span style="color: #007700">];<br />            }<br />        }<br />    }<br />} else {<br />    die(</span><span style="color: #DD0000">"Unable to connect to LDAP server"</span><span style="color: #007700">);<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+
+  <div class="example" id="example-2">
+   <p><strong>Example #2 Modify description only if it&#039;s not empty</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">// $link is an LDAP connection<br /><br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">ldap_mod_replace_ext</span><span style="color: #007700">(<br />    </span><span style="color: #0000BB">$link</span><span style="color: #007700">,<br />    </span><span style="color: #DD0000">'o=test,dc=example,dc=com'</span><span style="color: #007700">,<br />    [</span><span style="color: #DD0000">'description' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'New description'</span><span style="color: #007700">],<br />    [<br />        [<br />            </span><span style="color: #DD0000">'oid'         </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">LDAP_CONTROL_ASSERT</span><span style="color: #007700">,<br />            </span><span style="color: #DD0000">'iscritical'  </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">TRUE</span><span style="color: #007700">,<br />            </span><span style="color: #DD0000">'value'       </span><span style="color: #007700">=&gt; [</span><span style="color: #DD0000">'filter' </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">'(!(description=*))'</span><span style="color: #007700">]<br />        ]<br />    ]<br />);<br /><br /></span><span style="color: #FF8000">// Then use ldap_parse_result<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+
+  <div class="example" id="example-3">
+   <p><strong>Example #3 Read some values before deletion</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">// $link is an LDAP connection<br /><br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">ldap_delete_ext</span><span style="color: #007700">(<br />    </span><span style="color: #0000BB">$link</span><span style="color: #007700">,<br />    </span><span style="color: #DD0000">'o=test,dc=example,dc=com'</span><span style="color: #007700">,<br />    [<br />        [<br />            </span><span style="color: #DD0000">'oid'         </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">LDAP_CONTROL_PRE_READ</span><span style="color: #007700">,<br />            </span><span style="color: #DD0000">'iscritical'  </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">TRUE</span><span style="color: #007700">,<br />            </span><span style="color: #DD0000">'value'       </span><span style="color: #007700">=&gt; [</span><span style="color: #DD0000">'attrs' </span><span style="color: #007700">=&gt; [</span><span style="color: #DD0000">'o'</span><span style="color: #007700">, </span><span style="color: #DD0000">'description'</span><span style="color: #007700">]]<br />        ]<br />    ]<br />);<br /><br /></span><span style="color: #FF8000">// Then use ldap_parse_result<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+
+  <div class="example" id="example-4">
+   <p><strong>Example #4 Delete a reference</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">// $link is an LDAP connection<br /><br />// Without the control it would delete the referenced node<br />// Make sure to set the control as critical to avoid that<br /></span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">ldap_delete_ext</span><span style="color: #007700">(<br />    </span><span style="color: #0000BB">$link</span><span style="color: #007700">,<br />    </span><span style="color: #DD0000">'cn=reference,dc=example,dc=com'</span><span style="color: #007700">,<br />    [[</span><span style="color: #DD0000">'oid' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">LDAP_CONTROL_MANAGEDSAIT</span><span style="color: #007700">, </span><span style="color: #DD0000">'iscritical' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">TRUE</span><span style="color: #007700">]]<br />);<br /><br /></span><span style="color: #FF8000">// Then use ldap_parse_result<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+
+  <div class="example" id="example-5">
+   <p><strong>Example #5 Use pagination for a search</strong></p>
+   <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">// $link is an LDAP connection<br /><br /></span><span style="color: #0000BB">$cookie </span><span style="color: #007700">= </span><span style="color: #DD0000">''</span><span style="color: #007700">;<br /><br />do {<br />    </span><span style="color: #0000BB">$result </span><span style="color: #007700">= </span><span style="color: #0000BB">ldap_search</span><span style="color: #007700">(<br />        </span><span style="color: #0000BB">$link</span><span style="color: #007700">, </span><span style="color: #DD0000">'dc=example,dc=base'</span><span style="color: #007700">, </span><span style="color: #DD0000">'(cn=*)'</span><span style="color: #007700">, [</span><span style="color: #DD0000">'cn'</span><span style="color: #007700">], </span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">0</span><span style="color: #007700">, </span><span style="color: #0000BB">LDAP_DEREF_NEVER</span><span style="color: #007700">,<br />        [[</span><span style="color: #DD0000">'oid' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">LDAP_CONTROL_PAGEDRESULTS</span><span style="color: #007700">, </span><span style="color: #DD0000">'value' </span><span style="color: #007700">=&gt; [</span><span style="color: #DD0000">'size' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">2</span><span style="color: #007700">, </span><span style="color: #DD0000">'cookie' </span><span style="color: #007700">=&gt; </span><span style="color: #0000BB">$cookie</span><span style="color: #007700">]]]<br />    );<br />    </span><span style="color: #0000BB">ldap_parse_result</span><span style="color: #007700">(</span><span style="color: #0000BB">$link</span><span style="color: #007700">, </span><span style="color: #0000BB">$result</span><span style="color: #007700">, </span><span style="color: #0000BB">$errcode </span><span style="color: #007700">, </span><span style="color: #0000BB">$matcheddn </span><span style="color: #007700">, </span><span style="color: #0000BB">$errmsg </span><span style="color: #007700">, </span><span style="color: #0000BB">$referrals</span><span style="color: #007700">, </span><span style="color: #0000BB">$controls</span><span style="color: #007700">);<br />    </span><span style="color: #FF8000">// To keep the example short errors are not tested<br />    </span><span style="color: #0000BB">$entries </span><span style="color: #007700">= </span><span style="color: #0000BB">ldap_get_entries</span><span style="color: #007700">(</span><span style="color: #0000BB">$link</span><span style="color: #007700">, </span><span style="color: #0000BB">$result</span><span style="color: #007700">);<br />    foreach (</span><span style="color: #0000BB">$entries </span><span style="color: #007700">as </span><span style="color: #0000BB">$entry</span><span style="color: #007700">) {<br />        echo </span><span style="color: #DD0000">"cn: "</span><span style="color: #007700">.</span><span style="color: #0000BB">$entry</span><span style="color: #007700">[</span><span style="color: #DD0000">'cn'</span><span style="color: #007700">][</span><span style="color: #0000BB">0</span><span style="color: #007700">].</span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />    }<br />    if (isset(</span><span style="color: #0000BB">$controls</span><span style="color: #007700">[</span><span style="color: #0000BB">LDAP_CONTROL_PAGEDRESULTS</span><span style="color: #007700">][</span><span style="color: #DD0000">'value'</span><span style="color: #007700">][</span><span style="color: #DD0000">'cookie'</span><span style="color: #007700">])) {<br />        </span><span style="color: #FF8000">// You need to pass the cookie from the last call to the next one<br />        </span><span style="color: #0000BB">$cookie </span><span style="color: #007700">= </span><span style="color: #0000BB">$controls</span><span style="color: #007700">[</span><span style="color: #0000BB">LDAP_CONTROL_PAGEDRESULTS</span><span style="color: #007700">][</span><span style="color: #DD0000">'value'</span><span style="color: #007700">][</span><span style="color: #DD0000">'cookie'</span><span style="color: #007700">];<br />    } else {<br />        </span><span style="color: #0000BB">$cookie </span><span style="color: #007700">= </span><span style="color: #DD0000">''</span><span style="color: #007700">;<br />    }<br />    </span><span style="color: #FF8000">// Empty cookie means last page<br /></span><span style="color: #007700">} while (</span><span style="color: #0000BB">strlen</span><span style="color: #007700">(</span><span style="color: #0000BB">$cookie</span><span style="color: #007700">) &gt; </span><span style="color: #0000BB">0</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

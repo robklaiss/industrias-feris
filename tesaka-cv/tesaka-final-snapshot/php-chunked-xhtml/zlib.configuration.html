@@ -1,0 +1,258 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Runtime Configuration</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="zlib.installation.html" class="navbar__link">« Installation</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="zlib.resources.html" class="navbar__link">Resource Types »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="zlib.setup.html">Installing/Configuring</a></li>
+        <li>Runtime Configuration</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="zlib.configuration" class="section">
+ <h2 class="title">Runtime Configuration</h2>
+ <p class="simpara">
+The behaviour of these functions is affected by settings in <var class="filename">php.ini</var>.
+</p>
+ <p class="para">
+  The zlib extension offers the option to transparently compress
+  your pages on-the-fly, if the requesting browser supports
+  this. Therefore there are three options in the <a href="configuration.file.html" class="link">configuration file</a> <var class="filename">php.ini</var>.
+   <table class="doctable table">
+   <caption><strong>Zlib Configuration Options</strong></caption>
+   
+    <thead>
+     <tr>
+      <th>Name</th>
+      <th>Default</th>
+      <th>Changeable</th>
+      <th>Changelog</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+      <td><a href="zlib.configuration.html#ini.zlib.output-compression" class="link">zlib.output_compression</a></td>
+      <td>&quot;0&quot;</td>
+      <td><strong><code><a href="info.constants.html#constant.ini-all">INI_ALL</a></code></strong></td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr>
+      <td><a href="zlib.configuration.html#ini.zlib.output-compression-level" class="link">zlib.output_compression_level</a></td>
+      <td>&quot;-1&quot;</td>
+      <td><strong><code><a href="info.constants.html#constant.ini-all">INI_ALL</a></code></strong></td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+     <tr>
+      <td><a href="zlib.configuration.html#ini.zlib.output-handler" class="link">zlib.output_handler</a></td>
+      <td>&quot;&quot;</td>
+      <td><strong><code><a href="info.constants.html#constant.ini-all">INI_ALL</a></code></strong></td>
+      <td class="empty">&nbsp;</td>
+     </tr>
+
+    </tbody>
+   
+  </table>
+
+   For further details and definitions of the
+INI_* modes, see the <a href="configuration.changes.modes.html" class="xref">Where a configuration setting may be set</a>.
+</p>
+ 
+ <p class="para">Here&#039;s a short explanation of
+the configuration directives.</p>
+ 
+ <p class="para">
+ <dl>
+  
+   <dt id="ini.zlib.output-compression">
+    <code class="parameter">zlib.output_compression</code>
+    <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span>/<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     Whether to transparently compress pages. If this option is set
+     to &quot;On&quot; in <var class="filename">php.ini</var> or the Apache configuration, pages are
+     compressed if the browser sends an &quot;Accept-Encoding: gzip&quot; or
+     &quot;deflate&quot; header. &quot;Content-Encoding: gzip&quot; (respectively
+     &quot;deflate&quot;) and &quot;Vary: Accept-Encoding&quot; headers are added to
+     the output.
+     In runtime, it can be set only before sending any output.
+    </p>
+    <p class="para">
+     This option also accepts integer values instead of boolean
+     &quot;On&quot;/&quot;Off&quot;, using this you can set the output buffer size
+     (default is 4KB).
+    </p>
+    <blockquote class="note"><p><strong class="note">Note</strong>: 
+     <p class="para">
+      <a href="outcontrol.configuration.html#ini.output-handler" class="link">output_handler</a> must be 
+      empty if this is set &#039;On&#039; ! Instead you must use <code class="literal">zlib.output_handler</code>.
+     </p>
+    </p></blockquote>
+   </dd>
+  
+
+  
+   <dt id="ini.zlib.output-compression-level">
+    <code class="parameter">zlib.output_compression_level</code>
+    <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     Compression level used for transparent output compression. Specify a
+     value between 0 (no compression) to 9 (most compression). The default
+     value, -1, lets the server decide which level to use.
+    </p>
+   </dd>
+  
+
+  
+   <dt id="ini.zlib.output-handler">
+    <code class="parameter">zlib.output_handler</code>
+    <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+   </dt>
+   <dd>
+    <p class="para">
+     You cannot specify additional output handlers if zlib.output_compression
+     is activated here. This setting does the same as <a href="outcontrol.configuration.html#ini.output-handler" class="link">
+     output_handler</a> but in a different order.
+    </p>
+   </dd>
+  
+
+ </dl>
+ </p>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

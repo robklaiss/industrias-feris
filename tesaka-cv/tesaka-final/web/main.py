@@ -32,6 +32,15 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
+# DID_HELPER_BEGIN
+def _gen_did_15() -> str:
+    # YYYYMMDDHHMMSS + 1 dígito (15)
+    from datetime import datetime
+    import random
+    return datetime.utcnow().strftime("%Y%m%d%H%M%S") + str(random.randint(0, 9))
+# DID_HELPER_END
+
+
 # Cargar variables de entorno desde .env si existe
 try:
     from dotenv import load_dotenv
@@ -54,6 +63,19 @@ from . import lotes_db
 
 logger = logging.getLogger(__name__)
 
+
+
+def _ensure_lote_did(did: str) -> str:
+    """dId must be 15 digits: YYYYMMDDHHMMSSx"""
+    import datetime
+    did = (did or "").strip()
+    if len(did) == 15 and did.isdigit():
+        return did
+    # generate: YYYYMMDDHHMMSS + last digit (0-9)
+    now = datetime.datetime.now()
+    base = now.strftime("%Y%m%d%H%M%S")
+    # stable-ish last digit: seconds mod 10
+    return base + str(now.second % 10)
 app = FastAPI(title="TESAKA-SIFEN", version="1.0.0")
 
 # Configurar CORS para desarrollo
@@ -535,6 +557,24 @@ def _build_de_xml_with_items(
     return xml
 
 
+def ruc_only_digits_no_dv(value: str) -> str:
+    """Normaliza un RUC eliminando DV y todo lo que no sea dígito.
+
+    Ejemplos:
+        "4554737-8" -> "4554737"
+        " 45.547.37-8 " -> "4554737"
+        "4554737" -> "4554737"
+    """
+    if not value:
+        return ""
+    raw = str(value).strip()
+    # Cortar en el primer guion, si existe
+    raw = raw.split("-", 1)[0]
+    # Mantener solo dígitos
+    digits = "".join(ch for ch in raw if ch.isdigit())
+    return digits
+
+
 @app.post("/de/new", response_class=HTMLResponse)
 async def de_new_submit(
     request: Request,
@@ -793,12 +833,12 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
             except SifenClientError as e:
                 # Error de configuración (mTLS, etc.) - guardar y redirigir
                 error_msg = str(e)
-                db.update_document_status(doc_id, status="error", message=error_msg)
+                db.update_document_status(doc_id, last_status="error", last_message=error_msg)
                 return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
             except Exception as e:
                 # Otros errores al crear cliente - guardar y redirigir
                 error_msg = f"Error al crear cliente SIFEN: {str(e)}"
-                db.update_document_status(doc_id, status="error", message=error_msg)
+                db.update_document_status(doc_id, last_status="error", last_message=error_msg)
                 return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
 
             # Obtener DE XML
@@ -868,14 +908,14 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                         "BLOQUEADO: SIFEN_SIGN_P12_PATH no está seteado (o SIFEN_MTLS_P12_PATH). "
                         "Ver artifacts/sign_env_debug.txt"
                     )
-                    db.update_document_status(doc_id, status="error", message=error_msg)
+                    db.update_document_status(doc_id, last_status="error", last_message=error_msg)
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
                 if not sign_cert_password:
                     error_msg = (
                         "BLOQUEADO: SIFEN_SIGN_P12_PASSWORD o SIFEN_SIGN_P12_PASSWORD_FILE "
                         "(o MTLS equivalentes) no está seteado. Ver artifacts/sign_env_debug.txt"
                     )
-                    db.update_document_status(doc_id, status="error", message=error_msg)
+                    db.update_document_status(doc_id, last_status="error", last_message=error_msg)
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
 
                 # GUARD-RAIL: Verificar dependencias críticas ANTES de construir/firmar
@@ -887,7 +927,7 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                     error_msg = (
                         f"BLOQUEADO: {str(e)}. Ver artifacts/sign_blocked_reason.txt"
                     )
-                    db.update_document_status(doc_id, status="error", message=error_msg)
+                    db.update_document_status(doc_id, last_status="error", last_message=error_msg)
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
 
                 # Construir y firmar lote usando el pipeline correcto
@@ -900,11 +940,11 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                     )
                 except Exception as e:
                     error_msg = f"BLOQUEADO: Error al construir/firmar lote: {str(e)}"
-                    db.update_document_status(doc_id, status="error", message=error_msg)
+                    db.update_document_status(doc_id, last_status="error", last_message=error_msg)
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
 
                 payload_xml = build_r_envio_lote_xml(
-                    did=1, xml_bytes=de_xml_bytes, zip_base64=zip_base64
+                    did=_gen_did_15(), xml_bytes=de_xml_bytes, zip_base64=zip_base64
                 )
 
                 # PREFLIGHT: Validar antes de enviar
@@ -922,257 +962,337 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                         "BLOQUEADO: Preflight falló - "
                         f"{preflight_error}. Ver artifacts/preflight_*.xml y artifacts/preflight_zip.zip"
                     )
-                    db.update_document_status(doc_id, status="error", message=error_msg)
+                    db.update_document_status(doc_id, last_status="error", last_message=error_msg)
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
 
                 # --- GATE: verificar habilitación FE del RUC antes de enviar ---
-                try:
-                    from lxml import etree
-                    from tools.send_sirecepde import _extract_ruc_from_cert
+                from lxml import etree
+                from tools.send_sirecepde import _extract_ruc_from_cert
 
-                    # Constante de namespace SIFEN
-                    SIFEN_NS_URI = "http://ekuatia.set.gov.py/sifen/xsd"
+                # Constante de namespace SIFEN
+                SIFEN_NS_URI = "http://ekuatia.set.gov.py/sifen/xsd"
 
-                    # Helper para extraer localname
-                    def _localname(tag: str) -> str:
-                        """Extrae el localname de un tag (sin namespace)"""
+                # Helper para extraer localname
+                def _localname(tag: str) -> str:
+                    if isinstance(tag, str) and "}" in tag:
+                        return tag.split("}", 1)[1]
+                    return tag
 
-                        if isinstance(tag, str) and "}" in tag:
-                            return tag.split("}", 1)[1]
-                        return tag
-
-                    # Extraer RUC emisor del lote.xml
-                    ruc_de = None
-                    ruc_de_with_dv = None
-                    ruc_dv = None
-                    if lote_xml_bytes:
-                        try:
-                            lote_root = etree.fromstring(lote_xml_bytes)
-                            # Buscar DE dentro de rDE
-                            de_elem = None
-                            for elem in lote_root.iter():
-                                if isinstance(elem.tag, str) and _localname(elem.tag) == "DE":
-                                    de_elem = elem
-                                    break
-
-                            if de_elem is not None:
-                                # Buscar dRucEm y dDVEmi dentro de gEmis
-                                g_emis = de_elem.find(f".//{{{SIFEN_NS_URI}}}gEmis")
-                                if g_emis is not None:
-                                    d_ruc_elem = g_emis.find(f"{{{SIFEN_NS_URI}}}dRucEm")
-                                    if d_ruc_elem is not None and d_ruc_elem.text:
-                                        ruc_de = d_ruc_elem.text.strip()
-
-                                    d_dv_elem = g_emis.find(f"{{{SIFEN_NS_URI}}}dDVEmi")
-                                    if d_dv_elem is not None and d_dv_elem.text:
-                                        ruc_dv = d_dv_elem.text.strip()
-
-                                    # Construir RUC-DE completo si hay DV
-                                    if ruc_de and ruc_dv:
-                                        ruc_de_with_dv = f"{ruc_de}-{ruc_dv}"
-                                    elif ruc_de:
-                                        ruc_de_with_dv = ruc_de
-                        except Exception as e:
-                            logger.warning(
-                                "No se pudo extraer RUC del lote.xml para gate: %s", e
-                            )
-
-                    # Extraer RUC del certificado P12
-                    ruc_cert = None
-                    ruc_cert_with_dv = None
+                # Extraer RUC emisor del lote.xml (dRucEm, dDVEmi)
+                ruc_de: Optional[str] = None
+                ruc_de_with_dv: Optional[str] = None
+                ruc_dv: Optional[str] = None
+                if lote_xml_bytes:
                     try:
-                        if sign_cert_path and sign_cert_password:
-                            cert_info = _extract_ruc_from_cert(
-                                sign_cert_path, sign_cert_password
-                            )
-                            if cert_info:
-                                ruc_cert = cert_info.get("ruc")
-                                ruc_cert_with_dv = cert_info.get("ruc_with_dv")
+                        lote_root = etree.fromstring(lote_xml_bytes)
+                        de_elem = None
+                        for elem in lote_root.iter():
+                            if isinstance(elem.tag, str) and _localname(elem.tag) == "DE":
+                                de_elem = elem
+                                break
+
+                        if de_elem is not None:
+                            g_emis = de_elem.find(f".//{{{SIFEN_NS_URI}}}gEmis")
+                            if g_emis is not None:
+                                d_ruc_elem = g_emis.find(f"{{{SIFEN_NS_URI}}}dRucEm")
+                                if d_ruc_elem is not None and d_ruc_elem.text:
+                                    ruc_de = d_ruc_elem.text.strip()
+
+                                d_dv_elem = g_emis.find(f"{{{SIFEN_NS_URI}}}dDVEmi")
+                                if d_dv_elem is not None and d_dv_elem.text:
+                                    ruc_dv = d_dv_elem.text.strip()
+
+                                if ruc_de and ruc_dv:
+                                    ruc_de_with_dv = f"{ruc_de}-{ruc_dv}"
+                                elif ruc_de:
+                                    ruc_de_with_dv = ruc_de
+                    except Exception as e:
+                        logger.warning(
+                            "No se pudo extraer RUC del lote.xml para gate: %s", e
+                        )
+
+                # Extraer RUC del certificado P12 (solo para sanity check)
+                ruc_cert: Optional[str] = None
+                ruc_cert_with_dv: Optional[str] = None
+                try:
+                    if sign_cert_path and sign_cert_password:
+                        cert_info = _extract_ruc_from_cert(
+                            sign_cert_path, sign_cert_password
+                        )
+                        if cert_info:
+                            ruc_cert = cert_info.get("ruc")
+                            ruc_cert_with_dv = cert_info.get("ruc_with_dv")
+                except Exception:
+                    pass
+
+                # --- SANITY CHECK: Comparar RUCs ---
+                ruc_gate: Optional[str] = None
+                if ruc_de:
+                    ruc_gate = ruc_only_digits_no_dv(ruc_de)
+
+                logger.info("=" * 60)
+                logger.info("=== SIFEN SANITY CHECK ===")
+                logger.info(
+                    "RUC-DE:     %s", ruc_de_with_dv or ruc_de or "(no encontrado)"
+                )
+                logger.info("RUC-GATE:   %s", ruc_gate or "(no encontrado)")
+                logger.info(
+                    "RUC-CERT:   %s", ruc_cert_with_dv or ruc_cert or "(no disponible)"
+                )
+
+                match_de_gate = (
+                    ruc_de
+                    and ruc_gate
+                    and ruc_de.split("-", 1)[0].strip() == ruc_gate
+                )
+                match_cert_gate = (
+                    ruc_cert and ruc_gate and ruc_cert == ruc_gate
+                )
+
+                logger.info("match(DE.ruc == GATE.ruc):   %s", match_de_gate)
+                if ruc_cert:
+                    logger.info(
+                        "match(CERT.ruc == GATE.ruc): %s", match_cert_gate
+                    )
+
+                if ruc_de and ruc_gate and not match_de_gate:
+                    logger.warning(
+                        "RUC del DE (%s) no coincide con RUC-GATE (%s)",
+                        ruc_de.split("-", 1)[0],
+                        ruc_gate,
+                    )
+                if ruc_cert and ruc_gate and not match_cert_gate:
+                    logger.warning(
+                        "RUC del certificado (%s) no coincide con RUC-GATE (%s)",
+                        ruc_cert,
+                        ruc_gate,
+                    )
+
+                logger.info("=" * 60)
+
+                debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in (
+                    "1",
+                    "true",
+                    "True",
+                )
+                artifacts_dir: Optional[FSPath]
+                if debug_enabled:
+                    try:
+                        artifacts_dir = _ensure_artifacts_dir()
                     except Exception:
-                        pass  # Silenciosamente fallar si no se puede extraer
-
-                    # --- SANITY CHECK: Comparar RUCs ---
-                    ruc_gate = None
-                    if ruc_de:
-                        # ruc_gate debe ser SOLO el número (sin DV)
-                        ruc_gate = str(ruc_de).strip().split("-", 1)[0].strip()
-
-                    # Loggear sanity check
-                    logger.info("=" * 60)
-                    logger.info("=== SIFEN SANITY CHECK ===")
-                    logger.info(
-                        "RUC-DE:     %s", ruc_de_with_dv or ruc_de or "(no encontrado)"
-                    )
-                    logger.info("RUC-GATE:   %s", ruc_gate or "(no encontrado)")
-                    logger.info(
-                        "RUC-CERT:   %s", ruc_cert_with_dv or ruc_cert or "(no disponible)"
-                    )
-
-                    # Comparaciones booleanas
-                    match_de_gate = (
-                        ruc_de
-                        and ruc_gate
-                        and ruc_de.split("-", 1)[0].strip() == ruc_gate
-                    )
-                    match_cert_gate = (
-                        ruc_cert and ruc_gate and ruc_cert == ruc_gate
-                    )
-
-                    logger.info("match(DE.ruc == GATE.ruc):   %s", match_de_gate)
-                    if ruc_cert:
-                        logger.info(
-                            "match(CERT.ruc == GATE.ruc): %s", match_cert_gate
-                        )
-
-                    # Warnings si hay mismatch (pero no bloquear todavía)
-                    if ruc_de and ruc_gate and not match_de_gate:
-                        logger.warning(
-                            "RUC del DE (%s) no coincide con RUC-GATE (%s)",
-                            ruc_de.split("-", 1)[0],
-                            ruc_gate,
-                        )
-                    if ruc_cert and ruc_gate and not match_cert_gate:
-                        logger.warning(
-                            "RUC del certificado (%s) no coincide con RUC-GATE (%s)",
-                            ruc_cert,
-                            ruc_gate,
-                        )
-
-                    logger.info("=" * 60)
-
-                    debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in (
-                        "1",
-                        "true",
-                        "True",
-                    )
-                    # Guardar artifact JSON si debug está habilitado
-                    if debug_enabled:
-                        try:
-                            artifacts_dir = _ensure_artifacts_dir()
-                        except Exception:
-                            artifacts_dir = None
-                    else:
                         artifacts_dir = None
+                else:
+                    artifacts_dir = None
 
-                    if artifacts_dir:
-                        try:
-                            from datetime import datetime
+                if artifacts_dir:
+                    try:
+                        from datetime import datetime
 
-                            sanity_data = {
-                                "timestamp": datetime.now().isoformat(),
-                                "ruc_de": ruc_de_with_dv or ruc_de,
-                                "ruc_gate": ruc_gate,
-                                "ruc_cert": ruc_cert_with_dv or ruc_cert,
-                                "matches": {
-                                    "de_gate": match_de_gate,
-                                    "cert_gate": match_cert_gate if ruc_cert else None,
-                                },
-                            }
-                            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                            sanity_file = artifacts_dir / f"sanity_check_{timestamp}.json"
-                            _write_json(sanity_file, sanity_data)
-                        except Exception:
-                            pass  # Silenciosamente fallar si no se puede guardar
+                        sanity_data = {
+                            "timestamp": datetime.now().isoformat(),
+                            "ruc_de": ruc_de_with_dv or ruc_de,
+                            "ruc_gate": ruc_gate,
+                            "ruc_cert": ruc_cert_with_dv or ruc_cert,
+                            "matches": {
+                                "de_gate": match_de_gate,
+                                "cert_gate": match_cert_gate if ruc_cert else None,
+                            },
+                        }
+                        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                        sanity_file = artifacts_dir / f"sanity_check_{timestamp}.json"
+                        _write_json(sanity_file, sanity_data)
+                    except Exception:
+                        pass
 
-                    # Hard-fail si falta dRucEm o es inválido
-                    if not ruc_de or not ruc_gate:
-                        error_msg = (
-                            "BLOQUEADO: No se pudo extraer RUC válido del DE. "
-                            f"dRucEm={ruc_de!r} RUC-GATE={ruc_gate!r}"
-                        )
-                        logger.error(error_msg)
-                        db.update_document_status(
-                            doc_id, status="error", message=error_msg
-                        )
-                        return RedirectResponse(
-                            url=f"/de/{doc_id}?error=1", status_code=303
-                        )
+                # Hard-fail si falta dRucEm o es inválido
+                if not ruc_de or not ruc_gate:
+                    error_msg = (
+                        "BLOQUEADO: No se pudo extraer RUC válido del DE. "
+                        f"dRucEm={ruc_de!r} RUC-GATE={ruc_gate!r}"
+                    )
+                    logger.error(error_msg)
+                    try:
+                        artifacts_dir = _ensure_artifacts_dir()
+                        de_path = artifacts_dir / f"de_xml_doc_{doc_id}.xml"
+                        de_path.write_text(de_xml, encoding="utf-8")
+                    except Exception:
+                        pass
+                    db.update_document_status(doc_id, last_status="error", last_message=error_msg)
+                    return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
 
-                    # Consultar habilitación FE del RUC
-                    logger.info("Verificando habilitación FE del RUC: %s", ruc_gate)
-                    dump_http = os.getenv("SIFEN_DUMP_HTTP", "0") in (
-                        "1",
-                        "true",
-                        "True",
+                                # Consultar habilitación FE del RUC usando siConsRUC
+                # NOTA: En ambiente TEST suele haber redirect/portal (F5/vdesk) que rompe siConsRUC.
+                env_name = getattr(getattr(client, "config", None), "env", "") or ""
+                consulta_ruc_url = None
+                try:
+                    if hasattr(client, "config"):
+                        consulta_ruc_url = client.config.get_soap_service_url("consulta_ruc")
+                except Exception:
+                    consulta_ruc_url = None
+                is_test_env = str(env_name).lower() == "test" or (consulta_ruc_url and "sifen-test.set.gov.py" in str(consulta_ruc_url))
+                if is_test_env:
+                    logger.warning("SKIP siConsRUC gate (TEST). env=%s url=%s ruc=%s", env_name, consulta_ruc_url, ruc_gate)
+                    ruc_check = {}
+                    cod = "SKIPPED_TEST"
+                    msg = "siConsRUC skipped in test env (portal/redirect)"
+                    habilitado = True
+                else:
+                    logger.info(
+                        "Verificando habilitación FE del RUC (siConsRUC) usando dRucEm: %s",
+                        ruc_de,
                     )
                     ruc_check = client.consulta_ruc_raw(
-                        ruc=ruc_gate, dump_http=dump_http
+                        ruc=ruc_gate,
+                        dump_http=True,
                     )
                     cod = (ruc_check.get("dCodRes") or "").strip()
                     msg = (ruc_check.get("dMsgRes") or "").strip()
-
-                    # Extraer dRUCFactElec de xContRUC
+                
                     x_cont_ruc = ruc_check.get("xContRUC", {})
                     d_fact_raw = (
                         x_cont_ruc.get("dRUCFactElec")
                         if isinstance(x_cont_ruc, dict)
                         else None
                     )
-                    # Normalizar: convertir a string, trim, uppercase
                     d_fact_normalized = (
                         str(d_fact_raw).strip().upper()
                         if d_fact_raw is not None
                         else ""
                     )
-
-                    # Valores que indican HABILITADO: "1", "S", "SI"
                     habilitado = d_fact_normalized in ("1", "S", "SI")
 
-                    if cod != "0502":
-                        error_msg = (
-                            "BLOQUEADO: SIFEN siConsRUC no confirmó el RUC. "
-                            f"dCodRes={cod} dMsgRes={msg}"
+# Manejo especial para 0160 XML Mal Formado
+                if cod == "0160":
+                    try:
+                        from datetime import datetime
+                        import glob
+
+                        artifacts_dir = _ensure_artifacts_dir()
+                        debug_path = artifacts_dir / "consulta_ruc_last_debug.json"
+
+                        def _last_or_none(pattern: str) -> Optional[str]:
+                            try:
+                                matches = sorted(
+                                    glob.glob(str(artifacts_dir / pattern))
+                                )
+                                return matches[-1] if matches else None
+                            except Exception:
+                                return None
+
+                        sent_xml_path = _last_or_none("consulta_ruc_sent_*.xml")
+                        resp_xml_path = _last_or_none("consulta_ruc_response_*.xml")
+                        sent_headers_path = _last_or_none(
+                            "consulta_ruc_headers_sent_*.json"
                         )
-                        logger.error(error_msg)
-                        db.update_document_status(
-                            doc_id, status="error", message=error_msg
+                        recv_headers_path = _last_or_none(
+                            "consulta_ruc_headers_received_*.json"
                         )
-                        return RedirectResponse(
-                            url=f"/de/{doc_id}?error=1", status_code=303
+                        forensic_path = _last_or_none(
+                            "consulta_ruc_forensic_*.json"
                         )
 
-                    if not habilitado:
-                        razon = (
-                            x_cont_ruc.get("dRazCons", "")
-                            if isinstance(x_cont_ruc, dict)
-                            else ""
-                        )
-                        est = (
-                            x_cont_ruc.get("dDesEstCons", "")
-                            if isinstance(x_cont_ruc, dict)
-                            else ""
-                        )
-                        # Mostrar valor original y normalizado para diagnóstico
-                        d_fact_display = (
-                            repr(d_fact_raw) if d_fact_raw is not None else "None"
-                        )
-                        error_msg = (
-                            "BLOQUEADO: RUC NO habilitado para Facturación Electrónica en SIFEN "
-                            f"({env}). RUC={ruc_gate} RazónSocial='{razon}' Estado='{est}' "
-                            f"dRUCFactElec={d_fact_display} (normalizado='{d_fact_normalized}'). "
-                            "Debés gestionar la habilitación FE del RUC en SIFEN/SET."
-                        )
-                        logger.error(error_msg)
-                        db.update_document_status(
-                            doc_id, status="error", message=error_msg
-                        )
-                        return RedirectResponse(
-                            url=f"/de/{doc_id}?error=1", status_code=303
-                        )
+                        endpoint = None
+                        try:
+                            if hasattr(client, "config"):
+                                endpoint = client.config.get_soap_service_url(
+                                    "consulta_ruc"
+                                )
+                        except Exception:
+                            endpoint = None
 
-                    logger.info(
-                        "RUC %s habilitado para FE (dRUCFactElec=%r -> '%s')",
-                        ruc_gate,
-                        d_fact_raw,
-                        d_fact_normalized,
+                        sent_headers = ruc_check.get("sent_headers")
+                        received_headers = ruc_check.get("received_headers")
+                        content_type = None
+                        if isinstance(received_headers, dict):
+                            content_type = received_headers.get("Content-Type")
+
+                        debug_payload = {
+                            "timestamp": datetime.now().isoformat(),
+                            "doc_id": doc_id,
+                            "ruc_from_de": ruc_de_with_dv or ruc_de,
+                            "ruc_for_check": ruc_gate,
+                            "dCodRes": cod,
+                            "dMsgRes": msg,
+                            "endpoint": endpoint,
+                            "headers": {
+                                "sent": sent_headers,
+                                "received": received_headers,
+                                "content_type": content_type,
+                            },
+                            "artifacts": {
+                                "consulta_ruc_sent_xml": sent_xml_path,
+                                "consulta_ruc_response_xml": resp_xml_path,
+                                "consulta_ruc_headers_sent": sent_headers_path,
+                                "consulta_ruc_headers_received": recv_headers_path,
+                                "consulta_ruc_forensic": forensic_path,
+                            },
+                        }
+                        _write_json(debug_path, debug_payload)
+                    except Exception:
+                        pass
+
+                    error_msg = (
+                        "BLOQUEADO: SIFEN siConsRUC devolvió 0160 XML Mal Formado. "
+                        f"dCodRes={cod} dMsgRes={msg} "
+                        "(ver artifacts consulta_ruc_* en artifacts/)"
                     )
-                except Exception as e:
-                    # hard-fail: no enviar lote si el gate falla
-                    error_msg = f"BLOQUEADO: Error en gate de habilitación FE: {str(e)}"
-                    logger.error("GATE FALLÓ: %s", e, exc_info=True)
-                    db.update_document_status(doc_id, status="error", message=error_msg)
-                    return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
-                # --- FIN GATE ---
+                    logger.error(error_msg)
+                    db.update_document_status(
+                        doc_id=doc_id,
+                        last_status="error",
+                        last_message=error_msg,
+                    )
+                    return RedirectResponse(
+                        url=f"/de/{doc_id}?error=1", status_code=303
+                    )
+
+                if cod != "0502":
+                    error_msg = (
+                        "BLOQUEADO: SIFEN siConsRUC no confirmó el RUC. "
+                        f"dCodRes={cod} dMsgRes={msg}"
+                    )
+                    logger.error(error_msg)
+                    db.update_document_status(
+                        doc_id, last_status="error", last_message=error_msg
+                    )
+                    return RedirectResponse(
+                        url=f"/de/{doc_id}?error=1", status_code=303
+                    )
+
+                if not habilitado:
+                    razon = (
+                        x_cont_ruc.get("dRazCons", "")
+                        if isinstance(x_cont_ruc, dict)
+                        else ""
+                    )
+                    est = (
+                        x_cont_ruc.get("dDesEstCons", "")
+                        if isinstance(x_cont_ruc, dict)
+                        else ""
+                    )
+                    d_fact_display = (
+                        repr(d_fact_raw) if d_fact_raw is not None else "None"
+                    )
+                    error_msg = (
+                        "BLOQUEADO: RUC NO habilitado para Facturación Electrónica en SIFEN "
+                        f"({env}). RUC={ruc_gate} RazónSocial='{razon}' Estado='{est}' "
+                        f"dRUCFactElec={d_fact_display} (normalizado='{d_fact_normalized}'). "
+                        "Debés gestionar la habilitación FE del RUC en SIFEN/SET."
+                    )
+                    logger.error(error_msg)
+                    db.update_document_status(
+                        doc_id, last_status="error", last_message=error_msg
+                    )
+                    return RedirectResponse(
+                        url=f"/de/{doc_id}?error=1", status_code=303
+                    )
+
+                logger.info(
+                    "RUC %s habilitado para FE (dRUCFactElec=%r -> '%s')",
+                    ruc_gate,
+                    d_fact_raw,
+                    d_fact_normalized,
+                )
 
                 # Enviar lote a SIFEN (solo si preflight y gate pasaron)
                 response = client.recepcion_lote(payload_xml)
@@ -1184,9 +1304,20 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                 d_tpo_proces = response.get("d_tpo_proces")
 
                 # Guardar artifact de debug si está habilitado
+                debug_enabled = os.getenv("SIFEN_DEBUG_SOAP", "0") in (
+                    "1",
+                    "true",
+                    "True",
+                )
+                artifacts_dir: Optional[FSPath]
                 if debug_enabled:
                     try:
                         artifacts_dir = _ensure_artifacts_dir()
+                    except Exception:
+                        artifacts_dir = None
+
+                if artifacts_dir:
+                    try:
                         import json
 
                         parsed_response = {
@@ -1210,9 +1341,9 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                 # Guardar respuesta del documento con d_prot_cons_lote si existe
                 db.update_document_status(
                     doc_id=doc_id,
-                    status=status,
+                    last_status=status,
                     code=code,
-                    message=message,
+                    last_message=message,
                     sirecepde_xml=payload_xml,
                     d_prot_cons_lote=d_prot_cons_lote,
                 )
@@ -1277,7 +1408,7 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                 except SifenClientError as e:
                     # Error de SIFEN (mTLS, configuración, etc.) - guardar y redirigir
                     error_msg = str(e)
-                    db.update_document_status(doc_id, status="error", message=error_msg)
+                    db.update_document_status(doc_id, last_status="error", last_message=error_msg)
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
 
                 # Parsear respuesta (recepcion_de retorna dict con ok, codigo_respuesta, mensaje, etc.)
@@ -1299,9 +1430,9 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
                 # Guardar respuesta del documento
                 db.update_document_status(
                     doc_id=doc_id,
-                    status=status,
+                    last_status=status,
                     code=code,
-                    message=message,
+                    last_message=message,
                     sirecepde_xml=payload_xml,
                 )
 
@@ -1311,12 +1442,12 @@ async def de_send_to_sifen(request: Request, doc_id: int, mode: str = "lote"):
             error_msg = (
                 f"Error de importación: {e}. Instala dependencias: pip install -r app/requirements.txt"
             )
-            db.update_document_status(doc_id, status="error", message=error_msg)
+            db.update_document_status(doc_id, last_status="error", last_message=error_msg)
             return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
         except (SifenClientError, Exception) as e:
             # Capturar errores de SIFEN (mTLS, configuración, etc.) y otros errores
             error_msg = str(e)
-            db.update_document_status(doc_id, status="error", message=error_msg)
+            db.update_document_status(doc_id, last_status="error", last_message=error_msg)
             return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
 
     except HTTPException as http_exc:
@@ -1560,9 +1691,9 @@ async def _check_lote_status_async(lote_id: int, env: str, prot: str):
                         # Actualizar estado del DE
                         db.update_document_status(
                             doc_id=doc_id,
-                            status=de_status,
+                            last_status=de_status,
                             code=de_code,
-                            message=de_message,
+                            last_message=de_message,
                             approved_at=approved_at
                         )
                         
@@ -1712,9 +1843,9 @@ async def de_check_status(request: Request, doc_id: int):
                         # Actualizar estado del DE
                         db.update_document_status(
                             doc_id=doc_id,
-                            status=de_status,
+                            last_status=de_status,
                             code=de_code,
-                            message=de_message,
+                            last_message=de_message,
                             approved_at=approved_at
                         )
                         
@@ -1727,9 +1858,9 @@ async def de_check_status(request: Request, doc_id: int):
                             error_msg = "SIFEN no respondió (reset by peer). Reintentar."
                         db.update_document_status(
                             doc_id=doc_id,
-                            status=STATUS_ERROR,
+                            last_status=STATUS_ERROR,
                             code=None,  # Limpiar código anterior
-                            message=error_msg  # Sobrescribir mensaje anterior
+                            last_message=error_msg  # Sobrescribir mensaje anterior
                         )
                         return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
                 except Exception as e:
@@ -1737,9 +1868,9 @@ async def de_check_status(request: Request, doc_id: int):
                     error_msg = f"Error al consultar lote: {str(e)}"
                     db.update_document_status(
                         doc_id=doc_id,
-                        status=STATUS_ERROR,
+                        last_status=STATUS_ERROR,
                         code=None,  # Limpiar código anterior
-                        message=error_msg  # Sobrescribir mensaje anterior
+                        last_message=error_msg  # Sobrescribir mensaje anterior
                     )
                     return RedirectResponse(url=f"/de/{doc_id}?error=1", status_code=303)
             else:

@@ -1,0 +1,353 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Persistent Database Connections</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="features.connection-handling.html" class="navbar__link">« Connection handling</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="features.commandline.html" class="navbar__link">Command line usage »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="features.html">Features</a></li>
+        <li>Persistent Database Connections</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="features.persistent-connections" class="chapter">
+ <h1 class="title">Persistent Database Connections</h1>
+
+
+ <div class="simplesect">
+  <h3 class="title">What are Persistent Connections?</h3>
+  <p class="simpara">
+   Persistent connections are links that do not close when the
+   execution of your script ends. When a persistent connection is
+   requested, PHP checks if there&#039;s already an identical persistent
+   connection (that remained open from earlier) - and if it exists, it
+   uses it. If it does not exist, it creates the link. An &#039;identical&#039;
+   connection is a connection that was opened to the same host, with
+   the same username and the same password (where applicable).
+  </p>
+  <p class="simpara">
+   There&#039;s no method of requesting a specific connection, or guaranteeing
+   whether you get an existing connection or a brand new one (if all existing
+   connections are in use, or the request is being served by a different worker,
+   which has a separate pool of connections).
+  </p>
+  <p class="simpara">
+   This means that you cannot use PHP&#039;s persistent connections to, for example:
+  </p>
+  <ul class="simplelist">
+   <li>assign a specific database session to a specific web user</li>
+   <li>create a large transaction across multiple requests</li>
+   <li>initiate a query on one request and collect the results on another</li>
+  </ul>
+  <p class="simpara">
+   Persistent connections do not give you <em>any</em>
+   functionality that wasn&#039;t possible with non-persistent connections.
+  </p>
+ </div>
+
+ <div class="simplesect" id="persistent-connections.web">
+  <h3 class="title">Web Requests</h3>
+  <p class="simpara">
+   There are two ways in which your web server can utilize PHP to generate
+   web pages:
+  </p>
+  <p class="simpara">
+   The first method is to use PHP as a CGI &quot;wrapper&quot;. When run this
+   way, an instance of the PHP interpreter is created and destroyed
+   for every page request (for a PHP page) to your web server.
+   Because it is destroyed after every request, any resources that it
+   acquires (such as a link to an SQL database server) are closed when
+   it is destroyed. In this case, you do not gain anything from trying
+   to use persistent connections - they simply don&#039;t persist.
+  </p>
+  <p class="simpara">
+   The second, and most popular, method is to run PHP-FPM, or PHP as a module
+   in a multiprocess web server, which currently only includes Apache.
+   These setups typically have one process (the parent) which
+   coordinates a set of processes (its children) who actually do the
+   work of serving up web pages. When a request comes in from a
+   client, it is handed off to one of the children that is not already
+   serving another client. This means that when the same client makes
+   a second request to the server, it may be served by a different
+   child process than the first time. When opening a persistent connection,
+   every following page requesting SQL services can reuse the same
+   established connection to the SQL server.
+  </p>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <p class="para">
+   You can check which method your web requests use by checking the value of
+   &quot;Server API&quot; in the output of <span class="function"><a href="function.phpinfo.html" class="function">phpinfo()</a></span> or the value of
+   <strong><code><a href="reserved.constants.html#constant.php-sapi">PHP_SAPI</a></code></strong>, run from a web request.
+   </p>
+   <p class="para">
+    If the Server API is &quot;Apache 2 Handler&quot; or &quot;FPM/FastCGI&quot;, then persistent
+    connections will be used across requests served by the same worker. For any
+    other value, persistent connections will not persist after each request.
+   </p>
+  </p></blockquote>
+ </div>
+
+ <div class="simplesect" id="persistent-connections.cli">
+  <h3 class="title">Command-line Processes</h3>
+  <p class="simpara">
+   As command-line PHP uses a new process for each script, persistent
+   connections are not shared between command-line scripts, so there is no
+   value in using them in transient scripts such as crons or commands.
+   However, they may be useful if, for example, you&#039;re writing a long-running
+   application server that serves many requests or tasks and each may need
+   their own database connection.
+  </p>
+ </div>
+
+ <div class="simplesect" id="persistent-connections.why">
+  <h3 class="title">Why Use Them?</h3>
+  <p class="simpara">
+   Persistent connections are good if the overhead to create a link to your
+   SQL server is high. Whether or not this overhead is really high depends
+   on many factors. Like, what kind of database it is, whether or not
+   it sits on the same computer on which your web server sits, how
+   loaded the machine the SQL server sits on is and so forth. The
+   bottom line is that if that connection overhead is high, persistent
+   connections help you considerably. They cause the child process to
+   simply connect only once for its entire lifespan, instead of every
+   time it processes a page that requires connecting to the SQL
+   server. This means that for every child that opened a persistent
+   connection will have its own open persistent connection to the
+   server. For example, if you had 20 different child processes that
+   ran a script that made a persistent connection to your SQL server,
+   you&#039;d have 20 different connections to the SQL server, one from
+   each child.
+  </p>
+ </div>
+
+ <div class="simplesect" id="persistent-connections.drawbacks.conn-limits">
+  <h3 class="title">Potential Drawbacks: Connection Limits</h3>
+  <p class="simpara">
+   Note, however, that this can have some drawbacks if you are using a
+   database with connection limits that are exceeded by persistent
+   child connections. If your database has a limit of 16 simultaneous
+   connections, and in the course of a busy server session, 17 child
+   threads attempt to connect, one will not be able to. If there are
+   bugs in your scripts which do not allow the connections to shut
+   down (such as infinite loops), the database with only 16 connections
+   may be rapidly swamped.
+  </p>
+  <p class="simpara">
+   Persistent connections will usually increase the number of connections open
+   at any given time because idle workers will still hold the connections for
+   the previous requests they served. If a large number of workers is spun up to
+   handle an influx of requests, the connections they opened will remain until
+   the worker is killed or the database server closes the connection.
+  </p>
+  <p class="simpara">
+   Ensure that the maximum number of connections allowed by the database server
+   is greater than the maximum number of web request workers (plus any other
+   usage such as crons or administrative connections).
+  </p>
+  <p class="simpara">
+   Check your database documentation for information on handling abandoned or
+   idle connections (timeouts). Long timeouts may significantly increase the
+   number of persistent connections open at any one time.
+  </p>
+ </div>
+
+ <div class="simplesect" id="persistent-connections.drawbacks.state">
+  <h3 class="title">Potential Drawbacks: Maintaining Connection State</h3>
+  <p class="simpara">
+   Some database extensions perform automatic cleanup when the connection is
+   reused; others leave this task at the discretion of the application developer.
+   Depending on the chosen database extension and the application design, manual
+   cleanup may be needed before the script exits. Changes that may leave
+   connections in an unexpected state include:
+  </p>
+  <ul class="simplelist">
+   <li>Selected / default database</li>
+   <li>Table locks</li>
+   <li>Uncommitted transactions</li>
+   <li>Temporary tables</li>
+   <li>Connection specific settings or features such as profiling</li>
+  </ul>
+  <p class="simpara">
+   Table locks and transactions that are not cleaned up or closed may cause
+   other queries to be blocked indefinitely and/or cause subsequent reuse of
+   the connection to cause unexpected changes.
+  </p>
+  <p class="simpara">
+   Having the wrong database selected will cause subsequent reuse of the
+   connection to be unable to execute queries as expected (or execute them on
+   the wrong database if schemas are similar enough).
+  </p>
+  <p class="simpara">
+   If temporary tables are not cleaned up, subsequent requests will not be able
+   to recreate the same table.
+  </p>
+  <p class="simpara">
+   You can implement cleanup using class destructors or
+   <span class="function"><a href="function.register-shutdown-function.html" class="function">register_shutdown_function()</a></span>. You may also want to
+   consider dedicated connection pooling proxies that include this as part of
+   their functionality.
+  </p>
+ </div>
+
+ <div class="simplesect" id="persistent-connections.final-words">
+  <h3 class="title">Final Words</h3>
+  <p class="simpara">
+   Given their behavior and potential drawbacks described above, you should not
+   use persistent connections without careful consideration. They should not be
+   used without implementing additional changes to your application and careful
+   configuration of your database server and web server and/or PHP-FPM.
+  </p>
+  <p class="simpara">
+   Consider alternative solutions such as investigating and fixing the causes of
+   connection creation overheads (for example, disabling reverse DNS lookups on
+   the database server), or dedicated connection pooling proxies.
+  </p>
+  <p class="simpara">
+   For high volume web APIs, consider using alternative runtimes or long-running
+   application servers.
+  </p>
+ </div>
+
+ <div class="simplesect" id="persistent-connections.seealso">
+  <h3 class="title">See Also</h3>
+  <ul class="simplelist">
+   <li><span class="function"><a href="function.ibase-pconnect.html" class="function">ibase_pconnect()</a></span></li>
+   <li><span class="function"><a href="function.oci-pconnect.html" class="function">oci_pconnect()</a></span></li>
+   <li><span class="function"><a href="function.odbc-pconnect.html" class="function">odbc_pconnect()</a></span></li>
+   <li><span class="function"><a href="function.pfsockopen.html" class="function">pfsockopen()</a></span></li>
+   <li><span class="function"><a href="function.pg-connect.html" class="function">pg_connect()</a></span></li>
+   <li><a href="mysqli.persistconns.html" class="link">MySQLi and Persistent Connections</a></li>
+   <li><a href="pdo.connections.html" class="link">PDO Connection Management</a></li>
+  </ul>
+ </div>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

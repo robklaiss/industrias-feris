@@ -1,0 +1,291 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Compares two &quot;PHP-standardized&quot; version number strings</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.sys-get-temp-dir.html" class="navbar__link">« sys_get_temp_dir</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.zend-thread-id.html" class="navbar__link">zend_thread_id »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ref.info.html">PHP Options/Info Functions</a></li>
+        <li>Compares two &quot;PHP-standardized&quot; version number strings</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="function.version-compare" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">version_compare</h1>
+  <p class="verinfo">(PHP 4 &gt;= 4.1.0, PHP 5, PHP 7, PHP 8)</p><p class="refpurpose"><span class="refname">version_compare</span> &mdash; <span class="dc-title">Compares two &quot;PHP-standardized&quot; version number strings</span></p>
+
+ </div>
+ 
+ <div class="refsect1 description" id="refsect1-function.version-compare-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="methodname"><strong>version_compare</strong></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$version1</code></span>, <span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$version2</code></span>, <span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.string.html" class="type string">string</a></span></span> <code class="parameter">$operator</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>): <span class="type"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span>|<span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></span></div>
+
+  <p class="para rdfs-comment">
+   <span class="function"><strong>version_compare()</strong></span> compares two &quot;PHP-standardized&quot;
+   version number strings.
+  </p>
+  <p class="para">
+   The function first replaces <code class="literal">_</code>, <code class="literal">-</code> and
+   <code class="literal">+</code> with a dot <code class="literal">.</code> in the version
+   strings and also inserts dots <code class="literal">.</code> before and after any
+   non number so that for example &#039;4.3.2RC1&#039; becomes &#039;4.3.2.RC.1&#039;. Then it
+   compares the parts starting from left to right. If a part contains
+   special version strings these are handled in the following order:
+   <code class="literal">any string not found in this list</code> &lt; 
+   <code class="literal">dev</code> &lt; <code class="literal">alpha</code> =
+   <code class="literal">a</code> &lt; <code class="literal">beta</code> =
+   <code class="literal">b</code> &lt; <code class="literal">RC</code> =  
+   <code class="literal">rc</code> &lt; <code class="literal">#</code> &lt;
+   <code class="literal">pl</code> = <code class="literal">p</code>. This way not only versions
+   with different levels like &#039;4.1&#039; and &#039;4.1.2&#039; can be compared but also any
+   PHP specific version containing development state.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-function.version-compare-parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+    
+     <dt><code class="parameter">version1</code></dt>
+     <dd>
+      <p class="para">
+       First version number.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">version2</code></dt>
+     <dd>
+      <p class="para">
+       Second version number.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">operator</code></dt>
+     <dd>
+      <p class="para">
+       An optional operator. The possible operators
+       are: <code class="literal">&lt;</code>, <code class="literal">lt</code>,
+       <code class="literal">&lt;=</code>, <code class="literal">le</code>, <code class="literal">&gt;</code>,
+       <code class="literal">gt</code>, <code class="literal">&gt;=</code>, <code class="literal">ge</code>,
+       <code class="literal">==</code>, <code class="literal">=</code>, <code class="literal">eq</code>,
+       <code class="literal">!=</code>, <code class="literal">&lt;&gt;</code>, <code class="literal">ne</code>
+       respectively.
+      </p>
+      <p class="para">
+       This parameter is case-sensitive, values should be lowercase.
+      </p>
+     </dd>
+    
+   </dl>
+  </p>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-function.version-compare-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   By default, <span class="function"><strong>version_compare()</strong></span> returns
+   <code class="literal">-1</code> if the first version is lower than the second,
+   <code class="literal">0</code> if they are equal, and
+   <code class="literal">1</code> if the second is lower.
+  </p>
+  <p class="para">
+   When using the optional <code class="parameter">operator</code> argument, the
+   function will return <strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong> if the relationship is the one specified
+   by the operator, <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong> otherwise.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-function.version-compare-examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   The examples below use the <strong><code><a href="reserved.constants.html#constant.php-version">PHP_VERSION</a></code></strong> constant,
+   because it contains the value of the PHP version that is executing
+   the code.
+  </p>
+  <p class="para">
+   <div class="example" id="example-1">
+    <p><strong>Example #1 <span class="function"><strong>version_compare()</strong></span> examples</strong></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">if (</span><span style="color: #0000BB">version_compare</span><span style="color: #007700">(</span><span style="color: #0000BB">PHP_VERSION</span><span style="color: #007700">, </span><span style="color: #DD0000">'7.0.0'</span><span style="color: #007700">) &gt;= </span><span style="color: #0000BB">0</span><span style="color: #007700">) {<br />    echo </span><span style="color: #DD0000">'I am at least PHP version 7.0.0, my version: ' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_VERSION </span><span style="color: #007700">. </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />}<br /><br />if (</span><span style="color: #0000BB">version_compare</span><span style="color: #007700">(</span><span style="color: #0000BB">PHP_VERSION</span><span style="color: #007700">, </span><span style="color: #DD0000">'5.3.0'</span><span style="color: #007700">) &gt;= </span><span style="color: #0000BB">0</span><span style="color: #007700">) {<br />    echo </span><span style="color: #DD0000">'I am at least PHP version 5.3.0, my version: ' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_VERSION </span><span style="color: #007700">. </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />}<br /><br />if (</span><span style="color: #0000BB">version_compare</span><span style="color: #007700">(</span><span style="color: #0000BB">PHP_VERSION</span><span style="color: #007700">, </span><span style="color: #DD0000">'5.0.0'</span><span style="color: #007700">, </span><span style="color: #DD0000">'&gt;='</span><span style="color: #007700">)) {<br />    echo </span><span style="color: #DD0000">'I am at least PHP version 5.0.0, my version: ' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_VERSION </span><span style="color: #007700">. </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />}<br /><br />if (</span><span style="color: #0000BB">version_compare</span><span style="color: #007700">(</span><span style="color: #0000BB">PHP_VERSION</span><span style="color: #007700">, </span><span style="color: #DD0000">'5.0.0'</span><span style="color: #007700">, </span><span style="color: #DD0000">'&lt;'</span><span style="color: #007700">)) {<br />    echo </span><span style="color: #DD0000">'I am still PHP 4, my version: ' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_VERSION </span><span style="color: #007700">. </span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+   </div>
+  </p>
+ </div>
+
+
+ <div class="refsect1 notes" id="refsect1-function.version-compare-notes">
+  <h3 class="title">Notes</h3>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <p class="para">
+    The <strong><code><a href="reserved.constants.html#constant.php-version">PHP_VERSION</a></code></strong> constant holds current PHP version.
+   </p>
+  </p></blockquote>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <p class="para">
+    Note that pre-release versions, such as 5.3.0-dev, are considered
+    lower than their final release counterparts (like 5.3.0).
+   </p>
+  </p></blockquote>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <p class="para">
+    Special version strings such as <code class="literal">alpha</code> and
+    <code class="literal">beta</code> are case sensitive. Version strings from arbitrary
+    sources that do not adhere to the PHP standard may need to be lowercased
+    via <span class="function"><a href="function.strtolower.html" class="function">strtolower()</a></span> before calling
+    <span class="function"><strong>version_compare()</strong></span>.
+   </p>
+  </p></blockquote>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-function.version-compare-seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li><span class="function"><a href="function.phpversion.html" class="function" rel="rdfs-seeAlso">phpversion()</a> - Gets the current PHP version</span></li>
+    <li><span class="function"><a href="function.php-uname.html" class="function" rel="rdfs-seeAlso">php_uname()</a> - Returns information about the operating system PHP is running on</span></li>
+    <li><span class="function"><a href="function.function-exists.html" class="function" rel="rdfs-seeAlso">function_exists()</a> - Return true if the given function has been defined</span></li>
+   </ul>
+  </p>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

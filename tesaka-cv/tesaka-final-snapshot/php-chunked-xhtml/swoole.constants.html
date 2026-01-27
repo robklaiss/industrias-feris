@@ -1,0 +1,3997 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Predefined Constants</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="swoole.configuration.html" class="navbar__link">« Runtime Configuration</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="ref.swoole-funcs.html" class="navbar__link">Swoole Functions »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.swoole.html">Swoole</a></li>
+        <li>Predefined Constants</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="swoole.constants" class="appendix">
+ <h1 class="title">Predefined Constants</h1>
+
+ <p class="simpara">
+The constants below are defined by this extension, and
+will only be available when the extension has either
+been compiled into PHP or dynamically loaded at runtime.
+</p>
+ <p class="para">
+  <dl>
+   
+    <dt id="constant.swoole-version">
+     <strong><code><a href="swoole.constants.html#constant.swoole-version">SWOOLE_VERSION</a></code></strong>
+     (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Swoole version.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-version-id">
+     <strong><code><a href="swoole.constants.html#constant.swoole-version-id">SWOOLE_VERSION_ID</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Swoole version.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-major-version">
+     <strong><code><a href="swoole.constants.html#constant.swoole-major-version">SWOOLE_MAJOR_VERSION</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Swoole major version.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-minor-version">
+     <strong><code><a href="swoole.constants.html#constant.swoole-minor-version">SWOOLE_MINOR_VERSION</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Swoole minor version.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-release-version">
+     <strong><code><a href="swoole.constants.html#constant.swoole-release-version">SWOOLE_RELEASE_VERSION</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Swoole release version.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-extra-version">
+     <strong><code><a href="swoole.constants.html#constant.swoole-extra-version">SWOOLE_EXTRA_VERSION</a></code></strong>
+     (<span class="type"><a href="language.types.string.html" class="type string">string</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Swoole extra version.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-debug">
+     <strong><code><a href="swoole.constants.html#constant.swoole-debug">SWOOLE_DEBUG</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Debug mode.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-have-compression">
+     <strong><code><a href="swoole.constants.html#constant.swoole-have-compression">SWOOLE_HAVE_COMPRESSION</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Enable HTTP response compression mode.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-have-zlib">
+     <strong><code><a href="swoole.constants.html#constant.swoole-have-zlib">SWOOLE_HAVE_ZLIB</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Have zlib compression tool.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-have-brotli">
+     <strong><code><a href="swoole.constants.html#constant.swoole-have-brotli">SWOOLE_HAVE_BROTLI</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Have brotli compression tool.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-use-http2">
+     <strong><code><a href="swoole.constants.html#constant.swoole-use-http2">SWOOLE_USE_HTTP2</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Support http2 server.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-use-shortname">
+     <strong><code><a href="swoole.constants.html#constant.swoole-use-shortname">SWOOLE_USE_SHORTNAME</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Enable/disable short aliases.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-sock-tcp">
+     <strong><code><a href="swoole.constants.html#constant.swoole-sock-tcp">SWOOLE_SOCK_TCP</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TCP ipv4 socket.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-sock-tcp6">
+     <strong><code><a href="swoole.constants.html#constant.swoole-sock-tcp6">SWOOLE_SOCK_TCP6</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TCP ipv6 socket.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-sock-udp">
+     <strong><code><a href="swoole.constants.html#constant.swoole-sock-udp">SWOOLE_SOCK_UDP</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      UDP ipv4 socket.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-sock-udp6">
+     <strong><code><a href="swoole.constants.html#constant.swoole-sock-udp6">SWOOLE_SOCK_UDP6</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      UDP ipv6 socket.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-sock-unix-dgram">
+     <strong><code><a href="swoole.constants.html#constant.swoole-sock-unix-dgram">SWOOLE_SOCK_UNIX_DGRAM</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      UNIX socket dgram.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-sock-unix-stream">
+     <strong><code><a href="swoole.constants.html#constant.swoole-sock-unix-stream">SWOOLE_SOCK_UNIX_STREAM</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      UNIX socket stream.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-sock-sync">
+     <strong><code><a href="swoole.constants.html#constant.swoole-sock-sync">SWOOLE_SOCK_SYNC</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Synchronous client mode.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-sock-async">
+     <strong><code><a href="swoole.constants.html#constant.swoole-sock-async">SWOOLE_SOCK_ASYNC</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Asynchronous client mode.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-keep">
+     <strong><code><a href="swoole.constants.html#constant.swoole-keep">SWOOLE_KEEP</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Swoole\Client supports creating a TCP long connection to the server in PHP-FPM/Apache.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-ssl">
+     <strong><code><a href="swoole.constants.html#constant.swoole-ssl">SWOOLE_SSL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Enable SSL tunnel encryption.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-sslv3-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-sslv3-method">SWOOLE_SSLv3_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSLv3 method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-sslv3-server-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-sslv3-server-method">SWOOLE_SSLv3_SERVER_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSLv3 server method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-sslv3-client-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-sslv3-client-method">SWOOLE_SSLv3_CLIENT_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSLv3 client method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-tlsv1-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-tlsv1-method">SWOOLE_TLSv1_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLSv1 method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-tlsv1-server-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-tlsv1-server-method">SWOOLE_TLSv1_SERVER_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLSv1 server method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-tlsv1-client-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-tlsv1-client-method">SWOOLE_TLSv1_CLIENT_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLSv1 client method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-tlsv1-1-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-tlsv1-1-method">SWOOLE_TLSv1_1_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLSv1_1 method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-tlsv1-1-server-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-tlsv1-1-server-method">SWOOLE_TLSv1_1_SERVER_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLSv1_1 server method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-tlsv1-1-client-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-tlsv1-1-client-method">SWOOLE_TLSv1_1_CLIENT_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLSv1_1 client method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-tlsv1-2-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-tlsv1-2-method">SWOOLE_TLSv1_2_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLSv1_2 method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-tlsv1-2-server-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-tlsv1-2-server-method">SWOOLE_TLSv1_2_SERVER_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLSv1_2 server method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-tlsv1-2-client-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-tlsv1-2-client-method">SWOOLE_TLSv1_2_CLIENT_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLSv1_2 client method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-dtls-server-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-dtls-server-method">SWOOLE_DTLS_SERVER_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      DTLS server method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-dtls-client-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-dtls-client-method">SWOOLE_DTLS_CLIENT_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      DTLS client method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-sslv23-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-sslv23-method">SWOOLE_SSLv23_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSLv23 method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-sslv23-server-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-sslv23-server-method">SWOOLE_SSLv23_SERVER_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSLv23 server method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-sslv23-client-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-sslv23-client-method">SWOOLE_SSLv23_CLIENT_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSLv23 client method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-tls-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-tls-method">SWOOLE_TLS_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLS method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-tls-server-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-tls-server-method">SWOOLE_TLS_SERVER_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLS server method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-tls-client-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-tls-client-method">SWOOLE_TLS_CLIENT_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLS client method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-ssl-sslv3">
+     <strong><code><a href="swoole.constants.html#constant.swoole-ssl-sslv3">SWOOLE_SSL_SSLv3</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSLv3 protocol.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-ssl-tlsv1">
+     <strong><code><a href="swoole.constants.html#constant.swoole-ssl-tlsv1">SWOOLE_SSL_TLSv1</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLSv1 protocol.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-ssl-tlsv1-1">
+     <strong><code><a href="swoole.constants.html#constant.swoole-ssl-tlsv1-1">SWOOLE_SSL_TLSv1_1</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLSv1_1 protocol.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-ssl-tlsv1-2">
+     <strong><code><a href="swoole.constants.html#constant.swoole-ssl-tlsv1-2">SWOOLE_SSL_TLSv1_2</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLSv1_2 protocol.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-ssl-tlsv1-3">
+     <strong><code><a href="swoole.constants.html#constant.swoole-ssl-tlsv1-3">SWOOLE_SSL_TLSv1_3</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLSv1_3 protocol.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-ssl-dtls">
+     <strong><code><a href="swoole.constants.html#constant.swoole-ssl-dtls">SWOOLE_SSL_DTLS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      DTLS protocol.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-ssl-sslv2">
+     <strong><code><a href="swoole.constants.html#constant.swoole-ssl-sslv2">SWOOLE_SSL_SSLv2</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSLv2 protocol.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-event-read">
+     <strong><code><a href="swoole.constants.html#constant.swoole-event-read">SWOOLE_EVENT_READ</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Whether to listen for readable events.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-event-write">
+     <strong><code><a href="swoole.constants.html#constant.swoole-event-write">SWOOLE_EVENT_WRITE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Whether to listen for writable events.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-strerror-system">
+     <strong><code><a href="swoole.constants.html#constant.swoole-strerror-system">SWOOLE_STRERROR_SYSTEM</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Convert the system errno no into error messages.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-strerror-gai">
+     <strong><code><a href="swoole.constants.html#constant.swoole-strerror-gai">SWOOLE_STRERROR_GAI</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Convert the addr info errno no into error messages.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-strerror-dns">
+     <strong><code><a href="swoole.constants.html#constant.swoole-strerror-dns">SWOOLE_STRERROR_DNS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Convert the DNS errno no into error messages.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-strerror-swoole">
+     <strong><code><a href="swoole.constants.html#constant.swoole-strerror-swoole">SWOOLE_STRERROR_SWOOLE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Convert the swoole errno no into error messages.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-malloc-fail">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-malloc-fail">SWOOLE_ERROR_MALLOC_FAIL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Malloc memory fail.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-system-call-fail">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-system-call-fail">SWOOLE_ERROR_SYSTEM_CALL_FAIL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      System call fail.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-php-fatal-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-php-fatal-error">SWOOLE_ERROR_PHP_FATAL_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      PHP fatal error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-name-too-long">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-name-too-long">SWOOLE_ERROR_NAME_TOO_LONG</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Name too long.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-invalid-params">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-invalid-params">SWOOLE_ERROR_INVALID_PARAMS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Invalid params.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-queue-full">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-queue-full">SWOOLE_ERROR_QUEUE_FULL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Queue full.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-operation-not-support">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-operation-not-support">SWOOLE_ERROR_OPERATION_NOT_SUPPORT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Operation not support.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-protocol-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-protocol-error">SWOOLE_ERROR_PROTOCOL_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Protocol error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-wrong-operation">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-wrong-operation">SWOOLE_ERROR_WRONG_OPERATION</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Wrong operation.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-php-runtime-notice">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-php-runtime-notice">SWOOLE_ERROR_PHP_RUNTIME_NOTICE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      PHP runtime notice.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-for-test">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-for-test">SWOOLE_ERROR_FOR_TEST</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      For test.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-no-payload">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-no-payload">SWOOLE_ERROR_NO_PAYLOAD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      No payload.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-undefined-behavior">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-undefined-behavior">SWOOLE_ERROR_UNDEFINED_BEHAVIOR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Undefined behavior.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-not-thread-safety">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-not-thread-safety">SWOOLE_ERROR_NOT_THREAD_SAFETY</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Not thread safety.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-file-not-exist">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-file-not-exist">SWOOLE_ERROR_FILE_NOT_EXIST</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      File not exist.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-file-too-large">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-file-too-large">SWOOLE_ERROR_FILE_TOO_LARGE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      File too large.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-file-empty">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-file-empty">SWOOLE_ERROR_FILE_EMPTY</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      File empty.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-dnslookup-duplicate-request">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-dnslookup-duplicate-request">SWOOLE_ERROR_DNSLOOKUP_DUPLICATE_REQUEST</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      DNS Lookup duplicate request.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-dnslookup-resolve-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-dnslookup-resolve-failed">SWOOLE_ERROR_DNSLOOKUP_RESOLVE_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      DNS Lookup resolve failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-dnslookup-resolve-timeout">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-dnslookup-resolve-timeout">SWOOLE_ERROR_DNSLOOKUP_RESOLVE_TIMEOUT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      DNS Lookup resolve timeout.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-dnslookup-unsupported">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-dnslookup-unsupported">SWOOLE_ERROR_DNSLOOKUP_UNSUPPORTED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      DNS Lookup unsupported.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-dnslookup-no-server">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-dnslookup-no-server">SWOOLE_ERROR_DNSLOOKUP_NO_SERVER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      DNS Lookup no server.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-bad-ipv6-address">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-bad-ipv6-address">SWOOLE_ERROR_BAD_IPV6_ADDRESS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Bad ipv6 address.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-unregistered-signal">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-unregistered-signal">SWOOLE_ERROR_UNREGISTERED_SIGNAL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Unregistered signal.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-bad-host-addr">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-bad-host-addr">SWOOLE_ERROR_BAD_HOST_ADDR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Bad host addr.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-event-socket-removed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-event-socket-removed">SWOOLE_ERROR_EVENT_SOCKET_REMOVED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Event socket removed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-session-closed-by-server">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-session-closed-by-server">SWOOLE_ERROR_SESSION_CLOSED_BY_SERVER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Session closed by server.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-session-closed-by-client">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-session-closed-by-client">SWOOLE_ERROR_SESSION_CLOSED_BY_CLIENT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Session closed by client.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-session-closing">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-session-closing">SWOOLE_ERROR_SESSION_CLOSING</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Session closing.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-session-closed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-session-closed">SWOOLE_ERROR_SESSION_CLOSED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Session closed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-session-not-exist">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-session-not-exist">SWOOLE_ERROR_SESSION_NOT_EXIST</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Session not exist.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-session-invalid-id">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-session-invalid-id">SWOOLE_ERROR_SESSION_INVALID_ID</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Session invalid id.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-session-discard-timeout-data">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-session-discard-timeout-data">SWOOLE_ERROR_SESSION_DISCARD_TIMEOUT_DATA</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Session discard timeout data.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-session-discard-data">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-session-discard-data">SWOOLE_ERROR_SESSION_DISCARD_DATA</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Session discard data.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-output-buffer-overflow">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-output-buffer-overflow">SWOOLE_ERROR_OUTPUT_BUFFER_OVERFLOW</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Output buffer overflow.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-output-send-yield">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-output-send-yield">SWOOLE_ERROR_OUTPUT_SEND_YIELD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Output send yield
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-ssl-not-ready">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-ssl-not-ready">SWOOLE_ERROR_SSL_NOT_READY</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSL not ready
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-ssl-cannot-use-senfile">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-ssl-cannot-use-senfile">SWOOLE_ERROR_SSL_CANNOT_USE_SENFILE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSL cannot use senfile
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-ssl-empty-peer-certificate">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-ssl-empty-peer-certificate">SWOOLE_ERROR_SSL_EMPTY_PEER_CERTIFICATE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSL empty peer certificate.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-ssl-verify-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-ssl-verify-failed">SWOOLE_ERROR_SSL_VERIFY_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSL verify failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-ssl-bad-client">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-ssl-bad-client">SWOOLE_ERROR_SSL_BAD_CLIENT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSL bad client.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-ssl-bad-protocol">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-ssl-bad-protocol">SWOOLE_ERROR_SSL_BAD_PROTOCOL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSL bad protocol.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-ssl-reset">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-ssl-reset">SWOOLE_ERROR_SSL_RESET</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSL reset.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-ssl-handshake-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-ssl-handshake-failed">SWOOLE_ERROR_SSL_HANDSHAKE_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      SSL handshake failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-package-length-too-large">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-package-length-too-large">SWOOLE_ERROR_PACKAGE_LENGTH_TOO_LARGE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Package length too large.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-package-length-not-found">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-package-length-not-found">SWOOLE_ERROR_PACKAGE_LENGTH_NOT_FOUND</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Package length not found.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-data-length-too-large">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-data-length-too-large">SWOOLE_ERROR_DATA_LENGTH_TOO_LARGE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Data length too large.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-package-malformed-data">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-package-malformed-data">SWOOLE_ERROR_PACKAGE_MALFORMED_DATA</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Package malformed error data.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-task-package-too-big">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-task-package-too-big">SWOOLE_ERROR_TASK_PACKAGE_TOO_BIG</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Task package too big.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-task-dispatch-fail">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-task-dispatch-fail">SWOOLE_ERROR_TASK_DISPATCH_FAIL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Task dispatch fail.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-task-timeout">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-task-timeout">SWOOLE_ERROR_TASK_TIMEOUT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Task timeout.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-http2-stream-id-too-big">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-http2-stream-id-too-big">SWOOLE_ERROR_HTTP2_STREAM_ID_TOO_BIG</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Http2 stream id too big.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-http2-stream-no-header">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-http2-stream-no-header">SWOOLE_ERROR_HTTP2_STREAM_NO_HEADER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Http2 stream no header.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-http2-stream-not-found">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-http2-stream-not-found">SWOOLE_ERROR_HTTP2_STREAM_NOT_FOUND</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Http2 stream not found.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-http2-stream-ignore">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-http2-stream-ignore">SWOOLE_ERROR_HTTP2_STREAM_IGNORE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Http2 stream ignore.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-http2-send-control-frame-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-http2-send-control-frame-failed">SWOOLE_ERROR_HTTP2_SEND_CONTROL_FRAME_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Http2 send control frame failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-aio-bad-request">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-aio-bad-request">SWOOLE_ERROR_AIO_BAD_REQUEST</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Aio bad request.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-aio-canceled">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-aio-canceled">SWOOLE_ERROR_AIO_CANCELED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Aio canceled.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-aio-timeout">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-aio-timeout">SWOOLE_ERROR_AIO_TIMEOUT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Aio timeout.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-client-no-connection">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-client-no-connection">SWOOLE_ERROR_CLIENT_NO_CONNECTION</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Client no connection.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-socket-closed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-socket-closed">SWOOLE_ERROR_SOCKET_CLOSED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Socket closed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-socket-poll-timeout">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-socket-poll-timeout">SWOOLE_ERROR_SOCKET_POLL_TIMEOUT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Socket poll timeout.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-socks5-unsupport-version">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-socks5-unsupport-version">SWOOLE_ERROR_SOCKS5_UNSUPPORT_VERSION</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Socks5 unsupport version.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-socks5-unsupport-method">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-socks5-unsupport-method">SWOOLE_ERROR_SOCKS5_UNSUPPORT_METHOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Socks5 unsupport method.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-socks5-auth-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-socks5-auth-failed">SWOOLE_ERROR_SOCKS5_AUTH_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Socks5 auth failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-socks5-server-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-socks5-server-error">SWOOLE_ERROR_SOCKS5_SERVER_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Socks5 server error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-socks5-handshake-error">
+     <strong><code>SWOOLE_ERROR_SOCKS5_HANDSHAKE_FAILED</code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Socks5 handshake failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-http-proxy-handshake-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-http-proxy-handshake-error">SWOOLE_ERROR_HTTP_PROXY_HANDSHAKE_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Http proxy handshake error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-http-invalid-protocol">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-http-invalid-protocol">SWOOLE_ERROR_HTTP_INVALID_PROTOCOL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Http invalid protocol.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-http-proxy-handshake-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-http-proxy-handshake-failed">SWOOLE_ERROR_HTTP_PROXY_HANDSHAKE_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Http proxy handshake failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-http-proxy-bad-response">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-http-proxy-bad-response">SWOOLE_ERROR_HTTP_PROXY_BAD_RESPONSE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Http proxy bad response.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-http-conflict-header">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-http-conflict-header">SWOOLE_ERROR_HTTP_CONFLICT_HEADER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Http conflict header.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-http-context-unavailable">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-http-context-unavailable">SWOOLE_ERROR_HTTP_CONTEXT_UNAVAILABLE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Http context unavailable.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-http-cookie-unavailable">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-http-cookie-unavailable">SWOOLE_ERROR_HTTP_COOKIE_UNAVAILABLE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Http cookie unavailable.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-websocket-bad-client">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-websocket-bad-client">SWOOLE_ERROR_WEBSOCKET_BAD_CLIENT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket bad client.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-websocket-bad-opcode">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-websocket-bad-opcode">SWOOLE_ERROR_WEBSOCKET_BAD_OPCODE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket bad opcode.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-websocket-unconnected">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-websocket-unconnected">SWOOLE_ERROR_WEBSOCKET_UNCONNECTED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket unconnected.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-websocket-handshake-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-websocket-handshake-failed">SWOOLE_ERROR_WEBSOCKET_HANDSHAKE_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket handshake failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-websocket-pack-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-websocket-pack-failed">SWOOLE_ERROR_WEBSOCKET_PACK_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket pack failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-websocket-unpack-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-websocket-unpack-failed">SWOOLE_ERROR_WEBSOCKET_UNPACK_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket unpack failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-websocket-incomplete-packet">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-websocket-incomplete-packet">SWOOLE_ERROR_WEBSOCKET_INCOMPLETE_PACKET</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket incomplete packet.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-must-created-before-client">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-must-created-before-client">SWOOLE_ERROR_SERVER_MUST_CREATED_BEFORE_CLIENT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server must be created before client.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-too-many-socket">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-too-many-socket">SWOOLE_ERROR_SERVER_TOO_MANY_SOCKET</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server too many socket.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-worker-terminated">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-worker-terminated">SWOOLE_ERROR_SERVER_WORKER_TERMINATED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server worker terminated.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-invalid-listen-port">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-invalid-listen-port">SWOOLE_ERROR_SERVER_INVALID_LISTEN_PORT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server invalid listen port.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-too-many-listen-port">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-too-many-listen-port">SWOOLE_ERROR_SERVER_TOO_MANY_LISTEN_PORT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server too many listen port.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-pipe-buffer-full">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-pipe-buffer-full">SWOOLE_ERROR_SERVER_PIPE_BUFFER_FULL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server pipe buffer full.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-no-idle-worker">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-no-idle-worker">SWOOLE_ERROR_SERVER_NO_IDLE_WORKER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server no idle worker.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-only-start-one">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-only-start-one">SWOOLE_ERROR_SERVER_ONLY_START_ONE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server only start one.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-send-in-master">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-send-in-master">SWOOLE_ERROR_SERVER_SEND_IN_MASTER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server send in master.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-invalid-request">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-invalid-request">SWOOLE_ERROR_SERVER_INVALID_REQUEST</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server invalid request.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-connect-fail">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-connect-fail">SWOOLE_ERROR_SERVER_CONNECT_FAIL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server connect failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-invalid-command">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-invalid-command">SWOOLE_ERROR_SERVER_INVALID_COMMAND</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server invalid command.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-is-not-regular-file">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-is-not-regular-file">SWOOLE_ERROR_SERVER_IS_NOT_REGULAR_FILE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server is not regular file.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-send-to-woker-timeout">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-send-to-woker-timeout">SWOOLE_ERROR_SERVER_SEND_TO_WOKER_TIMEOUT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server send to woker timeout.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-invalid-callback">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-invalid-callback">SWOOLE_ERROR_SERVER_INVALID_CALLBACK</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server invalid callback.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-unrelated-thread">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-unrelated-thread">SWOOLE_ERROR_SERVER_UNRELATED_THREAD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server unrelated thread.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-worker-exit-timeout">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-worker-exit-timeout">SWOOLE_ERROR_SERVER_WORKER_EXIT_TIMEOUT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server worker exit timeout.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-worker-abnormal-pipe-data">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-worker-abnormal-pipe-data">SWOOLE_ERROR_SERVER_WORKER_ABNORMAL_PIPE_DATA</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server worker abnormal pipe data.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-server-worker-unprocessed-data">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-server-worker-unprocessed-data">SWOOLE_ERROR_SERVER_WORKER_UNPROCESSED_DATA</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server worker unprocessed data.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-out-of-coroutine">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-out-of-coroutine">SWOOLE_ERROR_CO_OUT_OF_COROUTINE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine out of coroutine.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-has-been-bound">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-has-been-bound">SWOOLE_ERROR_CO_HAS_BEEN_BOUND</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine has been bound.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-has-been-discarded">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-has-been-discarded">SWOOLE_ERROR_CO_HAS_BEEN_DISCARDED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine has been discarded.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-mutex-double-unlock">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-mutex-double-unlock">SWOOLE_ERROR_CO_MUTEX_DOUBLE_UNLOCK</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine mutex double unlock.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-block-object-locked">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-block-object-locked">SWOOLE_ERROR_CO_BLOCK_OBJECT_LOCKED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine block object locked.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-block-object-waiting">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-block-object-waiting">SWOOLE_ERROR_CO_BLOCK_OBJECT_WAITING</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine block object waiting.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-yield-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-yield-failed">SWOOLE_ERROR_CO_YIELD_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine yield failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-getcontext-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-getcontext-failed">SWOOLE_ERROR_CO_GETCONTEXT_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine getcontext failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-swapcontext-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-swapcontext-failed">SWOOLE_ERROR_CO_SWAPCONTEXT_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine swapcontext failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-makecontext-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-makecontext-failed">SWOOLE_ERROR_CO_MAKECONTEXT_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine makecontext failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-iocpinit-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-iocpinit-failed">SWOOLE_ERROR_CO_IOCPINIT_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine iocpinit failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-protect-stack-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-protect-stack-failed">SWOOLE_ERROR_CO_PROTECT_STACK_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine protect stack failed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-std-thread-link-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-std-thread-link-error">SWOOLE_ERROR_CO_STD_THREAD_LINK_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine std thread link error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-disabled-multi-thread">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-disabled-multi-thread">SWOOLE_ERROR_CO_DISABLED_MULTI_THREAD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine disabled multi thread.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-cannot-cancel">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-cannot-cancel">SWOOLE_ERROR_CO_CANNOT_CANCEL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine cannot cancel.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-not-exists">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-not-exists">SWOOLE_ERROR_CO_NOT_EXISTS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine not exists.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-canceled">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-canceled">SWOOLE_ERROR_CO_CANCELED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine canceled.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-timedout">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-timedout">SWOOLE_ERROR_CO_TIMEDOUT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine timedout.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-error-co-socket-close-wait">
+     <strong><code><a href="swoole.constants.html#constant.swoole-error-co-socket-close-wait">SWOOLE_ERROR_CO_SOCKET_CLOSE_WAIT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine socket close wait.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-server">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-server">SWOOLE_TRACE_SERVER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record server log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-client">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-client">SWOOLE_TRACE_CLIENT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record client log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-buffer">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-buffer">SWOOLE_TRACE_BUFFER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record buffer log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-conn">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-conn">SWOOLE_TRACE_CONN</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record connect log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-event">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-event">SWOOLE_TRACE_EVENT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record event log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-worker">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-worker">SWOOLE_TRACE_WORKER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record worker log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-memory">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-memory">SWOOLE_TRACE_MEMORY</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record memory log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-reactor">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-reactor">SWOOLE_TRACE_REACTOR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record reactor log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-php">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-php">SWOOLE_TRACE_PHP</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record php log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-http">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-http">SWOOLE_TRACE_HTTP</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record http log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-http2">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-http2">SWOOLE_TRACE_HTTP2</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record http2 log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-eof-protocol">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-eof-protocol">SWOOLE_TRACE_EOF_PROTOCOL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record eof protocol log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-length-protocol">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-length-protocol">SWOOLE_TRACE_LENGTH_PROTOCOL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record length protocol log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-close">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-close">SWOOLE_TRACE_CLOSE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record close event log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-websocket">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-websocket">SWOOLE_TRACE_WEBSOCKET</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record websocket log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-redis-client">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-redis-client">SWOOLE_TRACE_REDIS_CLIENT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record redis client log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-mysql-client">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-mysql-client">SWOOLE_TRACE_MYSQL_CLIENT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record mysql client log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-http-client">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-http-client">SWOOLE_TRACE_HTTP_CLIENT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record http client log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-aio">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-aio">SWOOLE_TRACE_AIO</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record AIO log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-ssl">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-ssl">SWOOLE_TRACE_SSL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record SSL log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-normal">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-normal">SWOOLE_TRACE_NORMAL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record normal log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-channel">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-channel">SWOOLE_TRACE_CHANNEL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record channel log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-timer">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-timer">SWOOLE_TRACE_TIMER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record timer log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-socket">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-socket">SWOOLE_TRACE_SOCKET</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record socket log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-coroutine">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-coroutine">SWOOLE_TRACE_COROUTINE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record coroutine log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-context">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-context">SWOOLE_TRACE_CONTEXT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record context log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-co-http-server">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-co-http-server">SWOOLE_TRACE_CO_HTTP_SERVER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record coroutine http server log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-table">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-table">SWOOLE_TRACE_TABLE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record table log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-co-curl">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-co-curl">SWOOLE_TRACE_CO_CURL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record coroutine curl log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-cares">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-cares">SWOOLE_TRACE_CARES</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record cares log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-zlib">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-zlib">SWOOLE_TRACE_ZLIB</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record zlib log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-co-pgsql">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-co-pgsql">SWOOLE_TRACE_CO_PGSQL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record pgsql coroutine log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-co-odbc">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-co-odbc">SWOOLE_TRACE_CO_ODBC</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record odbc coroutine log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-co-oracle">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-co-oracle">SWOOLE_TRACE_CO_ORACLE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record oracle coroutine log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-co-sqlite">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-co-sqlite">SWOOLE_TRACE_CO_SQLITE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record sqlite coroutine log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-trace-all">
+     <strong><code><a href="swoole.constants.html#constant.swoole-trace-all">SWOOLE_TRACE_ALL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record all level log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-log-debug">
+     <strong><code><a href="swoole.constants.html#constant.swoole-log-debug">SWOOLE_LOG_DEBUG</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record debug level log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-log-trace">
+     <strong><code><a href="swoole.constants.html#constant.swoole-log-trace">SWOOLE_LOG_TRACE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record trace level log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-log-info">
+     <strong><code><a href="swoole.constants.html#constant.swoole-log-info">SWOOLE_LOG_INFO</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record info level log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-log-notice">
+     <strong><code><a href="swoole.constants.html#constant.swoole-log-notice">SWOOLE_LOG_NOTICE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record notice level log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-log-warning">
+     <strong><code><a href="swoole.constants.html#constant.swoole-log-warning">SWOOLE_LOG_WARNING</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record warning level log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-log-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-log-error">SWOOLE_LOG_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Record error level log flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-log-none">
+     <strong><code><a href="swoole.constants.html#constant.swoole-log-none">SWOOLE_LOG_NONE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Equivalent to turning off log information, log information will not be thrown.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-log-rotation-single">
+     <strong><code><a href="swoole.constants.html#constant.swoole-log-rotation-single">SWOOLE_LOG_ROTATION_SINGLE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      disable log rotation.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-log-rotation-monthly">
+     <strong><code><a href="swoole.constants.html#constant.swoole-log-rotation-monthly">SWOOLE_LOG_ROTATION_MONTHLY</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Rotate logs monthly.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-log-rotation-daily">
+     <strong><code><a href="swoole.constants.html#constant.swoole-log-rotation-daily">SWOOLE_LOG_ROTATION_DAILY</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Rotate logs daily.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-log-rotation-hourly">
+     <strong><code><a href="swoole.constants.html#constant.swoole-log-rotation-hourly">SWOOLE_LOG_ROTATION_HOURLY</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Rotate logs hourly.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-log-rotation-every-minute">
+     <strong><code><a href="swoole.constants.html#constant.swoole-log-rotation-every-minute">SWOOLE_LOG_ROTATION_EVERY_MINUTE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Rotate logs every minute.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-ipc-none">
+     <strong><code><a href="swoole.constants.html#constant.swoole-ipc-none">SWOOLE_IPC_NONE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Do not use any inter-process communication (IPC) features.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-ipc-unixsock">
+     <strong><code><a href="swoole.constants.html#constant.swoole-ipc-unixsock">SWOOLE_IPC_UNIXSOCK</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      For inter-process communication (IPC), using Unix domain sockets (UnixSocket) in coroutine mode
+      is highly recommended.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-ipc-socket">
+     <strong><code><a href="swoole.constants.html#constant.swoole-ipc-socket">SWOOLE_IPC_SOCKET</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      To use sockets for inter-process communication (IPC),
+      the listen method must be called to specify the address and port to monitor.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-iov-max">
+     <strong><code><a href="swoole.constants.html#constant.swoole-iov-max">SWOOLE_IOV_MAX</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      MAX iov limit.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-iouring-default">
+     <strong><code><a href="swoole.constants.html#constant.swoole-iouring-default">SWOOLE_IOURING_DEFAULT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      In interrupt-driven mode, I/O requests can be submitted via the io_uring_enter syscall,
+      and completion is determined by directly checking the completion queue status.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-iouring-sqpoll">
+     <strong><code><a href="swoole.constants.html#constant.swoole-iouring-sqpoll">SWOOLE_IOURING_SQPOLL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      In kernel polling mode, the kernel creates dedicated threads to submit and reap I/O requests,
+      nearly eliminating user-kernel context switches.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-base">
+     <strong><code><a href="swoole.constants.html#constant.swoole-base">SWOOLE_BASE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Basic mode.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-process">
+     <strong><code><a href="swoole.constants.html#constant.swoole-process">SWOOLE_PROCESS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Multi-process mode.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-thread">
+     <strong><code><a href="swoole.constants.html#constant.swoole-thread">SWOOLE_THREAD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Multi-thread mode.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-ipc-unsock">
+     <strong><code><a href="swoole.constants.html#constant.swoole-ipc-unsock">SWOOLE_IPC_UNSOCK</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      The task process communicates with the worker process using a Unix Socket.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-ipc-msgqueue">
+     <strong><code><a href="swoole.constants.html#constant.swoole-ipc-msgqueue">SWOOLE_IPC_MSGQUEUE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      The task process communicates with the worker process using a sysvmsg queue.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-ipc-preemptive">
+     <strong><code><a href="swoole.constants.html#constant.swoole-ipc-preemptive">SWOOLE_IPC_PREEMPTIVE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      The task process communicates with the worker process using a preemptive mode over a sysvmsg queue.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-server-command-master">
+     <strong><code><a href="swoole.constants.html#constant.swoole-server-command-master">SWOOLE_SERVER_COMMAND_MASTER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Master process accept requests.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-server-command-manager">
+     <strong><code><a href="swoole.constants.html#constant.swoole-server-command-manager">SWOOLE_SERVER_COMMAND_MANAGER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Manager process accept requests.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-server-command-reactor-thread">
+     <strong><code><a href="swoole.constants.html#constant.swoole-server-command-reactor-thread">SWOOLE_SERVER_COMMAND_REACTOR_THREAD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Reactor thread accept requests.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-server-command-event-worker">
+     <strong><code><a href="swoole.constants.html#constant.swoole-server-command-event-worker">SWOOLE_SERVER_COMMAND_EVENT_WORKER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Event worker thread process accept requests.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-server-command-task-worker">
+     <strong><code><a href="swoole.constants.html#constant.swoole-server-command-task-worker">SWOOLE_SERVER_COMMAND_TASK_WORKER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Task worker thread process accept requests.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-dispatch-round">
+     <strong><code><a href="swoole.constants.html#constant.swoole-dispatch-round">SWOOLE_DISPATCH_ROUND</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Round robin mode, each Worker process will be allocated sequentially for every received connection.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-dispatch-fdmod">
+     <strong><code><a href="swoole.constants.html#constant.swoole-dispatch-fdmod">SWOOLE_DISPATCH_FDMOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Allocate Worker based on the connection&#039;s file descriptor. This ensures that data from the same connection
+      will be processed by the same Worker only.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-dispatch-idle-worker">
+     <strong><code><a href="swoole.constants.html#constant.swoole-dispatch-idle-worker">SWOOLE_DISPATCH_IDLE_WORKER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      The main process will choose delivery based on the workload status of the Worker, delivering only to idle Workers.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-dispatch-ipmod">
+     <strong><code><a href="swoole.constants.html#constant.swoole-dispatch-ipmod">SWOOLE_DISPATCH_IPMOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Allocate based on client IP using modulo hash, assigning to a specific Worker process.
+      This ensures that data from the same source IP connection will always be assigned to
+      the same Worker process. Algorithm: inet_addr_mod(ClientIP, worker_num).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-dispatch-uidmod">
+     <strong><code><a href="swoole.constants.html#constant.swoole-dispatch-uidmod">SWOOLE_DISPATCH_UIDMOD</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Requires binding a connection to a unique uid by calling Server-&gt;bind() in the user code.
+      Then, the underlying system allocates to different Worker processes based on the value of UID.
+      Algorithm: UID % worker_num. To use strings as UID, you can use crc32(UID_STRING).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-dispatch-userfunc">
+     <strong><code><a href="swoole.constants.html#constant.swoole-dispatch-userfunc">SWOOLE_DISPATCH_USERFUNC</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Set a dispatch_func callback function, where its return value determines
+      which process handles the request.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-dispatch-co-conn-lb">
+     <strong><code><a href="swoole.constants.html#constant.swoole-dispatch-co-conn-lb">SWOOLE_DISPATCH_CO_CONN_LB</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Determine which process handles the request based on the number of connections.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-dispatch-co-req-lb">
+     <strong><code><a href="swoole.constants.html#constant.swoole-dispatch-co-req-lb">SWOOLE_DISPATCH_CO_REQ_LB</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Determine which process handles the request based on the number of requests.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-dispatch-concurrent-lb">
+     <strong><code><a href="swoole.constants.html#constant.swoole-dispatch-concurrent-lb">SWOOLE_DISPATCH_CONCURRENT_LB</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Determine which process handles the request based on concurrency count.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-worker-busy">
+     <strong><code><a href="swoole.constants.html#constant.swoole-worker-busy">SWOOLE_WORKER_BUSY</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Process is busy.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-worker-idle">
+     <strong><code><a href="swoole.constants.html#constant.swoole-worker-idle">SWOOLE_WORKER_IDLE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Process is idle.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-worker-exit">
+     <strong><code><a href="swoole.constants.html#constant.swoole-worker-exit">SWOOLE_WORKER_EXIT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Process exited.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-mutex">
+     <strong><code><a href="swoole.constants.html#constant.swoole-mutex">SWOOLE_MUTEX</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Mutex lock.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-rwlock">
+     <strong><code><a href="swoole.constants.html#constant.swoole-rwlock">SWOOLE_RWLOCK</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      RW lock.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-spinlock">
+     <strong><code><a href="swoole.constants.html#constant.swoole-spinlock">SWOOLE_SPINLOCK</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Spin lock.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-coro-max-num-limit">
+     <strong><code><a href="swoole.constants.html#constant.swoole-coro-max-num-limit">SWOOLE_CORO_MAX_NUM_LIMIT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Maximum number of coroutines created(PHP_INT_MAX).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-coro-init">
+     <strong><code><a href="swoole.constants.html#constant.swoole-coro-init">SWOOLE_CORO_INIT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine initializing.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-coro-waiting">
+     <strong><code><a href="swoole.constants.html#constant.swoole-coro-waiting">SWOOLE_CORO_WAITING</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine yield.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-coro-running">
+     <strong><code><a href="swoole.constants.html#constant.swoole-coro-running">SWOOLE_CORO_RUNNING</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine completed
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-coro-end">
+     <strong><code><a href="swoole.constants.html#constant.swoole-coro-end">SWOOLE_CORO_END</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine completed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-exit-in-coroutine">
+     <strong><code><a href="swoole.constants.html#constant.swoole-exit-in-coroutine">SWOOLE_EXIT_IN_COROUTINE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Executing exit() function in coroutine.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-exit-in-server">
+     <strong><code><a href="swoole.constants.html#constant.swoole-exit-in-server">SWOOLE_EXIT_IN_SERVER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Executing exit() function in server.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-type-data">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-type-data">SWOOLE_HTTP2_TYPE_DATA</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 data frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-type-headers">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-type-headers">SWOOLE_HTTP2_TYPE_HEADERS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 headers frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-type-priority">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-type-priority">SWOOLE_HTTP2_TYPE_PRIORITY</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 priority frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-type-rst-stream">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-type-rst-stream">SWOOLE_HTTP2_TYPE_RST_STREAM</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 rst stream frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-type-settings">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-type-settings">SWOOLE_HTTP2_TYPE_SETTINGS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 settings frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-type-push-promise">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-type-push-promise">SWOOLE_HTTP2_TYPE_PUSH_PROMISE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 push promise frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-type-ping">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-type-ping">SWOOLE_HTTP2_TYPE_PING</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 ping frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-type-goaway">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-type-goaway">SWOOLE_HTTP2_TYPE_GOAWAY</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 goaway frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-type-window-update">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-type-window-update">SWOOLE_HTTP2_TYPE_WINDOW_UPDATE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 window update frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-type-continuation">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-type-continuation">SWOOLE_HTTP2_TYPE_CONTINUATION</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 continuation frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-error-no-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-error-no-error">SWOOLE_HTTP2_ERROR_NO_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 no error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-error-protocol-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-error-protocol-error">SWOOLE_HTTP2_ERROR_PROTOCOL_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 protocol error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-error-internal-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-error-internal-error">SWOOLE_HTTP2_ERROR_INTERNAL_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 internal error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-error-flow-control-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-error-flow-control-error">SWOOLE_HTTP2_ERROR_FLOW_CONTROL_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 flow control error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-error-settings-timeout">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-error-settings-timeout">SWOOLE_HTTP2_ERROR_SETTINGS_TIMEOUT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 setting timeout error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-error-stream-closed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-error-stream-closed">SWOOLE_HTTP2_ERROR_STREAM_CLOSED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 stream closed error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-error-frame-size-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-error-frame-size-error">SWOOLE_HTTP2_ERROR_FRAME_SIZE_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 frame size error error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-error-refused-stream">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-error-refused-stream">SWOOLE_HTTP2_ERROR_REFUSED_STREAM</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 refused stream error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-error-cancel">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-error-cancel">SWOOLE_HTTP2_ERROR_CANCEL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 cancel error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-error-compression-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-error-compression-error">SWOOLE_HTTP2_ERROR_COMPRESSION_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 compression error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-error-connect-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-error-connect-error">SWOOLE_HTTP2_ERROR_CONNECT_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 connect error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-error-enhance-your-calm">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-error-enhance-your-calm">SWOOLE_HTTP2_ERROR_ENHANCE_YOUR_CALM</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 enhance your calm error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-error-inadequate-security">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-error-inadequate-security">SWOOLE_HTTP2_ERROR_INADEQUATE_SECURITY</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 inadequate security error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http2-error-http-1-1-required">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http2-error-http-1-1-required">SWOOLE_HTTP2_ERROR_HTTP_1_1_REQUIRED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      HTTP2 require http1.1 error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http-client-estatus-connect-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http-client-estatus-connect-failed">SWOOLE_HTTP_CLIENT_ESTATUS_CONNECT_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Connection timeout, the server is not listening on the port or there is a network failure,
+      you can read $errCode to get the specific network error code.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http-client-estatus-request-timeout">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http-client-estatus-request-timeout">SWOOLE_HTTP_CLIENT_ESTATUS_REQUEST_TIMEOUT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Request timeout, the server did not return a response within the specified timeout time.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http-client-estatus-server-reset">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http-client-estatus-server-reset">SWOOLE_HTTP_CLIENT_ESTATUS_SERVER_RESET</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      After the client&#039;s request is sent, the server forcefully disconnects the connection.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-http-client-estatus-send-failed">
+     <strong><code><a href="swoole.constants.html#constant.swoole-http-client-estatus-send-failed">SWOOLE_HTTP_CLIENT_ESTATUS_SEND_FAILED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Client send failed (this constant is available in Swoole version &gt;= v4.5.9,
+      for versions less than this, please use the status code).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-msgqueue-orient">
+     <strong><code><a href="swoole.constants.html#constant.swoole-msgqueue-orient">SWOOLE_MSGQUEUE_ORIENT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Swoole\Process::pop() will return specific data in the queue with the message type as process id + 1,
+      Swoole\Process::push() will add the type process id + 1 to the message.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-msgqueue-balance">
+     <strong><code><a href="swoole.constants.html#constant.swoole-msgqueue-balance">SWOOLE_MSGQUEUE_BALANCE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Swoole\Process::pop() will return the first message in the queue,
+      Swoole\Process::push() will not add a specific type to the message.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-tcp">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-tcp">SWOOLE_HOOK_TCP</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based stream of TCP Socket type, including the most common ones like Redis, PDO, Mysqli.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-udp">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-udp">SWOOLE_HOOK_UDP</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based stream of UDP Socket type.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-unix">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-unix">SWOOLE_HOOK_UNIX</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based stream for Unix Stream Socket type.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-udg">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-udg">SWOOLE_HOOK_UDG</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based stream for UDG Stream Socket type.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-ssl">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-ssl">SWOOLE_HOOK_SSL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based stream for SSL Stream Socket type.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-tls">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-tls">SWOOLE_HOOK_TLS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based stream for TLS Stream Socket type.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-stream-function">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-stream-function">SWOOLE_HOOK_STREAM_FUNCTION</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based stream_*() function.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-file">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-file">SWOOLE_HOOK_FILE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based file operations.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-stdio">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-stdio">SWOOLE_HOOK_STDIO</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based STDIO operations.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-sleep">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-sleep">SWOOLE_HOOK_SLEEP</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based sleep operations, including sleep, usleep, time_nanosleep, time_sleep_until.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-proc">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-proc">SWOOLE_HOOK_PROC</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based proc* functions, including: proc_open, proc_close, proc_get_status, proc_terminate.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-curl">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-curl">SWOOLE_HOOK_CURL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based for curl extension.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-native-curl">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-native-curl">SWOOLE_HOOK_NATIVE_CURL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based for native curl extension.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-blocking-function">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-blocking-function">SWOOLE_HOOK_BLOCKING_FUNCTION</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based for blocking function, include gethostbyname, exec, shell_exec.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-sockets">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-sockets">SWOOLE_HOOK_SOCKETS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based for the sockets extension
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-pdo-pgsql">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-pdo-pgsql">SWOOLE_HOOK_PDO_PGSQL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based for pdo_pgsql extension.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-pdo-odbc">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-pdo-odbc">SWOOLE_HOOK_PDO_ODBC</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based for pdo_odbc extension.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-pdo-oracle">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-pdo-oracle">SWOOLE_HOOK_PDO_ORACLE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based for pdo_oci extension.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-pdo-sqlite">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-pdo-sqlite">SWOOLE_HOOK_PDO_SQLITE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based for pdo_sqlite extension.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-hook-all">
+     <strong><code><a href="swoole.constants.html#constant.swoole-hook-all">SWOOLE_HOOK_ALL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Coroutine-based for all block functions and extensions.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.socket-ecanceled">
+     <strong><code><a href="swoole.constants.html#constant.socket-ecanceled">SOCKET_ECANCELED</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Socket ecanceled error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.tcp-info">
+     <strong><code><a href="swoole.constants.html#constant.tcp-info">TCP_INFO</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TCP_INFO.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-timer-min-ms">
+     <strong><code><a href="swoole.constants.html#constant.swoole-timer-min-ms">SWOOLE_TIMER_MIN_MS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Minimum supported timer interval (in milliseconds).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-timer-min-sec">
+     <strong><code><a href="swoole.constants.html#constant.swoole-timer-min-sec">SWOOLE_TIMER_MIN_SEC</a></code></strong>
+     (<span class="type"><a href="language.types.float.html" class="type double">double</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Minimum supported timer interval (in seconds).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-timer-max-ms">
+     <strong><code><a href="swoole.constants.html#constant.swoole-timer-max-ms">SWOOLE_TIMER_MAX_MS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Maximum supported timer interval (in milliseconds).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-timer-max-sec">
+     <strong><code><a href="swoole.constants.html#constant.swoole-timer-max-sec">SWOOLE_TIMER_MAX_SEC</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Maximum supported timer interval (in seconds).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-status-connection">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-status-connection">SWOOLE_WEBSOCKET_STATUS_CONNECTION</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      WebSocket is establishing a connection.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-status-handshake">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-status-handshake">SWOOLE_WEBSOCKET_STATUS_HANDSHAKE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      The WebSocket is in the handshake phase.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-status-active">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-status-active">SWOOLE_WEBSOCKET_STATUS_ACTIVE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Active WebSocket connection.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-status-closing">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-status-closing">SWOOLE_WEBSOCKET_STATUS_CLOSING</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      WebSocket connection is closed.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-opcode-continuation">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-opcode-continuation">SWOOLE_WEBSOCKET_OPCODE_CONTINUATION</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket continuation frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-opcode-text">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-opcode-text">SWOOLE_WEBSOCKET_OPCODE_TEXT</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket text frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-opcode-binary">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-opcode-binary">SWOOLE_WEBSOCKET_OPCODE_BINARY</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket binary frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-opcode-close">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-opcode-close">SWOOLE_WEBSOCKET_OPCODE_CLOSE</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket close frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-opcode-ping">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-opcode-ping">SWOOLE_WEBSOCKET_OPCODE_PING</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket ping frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-opcode-pong">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-opcode-pong">SWOOLE_WEBSOCKET_OPCODE_PONG</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket pong frame.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-flag-fin">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-flag-fin">SWOOLE_WEBSOCKET_FLAG_FIN</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket FIN flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-flag-rsv1">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-flag-rsv1">SWOOLE_WEBSOCKET_FLAG_RSV1</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket RSV1 flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-flag-rsv2">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-flag-rsv2">SWOOLE_WEBSOCKET_FLAG_RSV2</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket RSV2 flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-flag-rsv3">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-flag-rsv3">SWOOLE_WEBSOCKET_FLAG_RSV3</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket RSV3 flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-flag-mask">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-flag-mask">SWOOLE_WEBSOCKET_FLAG_MASK</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket MASK flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-flag-compress">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-flag-compress">SWOOLE_WEBSOCKET_FLAG_COMPRESS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Websocket COMPRESS flag.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-close-normal">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-close-normal">SWOOLE_WEBSOCKET_CLOSE_NORMAL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Normal closure (connection completed successfully).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-close-going-away">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-close-going-away">SWOOLE_WEBSOCKET_CLOSE_GOING_AWAY</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Endpoint is going away (e.g., browser tab closed).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-close-protocol-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-close-protocol-error">SWOOLE_WEBSOCKET_CLOSE_PROTOCOL_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Protocol error (malformed data frame).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-close-data-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-close-data-error">SWOOLE_WEBSOCKET_CLOSE_DATA_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Received unsupported data (e.g., binary when expecting text).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-close-status-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-close-status-error">SWOOLE_WEBSOCKET_CLOSE_STATUS_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      No status code provided (sent as a placeholder).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-close-abnormal">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-close-abnormal">SWOOLE_WEBSOCKET_CLOSE_ABNORMAL</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Abnormal closure (no close frame received, e.g., TCP reset).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-close-message-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-close-message-error">SWOOLE_WEBSOCKET_CLOSE_MESSAGE_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Invalid data (e.g., non-UTF-8 text in a text frame).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-close-policy-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-close-policy-error">SWOOLE_WEBSOCKET_CLOSE_POLICY_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Policy violation (e.g., unauthorized action).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-close-message-too-big">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-close-message-too-big">SWOOLE_WEBSOCKET_CLOSE_MESSAGE_TOO_BIG</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Message too large (exceeds server’s max size).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-close-extension-missing">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-close-extension-missing">SWOOLE_WEBSOCKET_CLOSE_EXTENSION_MISSING</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Client didn’t negotiate required extensions.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-close-server-error">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-close-server-error">SWOOLE_WEBSOCKET_CLOSE_SERVER_ERROR</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server encountered an error.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-close-close-service-restart">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-close-close-service-restart">SWOOLE_WEBSOCKET_CLOSE_CLOSE_SERVICE_RESTART</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Server is restarting (temporary condition).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-close-try-again-later">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-close-try-again-later">SWOOLE_WEBSOCKET_CLOSE_TRY_AGAIN_LATER</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Temporary server overload (client should retry).
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-close-bad-gateway">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-close-bad-gateway">SWOOLE_WEBSOCKET_CLOSE_BAD_GATEWAY</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      Invalid response from upstream server.
+     </span>
+    </dd>
+   
+   
+    <dt id="constant.swoole-websocket-close-tls">
+     <strong><code><a href="swoole.constants.html#constant.swoole-websocket-close-tls">SWOOLE_WEBSOCKET_CLOSE_TLS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+    </dt>
+    <dd>
+     <span class="simpara">
+      TLS handshake failed (used when HTTPS fails).
+     </span>
+    </dd>
+   
+  </dl>
+ </p>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

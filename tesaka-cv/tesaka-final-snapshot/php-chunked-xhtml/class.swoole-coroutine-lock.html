@@ -1,0 +1,258 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>The Swoole\Coroutine\Lock class</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="swoole-coroutine.suspend.html" class="navbar__link">« Swoole\Coroutine::suspend</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="swoole-coroutine-lock.construct.html" class="navbar__link">Swoole\Coroutine\Lock::__construct »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.swoole.html">Swoole</a></li>
+        <li>The Swoole\Coroutine\Lock class</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="class.swoole-coroutine-lock" class="reference">
+
+ <h1 class="title">The Swoole\Coroutine\Lock class</h1>
+ 
+
+ <div class="partintro"><p class="verinfo">(No version information available, might only be in Git)</p>
+
+
+  <div class="section" id="swoole-coroutine-lock.intro">
+   <h2 class="title">Introduction</h2>
+   <p class="para">
+    Swoole 6.0.1 introduced a coroutine lock that supports inter-process and inter-thread sharing.
+    This lock is designed with non-blocking behavior and enables efficient coroutine synchronization
+    in multi-process and multi-thread environments.
+   </p>
+   <p class="para">
+    When compiled with the <code class="literal">--enable-iouring</code> option and the Linux kernel supports
+    the <code class="literal">io_uring futex</code> feature, Swoole&#039;s coroutine lock implements synchronization
+    using <code class="literal">io_uring futex</code>. In this case, coroutines wait for lock wakeups using
+    an efficient queuing mechanism, significantly improving performance.
+   </p>
+   <p class="para">
+    Without <code class="literal">io_uring futex</code>, the coroutine lock falls back to an exponential backoff
+    sleep mechanism, where the wait time increases by 2^n milliseconds (n being the number of failures)
+    after each failed attempt to acquire the lock. While this approach avoids busy waiting, it introduces
+    additional CPU scheduling overhead and latency.
+   </p>
+   <p class="para">
+    The coroutine lock is reentrant, allowing the currently holding coroutine to safely perform
+    multiple lock operations.
+   </p>
+   <div class="warning"><strong class="warning">Warning</strong>
+    <p class="para">
+     Do not create locks in callback functions like <code class="literal">onReceive</code>, as this will cause
+     continuous memory growth and lead to memory leaks.
+    </p>
+   </div>
+   <div class="warning"><strong class="warning">Warning</strong>
+    <p class="para">
+     Locking and unlocking must be performed in the same coroutine, otherwise it will break
+     static conditions.
+    </p>
+   </div>
+  </div>
+
+
+  <div class="section" id="swoole-coroutine-lock.synopsis">
+   <h2 class="title">Class synopsis</h2>
+
+
+   <div class="classsynopsis">
+    <span class="ooclass"><strong class="classname"></strong></span>
+
+
+    <div class="classsynopsisinfo">
+     <span class="ooclass">
+      <span class="modifier">class</span> <strong class="classname">Swoole\Coroutine\Lock</strong>
+     </span>
+     {</div>
+
+
+    <div class="classsynopsisinfo classsynopsisinfo_comment">/* Methods */</div>
+    <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><a href="swoole-coroutine-lock.construct.html" class="methodname">__construct</a></span>(): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="swoole-coroutine-lock.lock.html" class="methodname">lock</a></span>(): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="swoole-coroutine-lock.trylock.html" class="methodname">trylock</a></span>(): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+<div class="methodsynopsis dc-description"><span class="modifier">public</span> <span class="methodname"><a href="swoole-coroutine-lock.unlock.html" class="methodname">unlock</a></span>(): <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span></div>
+
+   }</div>
+
+
+  </div>
+
+  <div class="section" id="swoole-coroutine-lock.examples">
+   <h2 class="title">Examples</h2>
+   <div class="example" id="swoole-coroutine-lock.example.basic">
+    <p><strong>Example #1 Basic usage</strong></p>
+    <div class="example-contents">
+<div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">use </span><span style="color: #0000BB">Swoole\Coroutine\Lock</span><span style="color: #007700">;<br />use </span><span style="color: #0000BB">Swoole\Coroutine\WaitGroup</span><span style="color: #007700">;<br />use function </span><span style="color: #0000BB">Swoole\Coroutine\go</span><span style="color: #007700">;<br />use function </span><span style="color: #0000BB">Swoole\Coroutine\run</span><span style="color: #007700">;<br /><br /></span><span style="color: #0000BB">$lock </span><span style="color: #007700">= new </span><span style="color: #0000BB">Lock</span><span style="color: #007700">();<br /></span><span style="color: #0000BB">$waitGroup </span><span style="color: #007700">= new </span><span style="color: #0000BB">WaitGroup</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">run</span><span style="color: #007700">(function() use (</span><span style="color: #0000BB">$lock</span><span style="color: #007700">, </span><span style="color: #0000BB">$waitGroup</span><span style="color: #007700">) {<br />    </span><span style="color: #0000BB">go</span><span style="color: #007700">(function() use (</span><span style="color: #0000BB">$lock</span><span style="color: #007700">, </span><span style="color: #0000BB">$waitGroup</span><span style="color: #007700">) {<br />        </span><span style="color: #0000BB">$waitGroup</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">();<br />        </span><span style="color: #0000BB">$lock</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">lock</span><span style="color: #007700">();<br />        </span><span style="color: #0000BB">sleep</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">);<br />        </span><span style="color: #0000BB">$lock</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">unlock</span><span style="color: #007700">();<br />        </span><span style="color: #0000BB">$waitGroup</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">done</span><span style="color: #007700">();<br />    });<br /><br />    </span><span style="color: #0000BB">go</span><span style="color: #007700">(function() use (</span><span style="color: #0000BB">$lock</span><span style="color: #007700">, </span><span style="color: #0000BB">$waitGroup</span><span style="color: #007700">) {<br />        </span><span style="color: #0000BB">$waitGroup</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">add</span><span style="color: #007700">();<br />        </span><span style="color: #0000BB">$lock</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">lock</span><span style="color: #007700">(); </span><span style="color: #FF8000">// Wait for the holding coroutine to unlock<br />        </span><span style="color: #0000BB">sleep</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">);<br />        </span><span style="color: #0000BB">$lock</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">unlock</span><span style="color: #007700">();<br />        </span><span style="color: #0000BB">$waitGroup</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">done</span><span style="color: #007700">();<br />    });<br /><br />    echo </span><span style="color: #DD0000">'Lock does not block the process'</span><span style="color: #007700">;<br />    </span><span style="color: #0000BB">$waitGroup</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">wait</span><span style="color: #007700">();<br />});</span></span></code></div>
+    </div>
+
+   </div>
+  </div>
+
+ </div>
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="swoole-coroutine-lock.construct.html">Swoole\Coroutine\Lock::__construct</a> — Construct a new coroutine lock</li><li><a href="swoole-coroutine-lock.lock.html">Swoole\Coroutine\Lock::lock</a> — Acquire the lock, blocking if necessary</li><li><a href="swoole-coroutine-lock.trylock.html">Swoole\Coroutine\Lock::trylock</a> — Attempt to acquire the lock without blocking</li><li><a href="swoole-coroutine-lock.unlock.html">Swoole\Coroutine\Lock::unlock</a> — Release the lock</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

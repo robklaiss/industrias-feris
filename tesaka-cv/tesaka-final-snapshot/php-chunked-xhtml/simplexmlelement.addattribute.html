@@ -1,0 +1,275 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Adds an attribute to the SimpleXML element</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="class.simplexmlelement.html" class="navbar__link">« SimpleXMLElement</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="simplexmlelement.addchild.html" class="navbar__link">SimpleXMLElement::addChild »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="class.simplexmlelement.html">SimpleXMLElement</a></li>
+        <li>Adds an attribute to the SimpleXML element</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="simplexmlelement.addattribute" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">SimpleXMLElement::addAttribute</h1>
+  <p class="verinfo">(PHP 5 &gt;= 5.1.3, PHP 7, PHP 8)</p><p class="refpurpose"><span class="refname">SimpleXMLElement::addAttribute</span> &mdash; <span class="dc-title">
+   Adds an attribute to the SimpleXML element
+  </span></p>
+
+ </div>
+ <div class="refsect1 description" id="refsect1-simplexmlelement.addattribute-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="methodname"><strong>SimpleXMLElement::addAttribute</strong></span>(<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$qualifiedName</code></span>, <span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$value</code></span>, <span class="methodparam"><span class="type"><span class="type"><a href="language.types.null.html" class="type null">?</a></span><span class="type"><a href="language.types.string.html" class="type string">string</a></span></span> <code class="parameter">$namespace</code><span class="initializer"> = <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong></span></span>): <span class="type"><a href="language.types.void.html" class="type void">void</a></span></div>
+
+  <p class="para rdfs-comment">
+   Adds an attribute to the SimpleXML element.
+  </p>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-simplexmlelement.addattribute-parameters">
+  <h3 class="title">Parameters</h3>
+  <p class="para">
+   <dl>
+    
+     <dt><code class="parameter">qualifiedName</code></dt>
+     <dd>
+      <p class="para">
+       The name of the attribute to add.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">value</code></dt>
+     <dd>
+      <p class="para">
+       The value of the attribute.
+      </p>
+     </dd>
+    
+    
+     <dt><code class="parameter">namespace</code></dt>
+     <dd>
+      <p class="para">
+       If specified, the namespace to which the attribute belongs.
+      </p>
+     </dd>
+    
+   </dl>
+  </p>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-simplexmlelement.addattribute-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   No value is returned.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-simplexmlelement.addattribute-examples">
+  <h3 class="title">Examples</h3>
+  <p class="para">
+   <blockquote class="note"><p><strong class="note">Note</strong>: 
+    <p class="para">
+     Listed examples may include <code class="literal">examples/simplexml-data.php</code>,
+     which refers to the XML string found in the first example
+     of the <a href="simplexml.examples-basic.html" class="link">basic usage</a> guide.
+    </p>
+   </p></blockquote>
+   <div class="example" id="example-1">
+    <p><strong>Example #1 Add attributes and children to a SimpleXML element</strong></p>
+    <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #007700">include </span><span style="color: #DD0000">'examples/simplexml-data.php'</span><span style="color: #007700">;<br /> <br /></span><span style="color: #0000BB">$sxe </span><span style="color: #007700">= new </span><span style="color: #0000BB">SimpleXMLElement</span><span style="color: #007700">(</span><span style="color: #0000BB">$xmlstr</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$sxe</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">addAttribute</span><span style="color: #007700">(</span><span style="color: #DD0000">'type'</span><span style="color: #007700">, </span><span style="color: #DD0000">'documentary'</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$movie </span><span style="color: #007700">= </span><span style="color: #0000BB">$sxe</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">addChild</span><span style="color: #007700">(</span><span style="color: #DD0000">'movie'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$movie</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">addChild</span><span style="color: #007700">(</span><span style="color: #DD0000">'title'</span><span style="color: #007700">, </span><span style="color: #DD0000">'PHP2: More Parser Stories'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$movie</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">addChild</span><span style="color: #007700">(</span><span style="color: #DD0000">'plot'</span><span style="color: #007700">, </span><span style="color: #DD0000">'This is all about the people who make it work.'</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$characters </span><span style="color: #007700">= </span><span style="color: #0000BB">$movie</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">addChild</span><span style="color: #007700">(</span><span style="color: #DD0000">'characters'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$character  </span><span style="color: #007700">= </span><span style="color: #0000BB">$characters</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">addChild</span><span style="color: #007700">(</span><span style="color: #DD0000">'character'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$character</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">addChild</span><span style="color: #007700">(</span><span style="color: #DD0000">'name'</span><span style="color: #007700">, </span><span style="color: #DD0000">'Mr. Parser'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$character</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">addChild</span><span style="color: #007700">(</span><span style="color: #DD0000">'actor'</span><span style="color: #007700">, </span><span style="color: #DD0000">'John Doe'</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$rating </span><span style="color: #007700">= </span><span style="color: #0000BB">$movie</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">addChild</span><span style="color: #007700">(</span><span style="color: #DD0000">'rating'</span><span style="color: #007700">, </span><span style="color: #DD0000">'5'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$rating</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">addAttribute</span><span style="color: #007700">(</span><span style="color: #DD0000">'type'</span><span style="color: #007700">, </span><span style="color: #DD0000">'stars'</span><span style="color: #007700">);<br /> <br />echo </span><span style="color: #0000BB">$sxe</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">asXML</span><span style="color: #007700">();<br /><br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output
+something similar to:</p></div>
+    <div class="example-contents screen">
+<div class="annotation-interactive examplescode"><pre class="examplescode">&lt;?xml version=&quot;1.0&quot; standalone=&quot;yes&quot;?&gt;
+&lt;movies type=&quot;documentary&quot;&gt;
+ &lt;movie&gt;
+  &lt;title&gt;PHP: Behind the Parser&lt;/title&gt;
+  &lt;characters&gt;
+   &lt;character&gt;
+    &lt;name&gt;Ms. Coder&lt;/name&gt;
+    &lt;actor&gt;Onlivia Actora&lt;/actor&gt;
+   &lt;/character&gt;
+   &lt;character&gt;
+    &lt;name&gt;Mr. Coder&lt;/name&gt;
+    &lt;actor&gt;El Act&amp;#xD3;r&lt;/actor&gt;
+   &lt;/character&gt;
+  &lt;/characters&gt;
+  &lt;plot&gt;
+   So, this language. It&#039;s like, a programming language. Or is it a
+   scripting language? All is revealed in this thrilling horror spoof
+   of a documentary.
+  &lt;/plot&gt;
+  &lt;great-lines&gt;
+   &lt;line&gt;PHP solves all my web problems&lt;/line&gt;
+  &lt;/great-lines&gt;
+  &lt;rating type=&quot;thumbs&quot;&gt;7&lt;/rating&gt;
+  &lt;rating type=&quot;stars&quot;&gt;5&lt;/rating&gt;
+ &lt;/movie&gt;
+ &lt;movie&gt;
+  &lt;title&gt;PHP2: More Parser Stories&lt;/title&gt;
+  &lt;plot&gt;This is all about the people who make it work.&lt;/plot&gt;
+  &lt;characters&gt;
+   &lt;character&gt;
+    &lt;name&gt;Mr. Parser&lt;/name&gt;
+    &lt;actor&gt;John Doe&lt;/actor&gt;
+   &lt;/character&gt;
+  &lt;/characters&gt;
+  &lt;rating type=&quot;stars&quot;&gt;5&lt;/rating&gt;
+ &lt;/movie&gt;
+&lt;/movies&gt;</pre>
+</div>
+    </div>
+   </div>
+  </p>
+ </div>
+
+
+ <div class="refsect1 seealso" id="refsect1-simplexmlelement.addattribute-seealso">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li><span class="methodname"><a href="simplexmlelement.addchild.html" class="methodname" rel="rdfs-seeAlso">SimpleXMLElement::addChild()</a> - Adds a child element to the XML node</span></li>
+    <li><a href="simplexml.examples-basic.html" class="xref">Basic SimpleXML usage</a></li>
+   </ul>
+  </p>
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

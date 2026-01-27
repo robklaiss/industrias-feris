@@ -1,0 +1,276 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Runtime Configuration</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="soap.installation.html" class="navbar__link">« Installation</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="soap.constants.html" class="navbar__link">Predefined Constants »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="soap.setup.html">Installing/Configuring</a></li>
+        <li>Runtime Configuration</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="soap.configuration" class="section">
+ <h2 class="title">Runtime Configuration</h2>
+ <p class="simpara">
+The behaviour of these functions is affected by settings in <var class="filename">php.ini</var>.
+</p>
+ <p class="para">
+  <table class="doctable table">
+   <caption><strong>SOAP Configure Options</strong></caption>
+   
+    <thead>
+     <tr>
+      <th>Name</th>
+      <th>Default</th>
+      <th>Changeable</th>
+      <th>Changelog</th>
+     </tr>
+
+    </thead>
+
+    <tbody class="tbody">
+     <tr>
+      <td><a href="soap.configuration.html#ini.soap.wsdl-cache-enabled" class="link">soap.wsdl_cache_enabled</a></td>
+      <td>1</td>
+      <td><strong><code><a href="info.constants.html#constant.ini-all">INI_ALL</a></code></strong></td>
+      <td></td>
+     </tr>
+
+     <tr>
+      <td><a href="soap.configuration.html#ini.soap.wsdl-cache-dir" class="link">soap.wsdl_cache_dir</a></td>
+      <td>/tmp</td>
+      <td><strong><code><a href="info.constants.html#constant.ini-all">INI_ALL</a></code></strong></td>
+      <td></td>
+     </tr>
+
+     <tr>
+      <td><a href="soap.configuration.html#ini.soap.wsdl-cache-ttl" class="link">soap.wsdl_cache_ttl</a></td>
+      <td>86400</td>
+      <td><strong><code><a href="info.constants.html#constant.ini-all">INI_ALL</a></code></strong></td>
+      <td></td>
+     </tr>
+
+     <tr>
+      <td><a href="soap.configuration.html#ini.soap.wsdl-cache" class="link">soap.wsdl_cache</a></td>
+      <td>1</td>
+      <td><strong><code><a href="info.constants.html#constant.ini-all">INI_ALL</a></code></strong></td>
+      <td></td>
+     </tr>
+
+     <tr>
+      <td><a href="soap.configuration.html#ini.soap.wsdl-cache-limit" class="link">soap.wsdl_cache_limit</a></td>
+      <td>5</td>
+      <td><strong><code><a href="info.constants.html#constant.ini-all">INI_ALL</a></code></strong></td>
+      <td></td>
+     </tr>
+
+</tbody>
+   
+  </table>
+
+ </p>
+
+ <p class="para">Here&#039;s a short explanation of
+the configuration directives.</p>
+
+ <p class="para">
+  <dl>
+   
+     <dt id="ini.soap.wsdl-cache-enabled">
+      <code class="parameter">soap.wsdl_cache_enabled</code>
+      <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       Enables or disables the WSDL caching feature.
+      </p>
+     </dd>
+    
+    
+     <dt id="ini.soap.wsdl-cache-dir">
+      <code class="parameter">soap.wsdl_cache_dir</code>
+      <span class="type"><a href="language.types.string.html" class="type string">string</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       Sets the directory name where the SOAP extension will put cache files.
+      </p>
+     </dd>
+    
+    
+     <dt id="ini.soap.wsdl-cache-ttl">
+      <code class="parameter">soap.wsdl_cache_ttl</code>
+      <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       Sets the number of seconds (time to live) that cached files will be used
+       instead of the originals.
+      </p>
+     </dd>
+    
+    
+     <dt id="ini.soap.wsdl-cache">
+      <code class="parameter">soap.wsdl_cache</code>
+      <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       If <code class="parameter">soap.wsdl_cache_enabled</code> is on, this setting
+       determines the type of caching. It can be any of:
+       <strong><code><a href="soap.constants.html#constant.wsdl-cache-none">WSDL_CACHE_NONE</a></code></strong> (<code class="literal">0</code>),
+       <strong><code><a href="soap.constants.html#constant.wsdl-cache-disk">WSDL_CACHE_DISK</a></code></strong> (<code class="literal">1</code>),
+       <strong><code><a href="soap.constants.html#constant.wsdl-cache-memory">WSDL_CACHE_MEMORY</a></code></strong> (<code class="literal">2</code>) or
+       <strong><code><a href="soap.constants.html#constant.wsdl-cache-both">WSDL_CACHE_BOTH</a></code></strong> (<code class="literal">3</code>). This can
+       also be set via the <code class="parameter">options</code> array in the
+       <span class="classname"><a href="class.soapclient.html" class="classname">SoapClient</a></span> or <span class="classname"><a href="class.soapserver.html" class="classname">SoapServer</a></span>
+       constructor.
+      </p>
+     </dd>
+    
+    
+     <dt id="ini.soap.wsdl-cache-limit">
+      <code class="parameter">soap.wsdl_cache_limit</code>
+      <span class="type"><a href="language.types.integer.html" class="type int">int</a></span>
+     </dt>
+     <dd>
+      <p class="para">
+       Maximum number of in-memory cached WSDL files. Adding further files into
+       a full memory cache will delete the oldest files from it.
+      </p>
+     </dd>
+    
+
+  </dl>
+ </p>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

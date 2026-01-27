@@ -1,0 +1,216 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>SQLite PDO Driver (PDO_SQLITE)</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="pdo-pgsql.setnoticecallback.html" class="navbar__link">« Pdo\Pgsql::setNoticeCallback</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="ref.pdo-sqlite.connection.html" class="navbar__link">PDO_SQLITE DSN »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="pdo.drivers.html">PDO Drivers</a></li>
+        <li>SQLite PDO Driver (PDO_SQLITE)</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="ref.pdo-sqlite" class="reference">
+  
+  <h1 class="title">SQLite PDO Driver (PDO_SQLITE)</h1>
+  
+  <div class="partintro">
+
+   <div class="section" id="ref.pdo-sqlite.intro">
+   <h2 class="title">Introduction</h2>
+    <p class="para">
+     PDO_SQLITE is a driver that implements the <a href="intro.pdo.html" class="link">PHP
+     Data Objects (PDO) interface</a> to enable access to SQLite 3 databases.
+    </p>
+    <blockquote class="note"><p><strong class="note">Note</strong>: 
+     <p class="para">
+      PDO_SQLITE allows using strings apart from streams together with
+      <strong><code><a href="pdo.constants.html#pdo.constants.param-lob">PDO::PARAM_LOB</a></code></strong>.
+     </p>
+    </p></blockquote>
+   </div>
+
+   
+
+<div class="section" id="ref.pdo-sqlite.installation">
+ <h2 class="title">Installation</h2>
+ <p class="para">
+  The PDO_SQLITE PDO driver is enabled by default. To disable,
+  <strong class="option configure">--without-pdo-sqlite[=DIR]</strong> may be used, 
+  where the optional <code class="literal">[=DIR]</code> is the sqlite base install directory.
+  As of PHP 7.4.0 <a href="http://sqlite.org/" class="link external">&raquo;&nbsp;libsqlite</a> ≥ 3.5.0 is required.
+  Formerly, the bundled libsqlite could have been used instead, and was the
+  default, if <code class="literal">[=DIR]</code> has been omitted.
+ </p>
+ <blockquote class="note"><p><strong class="note">Note</strong>: 
+  <strong>Additional setup on Windows as of PHP 7.4.0</strong><br />
+  <p class="para">
+   In order for this extension to work, there are
+<abbr title="Dynamic Link Library">DLL</abbr> files that must be available to the Windows
+system <var class="envar">PATH</var>. For information on how to do this, see the
+<abbr title="Frequently Asked Questions">FAQ</abbr> entitled &quot;<a href="faq.installation.html#faq.installation.addtopath" class="link">How do I add my PHP directory to the PATH
+on Windows</a>&quot;. Although copying DLL
+files from the PHP folder into the Windows system directory also works
+(because the system directory is by default in the system&#039;s
+<var class="envar">PATH</var>), this is not recommended.
+<em>This extension requires the following files to be in the
+<var class="envar">PATH</var>:</em>  <var class="filename">libsqlite3.dll</var>.
+  </p>
+ </p></blockquote>
+</div>
+
+
+
+
+  </div>
+
+  
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ <h2>Table of Contents</h2><ul class="chunklist chunklist_reference"><li><a href="ref.pdo-sqlite.connection.html">PDO_SQLITE DSN</a> — Connecting to SQLite databases</li><li><a href="pdo.sqlitecreateaggregate.html">PDO::sqliteCreateAggregate</a> — Alias of Pdo\Sqlite::createAggregate</li><li><a href="pdo.sqlitecreatecollation.html">PDO::sqliteCreateCollation</a> — Alias of Pdo\Sqlite::createCollation</li><li><a href="pdo.sqlitecreatefunction.html">PDO::sqliteCreateFunction</a> — Alias of Pdo\Sqlite::createFunction</li></ul>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

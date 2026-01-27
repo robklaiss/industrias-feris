@@ -1,0 +1,299 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Predefined Constants</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="fileinfo.resources.html" class="navbar__link">« Resource Types</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="ref.fileinfo.html" class="navbar__link">Fileinfo Functions »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="book.fileinfo.html">Fileinfo</a></li>
+        <li>Predefined Constants</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="fileinfo.constants" class="appendix">
+ <h1 class="title">Predefined Constants</h1>
+
+ <p class="simpara">
+The constants below are defined by this extension, and
+will only be available when the extension has either
+been compiled into PHP or dynamically loaded at runtime.
+</p>
+ <dl>
+  
+   <dt id="constant.fileinfo-none">
+    <strong><code><a href="fileinfo.constants.html#constant.fileinfo-none">FILEINFO_NONE</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     No special handling.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.fileinfo-symlink">
+    <strong><code><a href="fileinfo.constants.html#constant.fileinfo-symlink">FILEINFO_SYMLINK</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Follow symlinks.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.fileinfo-mime-type">
+    <strong><code><a href="fileinfo.constants.html#constant.fileinfo-mime-type">FILEINFO_MIME_TYPE</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Return the mime type.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.fileinfo-mime-encoding">
+    <strong><code><a href="fileinfo.constants.html#constant.fileinfo-mime-encoding">FILEINFO_MIME_ENCODING</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Return the mime encoding of the file.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.fileinfo-mime">
+    <strong><code><a href="fileinfo.constants.html#constant.fileinfo-mime">FILEINFO_MIME</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Return the mime type and mime encoding as defined by RFC 2045.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.fileinfo-compress">
+    <strong><code><a href="fileinfo.constants.html#constant.fileinfo-compress">FILEINFO_COMPRESS</a></code></strong>
+     (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Decompress compressed files.
+    </span>
+    <span class="simpara">
+     Disabled due to thread safety issues.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.fileinfo-devices">
+    <strong><code><a href="fileinfo.constants.html#constant.fileinfo-devices">FILEINFO_DEVICES</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Look at the contents of blocks or character special devices.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.fileinfo-continue">
+    <strong><code><a href="fileinfo.constants.html#constant.fileinfo-continue">FILEINFO_CONTINUE</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Return all matches, not just the first.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.fileinfo-preserve-atime">
+    <strong><code><a href="fileinfo.constants.html#constant.fileinfo-preserve-atime">FILEINFO_PRESERVE_ATIME</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     If possible preserve the original access time.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.fileinfo-raw">
+    <strong><code><a href="fileinfo.constants.html#constant.fileinfo-raw">FILEINFO_RAW</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Don&#039;t translate unprintable characters to a <code class="literal">\ooo</code> octal
+     representation.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.fileinfo-extension">
+    <strong><code><a href="fileinfo.constants.html#constant.fileinfo-extension">FILEINFO_EXTENSION</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Returns the file extension appropriate for the MIME type detected in
+     the file.
+    </span>
+    <span class="simpara">
+     For types that commonly have multiple file extensions, such as <code class="literal">JPEG</code>
+     images, then the return value is multiple extensions separated by a forward slash e.g.:
+     <code class="literal">&quot;jpeg/jpg/jpe/jfif&quot;</code>. For unknown types not available in the
+     <var class="filename">magic.mime</var> database, then return value is <code class="literal">&quot;???&quot;</code>.
+    </span>
+    <span class="simpara">
+     Available since PHP 7.2.0.
+    </span>
+   </dd>
+  
+  
+   <dt id="constant.fileinfo-apple">
+    <strong><code><a href="fileinfo.constants.html#constant.fileinfo-apple">FILEINFO_APPLE</a></code></strong>
+    (<span class="type"><a href="language.types.integer.html" class="type int">int</a></span>)
+   </dt>
+   <dd>
+    <span class="simpara">
+     Return the Apple creator and type.
+    </span>
+   </dd>
+  
+ </dl>
+</div>
+</div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

@@ -1,0 +1,220 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Downloading PECL extensions</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="install.pecl.intro.html" class="navbar__link">« Introduction to PECL Installations</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="install.pecl.windows.html" class="navbar__link">Installing a PHP extension on Windows »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="install.pecl.html">Installation of PECL extensions</a></li>
+        <li>Downloading PECL extensions</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="install.pecl.downloads" class="sect1">
+  <h2 class="title">Downloading PECL extensions</h2>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+ <span class="simpara">
+  PHP Installer for Extensions (<abbr>PIE</abbr>) is a new tool that will deprecate PECL.
+  We recommend using PIE to install extensions.
+  Find out more at <a href="https://github.com/php/pie" class="link external">&raquo;&nbsp;https://github.com/php/pie</a>
+ </span>
+</p></blockquote>
+  <p class="simpara">
+   There are several options for downloading PECL extensions, such as:
+  </p>
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     The <strong class="command">pecl install extname</strong> command downloads the
+     extensions code automatically, so in this case, there is no need for a
+     separate download.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <a href="https://pecl.php.net/" class="link external">&raquo;&nbsp;https://pecl.php.net/</a>
+    </span>
+    <span class="simpara">
+     The PECL website contains information about the different extensions that
+     are offered by the PHP Development Team.
+     The information available here includes: changelog, release notes,
+     requirements, and other similar details.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <strong class="command">pecl download extname</strong>
+    </span>
+    <span class="simpara">
+     PECL extensions that have releases listed on the PECL website are available
+     for download and installation using the
+     <a href="https://pear.php.net/manual/en/guide.users.commandline.cli.php" class="link external">&raquo;&nbsp;pecl command</a>.
+     Specific revisions may also be specified.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <abbr>git</abbr>
+    </span>
+    <span class="simpara">
+     Many PECL extensions reside on GitHub.
+     
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <abbr>SVN</abbr>
+    </span>
+    <span class="simpara">
+     Some PECL extensions also reside in <abbr>SVN</abbr>.
+     A web-based view may be seen at
+     <a href="https://svn.php.net/pecl/" class="link external">&raquo;&nbsp;https://svn.php.net/pecl/</a>.
+     To download straight from <abbr>SVN</abbr>,
+     the following sequence of commands may be used:
+    </span>
+    <div class="example-contents screen">
+<div class="cdata"><pre>
+$ svn checkout https://svn.php.net/repository/pecl/extname/trunk extname
+</pre></div>
+    </div>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     Windows downloads
+    </span>
+    <span class="simpara">
+     The PHP project compiles and offers Windows DLLs for most PECL extensions
+     on the package page.
+    </span>
+   </li>
+  </ul>
+ </div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

@@ -1,0 +1,329 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Incrementing/Decrementing Operators</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="language.operators.arithmetic.html" class="navbar__link">« Arithmetic</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="language.operators.assignment.html" class="navbar__link">Assignment »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="language.operators.html">Operators</a></li>
+        <li>Incrementing/Decrementing Operators</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="language.operators.increment" class="sect1">
+ <h2 class="title">Incrementing/Decrementing Operators</h2>
+ 
+ <p class="para">
+  PHP supports pre- and post-increment and decrement operators.
+  Those unary operators allow to increment or decrement the value by one.
+ </p>
+ <table class="doctable table">
+  <caption><strong>Increment/decrement Operators</strong></caption>
+  
+   <thead>
+    <tr>
+     <th>Example</th>
+     <th>Name</th>
+     <th>Effect</th>
+    </tr>
+
+   </thead>
+
+   <tbody class="tbody">
+    <tr>
+     <td>++$a</td>
+     <td>Pre-increment</td>
+     <td>Increments <var class="varname">$a</var> by one, then returns <var class="varname">$a</var>.</td>
+    </tr>
+
+    <tr>
+     <td>$a++</td>
+     <td>Post-increment</td>
+     <td>Returns <var class="varname">$a</var>, then increments <var class="varname">$a</var> by one.</td>
+    </tr>
+
+    <tr>
+     <td>--$a</td>
+     <td>Pre-decrement</td>
+     <td>Decrements <var class="varname">$a</var> by one, then returns <var class="varname">$a</var>.</td>
+    </tr>
+
+    <tr>
+     <td>$a--</td>
+     <td>Post-decrement</td>
+     <td>Returns <var class="varname">$a</var>, then decrements <var class="varname">$a</var> by one.</td>
+    </tr>
+
+   </tbody>
+  
+ </table>
+
+
+ <p class="para">
+  <div class="example" id="example-1">
+   <p><strong>Example #1 Examples of Increment/Decrement</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">echo </span><span style="color: #DD0000">'Post-increment:'</span><span style="color: #007700">, </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$a </span><span style="color: #007700">= </span><span style="color: #0000BB">5</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a</span><span style="color: #007700">++);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a</span><span style="color: #007700">);<br /><br />echo </span><span style="color: #DD0000">'Pre-increment:'</span><span style="color: #007700">, </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$a </span><span style="color: #007700">= </span><span style="color: #0000BB">5</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(++</span><span style="color: #0000BB">$a</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a</span><span style="color: #007700">);<br /><br />echo </span><span style="color: #DD0000">'Post-decrement:'</span><span style="color: #007700">, </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$a </span><span style="color: #007700">= </span><span style="color: #0000BB">5</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a</span><span style="color: #007700">--);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a</span><span style="color: #007700">);<br /><br />echo </span><span style="color: #DD0000">'Pre-decrement:'</span><span style="color: #007700">, </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$a </span><span style="color: #007700">= </span><span style="color: #0000BB">5</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(--</span><span style="color: #0000BB">$a</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+Post-increment:
+int(5)
+int(6)
+Pre-increment:
+int(6)
+int(6)
+Post-decrement:
+int(5)
+int(4)
+Pre-decrement:
+int(4)
+int(4)
+</pre></div>
+   </div>
+  </div>
+
+  <div class="warning"><strong class="warning">Warning</strong>
+   <p class="para">
+    The increment and decrement operators have no effect on values
+    of type <span class="type"><a href="language.types.boolean.html" class="type bool">bool</a></span>.
+    A <strong><code><a href="errorfunc.constants.html#constant.e-warning">E_WARNING</a></code></strong> is emitted as of PHP 8.3.0,
+    because this will implicitly cast the value to <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> in the future.
+   </p>
+   <p class="para">
+    The decrement operator has no effect on values
+    of type <span class="type"><a href="language.types.null.html" class="type null">null</a></span>.
+    A <strong><code><a href="errorfunc.constants.html#constant.e-warning">E_WARNING</a></code></strong> is emitted as of PHP 8.3.0,
+    because this will implicitly cast the value to <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> in the future.
+   </p>
+   <p class="para">
+    The decrement operator has no effect on non-
+    <a href="language.types.numeric-strings.html" class="link">numeric string</a>.
+    A <strong><code><a href="errorfunc.constants.html#constant.e-warning">E_WARNING</a></code></strong> is emitted as of PHP 8.3.0,
+    because a <span class="classname"><a href="class.typeerror.html" class="classname">TypeError</a></span> will be thrown in the future.
+   </p>
+  </div>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <p class="para">
+    Internal objects that support overloading addition and/or subtraction
+    can also be incremented and/or decremented.
+    One such internal object is <span class="classname"><a href="class.gmp.html" class="classname">GMP</a></span>.
+   </p>
+  </p></blockquote>
+ </p>
+
+ <div class="sect2" id="language.operators.increment.string">
+  <h3 class="title">PERL string increment feature</h3>
+  <div class="warning"><strong class="warning">Warning</strong>
+   <p class="simpara">
+    This feature is soft-deprecated as of PHP 8.3.0.
+    The <span class="function"><a href="function.str-increment.html" class="function">str_increment()</a></span> function should be used instead.
+   </p>
+  </div>
+
+  <p class="para">
+   It is possible to increment a non-
+   <a href="language.types.numeric-strings.html" class="link">numeric string</a>
+   in PHP. The string must be an alphanumerical ASCII string.
+   Which increments letters up to the next letter, when reaching the letter
+   <code class="literal">Z</code> the increment is carried to the value on the left.
+   For example, <code class="code">$a = &#039;Z&#039;; $a++;</code> turns <var class="varname">$a</var>
+   into <code class="literal">&#039;AA&#039;</code>.
+  </p>
+
+  <div class="example" id="example-2">
+   <p><strong>Example #2 PERL string increment example</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">echo </span><span style="color: #DD0000">'== Alphabetic strings ==' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$s </span><span style="color: #007700">= </span><span style="color: #DD0000">'W'</span><span style="color: #007700">;<br />for (</span><span style="color: #0000BB">$n</span><span style="color: #007700">=</span><span style="color: #0000BB">0</span><span style="color: #007700">; </span><span style="color: #0000BB">$n</span><span style="color: #007700">&lt;</span><span style="color: #0000BB">6</span><span style="color: #007700">; </span><span style="color: #0000BB">$n</span><span style="color: #007700">++) {<br />    echo ++</span><span style="color: #0000BB">$s </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />}<br /></span><span style="color: #FF8000">// Alphanumeric strings behave differently<br /></span><span style="color: #007700">echo </span><span style="color: #DD0000">'== Alphanumeric strings ==' </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$d </span><span style="color: #007700">= </span><span style="color: #DD0000">'A8'</span><span style="color: #007700">;<br />for (</span><span style="color: #0000BB">$n</span><span style="color: #007700">=</span><span style="color: #0000BB">0</span><span style="color: #007700">; </span><span style="color: #0000BB">$n</span><span style="color: #007700">&lt;</span><span style="color: #0000BB">6</span><span style="color: #007700">; </span><span style="color: #0000BB">$n</span><span style="color: #007700">++) {<br />    echo ++</span><span style="color: #0000BB">$d </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">$d </span><span style="color: #007700">= </span><span style="color: #DD0000">'A08'</span><span style="color: #007700">;<br />for (</span><span style="color: #0000BB">$n</span><span style="color: #007700">=</span><span style="color: #0000BB">0</span><span style="color: #007700">; </span><span style="color: #0000BB">$n</span><span style="color: #007700">&lt;</span><span style="color: #0000BB">6</span><span style="color: #007700">; </span><span style="color: #0000BB">$n</span><span style="color: #007700">++) {<br />    echo ++</span><span style="color: #0000BB">$d </span><span style="color: #007700">. </span><span style="color: #0000BB">PHP_EOL</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+== Alphabetic strings ==
+X
+Y
+Z
+AA
+AB
+AC
+== Alphanumeric strings ==
+A9
+B0
+B1
+B2
+B3
+B4
+A09
+A10
+A11
+A12
+A13
+A14
+</pre></div>
+   </div>
+  </div>
+
+  <div class="warning"><strong class="warning">Warning</strong>
+   <p class="para">
+    If the alphanumerical string can be interpreted as a
+    <a href="language.types.numeric-strings.html" class="link">numeric string</a>
+    it will be cast to an <span class="type"><a href="language.types.integer.html" class="type int">int</a></span> or <span class="type"><a href="language.types.float.html" class="type float">float</a></span>.
+    This is particularly an issue with strings that look like a floating point
+    numbers written in exponential notation.
+    The <span class="function"><a href="function.str-increment.html" class="function">str_increment()</a></span> function does not suffer from
+    these implicit type cast.
+   </p>
+   <div class="example" id="example-3">
+    <p><strong>Example #3 Alphanumerical string converted to float</strong></p>
+    <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$s </span><span style="color: #007700">= </span><span style="color: #DD0000">"5d9"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(++</span><span style="color: #0000BB">$s</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(++</span><span style="color: #0000BB">$s</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+    </div>
+
+    <div class="example-contents"><p>The above example will output:</p></div>
+    <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+string(3) &quot;5e0&quot;
+float(6)
+</pre></div>
+    </div>
+    <div class="example-contents"><p>
+     This is because the value <code class="literal">&quot;5e0&quot;</code> is interpreted
+     as a <span class="type"><a href="language.types.float.html" class="type float">float</a></span> and cast to the value <code class="literal">5.0</code>
+     before being incremented.
+    </p></div>
+   </div>
+  </div>
+ </div>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

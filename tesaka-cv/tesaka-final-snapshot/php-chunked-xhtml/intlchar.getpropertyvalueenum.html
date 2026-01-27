@@ -1,0 +1,233 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Get the property value for a given value name</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="intlchar.getpropertyname.html" class="navbar__link">« IntlChar::getPropertyName</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="intlchar.getpropertyvaluename.html" class="navbar__link">IntlChar::getPropertyValueName »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="class.intlchar.html">IntlChar</a></li>
+        <li>Get the property value for a given value name</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="intlchar.getpropertyvalueenum" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">IntlChar::getPropertyValueEnum</h1>
+  <p class="verinfo">(PHP 7, PHP 8)</p><p class="refpurpose"><span class="refname">IntlChar::getPropertyValueEnum</span> &mdash; <span class="dc-title">Get the property value for a given value name</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-intlchar.getpropertyvalueenum-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="modifier">public</span> <span class="modifier">static</span> <span class="methodname"><strong>IntlChar::getPropertyValueEnum</strong></span>(<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$property</code></span>, <span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$name</code></span>): <span class="type"><a href="language.types.integer.html" class="type int">int</a></span></div>
+
+  <p class="para rdfs-comment">
+   Returns the property value integer for a given value name, as specified in the Unicode database file PropertyValueAliases.txt.
+   Short, long, and any other variants are recognized.
+  </p>
+  <blockquote class="note"><p><strong class="note">Note</strong>: 
+   <p class="para">
+    Some of the names in PropertyValueAliases.txt will only be recognized with
+    <strong><code><a href="class.intlchar.html#intlchar.constants.property-general-category-mask">IntlChar::PROPERTY_GENERAL_CATEGORY_MASK</a></code></strong>, not
+    <strong><code><a href="class.intlchar.html#intlchar.constants.property-general-category">IntlChar::PROPERTY_GENERAL_CATEGORY</a></code></strong>.
+    These include:
+    <ul class="simplelist">
+     <li>"C" / "Other"</li>
+     <li>"L" / "Letter"</li>
+     <li>"LC" / "Cased_Letter"</li>
+     <li>"M" / "Mark"</li>
+     <li>"N" / "Number"</li>
+     <li>"P" / "Punctuation"</li>
+     <li>"S" / "Symbol"</li>
+     <li> "Z" / "Separator"</li>
+    </ul>
+   </p>
+  </p></blockquote>
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-intlchar.getpropertyvalueenum-parameters">
+  <h3 class="title">Parameters</h3>
+  <dl>
+   
+    <dt><code class="parameter">property</code></dt>
+    <dd>
+     <p class="para">The Unicode property to lookup (see the <code class="literal">IntlChar::PROPERTY_*</code> constants).</p>
+     <p class="para">
+      If out of range, or this method doesn&#039;t work with the given value,
+      <strong><code><a href="class.intlchar.html#intlchar.constants.property-invalid-code">IntlChar::PROPERTY_INVALID_CODE</a></code></strong> is returned.
+     </p>
+    </dd>
+   
+   
+    <dt><code class="parameter">name</code></dt>
+    <dd>
+     <p class="para">
+      The value name to be matched.  The name is compared using &quot;loose matching&quot; as described in PropertyValueAliases.txt.
+     </p>
+    </dd>
+   
+  </dl>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-intlchar.getpropertyvalueenum-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   Returns the corresponding value integer, or <strong><code><a href="class.intlchar.html#intlchar.constants.property-invalid-code">IntlChar::PROPERTY_INVALID_CODE</a></code></strong> if the given name
+   does not match any value of the given property, or if the property is invalid.
+  </p>
+ </div>
+
+
+ <div class="refsect1 examples" id="refsect1-intlchar.getpropertyvalueenum-examples">
+  <h3 class="title">Examples</h3>
+  <div class="example" id="example-1">
+   <p><strong>Example #1 Testing different properties</strong></p>
+   <div class="example-contents">
+    <div class="phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">IntlChar</span><span style="color: #007700">::</span><span style="color: #0000BB">getPropertyValueEnum</span><span style="color: #007700">(</span><span style="color: #0000BB">IntlChar</span><span style="color: #007700">::</span><span style="color: #0000BB">PROPERTY_BLOCK</span><span style="color: #007700">, </span><span style="color: #DD0000">'greek'</span><span style="color: #007700">) === </span><span style="color: #0000BB">IntlChar</span><span style="color: #007700">::</span><span style="color: #0000BB">BLOCK_CODE_GREEK</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">IntlChar</span><span style="color: #007700">::</span><span style="color: #0000BB">getPropertyValueEnum</span><span style="color: #007700">(</span><span style="color: #0000BB">IntlChar</span><span style="color: #007700">::</span><span style="color: #0000BB">PROPERTY_BIDI_CLASS</span><span style="color: #007700">, </span><span style="color: #DD0000">'RIGHT_TO_LEFT'</span><span style="color: #007700">) === </span><span style="color: #0000BB">IntlChar</span><span style="color: #007700">::</span><span style="color: #0000BB">CHAR_DIRECTION_RIGHT_TO_LEFT</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">IntlChar</span><span style="color: #007700">::</span><span style="color: #0000BB">getPropertyValueEnum</span><span style="color: #007700">(</span><span style="color: #0000BB">IntlChar</span><span style="color: #007700">::</span><span style="color: #0000BB">PROPERTY_BIDI_CLASS</span><span style="color: #007700">, </span><span style="color: #DD0000">'some made-up string'</span><span style="color: #007700">) === </span><span style="color: #0000BB">IntlChar</span><span style="color: #007700">::</span><span style="color: #0000BB">PROPERTY_INVALID_CODE</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">IntlChar</span><span style="color: #007700">::</span><span style="color: #0000BB">getPropertyValueEnum</span><span style="color: #007700">(</span><span style="color: #0000BB">123456789</span><span style="color: #007700">, </span><span style="color: #DD0000">'RIGHT_TO_LEFT'</span><span style="color: #007700">) === </span><span style="color: #0000BB">IntlChar</span><span style="color: #007700">::</span><span style="color: #0000BB">PROPERTY_INVALID_CODE</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+    <div class="examplescode"><pre class="examplescode">bool(true)
+bool(true)
+bool(true)
+bool(true)</pre>
+</div>
+   </div>
+  </div>
+ </div>
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

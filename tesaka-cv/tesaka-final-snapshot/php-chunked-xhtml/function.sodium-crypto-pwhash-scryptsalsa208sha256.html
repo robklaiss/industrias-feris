@@ -1,0 +1,221 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Derives a key from a password, using scrypt</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="function.sodium-crypto-pwhash.html" class="navbar__link">« sodium_crypto_pwhash</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="function.sodium-crypto-pwhash-scryptsalsa208sha256-str.html" class="navbar__link">sodium_crypto_pwhash_scryptsalsa208sha256_str »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="ref.sodium.html">Sodium Functions</a></li>
+        <li>Derives a key from a password, using scrypt</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="function.sodium-crypto-pwhash-scryptsalsa208sha256" class="refentry">
+ <div class="refnamediv">
+  <h1 class="refname">sodium_crypto_pwhash_scryptsalsa208sha256</h1>
+  <p class="verinfo">(PHP 7 &gt;= 7.2.0, PHP 8)</p><p class="refpurpose"><span class="refname">sodium_crypto_pwhash_scryptsalsa208sha256</span> &mdash; <span class="dc-title">Derives a key from a password, using scrypt</span></p>
+
+ </div>
+
+ <div class="refsect1 description" id="refsect1-function.sodium-crypto-pwhash-scryptsalsa208sha256-description">
+  <h3 class="title">Description</h3>
+  <div class="methodsynopsis dc-description">
+   <span class="methodname"><strong>sodium_crypto_pwhash_scryptsalsa208sha256</strong></span>(<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$length</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="attribute"><a href="class.sensitiveparameter.html">#[\SensitiveParameter]</a> </span><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$password</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.string.html" class="type string">string</a></span> <code class="parameter">$salt</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$opslimit</code></span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="methodparam"><span class="type"><a href="language.types.integer.html" class="type int">int</a></span> <code class="parameter">$memlimit</code></span><br>): <span class="type"><a href="language.types.string.html" class="type string">string</a></span></div>
+
+  <p class="para rdfs-comment">
+   This is the scrypt counterpart to <span class="function"><a href="function.sodium-crypto-pwhash.html" class="function">sodium_crypto_pwhash()</a></span>.
+  </p>
+  <p class="para">
+   A common reason to use this particular function is to derive the seeds for cryptographic keys from a password and salt,
+   and then use these seeds to generate the actual keys needed for some purpose (e.g. <span class="function"><a href="function.sodium-crypto-sign-detached.html" class="function">sodium_crypto_sign_detached()</a></span>).
+  </p>
+
+ </div>
+
+
+ <div class="refsect1 parameters" id="refsect1-function.sodium-crypto-pwhash-scryptsalsa208sha256-parameters">
+  <h3 class="title">Parameters</h3>
+  <dl>
+   
+    <dt><code class="parameter">length</code></dt>
+    <dd>
+     <p class="para">
+      The length of the password hash to generate, in bytes.
+     </p>
+    </dd>
+   
+   
+    <dt><code class="parameter">password</code></dt>
+    <dd>
+     <p class="para">
+      The password to generate a hash for.
+     </p>
+    </dd>
+   
+   
+    <dt><code class="parameter">salt</code></dt>
+    <dd>
+     <p class="para">
+      A salt to add to the password before hashing. The salt should be unpredictable, ideally generated from a good random number source such as <span class="function"><a href="function.random-bytes.html" class="function">random_bytes()</a></span>, and have a length of at least <strong><code><a href="sodium.constants.html#constant.sodium-crypto-pwhash-scryptsalsa208sha256-saltbytes">SODIUM_CRYPTO_PWHASH_SCRYPTSALSA208SHA256_SALTBYTES</a></code></strong> bytes.
+     </p>
+    </dd>
+   
+   
+    <dt><code class="parameter">opslimit</code></dt>
+    <dd>
+     <p class="para">
+      Represents a maximum amount of computations to perform. Raising this number will make the function require more CPU cycles to compute a key. There are some constants available to set the operations limit to appropriate values depending on intended use, in order of strength: <strong><code><a href="sodium.constants.html#constant.sodium-crypto-pwhash-scryptsalsa208sha256-opslimit-interactive">SODIUM_CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_INTERACTIVE</a></code></strong> and <strong><code><a href="sodium.constants.html#constant.sodium-crypto-pwhash-scryptsalsa208sha256-opslimit-sensitive">SODIUM_CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_SENSITIVE</a></code></strong>.
+     </p>
+    </dd>
+   
+   
+    <dt><code class="parameter">memlimit</code></dt>
+    <dd>
+     <p class="para">
+      The maximum amount of RAM that the function will use, in bytes. There are constants to help you choose an appropriate value, in order of size: <strong><code><a href="sodium.constants.html#constant.sodium-crypto-pwhash-scryptsalsa208sha256-memlimit-interactive">SODIUM_CRYPTO_PWHASH_SCRYPTSALSA208SHA256_MEMLIMIT_INTERACTIVE</a></code></strong> and <strong><code><a href="sodium.constants.html#constant.sodium-crypto-pwhash-scryptsalsa208sha256-memlimit-sensitive">SODIUM_CRYPTO_PWHASH_SCRYPTSALSA208SHA256_MEMLIMIT_SENSITIVE</a></code></strong>. Typically these should be paired with the matching <code class="parameter">opslimit</code> values.
+     </p>
+    </dd>
+   
+  </dl>
+ </div>
+
+
+ <div class="refsect1 returnvalues" id="refsect1-function.sodium-crypto-pwhash-scryptsalsa208sha256-returnvalues">
+  <h3 class="title">Return Values</h3>
+  <p class="para">
+   A string of bytes of the desired length.
+  </p>
+ </div>
+
+
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

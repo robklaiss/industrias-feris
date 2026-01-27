@@ -1,0 +1,643 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Deprecated Features</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="migration85.incompatible.html" class="navbar__link">« Backward Incompatible Changes</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="migration85.other-changes.html" class="navbar__link">Other Changes »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="migration85.html">Migrating from PHP 8.4.x to PHP 8.5.x</a></li>
+        <li>Deprecated Features</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="migration85.deprecated" class="sect1">
+ <h2 class="title">Deprecated Features</h2>
+
+ <div class="sect2" id="migration85.deprecated.core">
+  <h3 class="title">PHP Core</h3>
+
+  <div class="sect3" id="migration85.deprecated.core.changes-to-user-output-handler">
+   <h4 class="title">Changes to user output handler</h4>
+   
+
+   <p class="simpara">
+    Trying to produce output (e.g. with <span class="function"><a href="function.echo.html" class="function">echo</a></span>) within
+    a user output handler is deprecated.
+    The deprecation warning will bypass the handler producing the output to
+    ensure it is visible; if there are nested output handlers the next
+    one will still be used.
+   </p>
+
+  </div>
+
+  <div class="sect3" id="migration85.deprecated.core.non-canonical-cast-names">
+   <h4 class="title">Non-canonical cast names</h4>
+   
+
+   <p class="simpara">
+    Non-canonical cast names <code class="literal">(boolean)</code>,
+    <code class="literal">(integer)</code>, <code class="literal">(double)</code>,
+    and <code class="literal">(binary)</code> have been deprecated,
+    use <code class="literal">(bool)</code>, <code class="literal">(int)</code>,
+    <code class="literal">(float)</code>, and <code class="literal">(string)</code> respectively.
+   </p>
+
+  </div>
+
+  <div class="sect3" id="migration85.deprecated.core.case-statements-with-semicolon">
+   <h4 class="title">Terminating case statements with a semicolon</h4>
+   
+
+   <p class="simpara">
+    Terminating case statements with a semicolon instead of a colon has
+    been deprecated.
+   </p>
+
+  </div>
+
+  <div class="sect3" id="migration85.deprecated.core.the-backtick-operator">
+   <h4 class="title">The backtick operator</h4>
+   
+
+   <p class="simpara">
+    <a href="language.operators.execution.html" class="link">The backtick operator</a>
+    as an alias for <span class="function"><a href="function.shell-exec.html" class="function">shell_exec()</a></span> has been deprecated.
+   </p>
+
+  </div>
+
+  <div class="sect3" id="migration85.deprecated.core.return-null-from-debuginfo">
+   <h4 class="title">Returning null from __debugInfo()</h4>
+   
+
+   <p class="simpara">
+    Returning <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong> from
+    <a href="language.oop5.magic.html#language.oop5.magic.debuginfo" class="link">__debugInfo()</a>
+    has been deprecated. Return an empty array instead.
+   </p>
+
+  </div>
+
+  <div class="sect3" id="migration85.deprecated.core.return-memleaks-ini-directive">
+   <h4 class="title">report_memleaks INI directive</h4>
+   
+
+   <p class="simpara">
+    The <a href="errorfunc.configuration.html#ini.report-memleaks" class="link">report_memleaks</a> INI directive
+    has been deprecated.
+   </p>
+
+  </div>
+
+  <div class="sect3" id="migration85.deprecated.core.constant-redeclaration">
+   <h4 class="title">Constant redeclaration</h4>
+   
+
+   <p class="simpara">
+    Constant redeclaration has been deprecated.
+    Note that this already generated a warning and will continue to do so.
+   </p>
+
+  </div>
+
+  <div class="sect3" id="migration85.deprecated.core.closure-binding-issues">
+   <h4 class="title">Closure binding issues</h4>
+   
+
+   <p class="para">
+    The following closure binding issues, which already emit an
+    <strong><code><a href="errorfunc.constants.html#constant.e-warning">E_WARNING</a></code></strong>, are now deprecated:
+
+    <ul class="simplelist">
+     <li>Binding an instance to a static closure.</li>
+     <li>Binding methods to objects that are not instances of the class
+      (or subclass) that the method is defined.</li>
+     <li>Unbinding $this from a method.</li>
+     <li>Unbinding $this from a closure that uses `$this`.</li>
+     <li>Binding a closure to the scope of an internal class.</li>
+     <li>Rebinding the scope of a closure created from a function or method.</li>
+    </ul>
+   </p>
+
+  </div>
+
+  <div class="sect3" id="migration85.deprecated.core.sleep-and-wakeup-magic-methods">
+   <h4 class="title">__sleep() and __wakeup() magic methods</h4>
+   
+   
+
+   <p class="simpara">
+    The <a href="language.oop5.magic.html#object.sleep" class="link">__sleep()</a> and
+    <a href="language.oop5.magic.html#object.wakeup" class="link">__wakeup()</a> magic methods
+    have been soft-deprecated.
+    The <a href="language.oop5.magic.html#object.serialize" class="link">__serialize()</a> and
+    <a href="language.oop5.magic.html#object.unserialize" class="link">__unserialize()</a> magic
+    methods should be used instead, or at the same time if compatibility
+    with PHP 7 is required.
+   </p>
+
+  </div>
+
+  <div class="sect3" id="migration85.deprecated.core.using-null-as-an-array-offset">
+   <h4 class="title">Using null as an array offset</h4>
+   
+
+   <p class="simpara">
+    Using <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong> as an array offset or when calling <span class="function"><a href="function.array-key-exists.html" class="function">array_key_exists()</a></span>
+    is now deprecated. Instead an empty string should be used.
+   </p>
+
+  </div>
+
+  <div class="sect3" id="migration85.deprecated.core.incrementing-non-numeric-strings">
+   <h4 class="title">Incrementing non-numeric strings</h4>
+   
+
+   <p class="simpara">
+    Incrementing non-numeric strings is now deprecated.
+    Instead the <span class="function"><a href="function.str-increment.html" class="function">str_increment()</a></span> function should be used.
+   </p>
+
+  </div>
+
+  <div class="sect3" id="migration85.deprecated.core.register-argc-argv-directive">
+   <h4 class="title">register_argc_argv INI directive</h4>
+   
+
+   <p class="simpara">
+    Deriving <code class="code">$_SERVER[&#039;argc&#039;]</code> and <code class="code">$_SERVER[&#039;argv&#039;]</code>
+    from the query string for non-CLI SAPIs has been deprecated.
+    Configure <code class="literal">register_argc_argv=0</code> and switch to either
+    <var class="varname"><a href="reserved.variables.get.html" class="classname">$_GET</a></var> or <code class="code">$_SERVER[&#039;QUERY_STRING&#039;]</code>
+    to access the information, after verifying that the usage is safe.
+   </p>
+
+  </div>
+
+ </div>
+
+ <div class="sect2" id="migration85.deprecated.curl">
+  <h3 class="title">cURL</h3>
+
+  <p class="simpara">
+   The <span class="function"><a href="function.curl-close.html" class="function">curl_close()</a></span> function has been deprecated,
+   as <span class="classname"><a href="class.curlhandle.html" class="classname">CurlHandle</a></span> objects are freed automatically.
+   
+  </p>
+
+  <p class="simpara">
+   The <span class="function"><a href="function.curl-share-close.html" class="function">curl_share_close()</a></span> function has been deprecated,
+   as <span class="classname"><a href="class.curlsharehandle.html" class="classname">CurlShareHandle</a></span> objects are freed automatically.
+   
+  </p>
+
+ </div>
+
+ <div class="sect2" id="migration85.deprecated.date">
+  <h3 class="title">Date</h3>
+
+  <p class="simpara">
+   The <strong><code><a href="datetime.constants.html#constant.date-rfc7231">DATE_RFC7231</a></code></strong> and
+   <strong><code><a href="class.datetimeinterface.html#datetimeinterface.constants.rfc7231">DateTimeInterface::RFC7231</a></code></strong> constants have been deprecated.
+   This is because the associated timezone is ignored and always uses GMT.
+   
+  </p>
+
+ </div>
+
+ <div class="sect2" id="migration85.deprecated.fileinfo">
+  <h3 class="title">FileInfo</h3>
+
+  <p class="simpara">
+   The <span class="function"><a href="function.finfo-close.html" class="function">finfo_close()</a></span> function has been deprecated.
+   As <span class="classname"><a href="class.finfo.html" class="classname">finfo</a></span> objects are freed automatically.
+   
+  </p>
+
+  <p class="simpara">
+   The <code class="parameter">$context</code> parameter of the
+   <span class="function"><a href="function.finfo-buffer.html" class="function">finfo_buffer()</a></span> function has been deprecated
+   as it is ignored.
+   
+  </p>
+
+ </div>
+
+ <div class="sect2" id="migration85.deprecated.gd">
+  <h3 class="title">GD</h3>
+
+  <p class="simpara">
+   The <span class="function"><a href="function.imagedestroy.html" class="function">imagedestroy()</a></span> function has been deprecated,
+   as <span class="classname"><a href="class.gdimage.html" class="classname">GdImage</a></span> objects are freed automatically.
+   
+  </p>
+
+ </div>
+
+ <div class="sect2" id="migration85.deprecated.hash">
+  <h3 class="title">Hash</h3>
+
+  <p class="simpara">
+   The <strong><code><a href="mhash.constants.html#constant.mhash-adler32">MHASH_<span class="replaceable">*</span></a></code></strong> constants have
+   been deprecated.
+  </p>
+
+ </div>
+
+ <div class="sect2" id="migration85.deprecated.intl">
+  <h3 class="title">Intl</h3>
+
+  <p class="simpara">
+   The <a href="intl.configuration.html#ini.intl.error-level" class="link">intl.error_level</a> INI setting
+   has been deprecated.
+   Errors should either be checked manually or exceptions should be enabled by
+   using the <a href="intl.configuration.html#ini.intl.use-exceptions" class="link">intl.use_exceptions</a>
+   INI setting.
+   
+  </p>
+
+ </div>
+
+ <div class="sect2" id="migration85.deprecated.ldap">
+  <h3 class="title">LDAP</h3>
+
+  <p class="para">
+   Specific Oracle Instant Client calls and constants have been deprecated.
+
+   List of affected calls:
+   <ul class="simplelist">
+    <li><span class="function"><a href="function.ldap-connect.html" class="function">ldap_connect()</a></span> with wallet support</li>
+    <li><span class="function"><a href="function.ldap-connect-wallet.html" class="function">ldap_connect_wallet()</a></span></li>
+   </ul>
+
+   List of affected constants:
+   <ul class="simplelist">
+    <li><strong><code>GSLC_SSL_NO_UATH</code></strong></li>
+    <li><strong><code>GSLC_SSL_ONEWAY_UATH</code></strong></li>
+    <li><strong><code>GSLC_SSL_TWOWAY_UATH</code></strong></li>
+   </ul>
+   
+  </p>
+
+ </div>
+
+ <div class="sect2" id="migration85.deprecated.mysqli">
+  <h3 class="title">MySQLi</h3>
+
+  <p class="simpara">
+   The <span class="function"><a href="function.mysqli-execute.html" class="function">mysqli_execute()</a></span> alias function has been deprecated.
+   Use <span class="function"><a href="mysqli-stmt.execute.html" class="function">mysqli_stmt_execute()</a></span> instead.
+   
+  </p>
+
+ </div>
+
+ <div class="sect2" id="migration85.deprecated.openssl">
+  <h3 class="title">OpenSSL</h3>
+
+  <p class="simpara">
+   The <code class="parameter">$key_length</code> parameter for
+   <span class="function"><a href="function.openssl-pkey-derive.html" class="function">openssl_pkey_derive()</a></span> has been deprecated.
+   This is because it is either ignored, or truncates the key, which can be
+   a security vulnerability.
+   
+  </p>
+
+ </div>
+
+ <div class="sect2" id="migration85.deprecated.pdo">
+  <h3 class="title">PDO</h3>
+
+  <p class="simpara">
+   The <code class="literal">&quot;uri:&quot;</code> DSN scheme has been deprecated due to security concerns with
+   DSNs coming from remote URIs.
+   
+  </p>
+
+  <p class="para">
+   Driver specific constants in the PDO class have been deprecated.
+   List of affected constants and their replacement:
+
+   <ul class="simplelist">
+    <li><strong><code>PDO::DBLIB_ATTR_CONNECTION_TIMEOUT</code></strong> => <strong><code><a href="class.pdo-dblib.html#pdo-dblib.constants.attr-connection-timeout">Pdo\Dblib::ATTR_CONNECTION_TIMEOUT</a></code></strong></li>
+    <li><strong><code>PDO::DBLIB_ATTR_QUERY_TIMEOUT</code></strong> => <strong><code><a href="class.pdo-dblib.html#pdo-dblib.constants.attr-query-timeout">Pdo\Dblib::ATTR_QUERY_TIMEOUT</a></code></strong></li>
+    <li><strong><code>PDO::DBLIB_ATTR_STRINGIFY_UNIQUEIDENTIFIER</code></strong> => <strong><code><a href="class.pdo-dblib.html#pdo-dblib.constants.attr-stringify-uniqueidentifier">Pdo\Dblib::ATTR_STRINGIFY_UNIQUEIDENTIFIER</a></code></strong></li>
+    <li><strong><code>PDO::DBLIB_ATTR_VERSION</code></strong> => <strong><code><a href="class.pdo-dblib.html#pdo-dblib.constants.attr-version">Pdo\Dblib::ATTR_VERSION</a></code></strong></li>
+    <li><strong><code>PDO::DBLIB_ATTR_TDS_VERSION</code></strong> => <strong><code><a href="class.pdo-dblib.html#pdo-dblib.constants.attr-tds-version">Pdo\Dblib::ATTR_TDS_VERSION</a></code></strong></li>
+    <li><strong><code>PDO::DBLIB_ATTR_SKIP_EMPTY_ROWSETS</code></strong> => <strong><code><a href="class.pdo-dblib.html#pdo-dblib.constants.attr-skip-empty-rowsets">Pdo\Dblib::ATTR_SKIP_EMPTY_ROWSETS</a></code></strong></li>
+    <li><strong><code>PDO::DBLIB_ATTR_DATETIME_CONVERT</code></strong> => <strong><code><a href="class.pdo-dblib.html#pdo-dblib.constants.attr-datetime-convert">Pdo\Dblib::ATTR_DATETIME_CONVERT</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-firebird.html#pdo.constants.fb-attr-date-format">PDO::FB_ATTR_DATE_FORMAT</a></code></strong> => <strong><code><a href="class.pdo-firebird.html#pdo-firebird.constants.attr-date-format">Pdo\Firebird::ATTR_DATE_FORMAT</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-firebird.html#pdo.constants.fb-attr-time-format">PDO::FB_ATTR_TIME_FORMAT</a></code></strong> => <strong><code><a href="class.pdo-firebird.html#pdo-firebird.constants.attr-time-format">Pdo\Firebird::ATTR_TIME_FORMAT</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-firebird.html#pdo.constants.fb-attr-timestamp-format">PDO::FB_ATTR_TIMESTAMP_FORMAT</a></code></strong> => <strong><code><a href="class.pdo-firebird.html#pdo-firebird.constants.attr-timestamp-format">Pdo\Firebird::ATTR_TIMESTAMP_FORMAT</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-use-buffered-query">PDO::MYSQL_ATTR_USE_BUFFERED_QUERY</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-use-buffered-query">Pdo\Mysql::ATTR_USE_BUFFERED_QUERY</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-local-infile">PDO::MYSQL_ATTR_LOCAL_INFILE</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-local-infile">Pdo\Mysql::ATTR_LOCAL_INFILE</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-local-infile-directory">PDO::MYSQL_ATTR_LOCAL_INFILE_DIRECTORY</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-local-infile-directory">Pdo\Mysql::ATTR_LOCAL_INFILE_DIRECTORY</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-init-command">PDO::MYSQL_ATTR_INIT_COMMAND</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-init-command">Pdo\Mysql::ATTR_INIT_COMMAND</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-max-buffer-size">PDO::MYSQL_ATTR_MAX_BUFFER_SIZE</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-max-buffer-size">Pdo\Mysql::ATTR_MAX_BUFFER_SIZE</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-read-default-file">PDO::MYSQL_ATTR_READ_DEFAULT_FILE</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-read-default-file">Pdo\Mysql::ATTR_READ_DEFAULT_FILE</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-read-default-group">PDO::MYSQL_ATTR_READ_DEFAULT_GROUP</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-read-default-group">Pdo\Mysql::ATTR_READ_DEFAULT_GROUP</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-compress">PDO::MYSQL_ATTR_COMPRESS</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-compress">Pdo\Mysql::ATTR_COMPRESS</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-direct-query">PDO::MYSQL_ATTR_DIRECT_QUERY</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-direct-query">Pdo\Mysql::ATTR_DIRECT_QUERY</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-found-rows">PDO::MYSQL_ATTR_FOUND_ROWS</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-found-rows">Pdo\Mysql::ATTR_FOUND_ROWS</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-ignore-space">PDO::MYSQL_ATTR_IGNORE_SPACE</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-ignore-space">Pdo\Mysql::ATTR_IGNORE_SPACE</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-ssl-key">PDO::MYSQL_ATTR_SSL_KEY</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-ssl-key">Pdo\Mysql::ATTR_SSL_KEY</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-ssl-cert">PDO::MYSQL_ATTR_SSL_CERT</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-ssl-cert">Pdo\Mysql::ATTR_SSL_CERT</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-ssl-ca">PDO::MYSQL_ATTR_SSL_CA</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-ssl-ca">Pdo\Mysql::ATTR_SSL_CA</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-ssl-capath">PDO::MYSQL_ATTR_SSL_CAPATH</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-ssl-capath">Pdo\Mysql::ATTR_SSL_CAPATH</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-ssl-cipher">PDO::MYSQL_ATTR_SSL_CIPHER</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-ssl-cipher">Pdo\Mysql::ATTR_SSL_CIPHER</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-ssl-verify-server-cert">PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-ssl-verify-server-cert">Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-server-public-key">PDO::MYSQL_ATTR_SERVER_PUBLIC_KEY</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-server-public-key">Pdo\Mysql::ATTR_SERVER_PUBLIC_KEY</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-mysql.html#pdo.constants.mysql-attr-multi-statements">PDO::MYSQL_ATTR_MULTI_STATEMENTS</a></code></strong> => <strong><code><a href="class.pdo-mysql.html#pdo-mysql.constants.attr-multi-statements">Pdo\Mysql::ATTR_MULTI_STATEMENTS</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-odbc.html#pdo.constants.odbc-attr-use-cursor-library">PDO::ODBC_ATTR_USE_CURSOR_LIBRARY</a></code></strong> => <strong><code><a href="class.pdo-odbc.html#pdo-odbc.constants.attr-use-cursor-library">Pdo\Odbc::ATTR_USE_CURSOR_LIBRARY</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-odbc.html#pdo.constants.odbc-attr-assume-utf8">PDO::ODBC_ATTR_ASSUME_UTF8</a></code></strong> => <strong><code><a href="class.pdo-odbc.html#pdo-odbc.constants.attr-assume-utf8">Pdo\Odbc::ATTR_ASSUME_UTF8</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-odbc.html#pdo.constants.odbc-sql-use-if-needed">PDO::ODBC_SQL_USE_IF_NEEDED</a></code></strong> => <strong><code><a href="class.pdo-odbc.html#pdo-odbc.constants.sql-use-if-needed">Pdo\Odbc::SQL_USE_IF_NEEDED</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-odbc.html#pdo.constants.odbc-sql-use-driver">PDO::ODBC_SQL_USE_DRIVER</a></code></strong> => <strong><code><a href="class.pdo-odbc.html#pdo-odbc.constants.sql-use-driver">Pdo\Odbc::SQL_USE_DRIVER</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-odbc.html#pdo.constants.odbc-sql-use-odbc">PDO::ODBC_SQL_USE_ODBC</a></code></strong> => <strong><code><a href="class.pdo-odbc.html#pdo-odbc.constants.sql-use-odbc">Pdo\Odbc::SQL_USE_ODBC</a></code></strong></li>
+    <li><strong><code><a href="ref.pdo-pgsql.html#pdo.constants.pgsql-attr-disable-prepares">PDO::PGSQL_ATTR_DISABLE_PREPARES</a></code></strong> => <strong><code><a href="class.pdo-pgsql.html#pdo-pgsql.constants.attr-disable-prepares">Pdo\Pgsql::ATTR_DISABLE_PREPARES</a></code></strong></li>
+    <li><strong><code>PDO::SQLITE_ATTR_EXTENDED_RESULT_CODES</code></strong> => <strong><code><a href="class.pdo-sqlite.html#pdo-sqlite.constants.attr-extended-result-codes">Pdo\Sqlite::ATTR_EXTENDED_RESULT_CODES</a></code></strong></li>
+    <li><strong><code>PDO::SQLITE_ATTR_OPEN_FLAGS</code></strong> => <strong><code>Pdo\Sqlite::OPEN_FLAGS</code></strong></li>
+    <li><strong><code>PDO::SQLITE_ATTR_READONLY_STATEMENT</code></strong> => <strong><code><a href="class.pdo-sqlite.html#pdo-sqlite.constants.attr-readonly-statement">Pdo\Sqlite::ATTR_READONLY_STATEMENT</a></code></strong></li>
+    <li><strong><code><a href="pdo.constants.html#pdo.constants.sqlite-deterministic">PDO::SQLITE_DETERMINISTIC</a></code></strong> => <strong><code><a href="class.pdo-sqlite.html#pdo-sqlite.constants.deterministic">Pdo\Sqlite::DETERMINISTIC</a></code></strong></li>
+    <li><strong><code>PDO::SQLITE_OPEN_READONLY</code></strong> => <strong><code><a href="class.pdo-sqlite.html#pdo-sqlite.constants.open-readonly">Pdo\Sqlite::OPEN_READONLY</a></code></strong></li>
+    <li><strong><code>PDO::SQLITE_OPEN_READWRITE</code></strong> => <strong><code><a href="class.pdo-sqlite.html#pdo-sqlite.constants.open-readwrite">Pdo\Sqlite::OPEN_READWRITE</a></code></strong></li>
+    <li><strong><code>PDO::SQLITE_OPEN_CREATE</code></strong> => <strong><code><a href="class.pdo-sqlite.html#pdo-sqlite.constants.open-create">Pdo\Sqlite::OPEN_CREATE</a></code></strong></li>
+   </ul>
+   
+  </p>
+
+  <p class="para">
+   Driver specific methods in the PDO class have been deprecated.
+   List of affected methods and their replacement:
+
+   <ul class="simplelist">
+    <li><span class="methodname"><a href="pdo.pgsqlcopyfromarray.html" class="methodname">PDO::pgsqlCopyFromArray()</a></span> => <span class="methodname"><a href="pdo-pgsql.copyfromarray.html" class="methodname">Pdo\Pgsql::copyFromArray()</a></span></li>
+    <li><span class="methodname"><a href="pdo.pgsqlcopyfromfile.html" class="methodname">PDO::pgsqlCopyFromFile()</a></span> => <span class="methodname"><a href="pdo-pgsql.copyfromfile.html" class="methodname">Pdo\Pgsql::copyFromFile()</a></span></li>
+    <li><span class="methodname"><a href="pdo.pgsqlcopytoarray.html" class="methodname">PDO::pgsqlCopyToArray()</a></span> => <span class="methodname"><a href="pdo-pgsql.copytoarray.html" class="methodname">Pdo\Pgsql::copyToArray()</a></span></li>
+    <li><span class="methodname"><a href="pdo.pgsqlcopytofile.html" class="methodname">PDO::pgsqlCopyToFile()</a></span> => <span class="methodname"><a href="pdo-pgsql.copytofile.html" class="methodname">Pdo\Pgsql::copyToFile()</a></span></li>
+    <li><span class="methodname"><a href="pdo.pgsqlgetnotify.html" class="methodname">PDO::pgsqlGetNotify()</a></span> => <span class="methodname"><a href="pdo-pgsql.getnotify.html" class="methodname">Pdo\Pgsql::getNotify()</a></span></li>
+    <li><span class="methodname"><a href="pdo.pgsqlgetpid.html" class="methodname">PDO::pgsqlGetPid()</a></span> => <span class="methodname"><a href="pdo-pgsql.getpid.html" class="methodname">Pdo\Pgsql::getPid()</a></span></li>
+    <li><span class="methodname"><a href="pdo.pgsqllobcreate.html" class="methodname">PDO::pgsqlLOBCreate()</a></span> => <span class="methodname"><a href="pdo-pgsql.lobcreate.html" class="methodname">Pdo\Pgsql::lobCreate()</a></span></li>
+    <li><span class="methodname"><a href="pdo.pgsqllobopen.html" class="methodname">PDO::pgsqlLOBOpen()</a></span> => <span class="methodname"><a href="pdo-pgsql.lobopen.html" class="methodname">Pdo\Pgsql::lobOpen()</a></span></li>
+    <li><span class="methodname"><a href="pdo.pgsqllobunlink.html" class="methodname">PDO::pgsqlLOBUnlink()</a></span> => <span class="methodname"><a href="pdo-pgsql.lobunlink.html" class="methodname">Pdo\Pgsql::lobUnlink()</a></span></li>
+    <li><span class="methodname"><a href="pdo.sqlitecreateaggregate.html" class="methodname">PDO::sqliteCreateAggregate()</a></span> => <span class="methodname"><a href="pdo-sqlite.createaggregate.html" class="methodname">Pdo\Sqlite::createAggregate()</a></span></li>
+    <li><span class="methodname"><a href="pdo.sqlitecreatecollation.html" class="methodname">PDO::sqliteCreateCollation()</a></span> => <span class="methodname"><a href="pdo-sqlite.createcollation.html" class="methodname">Pdo\Sqlite::createCollation()</a></span></li>
+    <li><span class="methodname"><a href="pdo.sqlitecreatefunction.html" class="methodname">PDO::sqliteCreateFunction()</a></span> => <span class="methodname"><a href="pdo-sqlite.createfunction.html" class="methodname">Pdo\Sqlite::createFunction()</a></span></li>
+   </ul>
+   
+  </p>
+
+ </div>
+
+ <div class="sect2" id="migration85.deprecated.pdo-pgsql">
+  <h3 class="title">PDO_PGSQL</h3>
+
+  <p class="para">
+   Constants related to transaction states have been deprecated as this feature is unavailable with PDO:
+
+   <ul class="simplelist">
+    <li><strong><code>PDO::PGSQL_TRANSACTION_IDLE</code></strong></li>
+    <li><strong><code>PDO::PGSQL_TRANSACTION_ACTIVE</code></strong></li>
+    <li><strong><code>PDO::PGSQL_TRANSACTION_INTRANS</code></strong></li>
+    <li><strong><code>PDO::PGSQL_TRANSACTION_INERROR</code></strong></li>
+    <li><strong><code>PDO::PGSQL_TRANSACTION_UNKNOWN</code></strong></li>
+   </ul>
+   
+  </p>
+
+ </div>
+
+ <div class="sect2" id="migration85.deprecated.reflection">
+  <h3 class="title">Reflection</h3>
+
+  <p class="simpara">
+    The <code class="code">setAccessible()</code> methods of various Reflection objects have been
+    deprecated, as those no longer have an effect.
+    
+  </p>
+
+  <p class="simpara">
+   Calling <span class="methodname"><a href="reflectionclass.getconstant.html" class="methodname">ReflectionClass::getConstant()</a></span> for constants
+   that do not exist has been deprecated.
+   
+  </p>
+
+  <p class="simpara">
+   Calling <span class="methodname"><a href="reflectionproperty.getdefaultvalue.html" class="methodname">ReflectionProperty::getDefaultValue()</a></span> for
+   properties without default values has been deprecated.
+   
+  </p>
+
+ </div>
+
+ <div class="sect2" id="migration85.deprecated.spl">
+  <h3 class="title">SPL</h3>
+
+  <p class="simpara">
+   Unregistering all autoloaders by passing the
+   <span class="function"><a href="function.spl-autoload-call.html" class="function">spl_autoload_call()</a></span> function as a callback argument to
+   <span class="function"><a href="function.spl-autoload-unregister.html" class="function">spl_autoload_unregister()</a></span> has been deprecated.
+   Instead if this is needed, one should iterate over the return value of
+   <span class="function"><a href="function.spl-autoload-functions.html" class="function">spl_autoload_functions()</a></span> and call
+   <span class="function"><a href="function.spl-autoload-unregister.html" class="function">spl_autoload_unregister()</a></span> on each value.
+   
+  </p>
+
+  <p class="simpara">
+   The <span class="methodname"><a href="splobjectstorage.contains.html" class="methodname">SplObjectStorage::contains()</a></span>,
+   <span class="methodname"><a href="splobjectstorage.attach.html" class="methodname">SplObjectStorage::attach()</a></span>, and
+   <span class="methodname"><a href="splobjectstorage.detach.html" class="methodname">SplObjectStorage::detach()</a></span> methods have been deprecated
+   in favour of <span class="methodname"><a href="splobjectstorage.offsetexists.html" class="methodname">SplObjectStorage::offsetExists()</a></span>,
+   <span class="methodname"><a href="splobjectstorage.offsetset.html" class="methodname">SplObjectStorage::offsetSet()</a></span>, and
+   <span class="methodname"><a href="splobjectstorage.offsetunset.html" class="methodname">SplObjectStorage::offsetUnset()</a></span> respectively.
+   
+  </p>
+
+  <p class="simpara">
+   Using <span class="classname"><a href="class.arrayobject.html" class="classname">ArrayObject</a></span> and
+   <span class="classname"><a href="class.arrayiterator.html" class="classname">ArrayIterator</a></span> with objects has been deprecated.
+   
+  </p>
+
+ </div>
+
+ <div class="sect2" id="migration85.deprecated.standard">
+  <h3 class="title">Standard</h3>
+
+  <p class="simpara">
+   The <span class="function"><a href="function.socket-set-timeout.html" class="function">socket_set_timeout()</a></span> alias function has been deprecated.
+   Use <span class="function"><a href="function.stream-set-timeout.html" class="function">stream_set_timeout()</a></span> instead.
+   
+  </p>
+
+  <p class="simpara">
+   Passing <strong><code><a href="reserved.constants.html#constant.null">null</a></code></strong> to <span class="function"><a href="function.readdir.html" class="function">readdir()</a></span>,
+   <span class="function"><a href="function.rewinddir.html" class="function">rewinddir()</a></span>, and <span class="function"><a href="function.closedir.html" class="function">closedir()</a></span>
+   to use the last opened directory has been deprecated.
+   Provide the last opened directory explicitly instead.
+   
+  </p>
+
+  <p class="simpara">
+   Passing integers outside the interval <code class="literal">[0, 255]</code> to <span class="function"><a href="function.chr.html" class="function">chr()</a></span>
+   is now deprecated.
+   This is because a byte can only hold a value within this interval.
+   
+  </p>
+
+  <p class="simpara">
+   Passing a string which is not a single byte to <span class="function"><a href="function.ord.html" class="function">ord()</a></span>
+   is now deprecated, this is indicative of a bug.
+   
+  </p>
+
+  <p class="simpara">
+   The locally predefined variable
+   <a href="reserved.variables.httpresponseheader.html" class="link">$http_response_header</a>
+   is deprecated. Instead one should call the
+   <span class="function"><a href="function.http-get-last-response-headers.html" class="function">http_get_last_response_headers()</a></span> function.
+   
+  </p>
+
+ </div>
+
+ <div class="sect2" id="migration85.deprecated.xml">
+  <h3 class="title">XML</h3>
+
+  <p class="simpara">
+   The <span class="function"><a href="function.xml-parser-free.html" class="function">xml_parser_free()</a></span> function has been deprecated,
+   as <span class="classname"><a href="class.xmlparser.html" class="classname">XMLParser</a></span> objects are freed automatically.
+   
+  </p>
+
+ </div>
+
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

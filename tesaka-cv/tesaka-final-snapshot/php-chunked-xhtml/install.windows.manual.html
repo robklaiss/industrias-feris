@@ -1,0 +1,218 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Manual installation of pre-built binaries</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="install.windows.recommended.html" class="navbar__link">« Recommended configuration on Windows systems</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="install.windows.apache2.html" class="navbar__link">Installation for Apache 2.x on Windows systems »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="install.windows.html">Installation on Windows systems</a></li>
+        <li>Manual installation of pre-built binaries</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="install.windows.manual" class="sect1">
+ <h2 class="title">Manual installation of pre-built binaries</h2>
+
+ <div class="simplesect" id="install.windows.requirements">
+  <h3 class="title">Installation requirements</h3>
+  <p class="simpara">
+   PHP is only available for 32-bit x86 or 64-bit x64 systems, and does
+   not currently run on Windows RT or Windows on ARM.
+   As of version 8.3.0, PHP requires Windows 8 or Windows Server 2012.
+   Versions after 7.2.0 required Windows 2008 R2 or Windows 7.
+   Versions before 7.2.0 supported Windows 2008 and Vista.
+  </p>
+
+  <p class="simpara">
+   PHP requires the Visual C runtime (CRT). Many other applications also
+   require it, so it is likely to already be installed, but if it is
+   not the Microsoft Visual C++ Redistributable for Visual Studio 2022
+   is suitable for use with all PHP versions and can be
+   <a href="https://visualstudio.microsoft.com/downloads/#microsoft-visual-c-redistributable-for-visual-studio-2022" class="link external">&raquo;&nbsp;downloaded from Microsoft</a>.
+  </p>
+
+  <p class="simpara">
+   The x86 CRT must be downloaded for use with PHP x86 builds and the
+   x64 CRT for PHP x64 builds.
+   If CRT is already installed, the installer will display a message
+   that it was already installed and not make any changes.
+   The CRT installer supports the <strong class="option unknown">/quiet</strong> and
+   <strong class="option unknown">/norestart</strong> command-line switches, so the installation
+   can be scripted.
+  </p>
+ </div>
+
+ <div class="simplesect">
+  <h3 class="title">Where to download PHP binaries</h3>
+  <p class="simpara">
+   Windows builds can be downloaded from <a href="https://windows.php.net/download/" class="link external">&raquo;&nbsp;the
+   PHP Windows website</a>.
+   All builds are optimized (<abbr class="abbrev">PGO</abbr>), and QA and GA releases
+   are thoroughly tested.
+  </p>
+ </div>
+
+ <div class="simplesect" id="install.windows.pecl">
+  <h3 class="title">Pre-built PECL Extensions</h3>
+  <p class="para">
+   Pre-built Windows versions of PECL extensions are distributed as DLL
+   files on the extension&#039;s PECL page.
+  </p>
+  <p class="para">
+   Binaries are not available for extensions that use features specific
+   to other systems, like Unix, or depend on libraries that are not
+   available on Windows.
+  </p>
+ </div>
+
+
+ <div class="simplesect">
+  <h3 class="title">Build types</h3>
+  <p class="para">
+   There are four types of PHP builds:
+   <ul class="itemizedlist">
+    <li class="listitem">
+     <p class="para">Thread-Safe (TS) - for single process web servers, like Apache with mod_php</p>
+    </li>
+    <li class="listitem">
+     <p class="para">Non-Thread-Safe (NTS) - for IIS and other FastCGI web servers (Apache with mod_fastcgi) and recommended for command-line scripts</p>
+    </li>
+    <li class="listitem">
+     <p class="para">x86 - for 32-bit systems.</p>
+    </li>
+    <li class="listitem">
+     <p class="para">x64 - for 64-bit systems.</p>
+    </li>
+   </ul>
+  </p>
+ </div>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

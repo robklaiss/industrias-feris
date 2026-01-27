@@ -1,0 +1,269 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Array Operators</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="language.operators.string.html" class="navbar__link">« String</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="language.operators.type.html" class="navbar__link">Type »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="language.operators.html">Operators</a></li>
+        <li>Array Operators</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="language.operators.array" class="sect1">
+ <h2 class="title">Array Operators</h2>
+ 
+ <table class="doctable table">
+  <caption><strong>Array Operators</strong></caption>
+  
+   <thead>
+    <tr>
+     <th>Example</th>
+     <th>Name</th>
+     <th>Result</th>
+    </tr>
+
+   </thead>
+
+   <tbody class="tbody">
+    <tr>
+     <td>$a + $b</td>
+     <td>Union</td>
+     <td>Union of <var class="varname">$a</var> and <var class="varname">$b</var>.</td>
+    </tr>
+
+    <tr>
+     <td>$a == $b</td>
+     <td>Equality</td>
+     <td><strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong> if <var class="varname">$a</var> and <var class="varname">$b</var> have the same key/value pairs.</td>
+    </tr>
+
+    <tr>
+     <td>$a === $b</td>
+     <td>Identity</td>
+     <td><strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong> if <var class="varname">$a</var> and <var class="varname">$b</var> have the same key/value pairs in the same
+      order and of the same types.</td>
+    </tr>
+
+    <tr>
+     <td>$a != $b</td>
+     <td>Inequality</td>
+     <td><strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong> if <var class="varname">$a</var> is not equal to <var class="varname">$b</var>.</td>
+    </tr>
+
+    <tr>
+     <td>$a &lt;&gt; $b</td>
+     <td>Inequality</td>
+     <td><strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong> if <var class="varname">$a</var> is not equal to <var class="varname">$b</var>.</td>
+    </tr>
+
+    <tr>
+     <td>$a !== $b</td>
+     <td>Non-identity</td>
+     <td><strong><code><a href="reserved.constants.html#constant.true">true</a></code></strong> if <var class="varname">$a</var> is not identical to <var class="varname">$b</var>.</td>
+    </tr>
+
+   </tbody>
+  
+ </table>
+
+ <p class="para">
+  The <code class="literal">+</code> operator returns the right-hand array appended
+  to the left-hand array; for keys that exist in both arrays, the elements
+  from the left-hand array will be used, and the matching elements from the
+  right-hand array will be ignored.
+ </p>
+ <p class="para">
+  <div class="example" id="example-1">
+   <p><strong>Example #1 Array Append Operator</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$a </span><span style="color: #007700">= array(</span><span style="color: #DD0000">"a" </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">"apple"</span><span style="color: #007700">, </span><span style="color: #DD0000">"b" </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">"banana"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$b </span><span style="color: #007700">= array(</span><span style="color: #DD0000">"a" </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">"pear"</span><span style="color: #007700">, </span><span style="color: #DD0000">"b" </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">"strawberry"</span><span style="color: #007700">, </span><span style="color: #DD0000">"c" </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">"cherry"</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$c </span><span style="color: #007700">= </span><span style="color: #0000BB">$a </span><span style="color: #007700">+ </span><span style="color: #0000BB">$b</span><span style="color: #007700">; </span><span style="color: #FF8000">// Union of $a and $b<br /></span><span style="color: #007700">echo </span><span style="color: #DD0000">"Union of \$a and \$b: \n"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$c</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$c </span><span style="color: #007700">= </span><span style="color: #0000BB">$b </span><span style="color: #007700">+ </span><span style="color: #0000BB">$a</span><span style="color: #007700">; </span><span style="color: #FF8000">// Union of $b and $a<br /></span><span style="color: #007700">echo </span><span style="color: #DD0000">"Union of \$b and \$a: \n"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$c</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">$a </span><span style="color: #007700">+= </span><span style="color: #0000BB">$b</span><span style="color: #007700">; </span><span style="color: #FF8000">// Union of $a += $b is $a and $b<br /></span><span style="color: #007700">echo </span><span style="color: #DD0000">"Union of \$a += \$b: \n"</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+   <div class="example-contents"><p>The above example will output:</p></div>
+   <div class="example-contents screen">
+<div class="annotation-interactive cdata"><pre>
+Union of $a and $b:
+array(3) {
+  [&quot;a&quot;]=&gt;
+  string(5) &quot;apple&quot;
+  [&quot;b&quot;]=&gt;
+  string(6) &quot;banana&quot;
+  [&quot;c&quot;]=&gt;
+  string(6) &quot;cherry&quot;
+}
+Union of $b and $a:
+array(3) {
+  [&quot;a&quot;]=&gt;
+  string(4) &quot;pear&quot;
+  [&quot;b&quot;]=&gt;
+  string(10) &quot;strawberry&quot;
+  [&quot;c&quot;]=&gt;
+  string(6) &quot;cherry&quot;
+}
+Union of $a += $b:
+array(3) {
+  [&quot;a&quot;]=&gt;
+  string(5) &quot;apple&quot;
+  [&quot;b&quot;]=&gt;
+  string(6) &quot;banana&quot;
+  [&quot;c&quot;]=&gt;
+  string(6) &quot;cherry&quot;
+}
+</pre></div>
+   </div>
+  </div>
+ </p>
+ <p class="para">
+  Elements of arrays are equal for the comparison if they have the
+  same key and value.
+ </p>
+ <p class="para">
+  <div class="example" id="example-2">
+   <p><strong>Example #2 Comparing arrays</strong></p>
+   <div class="example-contents">
+<div class="annotation-interactive phpcode"><code><span style="color: #000000"><span style="color: #0000BB">&lt;?php<br />$a </span><span style="color: #007700">= array(</span><span style="color: #DD0000">"apple"</span><span style="color: #007700">, </span><span style="color: #DD0000">"banana"</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$b </span><span style="color: #007700">= array(</span><span style="color: #0000BB">1 </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">"banana"</span><span style="color: #007700">, </span><span style="color: #DD0000">"0" </span><span style="color: #007700">=&gt; </span><span style="color: #DD0000">"apple"</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a </span><span style="color: #007700">== </span><span style="color: #0000BB">$b</span><span style="color: #007700">); </span><span style="color: #FF8000">// bool(true)<br /></span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$a </span><span style="color: #007700">=== </span><span style="color: #0000BB">$b</span><span style="color: #007700">); </span><span style="color: #FF8000">// bool(false)<br /></span><span style="color: #0000BB">?&gt;</span></span></code></div>
+   </div>
+
+  </div>
+ </p>
+
+ <div class="sect2">
+  <h3 class="title">See Also</h3>
+  <p class="para">
+   <ul class="simplelist">
+    <li><a href="language.types.array.html" class="link">Array type</a></li>
+    <li><a href="ref.array.html" class="link">Array functions</a></li>
+   </ul>
+  </p>
+ </div>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>

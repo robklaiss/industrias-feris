@@ -1,0 +1,293 @@
+    <!DOCTYPE HTML>
+    <html>
+     <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <style>
+        .navbar__local {
+          flex-grow: 1;
+          display: grid;
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr min-content 1fr;
+          margin: 0;
+          height: 100%;
+          
+          .navbar__item {
+            align-content: center;
+          }
+          .navbar__link {
+            display: inline;
+          }
+          .search {
+            text-align: center;
+          }
+          .next {
+            text-align: right;
+          }
+        }
+      </style>
+      <title>Changed functions</title>
+      <link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-base.css" />
+<link media="all" rel="stylesheet" type="text/css" href="styles/03e73060321a0a848018724a6c83de7f-theme-medium.css" />
+
+     </head>
+     <body class="docs">    <div class="navbar navbar-fixed-top">
+      <div class="navbar__inner clearfix">
+          <ul class="navbar__local">
+            <li class="navbar__item prev"><a href="migration71.deprecated.html" class="navbar__link">« Deprecated features in PHP 7.1.x</a></li>
+            <li class="navbar__item search">
+              <!-- Desktop encanced search -->
+              <button
+                id="navbar__search-button"
+                class="navbar__search-button"
+                hidden
+              >
+                    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+                Search
+              </button>
+            </li>
+            <li class="navbar__item next"><a href="migration71.other-changes.html" class="navbar__link">Other changes »</a></li>
+          </ul>
+      </div>
+    </div>    <div id="breadcrumbs" class="clearfix">
+      <ul class="breadcrumbs-container">
+        <li><a href="index.html">PHP Manual</a></li>
+        <li><a href="migration71.html">Migrating from PHP 7.0.x to PHP 7.1.x</a></li>
+        <li>Changed functions</li>
+      </ul>
+    </div>    <div id="layout">
+      <div id="layout-content"><div id="migration71.changed-functions" class="sect1">
+ <h2 class="title">Changed functions</h2>
+
+ <div class="sect2" id="migration71.changed-functions.core">
+  <h3 class="title">PHP Core</h3>
+  
+
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.getopt.html" class="function">getopt()</a></span> has an optional third parameter that exposes
+     the index of the next element in the argument vector list to be processed.
+     This is done via a by-ref parameter.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.getenv.html" class="function">getenv()</a></span> no longer requires its parameter. If the
+     parameter is omitted, then the current environment variables will be
+     returned as an associative array.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.get-headers.html" class="function">get_headers()</a></span> now has an additional parameter to enable
+     for the passing of custom stream contexts.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.output-reset-rewrite-vars.html" class="function">output_reset_rewrite_vars()</a></span> no longer resets session
+     URL rewrite variables.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.parse-url.html" class="function">parse_url()</a></span> is now more restrictive and supports
+     RFC3986.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.unpack.html" class="function">unpack()</a></span> now accepts an optional third parameter to
+     specify the offset to begin unpacking from.
+    </span>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration71.changed-functions.filesystem">
+  <h3 class="title">File System</h3>
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.file-get-contents.html" class="function">file_get_contents()</a></span> now accepts a negative seek offset
+     if the stream is seekable.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.tempnam.html" class="function">tempnam()</a></span> now emits a notice when falling back to the
+     system&#039;s temp directory.
+    </span>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration71.changed-functions.json">
+  <h3 class="title">JSON</h3>
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.json-encode.html" class="function">json_encode()</a></span> now accepts a new option,
+     <strong><code><a href="json.constants.html#constant.json-unescaped-line-terminators">JSON_UNESCAPED_LINE_TERMINATORS</a></code></strong>, to disable the
+     escaping of U+2028 and U+2029 characters when
+     <strong><code><a href="json.constants.html#constant.json-unescaped-unicode">JSON_UNESCAPED_UNICODE</a></code></strong> is supplied.
+    </span>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration71.changed-functions.mbstring">
+  <h3 class="title">Multibyte String</h3>
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.mb-ereg.html" class="function">mb_ereg()</a></span> now rejects illegal byte sequences.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.mb-ereg-replace.html" class="function">mb_ereg_replace()</a></span> now rejects illegal byte sequences.
+    </span>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration71.changed-functions.pdo">
+  <h3 class="title">PDO</h3>
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <span class="methodname"><a href="pdo.lastinsertid.html" class="methodname">PDO::lastInsertId()</a></span> for PostgreSQL will now trigger an error
+     when <code class="literal">nextval</code> has not been called for the current
+     session (the postgres connection).
+    </span>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration71.changed-functions.pgsql">
+  <h3 class="title">PostgreSQL</h3>
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.pg-last-notice.html" class="function">pg_last_notice()</a></span> now accepts an optional parameter to
+     specify an operation. This can be done with one of the following new
+     constants: <strong><code><a href="pgsql.constants.html#constant.pgsql-notice-last">PGSQL_NOTICE_LAST</a></code></strong>,
+     <strong><code><a href="pgsql.constants.html#constant.pgsql-notice-all">PGSQL_NOTICE_ALL</a></code></strong>, or
+     <strong><code><a href="pgsql.constants.html#constant.pgsql-notice-clear">PGSQL_NOTICE_CLEAR</a></code></strong>.
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.pg-fetch-all.html" class="function">pg_fetch_all()</a></span> now accepts an optional second parameter
+     to specify the result type (similar to the third parameter of
+     <span class="function"><a href="function.pg-fetch-array.html" class="function">pg_fetch_array()</a></span>).
+    </span>
+   </li>
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.pg-select.html" class="function">pg_select()</a></span> now accepts an optional fourth parameter to
+     specify the result type (similar to the third parameter of
+     <span class="function"><a href="function.pg-fetch-array.html" class="function">pg_fetch_array()</a></span>).
+    </span>
+   </li>
+  </ul>
+ </div>
+
+ <div class="sect2" id="migration71.changed-functions.session">
+  <h3 class="title">Session</h3>
+  <ul class="itemizedlist">
+   <li class="listitem">
+    <span class="simpara">
+     <span class="function"><a href="function.session-start.html" class="function">session_start()</a></span> now returns <strong><code><a href="reserved.constants.html#constant.false">false</a></code></strong> and no longer
+     initializes <var class="varname"><a href="reserved.variables.session.html" class="classname">$_SESSION</a></var> when it failed to start the
+     session.
+    </span>
+   </li>
+  </ul>
+ </div>
+</div></div></div><script type="text/javascript" src="search-combined.js"></script><script type="text/javascript" src="js/67ae199ee27cc87120cab9ba49d1b776-FuzzySearch.min.js"></script><script type="text/javascript" src="js/f5555778cd757f2cb49676062898832b-search.js"></script>    <div id="search-modal__backdrop" class="search-modal__backdrop">
+      <div
+        role="dialog"
+        aria-label="Search modal"
+        id="search-modal"
+        class="search-modal"
+      >
+        <div class="search-modal__header">
+          <div class="search-modal__form">
+            <div class="search-modal__input-icon">
+              <!-- https://feathericons.com search -->
+              <svg xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                width="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search-modal__input"
+              class="search-modal__input"
+              placeholder="Search docs"
+              aria-label="Search docs"
+            />
+          </div>
+    
+          <button aria-label="Close" class="search-modal__close">
+            <!-- https://pictogrammers.com/library/mdi/icon/close/ -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              width="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+          </button>
+        </div>
+        <div
+          role="listbox"
+          aria-label="Search results"
+          id="search-modal__results"
+          class="search-modal__results"
+        ></div>
+        <div class="search-modal__helper-text">
+          <div>
+            <kbd>↑</kbd> and <kbd>↓</kbd> to navigate •
+            <kbd>Enter</kbd> to select •
+            <kbd>Esc</kbd> to close • <kbd>/</kbd> to open
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            /*{{{Search Modal*/
+            const language = 'local';
+            initSearchModal();
+            initPHPSearch(language).then((searchCallback) => {
+                initSearchUI({language, searchCallback, limit: 30});
+            });
+            /*}}}*/
+        });
+    </script></body></html>
